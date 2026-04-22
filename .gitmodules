@@ -1,0 +1,3 @@
+[submodule "modules/KnowledgeBase"]
+	path = modules/KnowledgeBase
+	url = git@github.com:dbrowneup/KnowledgeBase.git
