@@ -66,7 +66,7 @@ planning on hypothetical ones. Ship rough, learn, iterate.
 ### Evidence beats intuition
 
 Plateau points get resolved by measurement, not argument. Flash-moe pattern: set a metric, set
-a goal, iterate until the goal is hit. Keep-or-revert by git. 42% of experiments being
+a goal, devise tests, and iterate until the goal is hit. Keep-or-revert by git. 42% of experiments being
 discarded is a sign the search is working.
 
 ## Hardware Constraints
