@@ -54,11 +54,12 @@ What Linus the project inherits from Pauling:
 - **Long horizons.** Two Nobels, decades apart, in different fields. Linus the project has
   no v1 deadline. It is an open-ended practice.
 
-Pauling's favorite element — reportedly — was oxygen, for its role in the biology he studied
-later. His early work was on carbon's tetravalent sp³ hybridization. Carbon is the logo.
-Carbon is the substrate of biochemistry, Dan's field. Carbon-based life meeting
-silicon-based intelligence is a nice conceptual hook and a reminder that the two have always
-been more entangled than the hardware/software split makes them look.
+Pauling's favorite element is unknown, but it could have been oxygen, for its role in the 
+biology he studied later. It could also have been carbon, as his early work was on carbon's 
+tetravalent sp³ hybridization. Carbon is the logo. Carbon is the substrate of biochemistry, 
+Dan's field. Carbon-based life meeting silicon-based intelligence is a nice conceptual hook 
+and a reminder that the two have always been more entangled than the hardware/software split 
+makes them look.
 
 ### Linus Torvalds (1969–)
 
