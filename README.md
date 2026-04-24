@@ -14,7 +14,7 @@ evolve toward fine-tuned models trained on its owner's own data.
 
 It's not a replacement for hosted frontier models — hosted Claude plus owner remains the 
 primary Maestro for complex reasoning and architecture. Linus is the orchestra that Claude
-conducts, and the assistant that serves its owner directly when private or offline
+plus owner conducts, and the assistant that serves its owner directly when private or offline
 operation is needed.
 
 This is a personal project, not a product. There is no company, no users to serve, no
@@ -38,8 +38,8 @@ Applied in every design decision:
 
 Plus:
 
-- **Maestro/Worker discipline.** Hosted Claude plans and directs; local models execute.
-- **Evidence beats intuition.** Set a metric, set a goal, iterate.
+- **Maestro/Worker discipline.** Hosted Claude plus owner plans and directs; local models execute.
+- **Evidence beats intuition.** Set a metric, set a goal, devise tests, iterate.
 - **Parallel by default.** Multi-file and multi-subtask work fans out.
 
 See [VISION.md](VISION.md) for the full framing.
@@ -159,7 +159,7 @@ under their own licenses.
 
 ## Acknowledgments
 
-- Anthropic for Claude, the Maestro that makes this project possible
+- Anthropic for Claude, a key part of the Maestro that makes this project possible
 - Apple's MLX team for making Apple Silicon a real ML platform
 - Every repo in `repos/` and their authors — see `docs/repo-notes/` (Phase 1+) for
   per-repo credit

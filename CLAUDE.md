@@ -29,9 +29,10 @@ A personal AI orchestration backend that:
 - Enforces sandbox policy regardless of front-end
 - Evolves toward hosting fine-tuned, Dan-specific models
 
-Linus is NOT intended to replace hosted Claude. Hosted Claude remains the Maestro for complex
-reasoning and architecture. Linus is the Worker orchestra that executes under Claude's direction
-and serves Dan directly when private/offline operation is needed.
+Linus is NOT intended to replace hosted Claude. Hosted Claude plus Dan remains the Maestro for
+complex reasoning and architecture. Linus is the Worker orchestra that executes under Claude's
+and Dan's direction and serves Dan directly when private/offline operation is needed. Eventually, 
+as Linus gets better, it can become part of the Maestro team too, directing instantiated Workers.
 
 ## Guiding Principles
 
