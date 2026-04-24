@@ -289,7 +289,11 @@ For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 
 ### Forbidden (do not propose)
 
-- `rm -rf` on anything under `~/`
+- `rm -rf` on anything under `~/` or `/` (avoid key system files for maximal safety)
+  - Temporary files as part of our workflows may be safely created and destroyed in `/tmp`
+  - Files may be deleted within the git-tracked Linus directory as part of our work
+    - When removing git-tracked files, use `git rm`, otherwise use `rm`
+  - At this point, seek user permission before deleting any files (more autonomy may be granted in future)
 - Edits to `modules/KnowledgeBase/` (it's a submodule — work happens in the KnowledgeBase repo)
 - Edits to `repos/*` (reference-only clones)
 - Writing to `~/.ssh`, `~/.aws`, or any credentials path
