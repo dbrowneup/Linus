@@ -1,2 +1,63 @@
+# Linus .gitignore
+
+# Reference clones — study material, not tracked
 repos/
+
+# Personal context — papers, notes, threads, pics
+context/
+
+# macOS
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments (should not live inside repo, but just in case)
+.venv/
+venv/
+env/
+
+# Editor / IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb  # Opt-in tracking: move to experiments/ and force-add specific ones
+
+# Linus runtime data (local)
+.linus/
+~/.linus/
+
+# Experimentation scratch
+experiments/tmp/
+experiments/adapters/
+experiments/checkpoints/
+experiments/datasets/
+experiments/models/
+
+# Benchmark raw outputs (results committed, raw logs not)
+benchmarks/raw/
+benchmarks/logs/
+
+# Build artifacts
+target/
+*.dylib
+*.o
