@@ -1,0 +1,24 @@
+{
+  "$comment": "Claude Code settings for the Linus repo. PostToolUse hooks run ruff format, isort-via-ruff, and ruff check on Python file edits. See CLAUDE.md for the full engineering-conventions section.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff format --line-length 120 \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check --select I --fix \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
