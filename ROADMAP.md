@@ -196,6 +196,14 @@ than the same local model without Linus's RAG on the Dan task suite.
 **Goal:** Linus becomes meaningfully smarter on Dan's work, and the Maestro/Worker
 pattern extends to parallel multi-agent fan-out.
 
+**Branching model graduation:** Phase 3 is the gate for adopting full Driessen gitflow
+(see BRANCHING.md). At the start of Phase 3:
+- Create `develop` branch from `main` as the integration point for features
+- Feature branches branch from `develop` instead of `main`
+- Introduce `release/*` and `hotfix/*` branches for release management
+- Tag releases on `main` with semantic version numbers
+- This graduation will be documented in DECISIONS.md with rationale and migration steps.
+
 **3a — KnowledgeBase deepening:**
 
 - All current KnowledgeBase tools exposed: `linus.knowledge.neighbors_of`,

@@ -244,6 +244,24 @@ Prose over bullet-heavy dumps for anything a human will read. Markdown files in 
 communicate reasoning, not just facts. Lists where they clarify; paragraphs where they
 reason. Claude Code: when generating docs, follow this style.
 
+### Branch discipline
+
+All changes to `main` require a pull request reviewed by Dan before merge. Branches are
+the unit of parallel work. See [BRANCHING.md](BRANCHING.md) for the complete model:
+
+- **Feature branches** (`feature/<name>`): new features, reviewed PR to `main`
+- **Agent branches** (`agent/<task-id>/<slug>`): Worker-delegated tasks, always opened as
+  PR by the Worker, reviewed by Dan before merge
+- **Fix branches** (`fix/<name>`): bug fixes, reviewed PR to `main`
+- **Experiment/spike branches** (`experiment/<name>`, `spike/<name>`): throwaway
+  exploration, no review required, often deleted without merging
+- **Personal branches** (`dan/<name>`): Dan's staging branches before formalizing as a PR
+
+Push to origin and use `gh pr create` to open PRs. Maestro (Dan) reviews and merges via
+GitHub. Never force-push to `main`; force-push to your own branch is OK before opening a
+PR. See BRANCHING.md for detailed workflows and examples.
+
+
 ## Session Startup Protocol
 
 When Claude Code opens a session in this repo:
@@ -276,12 +294,17 @@ For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 - Read any file under the Linus tree
 - Write/edit files under `src/`, `benchmarks/`, `experiments/`, `docs/`
 - Run `pytest`, `ruff`, `python` (in linus env), `git add`, `git commit`
-- Read-only git: `git status`, `git log`, `git diff`, `git branch`
+- Read-only git: `git status`, `git log`, `git diff`, `git branch`, `git show`
+- Branch creation and pushing: `git switch -c <branch>`, `git push -u origin <branch>`
+- Pull request creation and interaction: `gh pr create`, `gh pr view`, `gh pr list`,
+  `gh pr comment`, `gh pr merge` (with Dan approval for merge)
 - `ls`, `cat`, `grep`, `tree`, `wc`, `head`, `tail`
 
 ### Require confirmation (show command, wait for OK)
 
-- Any `git push`, `git rebase`, `git reset --hard`
+- `git push` to `main` (always forbidden; use PR + Dan review instead)
+- `git rebase`, `git reset --hard` (rewrites history; ask first)
+- `git push --force` anywhere (forbidden; see BRANCHING.md)
 - File writes outside `src/ benchmarks/ experiments/ docs/` (including repo root edits)
 - Shell commands touching `~/` outside the Linus tree
 - Any network operation (curl, wget, pip install, brew install, ollama pull)

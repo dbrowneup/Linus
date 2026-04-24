@@ -1,5 +1,9 @@
 # Linus — Safety & Autonomy
 
+See [BRANCHING.md](BRANCHING.md) for the complete git branching model. This document
+focuses on autonomy tiers, tool policies, and audit logging. Branch-specific safety
+rules are noted in the blocklist below and detailed in BRANCHING.md.
+
 ## Principles
 
 - **Default deny for destructive operations.** Most actions are reversible; the ones that
@@ -88,6 +92,10 @@ Auto-execute without confirmation:
 - `python`, `python3` (with arguments; within the linus conda env)
 - `pytest`, `ruff`, `black`, `mypy`
 - `git status`, `git log`, `git diff`, `git branch`, `git show`, `git add`, `git commit`
+- `git switch -c <branch>` (branch creation)
+- `git push -u origin <branch>` (push to non-main branches)
+- `gh pr create`, `gh pr view`, `gh pr list`, `gh pr comment` (PR interaction)
+- `gh pr merge` (merge PRs; requires Dan's explicit approval in the PR)
 - `ls`, `cat`, `grep`, `rg`, `tree`, `wc`, `head`, `tail`, `find` (without `-delete`)
 - `echo`, `printf`, `date`
 - `conda list`, `conda info`, `conda env list`
@@ -116,8 +124,12 @@ These ALWAYS require confirmation, even at Tier 3+:
 - Any command touching `~/.ssh/`, `~/.aws/`, `~/.config/gh/`, `~/Library/Keychains/`
 - Any command touching `~/Library/Application Support/` (apart from Linus's own data)
 - Any command with `>`/`>>` redirects outside the repo tree
-- `git push`, `git reset --hard`, `git rebase` (any form), `git clean -fd`,
-  `git submodule deinit`
+- `git push` to `main` or `master`
+- `git push --force` (any branch)
+- `git reset --hard`, `git rebase` (any form), `git clean -fd`, `git submodule deinit`
+- `git branch -d` or `git push --delete` for branches other than your own
+- Merging non-main branches to `main` outside of PR review (use `gh pr merge` after
+  Dan's approval)
 
 ## Forbidden operations (never, no tier unlock, no confirmation override)
 
