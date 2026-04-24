@@ -1,0 +1,158 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linus"
+description = "Personal AI orchestration backend for Apple Silicon"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Daniel Browne", email = "dbrowne.up@gmail.com" }
+]
+keywords = ["llm", "apple-silicon", "mlx", "orchestration", "agent", "rag"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dynamic = ["version"]
+dependencies = [
+    # These mirror environment.yml; pip install -e . will resolve them within the
+    # conda env. Pinning is deliberately loose during Phase 0/1; tighten as we stabilize.
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "pydantic>=2.5",
+    "httpx>=0.26",
+    "tenacity>=8.2",
+    "typer>=0.9",
+    "rich>=13.7",
+    "sqlalchemy>=2.0",
+    "pyyaml>=6.0",
+    "jsonlines>=4.0",
+    "openai>=1.12",
+    "ollama>=0.1.7",
+    "tiktoken>=0.5",
+]
+
+[project.optional-dependencies]
+ui = [
+    "streamlit>=1.31",
+]
+mlx = [
+    "mlx-lm>=0.8",
+]
+knowledge = [
+    # KnowledgeBase submodule provides its own deps; these are extras for direct use
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scipy>=1.11",
+]
+eval = [
+    "lm-eval>=0.4",
+]
+dev = [
+    "ruff>=0.3",
+    "mypy>=1.8",
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "pre-commit>=3.6",
+]
+all = [
+    "linus[ui,mlx,knowledge,eval,dev]",
+]
+
+[project.urls]
+Homepage = "https://github.com/dbrowneup/Linus"
+Repository = "https://github.com/dbrowneup/Linus"
+Issues = "https://github.com/dbrowneup/Linus/issues"
+
+[project.scripts]
+# Placeholder; implemented in Phase 2+
+# linus = "linus.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["linus*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "linus.__about__.__version__" }
+
+# --- Ruff configuration ------------------------------------------------------
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "benchmarks", "experiments"]
+extend-exclude = [
+    "modules",        # submodule — not ours to lint
+    "repos",          # reference clones
+    "context",        # personal content
+    "docs",           # prose, not code
+]
+
+[tool.ruff.format]
+# Match ruff format --line-length 120 used by the PostToolUse hook
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint]
+# Start conservative; tighten over time
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "E501",  # line length (handled by formatter)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["linus"]
+
+# --- Mypy configuration ------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [
+    "modules/",
+    "repos/",
+    "context/",
+]
+
+# --- Pytest configuration ----------------------------------------------------
+
+[tool.pytest.ini_options]
+testpaths = ["src/linus/tests", "benchmarks", "experiments"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-ra --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with -m 'not slow')",
+    "smoke: marks smoke tests for pre-full-run validation",
+    "integration: marks integration tests requiring Ollama/pmetal/etc.",
+]
+
+# --- Coverage ----------------------------------------------------------------
+
+[tool.coverage.run]
+source = ["src/linus"]
+omit = [
+    "*/tests/*",
+    "*/__about__.py",
+]
