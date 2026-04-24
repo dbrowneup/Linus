@@ -91,6 +91,7 @@ discarded is a sign the search is working.
 - **uv** is installed inside the linus conda env for fast Python package operations when
   needed (e.g., autoresearch-mlx).
 - **node/npm** installable inside conda env if openclaw or other JS-based components are used.
+- **poppler** is available via a Homebrew install to read PDF files in the context folder.
 
 ## Repo Layout
 
