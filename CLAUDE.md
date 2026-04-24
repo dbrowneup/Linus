@@ -320,5 +320,5 @@ on 10k+ rows fail. Inherited from KnowledgeBase.
 
 ---
 
-*This file is the contract between Dan, Claude (Maestro), and any Worker operating in the
+*This file is the contract between Dan and Claude (Maestro), and any Worker operating in the
 Linus repo. Update it when conventions change. Don't silently drift.*
