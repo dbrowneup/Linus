@@ -120,6 +120,7 @@ Linus/
 │   ├── mlx-flash/         # Matt Wong MLX weight streaming
 │   ├── pmetal/            # Epistates Rust ML platform for Apple Silicon
 │   ├── autoresearch/      # Karpathy agentic research loop methodology
+│   ├── autoresearch-mlx/  # MLX-flavored variant of Karpathy's research loop
 │   ├── ANE/               # Maderix ANE reverse-engineering
 │   ├── claw-code/         # ultraworkers Rust CLI agent harness (inspiration; Anthropic-only)
 │   ├── claw-code-local/   # codetwentyfive fork adding Ollama backend (more practical lead)
