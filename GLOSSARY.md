@@ -208,7 +208,11 @@ usefulness.
 - **autoresearch** — Karpathy's agentic research loop.
 - **autoresearch-mlx** — Apple Silicon port of autoresearch (trevin-creator).
 - **openclaw** — Local-first gateway with multi-channel chat, voice, Canvas.
-- **claw-code** — Rust CLI agent harness (reference).
+- **claw-code** — Rust CLI agent harness (inspiration only; upstream is hard-wired to the
+  Anthropic API and has no local-model path).
+- **claw-code-local** — Community fork by codetwentyfive ([github.com/codetwentyfive/claw-code-local](https://github.com/codetwentyfive/claw-code-local))
+  that adds Ollama backend support. Closer to a practical CLI harness for Linus, since it
+  already speaks to a local server. pmetal integration is still TBD.
 - **cline** — VS Code agentic coding extension.
 - **project-nomad** — Offline knowledge server (inspiration for Phase 4).
 - **flash-moe** — MoE streaming inference (Dan Woods, methodology reference).

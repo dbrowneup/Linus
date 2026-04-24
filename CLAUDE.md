@@ -121,7 +121,8 @@ Linus/
 │   ├── pmetal/            # Epistates Rust ML platform for Apple Silicon
 │   ├── autoresearch/      # Karpathy agentic research loop methodology
 │   ├── ANE/               # Maderix ANE reverse-engineering
-│   ├── claw-code/         # ultraworkers Rust CLI agent harness (reference)
+│   ├── claw-code/         # ultraworkers Rust CLI agent harness (inspiration; Anthropic-only)
+│   ├── claw-code-local/   # codetwentyfive fork adding Ollama backend (more practical lead)
 │   ├── openclaw/          # openclaw local-first gateway (reference/future front-end)
 │   ├── cline/             # VS Code agentic coding extension
 │   └── project-nomad/     # Offline knowledge server (inspiration only)
