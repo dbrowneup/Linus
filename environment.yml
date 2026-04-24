@@ -1,0 +1,75 @@
+# Linus conda environment specification
+#
+# Create with:  conda env create -f environment.yml
+# Activate:     conda activate linus
+# Update:       conda env update -f environment.yml --prune
+#
+# Notes:
+#   - Python 3.12 to match KnowledgeBase's 3.11+ requirement and mambaforge base.
+#   - Rust and uv inside the env for tool flexibility (pmetal build, etc.).
+#   - Do NOT add mlx or ollama here — use the Homebrew installs for Apple Silicon
+#     optimization. mlx-lm is pip-installed and uses the brew mlx.
+#   - Heavy ML dependencies (torch, transformers, sentence-transformers) come via the
+#     KnowledgeBase submodule's own editable install in Phase 2+, not from this file.
+#     Keep this env lean; KB brings its own stack.
+
+name: linus
+
+channels:
+  - conda-forge
+
+dependencies:
+  # Core
+  - python=3.12
+  - pip
+
+  # Build / systems tooling
+  - rust          # needed for pmetal build; also occasionally useful elsewhere
+  - uv            # fast Python package manager for subprojects that need it
+  - nodejs        # for optional JS-based components (openclaw tooling, etc.)
+  - just          # task runner (pmetal uses this; common elsewhere)
+  - cmake         # build dep for some native packages
+
+  # Python toolchain
+  - ruff          # linter + formatter
+  - mypy          # type checker
+  - pytest
+  - pytest-cov
+  - ipython
+  - jupyter
+
+  # Core Python libraries needed for the Linus backend
+  - fastapi
+  - uvicorn
+  - pydantic
+  - httpx
+  - requests
+  - aiohttp
+  - tenacity      # retry logic
+  - typer         # CLI framework
+  - rich          # terminal pretty-printing
+
+  # Data and storage
+  - sqlalchemy
+  - tomli         # TOML reading (for Python < 3.11 compat, harmless on 3.12)
+  - tomli-w       # TOML writing
+  - pyyaml
+  - jsonlines
+  - pandas
+  - numpy
+  - scipy
+
+  # Markdown / docs tooling
+  - pre-commit
+
+  # Pip-only dependencies
+  - pip:
+    - streamlit                # chat UI (Phase 2)
+    - mlx-lm                   # MLX LLM runtime; uses brew-installed mlx
+    - ollama                   # Python client for Ollama
+    - openai                   # for OpenAI-compatible client patterns
+    - haystack-ai              # used by KnowledgeBase, convenient to have here too
+    - langchain                # available if we adopt LangGraph in Phase 3+
+    - langgraph                # state-machine agent workflows (Phase 3+ evaluation)
+    - tiktoken                 # token counting
+    - lm-eval                  # EleutherAI lm-evaluation-harness (Phase 1)
