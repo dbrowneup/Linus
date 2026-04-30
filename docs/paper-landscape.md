@@ -1,8 +1,9 @@
 # Paper Notes
 
-One-page summaries of every PDF in [`context/papers/`](../../context/papers/), each
+One-page summaries of every PDF in [`context/papers/`](../context/papers/), each
 written as a translation layer between dense technical material and Linus' practical
-needs. Filenames mirror the PDF basenames so `<paper>.md` corresponds to `<paper>.pdf`.
+needs. The notes themselves live in [`paper-notes/`](paper-notes/), and filenames mirror
+the PDF basenames so `<paper>.md` corresponds to `<paper>.pdf`.
 
 Each note follows the same shape: TL;DR, plain-language problem statement, what the
 paper proposes, key results, what's reusable in Linus, what's NOT applicable
@@ -20,25 +21,25 @@ The most internally-coherent thread in this folder. Six papers from Microsoft
 Research (and one community-built inference runtime) tracing the path from
 "can a 1-bit LLM exist" (2023) to "here's a 2B open checkpoint that runs at
 0.4 GB on Apple Silicon" (2025). Read in order if approaching this thread cold;
-otherwise [BitNet b1.58 2B4T](2504.12285v2.md) and [bitnet.cpp](2502.11880v1.md)
+otherwise [BitNet b1.58 2B4T](paper-notes/2504.12285v2.md) and [bitnet.cpp](paper-notes/2502.11880v1.md)
 are the two highest-leverage entry points for Linus.
 
-- [BitNet (original, 2023-10)](2310.11453v1.md) — BitLinear, the first 1-bit
+- [BitNet (original, 2023-10)](paper-notes/2310.11453v1.md) — BitLinear, the first 1-bit
   Transformer trained from scratch. Founding paper.
-- [BitNet b1.58 (2024-02)](2402.17764v1.md) — Adds the zero state to make
+- [BitNet b1.58 (2024-02)](paper-notes/2402.17764v1.md) — Adds the zero state to make
   ternary `{-1, 0, +1}` weights. The variant everyone means when they say
   "BitNet" today.
-- [BitNet a4.8 (2024-11)](2411.04965v1.md) — First push to 4-bit activations
+- [BitNet a4.8 (2024-11)](paper-notes/2411.04965v1.md) — First push to 4-bit activations
   via hybrid quantization + sparsification. Mostly superseded by BitNet v2.
-- [BitNet v2 (2025-04)](2504.18415v2.md) — 4-bit activations done elegantly via
+- [BitNet v2 (2025-04)](paper-notes/2504.18415v2.md) — 4-bit activations done elegantly via
   Hadamard transforms. The current best W1.58A4 design.
-- [BitNet b1.58 2B4T (2025-04)](2504.12285v2.md) — *The released open-weights
+- [BitNet b1.58 2B4T (2025-04)](paper-notes/2504.12285v2.md) — *The released open-weights
   checkpoint.* 2B params, 4T training tokens, instruction-tuned via SFT+DPO.
   Highest-priority paper in the folder for immediate Linus action.
-- [bitnet.cpp (2025-02)](2502.11880v1.md) — The CPU inference runtime that makes
+- [bitnet.cpp (2025-02)](paper-notes/2502.11880v1.md) — The CPU inference runtime that makes
   BitNet b1.58 2B4T fast on Apple Silicon. Tested up to M2 Ultra; the only paper
   in this folder with direct Apple-Silicon throughput numbers.
-- [BitNet Distillation (2025-10)](2510.13998v1.md) — How to convert *any*
+- [BitNet Distillation (2025-10)](paper-notes/2510.13998v1.md) — How to convert *any*
   pre-trained FP16 model (Qwen3, Gemma) into a 1.58-bit BitNet for a specific
   downstream task using only ~10B tokens. Plausibly Phase 6's recipe.
 
@@ -50,10 +51,10 @@ on demand rather than loading everything into DRAM. Together they map the full
 range from "small models on big-RAM machines" through "70B-class models on
 consumer Macs" to "397B-class MoE models on a 48 GB MacBook."
 
-- [LLM in a Flash (Apple, 2023-12)](2312.11514v3.md) — The conceptual foundation:
+- [LLM in a Flash (Apple, 2023-12)](paper-notes/2312.11514v3.md) — The conceptual foundation:
   flash-streaming via activation-sparsity prediction, sliding-window cache, and
   bundled column/row reads. Tested on M1 Max, MeasureBook directly relevant.
-- [Flash-MoE (Anthropic + Daniel Woods, 2026-03)](flash_moe.md) — The extreme
+- [Flash-MoE (Anthropic + Daniel Woods, 2026-03)](paper-notes/flash_moe.md) — The extreme
   demonstration: 397B-parameter MoE running at 5.7 tok/s on a 48 GB M3 Max via
   custom Metal/Obj-C inference engine. Notable: primary author is Claude Opus
   4.6 itself.
@@ -63,7 +64,7 @@ consumer Macs" to "397B-class MoE models on a 48 GB MacBook."
 Single paper, but a substantial one. Aimed at people who design model
 architectures, not at people who just use them.
 
-- [JPmHC (JP Morgan, 2026-02)](2602.18308v2.md) — How to constrain the
+- [JPmHC (JP Morgan, 2026-02)](paper-notes/2602.18308v2.md) — How to constrain the
   residual-stream mixer in Hyper-Connections to the orthogonal group via the
   Cayley transform, preventing the spectral-collapse failure mode of the prior
   doubly-stochastic approach. Validated on ARC-AGI with a 7M-parameter Tiny
@@ -71,30 +72,60 @@ architectures, not at people who just use them.
 
 ## Pre-training data curation
 
-- [FineWeb (Hugging Face, 2024-06)](2406.17557v2.md) — The 15T-token open
+- [FineWeb (Hugging Face, 2024-06)](paper-notes/2406.17557v2.md) — The 15T-token open
   Common Crawl dataset (and its 1.3T educational subset, FineWeb-Edu) plus the
   open-source `datatrove` curation library. Used by BitNet b1.58 2B4T as a
   pretraining source. Methodologically interesting beyond just the data.
 
+## Knowledge graphs & KnowledgeBase foundations
+
+The two papers here are the theoretical and methodological backbone for
+building [modules/KnowledgeBase/](../modules/KnowledgeBase/) — one giving the
+*structural* substrate (a graph of entities and relations) and the other giving
+the *vector* substrate (semantic embeddings over the nodes). They are best
+read together.
+
+- [Knowledge Graphs (Hogan et al., 2020-03 / 2021-09)](paper-notes/2003.02320v6.md) —
+  The 100+ page tutorial-survey by a 17-author consortium that emerged from the
+  2018 Dagstuhl seminar and crystallized the field. Walks through every layer of
+  the KG stack: data models (RDF, property graphs), querying (SPARQL, Cypher),
+  schemata (semantic, validating, emergent), identity, context, deductive
+  knowledge (ontologies, rules, OWL, DLs), inductive knowledge (analytics,
+  embeddings, GNNs, rule mining), creation, quality, refinement, and
+  publication. Authored in part by Aidan Hogan at Universidad de Chile. **The
+  single most KB-relevant paper in this folder** — almost every KB design
+  decision Dan needs to make has a section in this paper.
+
 ## Embeddings & retrieval (KnowledgeBase-aligned)
 
 - [Extracting Sentence Embeddings from Pretrained Transformer Models
-  (Stankevičius & Lukoševičius, 2024-08)](2408.08073v2.md) — A 75-page
+  (Stankevičius & Lukoševičius, 2024-08)](paper-notes/2408.08073v2.md) — A 75-page
   systematic ablation of how to get good fixed-length embeddings out of
   pretrained transformers without fine-tuning. Token aggregation (idf
   weighting, first+last layer averaging, bias removal) and post-processing
   (quantile-uniform normalization, whitening, ABTT) collectively raise
   STS Spearman correlation from 62.3 → 71.6. Most striking: random embeddings
   + the same techniques nearly match BERT, proving most of the gain is in
-  the shaping, not the contextualization. **The most KB-relevant paper in
-  this folder** — directly informs embedding choices for
-  [modules/KnowledgeBase/](../../modules/KnowledgeBase/), and its evaluation
+  the shaping, not the contextualization. The KB-vector-layer companion to
+  the Hogan KG survey — directly informs embedding choices for
+  [modules/KnowledgeBase/](../modules/KnowledgeBase/), and its evaluation
   methodology is a template for Linus' benchmark suite.
+
+- [Interpreting the Curse of Dimensionality (Peng, Gui & Wu, 2024-01 / 2025-03)](paper-notes/2401.00422v3.md) —
+  A short, surgical theoretical paper that proves *why* high-dimensional
+  embeddings degrade: distance concentration (Minkowski, Chebyshev, and cosine
+  distances all converge to a single value as dimension grows) and manifold
+  effect (when `d ≫ n`, the bottom `d−n` PCA eigenvalues are exactly zero, so
+  the data is forced onto a low-dim manifold). Empirically validated on Iris,
+  Dermatology, Satimage, Control, Mfeat — all reach 90% variance with <10
+  PCs. The theoretical foundation that explains *why* the Stankevičius
+  embedding-shaping techniques are so effective, and *why* PCA-reducing
+  oversized embeddings before indexing is almost always a free win.
 
 ## High-dimensional geometry / visualization (Dan's biology overlap)
 
 - [Orthogonal projections of hypercubes (Horiike & Fujishiro, Phys Rev E
-  2025)](Horiike-Orthogonal projections of hypercubes-2025-Physical Review E copy.md)
+  2025)](paper-notes/Horiike-Orthogonal projections of hypercubes-2025-Physical Review E copy.md)
   — A pure-physics paper. Uses PCA as a principled, reproducible orthogonal
   projection method for visualizing high-dimensional binary state spaces (Ising
   spin systems, gene regulatory networks, evolutionary fitness landscapes).
@@ -106,16 +137,23 @@ architectures, not at people who just use them.
 ## Reading orders by Linus phase
 
 **If you only have time for two papers**:
-[BitNet b1.58 2B4T](2504.12285v2.md) (Linus' near-term Worker model) +
-[bitnet.cpp](2502.11880v1.md) (how to run it on M1 Max).
+[BitNet b1.58 2B4T](paper-notes/2504.12285v2.md) (Linus' near-term Worker model) +
+[bitnet.cpp](paper-notes/2502.11880v1.md) (how to run it on M1 Max).
 
 **Phase 2 (Linus MVP, Worker selection + KB v1)**:
 2B4T → bitnet.cpp → BitNet b1.58 (background on what 2B4T inherits) →
-[Sentence Embeddings](2408.08073v2.md) (KB embedding pipeline).
+[Knowledge Graphs](paper-notes/2003.02320v6.md) (KB structural design) →
+[Sentence Embeddings](paper-notes/2408.08073v2.md) (KB embedding pipeline) →
+[Curse of Dimensionality](paper-notes/2401.00422v3.md) (why embedding-dim choices matter).
 
 **Phase 3 (Knowledge & Parallel Agents)**:
-[Sentence Embeddings](2408.08073v2.md) is the rate-limiting paper here — KB
-retrieval quality is bounded by embedding quality.
+[Knowledge Graphs](paper-notes/2003.02320v6.md) is the spine here — every KB design
+decision (data model, schema, identity, context, querying, deductive vs inductive
+layer) has a section in it. [Sentence Embeddings](paper-notes/2408.08073v2.md) and
+[Curse of Dimensionality](paper-notes/2401.00422v3.md) are the rate-limiting papers
+for the *vector* layer over the graph — KB retrieval quality is bounded by embedding
+quality, and embedding quality is bounded by how well distance concentration is
+mitigated.
 
 **Phase 6 (fine-tuning)**:
 BitNet Distillation → 2B4T → BitNet original (for BitLinear / SubLN /
@@ -148,7 +186,19 @@ notes and may deserve a discussion of their own:
    that pulls the four-or-five most relevant papers into one "what's the actual
    inference path" writeup?** Mentioned in BitNet v2 and 2B4T notes.
 5. **Should the KB v1 embedding pipeline use the recipe from
-   [Stankevičius & Lukoševičius](2408.08073v2.md)** (idf weighting + first+last
+   [Stankevičius & Lukoševičius](paper-notes/2408.08073v2.md)** (idf weighting + first+last
    layers + quantile-u normalization), and should that paper's ablation
    methodology be lifted into a `docs/experimental-protocol.md` Linus-house
    style guide for benchmark design? Mentioned in the embeddings note.
+6. **Should there be a `docs/specs/kb-architecture.md` that walks through the
+   [Hogan et al. KG survey](paper-notes/2003.02320v6.md) section by section
+   and records the design choice + rationale for each KB layer** (data model,
+   schema, identity, context, query language, deductive layer, inductive
+   layer)? Mentioned in the KG-survey note. The KB submodule benefits from
+   this kind of audited design rationale; building it incrementally is much
+   cheaper than retrofitting it.
+7. **Should KB embeddings be PCA-reduced before indexing, and should the KB
+   observability dashboard track distance discrimination
+   `|D_max − D_min| / D_min` as a health metric?** Mentioned in the
+   [Curse of Dimensionality](paper-notes/2401.00422v3.md) note. Both are
+   small-effort, large-payoff implementations.
