@@ -59,6 +59,21 @@ consumer Macs" to "397B-class MoE models on a 48 GB MacBook."
   custom Metal/Obj-C inference engine. Notable: primary author is Claude Opus
   4.6 itself.
 
+## Benchmarking & inference evaluation
+
+A single paper but one with direct operational implications. Evaluation methodology often gets
+treated as a solved problem; this paper argues it is not, specifically for the metrics used
+to select local models.
+
+- [Speed and LLMs: Not All Is About Tokens per Second (Conde et al., 2025-02)](paper-notes/2502.16721v1.md) —
+  Five open-weights ~7B models run on 660 questions across three task designs spanning the verbosity
+  spectrum (minimal output, fixed-length, open-ended explanation). **Task-completion-time rankings
+  frequently invert tok/s rankings**: LLaMA-3-8B is among the slowest in tok/s but fastest to finish
+  short tasks; Gemma-7B is fastest for open explanation despite mediocre tok/s. The core message:
+  tok/s conflates tokenizer efficiency, verbosity, and generation speed into a single number that
+  can mislead Worker model selection. The paper's three-task schema (minimal / fixed-length / open-ended,
+  measured by wall-clock time) is a ready-made template for `benchmarks/dan_tasks/`.
+
 ## Training stability — multi-stream residuals
 
 Single paper, but a substantial one. Aimed at people who design model
@@ -76,6 +91,28 @@ architectures, not at people who just use them.
   Common Crawl dataset (and its 1.3T educational subset, FineWeb-Edu) plus the
   open-source `datatrove` curation library. Used by BitNet b1.58 2B4T as a
   pretraining source. Methodologically interesting beyond just the data.
+
+## KnowledgeBase ingestion — keyphrase extraction
+
+Two complementary papers on automatically extracting keyphrases from documents during KB ingestion.
+Read together: the first provides a fast, structural, unsupervised baseline; the second enriches it
+with knowledge-graph semantics. Both directly address the Phase 2 KB indexing problem.
+
+- [RaKUn 2.0 (Škrlj, Koloski & Pollak, 2022-08)](paper-notes/2208.07262v1.md) — Graph-based
+  unsupervised keyphrase extractor at the Pareto frontier of retrieval quality and speed. **Up to
+  two orders of magnitude faster than YAKE and MultiPartiteRank** across 15 benchmark datasets,
+  with statistically indistinguishable F1@15. Processes **14 million biomedical documents in ~40
+  seconds** on 12-core/32GB hardware (directly comparable to M1 Max). CPU-only, pure Python
+  (`pip install rakun2`), no GPU or fine-tuning required. The Phase 2 KB ingestion tool for fast,
+  large-scale keyphrase tagging and KG node-candidate generation.
+
+- [KGRank (Shi, Zheng, Yu et al., 2017-11)](paper-notes/s41019-017-0055-z.md) — Replaces the
+  standard word co-occurrence graph with a semantically enriched graph derived from DBpedia,
+  linking noun-phrase keyterms to knowledge-graph entities and ranking via Personalized PageRank.
+  **Best F-measure ~0.33 at K=10 on DUC2001**, outperforming all seven baselines. The key insight:
+  two terms semantically related but textually far apart get a connecting edge through KG paths —
+  a failure mode of TextRank and RaKUn 2.0 that KGRank sidesteps. Phase 3 KB ingestion reference
+  for domain-ontology-enriched indexing (substituting GO, MeSH, ChEBI for DBpedia).
 
 ## Knowledge graphs & KnowledgeBase foundations
 
@@ -132,6 +169,31 @@ read together.
   Connection to Linus is indirect; included here because Dan flagged it as a
   "hypercube" paper of interest.
 
+## Cognitive throughput & information theory
+
+Two papers that debate the information throughput of the human brain. They form a natural
+pair — read the Zheng & Meister paper first, then the Sauerbrei & Pruszynski rebuttal. The
+debate is scientifically interesting to Dan as a researcher, and the core framing (a narrow
+conscious channel bottlenecked at ~10 bits/s above a massively parallel substrate) maps
+cleanly onto the Maestro/Worker architecture. Neither paper contains code or algorithms.
+
+- [The Unbearable Slowness of Being (Zheng & Meister, Caltech, Neuron 2025-01)](paper-notes/PIIS0896627324008080.md) —
+  A Perspective applying information theory to a century of behavioral data. Human cognition —
+  typing, reading, Tetris, competitive gaming, memory sports — operates at a consistent
+  **~10 bits/s** regardless of modality, while peripheral senses ingest **~10⁹ bits/s**. The
+  "Sifting Number" Si = 10⁸ is called the largest unexplained constant in brain science. The
+  proposed outer/inner brain two-mode model maps onto Linus's Maestro (conscious synthesis) vs.
+  Worker (parallel execution) split, and the ~5 GB lifetime information acquisition estimate has
+  implications for KB scope and completeness goals.
+
+- [The Brain Works at More than 10 bits/s (Sauerbrei & Pruszynski, Nat Neurosci 2025-07)](paper-notes/nihms-2096004.md) —
+  A direct rebuttal arguing the 10 bits/s figure is a *lower bound* on whole-brain throughput, not
+  an upper bound. Unconscious sensorimotor processing (the cerebellum alone contains half of all
+  brain neurons) operates far above 10 bits/s; the Zheng-Meister measurement captures only the
+  conscious cognitive output channel. The inner/outer brain partition is anatomically incoherent.
+  For Linus: this deepens the Maestro/Worker analogy — Workers handle the high-bandwidth
+  sensorimotor-equivalent substrate; Maestro handles the narrow conscious synthesis channel.
+
 ---
 
 ## Reading orders by Linus phase
@@ -142,8 +204,10 @@ read together.
 
 **Phase 2 (Linus MVP, Worker selection + KB v1)**:
 2B4T → bitnet.cpp → BitNet b1.58 (background on what 2B4T inherits) →
+[Speed and LLMs](paper-notes/2502.16721v1.md) (benchmark methodology for Worker selection) →
 [Knowledge Graphs](paper-notes/2003.02320v6.md) (KB structural design) →
 [Sentence Embeddings](paper-notes/2408.08073v2.md) (KB embedding pipeline) →
+[RaKUn 2.0](paper-notes/2208.07262v1.md) (fast keyphrase extraction for KB ingestion) →
 [Curse of Dimensionality](paper-notes/2401.00422v3.md) (why embedding-dim choices matter).
 
 **Phase 3 (Knowledge & Parallel Agents)**:
@@ -153,7 +217,8 @@ layer) has a section in it. [Sentence Embeddings](paper-notes/2408.08073v2.md) a
 [Curse of Dimensionality](paper-notes/2401.00422v3.md) are the rate-limiting papers
 for the *vector* layer over the graph — KB retrieval quality is bounded by embedding
 quality, and embedding quality is bounded by how well distance concentration is
-mitigated.
+mitigated. [KGRank](paper-notes/s41019-017-0055-z.md) is the Phase 3 upgrade for
+keyphrase extraction, enriching KB node labels with ontology-grounded semantics.
 
 **Phase 6 (fine-tuning)**:
 BitNet Distillation → 2B4T → BitNet original (for BitLinear / SubLN /
@@ -202,3 +267,23 @@ notes and may deserve a discussion of their own:
    `|D_max − D_min| / D_min` as a health metric?** Mentioned in the
    [Curse of Dimensionality](paper-notes/2401.00422v3.md) note. Both are
    small-effort, large-payoff implementations.
+
+8. **Should `benchmarks/dan_tasks/` be structured from the start around a
+   three-task schema (minimal, fixed-length, open-ended) with wall-clock
+   task-completion time as the primary metric, rather than tok/s?** The
+   [Speed and LLMs](paper-notes/2502.16721v1.md) paper shows that tok/s
+   rankings frequently invert task-completion rankings, making tok/s
+   an unreliable Worker selection criterion. Getting the benchmark axis right
+   in Phase 1 prevents the tok/s trap.
+
+9. **Should RaKUn 2.0 be the Phase 2 keyphrase extraction layer for KB
+   ingestion, and what merge threshold τ works best for biomedical/genomics
+   papers?** Mentioned in [RaKUn 2.0](paper-notes/2208.07262v1.md). The
+   default τ=1 favors multi-word phrases; a 20-50 paper smoke test on
+   `context/papers/` would validate the setting for Dan's domain.
+
+10. **Should the Phase 2 Linus output interface default to high-information-density
+    concise summaries, explicitly designed around the ~10 bits/s human review
+    throughput limit?** Mentioned in both cognitive throughput papers. Parallel
+    Worker fan-out generates zero throughput gain for Dan unless the Maestro interface
+    sifts outputs to the essential bits first.
