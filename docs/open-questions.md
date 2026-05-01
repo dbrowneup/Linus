@@ -592,6 +592,126 @@ For a smaller, prioritized subset focused on the most consequential decisions, s
 
 ---
 
+## Speed and LLMs: Benchmarking Methodology (2502.16721v1)
+
+1. **Benchmark design decision:** Should `benchmarks/dan_tasks/` be structured from the start around a three-task schema (minimal, fixed-length, open-ended) with wall-clock completion time as the primary metric, rather than being organized by topic or capability? Getting the measurement axis right now costs nothing and prevents the tok/s trap later.
+
+2. **Worker selection experiment:** Would you like a smoke-test spec (50 items, three task types, wall-clock time measured) comparing whichever models you currently have pulled in Ollama as a Phase 1 deliverable? The paper's methodology is simple enough that a Worker could write the script from a spec.
+
+3. **Router implications:** If Linus eventually dispatches different task types to different Workers (fast-terse vs. slow-expansive), does the orchestration layer need to classify tasks before dispatching, or is the distinction between "short-answer" and "open-ended" tasks something the caller always knows at dispatch time? The architecture answer changes how complex the router needs to be.
+
+4. **Verbosity as a fine-tuning target:** Is calibrating output verbosity (terse for structured tasks, expansive for synthesis) a Phase 6 fine-tuning objective worth adding to the roadmap explicitly? This paper makes a strong case that verbosity is a first-class model behavior, not a side effect.
+
+5. **Apple Silicon specifics:** The paper's A100 results are a motivation, not a number. Is there a community resource (MLX Discord, Hugging Face discussions) where M1/M2/M3 task-completion benchmarks are being collected, or is this a gap Linus could fill with a small public benchmark release?
+
+---
+
+## RaKUn 2.0 — Keyphrase Extraction (2208.07262v1)
+
+1. **Should RaKUn 2.0 be the keyphrase extraction layer for the KnowledgeBase ingestion pipeline in Phase 2**, or does the KnowledgeBase already have a keyphrase extraction step? If so, what method does it use, and should we benchmark RaKUn 2.0 against it on a sample of Dan's paper corpus?
+
+2. **What is the right merge threshold τ for biomedical/genomics papers?** The default of τ=1 favors multi-word phrases. Worth a smoke test on 20–50 papers from `context/papers/` at τ ∈ {0.5, 1.0, 1.5} with manual evaluation of top-5 keyphrases?
+
+3. **How does RaKUn 2.0's output compare to author-supplied keywords already embedded in paper PDFs?** A concrete benchmark: extract keyphrases from papers that have author keywords, compute overlap, and see whether RaKUn 2.0 adds novel signal or merely recovers existing metadata.
+
+4. **Is there a parallelism opportunity in the KB ingestion pipeline?** At 40 seconds for 14M documents, throughput is not currently a bottleneck — but should the ingestion loop be structured for parallel batching from the start so the architecture doesn't need refactoring later?
+
+5. **Should RaKUn 2.0 keyphrases feed directly into Qdrant as document metadata tags, or into the knowledge graph as node labels, or both?** Keyphrases-as-tags enables fast filter-based retrieval; keyphrases-as-graph-nodes enables multi-hop reasoning. The implementation sequence matters for Phase 2 and 3 design.
+
+---
+
+## KGRank — KG-Enriched Keyphrase Extraction (s41019-017-0055-z)
+
+1. **Which controlled vocabulary — GO, MeSH, ChEBI, UniProt keywords — would serve as the most practical KGRank-style knowledge graph for Dan's biochemistry/genomics domain**, and how would h-hop path extraction behave on GO's DAG structure versus DBpedia's general graph?
+
+2. **Does the noun-only heuristic hold for scientific text?** The paper excludes adjectives citing low annotator agreement, but in scientific writing adjectives frequently carry domain meaning ("oxidative stress," "transcriptional regulation"). Does excluding adjectives discard too much signal in Dan's corpus?
+
+3. **Would section-level entity-linking disambiguation outperform whole-document matching for long scientific papers?** Matching DBpedia/ontology abstracts against the methods section independently could better capture domain-specific term meanings.
+
+4. **For Linus's RAG use case, keyphrases should maximize retrieval recall for queries Dan is likely to ask**, not just topic coverage. Is there a way to incorporate Dan's past query patterns as a supervision signal for the PPR jump probabilities?
+
+5. **Would spaCy's `en_core_sci_lg` (scispaCy) be sufficient for accurate entity boundary detection in genomics papers**, or would a domain-specific fine-tune be needed as a drop-in CoreNLP replacement?
+
+---
+
+## The Unbearable Slowness of Being — Cognitive Throughput (PIIS0896627324008080)
+
+1. **Does the authors' estimate of ~270 bits/s per cone photoreceptor hold under the biophysics of phototransduction?** Is the sifting happening primarily in the retina (already 10× compression to optic nerve) or between the optic nerve and behavior (the remaining 10⁷)?
+
+2. **Could the KnowledgeBase be curated to assemble the evidence for or against the hypercolumn model of prefrontal cortex?** Which naturalistic behavioral neuroscience experiments could distinguish it from the low-dimensional manifold model?
+
+3. **The paper implies that a well-curated KnowledgeBase containing Dan's papers, notes, and corpora could represent a meaningful fraction of the ~5 GB a person acquires in a lifetime.** Does this change how you think about the scope and completeness goals for the KnowledgeBase?
+
+4. **Linus-as-cognitive-augmentation should focus on reducing the cost of accessing structured information** (faster retrieval, better summarization) rather than increasing raw data transfer rates — the bottleneck is the 10 bits/s channel, not the model latency. Does that framing match your intuition about where friction actually is in your scientific workflow?
+
+5. **Could your own scientific workflow (interpreting pipeline outputs, cross-referencing databases, designing experiments) be instrumented as a naturalistic behavioral neuroscience experiment** — logging decision sequences and computing empirical information throughput?
+
+---
+
+## The Brain Works at More than 10 bits/s — Rebuttal (nihms-2096004)
+
+1. **Does the 10 bits/s conscious channel bottleneck hold for scientists doing complex data interpretation?** When Dan scans a Manhattan plot or a genome browser track, is the rate of "discoveries per second" also ~10 bits/s, or does pattern recognition in domain experts operate differently?
+
+2. **Is there a genomics analog to the sensorimotor sifting number** — say, the ratio of raw reads processed by alignment algorithms to the biological conclusions extracted (~10⁸?) — and would that ratio be meaningful to track as a design metric for the KnowledgeBase pipeline?
+
+3. **Do you see an analogous "sifting number" in your own research workflows that Linus could be specifically designed to reduce** — compressing the gap between data ingestion and interpretable insight?
+
+4. **Should the Maestro/Worker architecture be explicitly framed in terms of the 10 bits/s conscious channel** — Workers handle high-bandwidth sensorimotor-equivalent tasks; Dan+Claude handle the narrow conscious synthesis channel? Would that framing change how you draw the autonomy boundary?
+
+5. **If Linus eventually develops a voice or gesture interface, should interaction design explicitly optimize for the 10 bits/s bottleneck** — front-loading inference so Dan's conscious output channel is never blocked waiting for compute?
+
+---
+
+# Part 3 — From `docs/` synthesis documents
+
+## LLM Wiki & Community Insights (docs/llm-wiki-synthesis.md)
+
+1. **How should Linus implement the write-back rule across parallel Workers?** For Phase 3 multi-agent fan-out, multiple Workers may simultaneously propose updates to the same KB pages. What coordination mechanism prevents parallel workers from producing contradictory KB writes? (git branch per ingestion, mesh sync, last-write-wins?)
+
+2. **What is the right confidence decay rate for different claim types in a scientific corpus?** The v2 gist proposes Ebbinghaus decay — exponential with time, reset on access or confirmation. Methods sections decay faster than foundational results. What are the right decay constants for Dan's domains (genomics, computational biology, ML inference)?
+
+3. **Can the FUNGI processing protocol (Frame, Unearth, Network, Grow, Interrogate) be formalized as a KnowledgeBase ingest step?** Is it tractable to run this on every paper with a local Qwen2.5 Worker, or does the Interrogate step require a stronger model?
+
+4. **Should Linus adopt immutable atomic notes (Zettelkasten) or mutable wiki pages for KnowledgeBase?** Mutable pages are easier to keep current but make provenance harder. Immutable notes with stable IDs make every claim traceable but require a separate synthesis layer. Is there a hybrid given that KnowledgeBase is already structured around entity pages?
+
+5. **What is the right entity deduplication threshold for KnowledgeBase?** Some systems use >60% entity overlap as the threshold for updating vs. creating. The community identified concept deduplication ("attention mechanism" vs "self-attention") as the hardest part of graph construction. What threshold works for Dan's scientific domain?
+
+6. **How should Linus handle the "mostly correct is broken" problem for high-stakes content?** For formal protocols and method descriptions in the KB, a mostly-correct summary is a broken state, not a degraded one. Should those content types use the wiki only as a pointer to validated source material?
+
+7. **What does the entrepreneurial application surface look like for a private compiled KB?** The business use cases (internal wiki fed by domain content, competitive analysis, due diligence) suggest a Linus-derived KB-as-a-service could be differentiated. What would it look like for a small lab or startup?
+
+8. **Which repos from the LLM wiki community list should be cloned into `repos/` as reference material?** Top candidates: `omega-memory` (hybrid FTS5+vector+cross-encoder retrieval, 95.4% accuracy at 50ms), `keppi` (graph traversal with blast-radius analysis on 1.4K notes), `rohitg00/agentmemory` (production memory/retrieval with 43 MCP tools), `openaugi` (simplest graph-backed memory with write-back). See `docs/llm-wiki-synthesis.md` Section 8 for full list.
+
+---
+
+## Skills, Practices & Entrepreneurial Opportunities (docs/skills-and-practices-synthesis.md)
+
+1. **What is Linus's first monetizable capability, and when?** Should Dan start generating revenue from AI-assisted services now (scientific literature intelligence retainer, ~$1,000–$3,000/month/client) using hosted Claude + domain expertise, while Linus builds in the background? Or does investment focus remain entirely on infrastructure? Real client feedback is more valuable than speculative roadmap planning.
+
+2. **Does Linus need a custom orchestration layer, or will Task Master AI + Cline cover Phase 2?** The Algorithm says delete before building. Do Dan's requirements for KnowledgeBase integration, sandbox policy enforcement, and Apple Silicon optimization justify a custom orchestration layer, or does combining existing tools get to a working system faster?
+
+3. **What is Linus's smallest-possible closed Maestro/Worker loop that Dan could run this week?** A Worker receiving a spec, executing it, and returning a verifiable result — even trivially. Getting that loop working is more valuable than any further planning.
+
+4. **What is the right fine-tuning target in Phase 6, and does it change the entrepreneurial calculus?** A genomics-specialized model opens the scientific intelligence opportunities; a coding-specialized model accelerates Linus's own development. This decision should probably be made by Phase 3, not deferred to Phase 6.
+
+5. **Is Dan's domain expertise (biochemistry, genomics, environmental science) the scarce input at Maestro time, rather than task decomposition skill?** This shapes how the Maestro/Worker boundary is drawn — domain expertise applied to problems Workers cannot touch may be higher-leverage than decomposing tasks for Workers to execute.
+
+---
+
+## Security Posture (docs/security-synthesis.md)
+
+1. **How much supply chain risk is acceptable, and at what cost?** Full hash pinning and lock files add friction to the development workflow. How does Dan want to balance iteration speed against supply chain integrity? A middle path (audit monthly, hash-pin at phase milestones) should be an explicit choice.
+
+2. **Should Linus ever run untrusted packages from the internet, and if so, how?** Should experimental packages always run in isolated, disposable `uv` virtual environments that are never activated alongside the linus conda env, or is conda env isolation sufficient?
+
+3. **What is the threat model for the KnowledgeBase content?** Dan adds papers from arXiv, bioRxiv, and other sources. Is the threat of a maliciously crafted PDF realistic enough to warrant PDF sanitization tooling? Or is the corpus trusted because Dan controls what enters it?
+
+4. **When the OpenAI-compatible endpoint is exposed, who is allowed to query it?** Is there a point at which Linus needs TLS and mutual authentication (e.g., if run on a home server or accessed from mobile), or will it remain strictly localhost-only?
+
+5. **How should Linus handle a detected supply chain compromise?** If `pip-audit` reports a CVE in an installed package, what is the response protocol? Immediate env rebuild? Credential rotation as a precaution? The litellm incident was discovered by accident via a RAM crash; a more subtle attack would not announce itself.
+
+---
+
 ## Cross-cutting (from `docs/paper-landscape.md`)
 
 These reappeared across multiple paper notes and are reproduced here so they are not

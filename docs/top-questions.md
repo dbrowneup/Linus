@@ -12,6 +12,32 @@ documentation cadence.
 
 ---
 
+## Tier 0 — Immediate actions (Phase 0 / security hygiene, do not wait)
+
+These are not architectural questions — they are concrete, reversible actions with negligible
+downside that should happen before Phase 1 starts. They don't require answers; they require
+execution.
+
+### 0. Remove pre-emptive ML framework dependencies from environment.yml
+
+`langchain`, `langgraph`, and `haystack-ai` are currently installed in the linus conda
+environment for "Phase 3+ evaluation" but serve no current function. Their transitive
+dependency trees are enormous, their release cadence is fast, and the core value they provide
+(agent state machines, tool orchestration, document pipelines) is exactly what Linus is building
+as its core competency. `langchain` alone was a litellm-style supply chain attack target in 2024.
+Removing them costs nothing; re-adding them at Phase 3 takes one line.
+
+Additionally, `haystack-ai` is a KnowledgeBase-layer dependency and should live in
+KnowledgeBase's own environment, not Linus's.
+
+**Action**: Remove `langchain`, `langgraph`, and `haystack-ai` from `environment.yml`. Rebuild
+the env. Add a lock file (`pip-compile --generate-hashes`) to pin all dependencies with hash
+verification. Document the dependency philosophy in CLAUDE.md.
+
+**Source**: `docs/security-synthesis.md` dependency surface analysis.
+
+---
+
 ## Tier 1 — Decisions that block Phase 1 / Phase 2
 
 These determine what gets built first, and several other questions resolve
@@ -141,7 +167,30 @@ probably ~100–150B MoE or 30–50B dense-1-bit. Want a concrete Phase 6d
 target ("get model X running at N tok/s on Dan's hardware") sketched once
 Phase 1b closes? *(flash-moe Q1; Flash-MoE paper Q1.)*
 
-### 13. Phase 5c: deferred or done?
+### 13. Does Linus need a custom orchestration layer, or will Task Master AI + Cline cover Phase 2?
+
+Task Master AI (PRD → structured tasks → sequential Claude execution) and claude-squad (parallel
+terminal agents) together might satisfy Phase 2's orchestration requirements without Linus building
+a custom router. The Algorithm says delete before building. The counter-argument is that
+KnowledgeBase integration, sandbox policy, and Apple Silicon optimization require enough
+custom orchestration primitives that the custom layer is the work, not overhead. This question
+should be answered by explicit comparison, not assumption.
+
+**Source**: `docs/skills-and-practices-synthesis.md` Q2; cross-cutting entrepreneurial material.
+
+### 14. Should Dan start monetizing AI capabilities now, before Linus infrastructure is ready?
+
+Scientific literature intelligence as a retainer service — Dan's PhD + genomics domain expertise +
+hosted Claude — is buildable today with no Linus infrastructure, and could generate $1,000–$3,000/
+month per client. Starting even one engagement would generate real feedback about what clients pay
+for, which is more valuable than further planning. The tradeoff: time taken from Linus
+infrastructure work. The counter-argument: Linus's value is to enable this kind of work at scale,
+so building the infrastructure first makes each engagement cheaper. Which path yields better
+information faster?
+
+**Source**: `docs/skills-and-practices-synthesis.md` Q1; entrepreneurial opportunity analysis.
+
+### 15. Phase 5c: deferred or done?
 
 claw-code-local plus the Phase 2a Linus endpoint already solves the terminal
 agent surface. The roadmap's 5c fallback ("a small custom terminal agent
@@ -155,6 +204,51 @@ Q1; claw-code Q1.)*
 
 These are meaningful but don't block any concrete next action. Resolve them
 in batches when there is time.
+
+### 19. Benchmark architecture: tok/s vs. task-completion time
+
+The [Speed and LLMs paper](paper-notes/2502.16721v1.md) shows that task-completion rankings
+frequently invert tok/s rankings — the canonical Worker selection metric is systematically
+misleading. `benchmarks/dan_tasks/` should be structured around a three-task schema (minimal
+output, fixed-length, open-ended) with wall-clock completion time as the primary axis from
+Phase 1. This is not a hard decision — it is a design choice that is cheap to get right now
+and expensive to retrofit later. *(2502.16721v1 Q1; Q2.)*
+
+### 20. KB ingestion keyphrase strategy: RaKUn 2.0 as the Phase 2 baseline?
+
+RaKUn 2.0 is CPU-only, pure Python, 2 orders of magnitude faster than alternatives with
+statistically indistinguishable F1, and demonstrated on biomedical corpora the size of
+Dan's domain. It is the natural Phase 2 keyphrase extraction baseline. The question is
+whether to adopt it immediately or benchmark it against author-supplied paper keywords
+first. KGRank is the Phase 3 upgrade path for ontology-enriched KB node labels.
+*(2208.07262v1 Q1-3; s41019-017-0055-z Q1.)*
+
+### 21. Security posture decisions: lock files, dependency philosophy, incident protocol
+
+Three concrete decisions that don't require architecture work but require Dan's values-level input:
+(1) How much supply chain friction is acceptable — full hash pinning, monthly audit, or phase-
+milestone pinning? (2) Should untrusted experimental packages always run in disposable `uv` envs?
+(3) What is the response protocol if `pip-audit` finds a CVE in the installed env? Having written
+answers to all three now, before an incident, is the right time to do it.
+*(security-synthesis.md Q1, Q2, Q5.)*
+
+### 22. Output interface design: optimize for the 10 bits/s human review channel?
+
+Parallel Worker fan-out generates zero throughput gain for Dan unless the Maestro interface
+compresses outputs to the essential bits before presenting them. The [Zheng-Meister paper](paper-notes/PIIS0896627324008080.md) gives this a quantitative foundation: the bottleneck is ~10 bits/s
+human review, not model latency. The design implication for Phase 2 is that Linus's chat/summary
+interface should default to high-information-density concise outputs, with verbose modes opt-in.
+*(PIIS0896627324008080 Q4; nihms-2096004 Q4.)*
+
+### 23. Which community repos to clone into repos/ as Phase 2-3 references?
+
+The LLM wiki synthesis identified 8 high-value repos not already in `repos/` — all local-first,
+Apple Silicon compatible, no CUDA required. Top candidates: `omega-memory` (hybrid
+FTS5+vector+cross-encoder, 95.4% at 50ms), `keppi` (graph traversal on real 1.4K-note KG),
+`rohitg00/agentmemory` (43 MCP tools, BM25+vector+KG), `openaugi` (simplest graph-backed memory
+with write-back). The skills synthesis also flagged `fastmcp`, `Task Master AI`, and `claude-squad`.
+Cloning all ~12 adds study material without operational risk. *(llm-wiki-synthesis.md S8;
+skills-and-practices-synthesis.md S4.)*
 
 ### 14. Documentation cadence and synthesis docs
 
@@ -223,6 +317,9 @@ Q3.)*
 ---
 
 ## How to use this document
+
+**Tier 0** is new: concrete, immediate actions (remove pre-emptive ML dependencies, add lock
+file) that should happen before Phase 1 starts. No discussion needed — just do them.
 
 The plan is to walk Tier 1 first as a focused conversation, with Tier 2 as
 the natural follow-up. Tier 3 is a reservoir to dip into when context
