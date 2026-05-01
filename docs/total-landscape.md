@@ -32,8 +32,13 @@ code is the right shape. This is the structural picture:
 | **Hypercube projections (orthogonal layer)** | Horiike-Fujishiro Phys. Rev. E | (none) | Curiosity / biology overlap; not phase-blocking |
 | **Harnesses and orchestration** | (no paper anchor — practitioner thread) | `cline`, `claw-code-local`, `claw-code`, `openclaw` | Phase 1e/2/5 front-ends |
 | **Data sovereignty (component catalog)** | (none — pragmatic) | `project-nomad` | Phase 4 reference catalog only |
+| **KB ingestion — keyphrase extraction** | RaKUn 2.0 (2208.07262) Phase 2 baseline; KGRank (s41019-017-0055-z) Phase 3 enriched path | `modules/KnowledgeBase/` | Phase 2 ingestion pipeline; Phase 3 ontology-grounded indexing |
+| **Benchmarking & inference evaluation** | Speed and LLMs (2502.16721) — task-completion time as primary metric; tok/s is misleading | `benchmarks/dan_tasks/` (design target) | Phase 1 benchmark design; Worker selection methodology |
+| **Cognitive throughput / human-AI interface** | Zheng-Meister Neuron 2025 (PIIS0896627324008080) + Sauerbrei-Pruszynski rebuttal (nihms-2096004) | (no code anchor — design heuristic) | Phase 2 interface design; Maestro/Worker analogy grounding |
+| **Security posture** | (no paper — practitioner synthesis in docs/security-synthesis.md) | `environment.yml`, `.claude/settings.json`, SAFETY.md | Phase 0 immediate (dep cleanup); Phase 2 (endpoint security); Phase 3 (prompt injection) |
+| **Skills, practices & entrepreneurial** | (no paper — practitioner threads in docs/skills-and-practices-synthesis.md) | `repos/cline`, emerging: Task Master AI, claude-squad | Phase 1 (closed loop); commercial surface Phase 1+ |
 
-Two observations fall out of this table:
+Four observations fall out of this table:
 
 **The BitNet thread is the most internally-coherent one.** Six papers and
 three repos line up tightly enough that the right action — pull
@@ -47,6 +52,21 @@ that reason.
 adopting either in Linus means writing or pulling new code (a Cayley
 parametrization layer for MLX; a `datatrove`-style ingestion pipeline). They
 are Phase 6+ candidates by virtue of where the code gap lives.
+
+**The keyphrase extraction papers (RaKUn 2.0, KGRank) close a gap in the KB
+ingestion pipeline.** Previously there was no paper anchor for *how* documents
+get indexed when they enter the KnowledgeBase. RaKUn 2.0 provides the Phase 2
+baseline (fast, unsupervised, CPU-only); KGRank provides the Phase 3 upgrade
+path (ontology-grounded, semantic). Together they give the KB ingestion stack
+a complete theory-to-implementation path.
+
+**Security is now an explicit cross-cutting concern.** The `docs/security-synthesis.md`
+analysis identified that `langchain`, `langgraph`, and `haystack-ai` are installed for
+future use but represent unnecessary supply chain surface today. The first concrete action
+before Phase 1 begins is removing these packages and adding hash-pinned lock files. The
+Maestro/Worker architecture is an asset for prompt injection defense (Workers should
+not take safety-relevant actions on their own authority regardless of what their context
+window says), but that defense needs to be made explicit in the orchestration design.
 
 ---
 
@@ -131,6 +151,40 @@ Linus-specialized model trained on KB content inherits whatever the KB has
 recorded, and KB embeddings are how Workers retrieve context at run time. KB
 quality compounds across phases.
 
+### Crossing 4 — Security posture vs. development velocity
+
+This crossing is new and does not have a paper anchor — it emerged from the
+`docs/security-synthesis.md` synthesis of the litellm supply chain incident (Karpathy
+tweet, May 2026), the Linus dependency audit, and SAFETY.md. The framing:
+
+SAFETY.md is well-designed for operational autonomy control — the tiered permission
+model, blocklist of credential paths, and audit log are solid. But it addresses a
+completely different threat class than supply chain attacks or prompt injection. A
+litellm-style attack bypasses all of SAFETY.md because it runs inside the package,
+before any tool call is made.
+
+The crossing Linus has to navigate is between two legitimate pressures: the need for rapid
+iteration (adding packages as needed, low-friction env management) and the need for supply
+chain integrity (hash-pinned lock files, minimal dependency surface, audit gates). These
+are genuinely in tension for a solo developer in rapid Phase 1 iteration.
+
+Three rungs of the security posture, in increasing rigor:
+
+1. **Immediate (Phase 0):** Remove pre-emptive ML framework packages (`langchain`,
+   `langgraph`, `haystack-ai`). Add a `requirements-locked.txt` with hash verification
+   (`pip-compile --generate-hashes`). Document the dependency philosophy in CLAUDE.md.
+   Cost: one session. Benefit: eliminates the largest supply chain exposure for no
+   current functionality.
+
+2. **Phase 2 (build into MVP):** Structure the OpenAI-compatible endpoint as localhost-only
+   with explicit authentication design at Phase 2. Treat KnowledgeBase content as a
+   prompt injection surface and add a trust-tier for Retrieved content vs. system prompts.
+   Workers should not be able to take safety-relevant actions on their own authority
+   regardless of what their context window says.
+
+3. **Phase 3+ (ongoing):** Quarterly `pip-audit` runs. Prompt injection test suite for
+   KB-backed retrieval. Credential rotation protocol if an incident is detected.
+
 ---
 
 ## The three layers Linus actually has to build
@@ -208,6 +262,20 @@ currently no public-API ANE serving path that performs comparably. The
 choice is "accept the risk and benefit from pmetal-ANE" or "stay GPU-only
 and revisit if/when CoreML's posture changes."
 
+**A clear answer on Phase 2 custom orchestration vs. off-the-shelf tools.** The
+skills/practices synthesis flagged that Task Master AI (PRD → tasks → sequential
+Claude execution) and claude-squad (parallel terminal agents) together might satisfy
+Phase 2 requirements without Linus building a custom router. The Algorithm says delete
+before building. This gap is not a code gap — it is a decision gap that should close
+before Phase 2 engineering begins.
+
+**A commercial surface and entrepreneurial plan.** Linus's capabilities — domain expertise
++ local AI orchestration + private KnowledgeBase — map onto several monetizable services
+(scientific literature intelligence, biotech analysis, research infrastructure consulting).
+Currently there is no planning document for the commercial layer. The open question
+(top-questions.md Tier 1 #14) is whether to start generating revenue now using hosted
+Claude + domain expertise while Linus builds, or defer until Phase 2+ infrastructure is ready.
+
 ---
 
 ## How the four work products fit together
@@ -228,10 +296,27 @@ deciding on, and surfaces the gaps where neither side currently delivers.
 prioritized questions, with explicit pointers back to source notes.
 
 [open-questions.md](open-questions.md) — the complete archive of every
-"open question for Dan" extracted from any per-repo or per-paper note. The
+"open question for Dan" extracted from any per-repo, per-paper, or synthesis note. The
 reservoir from which `top-questions.md` was distilled.
 
-The intended workflow is to walk `top-questions.md` Tier 1 in conversation,
-with `total-landscape.md` open as the map, and update both this file and
-the relevant decisions / planning documents (ROADMAP, DECISIONS, CLAUDE.md,
-the per-note "Open questions for Dan" sections) as each answer lands.
+**New synthesis documents** produced alongside the second batch of paper notes (May 2026):
+
+[docs/llm-wiki-synthesis.md](../llm-wiki-synthesis.md) — Synthesis of Karpathy's LLM Wiki Gist,
+community-contributed repos and insights (COMMUNITY_INSIGHTS.md, KB_DESIGN_PATTERNS.md), Rohit's
+v2 gist, and the autoresearch/Apple Flash thread. Covers 14 core KB design concepts, 20 relevant
+repos (8 suggested for `repos/`), community-validated implementation patterns, and 9 open questions.
+
+[docs/skills-and-practices-synthesis.md](../skills-and-practices-synthesis.md) — Synthesis of the
+Claude skills and best-practices threads (17 skills, Top 50 repos, 17 best practices, Stop Staring
+at Files, Cline description). Covers Maestro/Worker collaboration practices, 13 skills for Linus,
+12 new repo candidates, 7 entrepreneurial opportunities, and 5 open questions.
+
+[docs/security-synthesis.md](../security-synthesis.md) — Security posture analysis triggered by
+the litellm supply chain incident. Covers current dependency surface, supply chain mitigations,
+prompt injection threat model, endpoint security, and 5 open questions requiring Dan's
+values-level input.
+
+The intended workflow is to walk `top-questions.md` Tier 0 (immediate actions) first, then Tier 1
+in conversation, with `total-landscape.md` open as the map. Update both this file and the relevant
+decisions / planning documents (ROADMAP, DECISIONS, CLAUDE.md, the per-note "Open questions for
+Dan" sections) as each answer lands.
