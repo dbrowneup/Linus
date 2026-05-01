@@ -1,10 +1,15 @@
 # Open Questions for Dan
 
-All questions aggregated from `docs/repo-notes/`. Each section names the source repo
-and carries the questions unchanged. Work through these in one pass or use them as
-a reading agenda alongside the individual notes.
+All questions aggregated from `docs/repo-notes/` and `docs/paper-notes/`. Each section
+names the source note and carries the questions unchanged. Work through these in one
+pass or use them as a reading agenda alongside the individual notes.
+
+For a smaller, prioritized subset focused on the most consequential decisions, see
+[top-questions.md](top-questions.md).
 
 ---
+
+# Part 1 — From `docs/repo-notes/`
 
 ## pmetal
 
@@ -293,3 +298,330 @@ a reading agenda alongside the individual notes.
    Never Goes Offline," zero telemetry, no authentication by default because the network
    boundary is the trust boundary) is crisper than Linus currently articulates. Worth
    lifting into VISION.md?
+
+---
+
+# Part 2 — From `docs/paper-notes/`
+
+## BitNet (original, 2310.11453v1)
+
+1. Are you interested in the *training-side* contribution here (STE, latent weights,
+   large LR) for a hypothetical Linus-specific fine-tune, or only in the *inference-side*
+   artifact (a binarized matrix you can run cheaply)? That's a Phase 6 vs. Phase 2 split.
+
+2. The paper's energy advantage relies on the matmul being almost-pure-addition. On the
+   M1 Max specifically, do we have a ternary/binary matmul kernel for Metal/MLX, or is
+   everyone still using `mlx.matmul` with FP16 weights? (This is a `repos/pmetal/`
+   question.)
+
+3. Worth a synthesis note tying BitNet → ANE → flash-moe into one inference story for
+   Linus? I think so, but you should call it.
+
+---
+
+## BitNet b1.58 (2402.17764v1)
+
+1. Is there a community-released 1.58-bit checkpoint at 3B+ in MLX format yet, or is
+   Bonsai-demo (which is the original 1-bit, not 1.58) the best we have on Apple Silicon
+   today?
+
+2. For Phase 6, do you imagine fine-tuning *on top of* a pre-trained BitNet (cheap,
+   possible on M1 Max), or LoRA-on-FP16 then converting to BitNet (more standard, but
+   throws away the BitNet training advantage)?
+
+3. The paper's "design new hardware for 1-bit LLMs" pitch maps neatly onto Apple's ANE
+   strategy. Worth a longer synthesis note connecting BitNet → ANE → pmetal → flash-moe
+   as one coherent inference story?
+
+---
+
+## BitNet a4.8 (2411.04965v1)
+
+1. Is the squared-ReLU GLU + sparsity trick worth pulling out as a standalone technique
+   we apply to FP16 Workers, independent of BitNet? Could be a quick Phase 1 inference
+   win.
+
+2. The 3-bit KV cache result is the most striking number here. Same answer to BitNet v2's
+   4-bit KV — do you want to prioritize KV-cache compression as a near-term Linus
+   inference experiment?
+
+3. This paper is mostly subsumed by BitNet v2. Should the v2 note simply replace this, or
+   is it useful to keep both for the historical record? My vote: keep both, mark this one
+   clearly as superseded.
+
+---
+
+## BitNet v2 (2504.18415v2)
+
+1. Is 4-bit KV cache more interesting to you than 4-bit weights *right now*? My read:
+   long-context queries against the KnowledgeBase are a near-term Linus pain point, and a
+   4-bit KV cache trick may help even with FP16 weights.
+
+2. Would you want a `paper-notes/synthesis-bitnet-on-apple-silicon.md` that pulls the
+   four BitNet papers + Bonsai-demo + pmetal into one "what's the single best inference
+   path on M1 Max in 2026" writeup? The four BitNet papers individually summarize fine;
+   the *practical answer* probably needs synthesis.
+
+3. The "trained at low precision is fundamentally different from quantized after the
+   fact" claim is the throughline of the BitNet line. Do you trust it enough to commit
+   Linus to a BitNet-derived Worker model in Phase 6, or do you want to keep the
+   FP16-LoRA option open as a fallback?
+
+---
+
+## BitNet b1.58 2B4T (2504.12285v2)
+
+1. **Highest-leverage concrete action**: should I scope a Phase 1 spec for "Pull
+   `bitnet-b1.58-2B-4T-gguf`, build bitnet.cpp on M1 Max, benchmark against
+   ollama-served Qwen2.5-1.5B and Llama-3.2-1B on a few representative Dan tasks (Python
+   refactor, paper-summarization, quick Q&A)"? My read: this is the single most
+   informative Phase 1 experiment; ~half a day of work.
+
+2. The HumanEval+ underperformance suggests **a code-specialized BitNet would be more
+   useful for Linus than a general-purpose one**. Does the Phase 6 fine-tuning plan
+   include a domain-specialization step on Dan's specific Python/Rust corpus?
+
+3. The DPO recipe documented here is the closest thing to a "how to align a Linus-
+   specific BitNet" recipe in the public literature. Worth deciding now whether Phase 6
+   fine-tuning includes a DPO step or stops at SFT.
+
+---
+
+## bitnet.cpp (2502.11880v1)
+
+1. **Direct test path**: Want me to scope a Phase 1 benchmark that builds bitnet.cpp on
+   the M1 Max, runs the official BitNet b1.58 3B checkpoint, and measures `tokens/s`
+   against the FP16 LLaMA baseline? This is small, concrete, gives us actual M1 numbers,
+   and would directly validate or kill BitNet as a Worker model. Probably 1–2 hours of
+   work.
+
+2. The CPU-only restriction means none of bitnet.cpp's gains touch the GPU or ANE. Is the
+   synthesis "BitNet → ANE → pmetal" still the long-term Linus story, or does the
+   CPU-only result here suggest the simpler path is "use M1 Max CPU + bitnet.cpp" and
+   skip the ANE detour?
+
+3. Bitnet.cpp ships from the same GitHub repo as the BitNet model code. Do you want me
+   to verify the `repos/BitNet/` clone has the bitnet.cpp tree, or is that a "Phase 1
+   to-do" item?
+
+---
+
+## BitNet Distillation (2510.13998v1)
+
+1. Does Microsoft's BitNet repo actually include BitDistill training code, or just
+   inference? (The paper says yes; want me to check the repo and report back?)
+
+2. If we adopted this as the Linus Phase 6 plan: which downstream task would be the
+   first BitDistill target? Classification of incoming papers into KB topics is the
+   natural Phase 0/1 candidate; KnowledgeBase summarization is the more ambitious Phase 3
+   candidate.
+
+3. The paper trains on AMD MI300X; we run on M1 Max. Worth a benchmark spike to measure
+   whether 10B tokens of continued pre-training is hours/days/weeks on our hardware
+   before committing to BitDistill as the Phase 6 path?
+
+---
+
+## LLM in a Flash (2312.11514v3)
+
+1. The paper's predictor training requires picking an architecture that has clean
+   activation sparsity (ReLU). The BitNet 2B4T model uses **squared-ReLU GLU** which *is*
+   sparse — does that mean the predictor approach is naturally compatible with our chosen
+   Worker architecture? My best guess: yes, but worth checking the `repos/mlx-flash/`
+   impl to see what models they support.
+
+2. Sliding-window k=5 has a ~10–15% per-token incremental load. On M1 Max flash that's
+   ~150 ms per layer-forward at 7B. Worth a back-of-envelope: what model size + window-k
+   combination crosses the latency threshold of "feels interactive"?
+
+3. This and `flash_moe.pdf` are the two papers most directly tied to existing Linus
+   repos. Do you want a *single synthesis note* that combines them with the
+   `repos/mlx-flash/` and `repos/flash-moe/` repo notes, since they're really one
+   inference story?
+
+---
+
+## Flash-MoE (flash_moe.md)
+
+1. **Highest-impact concrete next step**: do you want me to scope a Phase 1 spike that
+   runs the *existing* `repos/flash-moe/` code on the M1 Max with a smaller MoE
+   checkpoint (Mixtral-8×7B or DeepSeek-V2-Lite) to validate the technique works on our
+   hardware? This would directly test "can Linus host 80B-class MoE models" — a Phase 6/7
+   question made concrete in Phase 1.
+
+2. The paper is Claude-as-primary-author. That's an existence proof for the Maestro/
+   Worker model that Linus is built around. Worth a
+   `docs/maestro-worker-flash-moe-case-study.md` companion writeup analyzing the
+   collaboration dynamics? Or is that too meta?
+
+3. Combining BitNet experts with Flash-MoE streaming would push the memory/quality
+   frontier further. Realistic Phase 8 direction, or premature?
+
+---
+
+## JPmHC (2602.18308v2)
+
+1. **Is JPmHC interesting on its own merits, or as part of a larger BitNet+MoE+JPmHC
+   story?** The most exciting Linus-aligned synthesis is "stability via Cayley + ternary
+   weights via BitNet + expert streaming via Flash-MoE," none of which exists yet as a
+   unified codebase. Worth flagging as a Phase 8 research direction in
+   `docs/open-questions.md`?
+
+2. **Phase 1 reproducibility spike**: would it be worth a 1–2 day exercise to try
+   reproducing the JPmHC TRM result in MLX on M1 Max? It's ambitious — the paper used 8×
+   B200 GPUs — but the model is tiny enough that the wallclock might be tolerable, and it
+   would directly exercise our MLX training path.
+
+3. The TRM-on-ARC-AGI methodology is very similar to what `repos/autoresearch/` and
+   `repos/autoresearch-mlx/` are about — agentic research loops. Worth a synthesis note
+   connecting JPmHC as a target architecture for those loops to *learn to design
+   improvements upon*?
+
+---
+
+## FineWeb (2406.17557v2)
+
+1. **Phase 6 path question**: if we adopt the BitDistill plan (10B tokens of continued
+   pretraining + downstream fine-tune), should the 10B-token corpus be a slice of
+   FineWeb-Edu, a slice of Dan's domain papers, or a mix? The Microsoft team used FALCON;
+   FineWeb-Edu is the closest open analogue.
+
+2. **KnowledgeBase ingestion**: would you want me to write a small `kb-quality-filter.md`
+   spec applying FineWeb's "compare known-good vs known-bad statistics" methodology to
+   your paper-ingest pipeline? The filtering math is paper-agnostic and may help with
+   junk pages from web-scraped reference material.
+
+3. **English-only assumption**: are any of your scientific reference materials in
+   non-English languages (German for older biochemistry, French for some EnvSci sources)?
+   If so, FineWeb is the wrong corpus and we should look at multilingual alternatives
+   (CC-100, mC4).
+
+---
+
+## Knowledge Graphs survey (2003.02320v6)
+
+1. **Choice of graph data model for KnowledgeBase**: RDF (Semantic Web stack, full
+   ecosystem) or property graph (richer attributes, more performant for some workloads)?
+   §2 lays out the tradeoffs. My read: RDF wins for a KB whose primary purpose is
+   knowledge integration and SPARQL queryability; property graph wins if you imagine KB
+   primarily as a graph database for analytics. Worth deciding *now* before the schema
+   design hardens, because converting later is painful.
+
+2. **Schema-first vs schema-emergent**: Build a top-down ontology (using ontology-design
+   patterns from §6.5) before ingesting content? Or ingest first, then mine the emergent
+   schema (§3.1.3) and formalize? My recommendation: schema-first for the *spine*
+   (papers, authors, concepts, citations) using existing standards (BIBO, SKOS, FOAF),
+   schema-emergent for the long tail.
+
+3. **Entailment regime**: RDFS-only (sub-class, sub-property, domain, range) or OWL 2 RL
+   (richer, but heavier)? §4.3 makes the case; my read is RDFS-only is plenty for KB v1,
+   with OWL 2 RL revisited if/when Phase 3 reasoning needs justify it.
+
+4. **Worth a `docs/specs/kb-architecture.md`** that walks through this paper section by
+   section and records the design choice + rationale for each? It would make the KB
+   design decisions auditable and would pay back across the project lifetime.
+
+---
+
+## Sentence Embeddings (2408.08073v2)
+
+1. **Concrete Phase 2 KB action**: do you want me to scope a
+   `experiments/kb-embedding-ablation.md` spec that takes a sample of papers from your
+   `context/papers/` folder, runs them through (a) raw last-layer-mean, (b) first+last +
+   idf + quantile-u, (c) BERT+Avg., (d) a modern encoder like BGE-base — and measures
+   cluster quality and retrieval relevance against a small set of hand-labeled
+   "should-be-similar" pairs you provide? This would directly validate which embedding
+   recipe to bake into the KB ingestion pipeline.
+
+2. **Methodology generalization**: would it be worth a `docs/experimental-protocol.md`
+   companion to ROADMAP.md, distilling this paper's ablation methodology + FineWeb's
+   curation methodology into a Linus-house style guide for how benchmarks should be
+   structured? My hunch: yes, and it would pay back across every Linus experiment going
+   forward.
+
+3. **Embedding-model selection**: BERT-base is the paper's test bed. What does Linus
+   actually use today? My read of `CLAUDE.md` and the repos suggests Ollama-served models
+   for generation, but I don't see a designated *embedding* model. Is that a Phase 2
+   decision still pending, and would you like a recommendation note pulling together the
+   post-2024 embedding-model landscape (E5, BGE, Stella, Voyage, GIST) measured against
+   the recipe in this paper?
+
+---
+
+## Curse of Dimensionality (2401.00422v3)
+
+1. **Concrete next step**: should we add a "distance discrimination" health metric to
+   the KB observability dashboard? It would be a simple periodic computation: sample
+   1,000 random points from the KB embedding store, compute pairwise distances, report
+   `|D_max − D_min| / D_min`. If this ratio drops below some threshold (e.g., 0.3),
+   retrieval quality has degraded into the concentration regime and we should investigate
+   (re-train embeddings, dimension-reduce, etc.). I'd estimate ~30 lines of Python.
+
+2. **PCA-reduce KB embeddings before indexing?** Theorem 4 strongly suggests there's a
+   lower-dim representation that loses no signal, and the Stankevičius paper shows that
+   post-processing helps. Worth a Phase 2 experiment: take BGE-base 768-dim embeddings,
+   PCA-reduce to 256-dim, measure retrieval quality vs baseline. My prior: PCA-reduced
+   embeddings will retrieve *as well or better* than full-dim, with 3× less storage.
+
+3. **Norm choice for retrieval**: Should the KB retrieval system use cosine (the default)
+   or Minkowski with k < 2 (more robust to concentration)? This is more speculative and
+   probably needs empirical validation on a Linus-relevant retrieval task before
+   committing.
+
+---
+
+## Horiike Hypercube Projections
+
+1. **Why is this paper in your `context/papers/` folder?** Is it for the geometry
+   methodology (visualization tool), the biology applications (Ising-as-Boltzmann ↔ gene
+   regulation), or because of the surface-level "hypercube" word overlap with JPmHC?
+   Knowing your motivation would refocus the note.
+
+2. **BitNet weight visualization**: would you find it useful if I drafted a small
+   experiment spec — `experiments/bitnet-weight-hypercube.md` — that takes a small BitNet
+   checkpoint, extracts the sign-pattern of one layer's weights, treats each input row as
+   a hypercube vertex, and applies the PCA projection from this paper? It's
+   curiosity-driven, not Phase 6 critical, but might give surprising structural insight
+   into what 1-bit LLMs encode.
+
+3. **Methodological methodology**: the paper's framing of "we want reproducible AND
+   interpretable visualizations of high-dim binary data" maps onto a question we'll have
+   downstream when Linus produces visualizations of agent state, KB structure, etc.
+   Worth elevating as a Linus design principle (reproducibility + interpretability over
+   fancy stochastic methods)?
+
+---
+
+## Cross-cutting (from `docs/paper-landscape.md`)
+
+These reappeared across multiple paper notes and are reproduced here so they are not
+lost amid the per-paper questions:
+
+1. Is the *single most useful Phase 1 spike* "build bitnet.cpp on M1 Max, pull
+   `bitnet-b1.58-2B-4T-gguf`, benchmark vs Ollama-served Qwen and Llama"? Mentioned in
+   2B4T, bitnet.cpp, and BitNet Distillation notes.
+
+2. Should Linus commit to a BitNet-derived Worker for Phase 6, or keep the FP16-LoRA
+   option open? Mentioned in BitNet b1.58 and BitNet Distillation notes.
+
+3. Is a BitNet × Flash-MoE × JPmHC synthesis a real Phase 8 research direction, or
+   premature speculation? Mentioned in JPmHC and Flash-MoE notes.
+
+4. Should there be a `synthesis-bitnet-on-apple-silicon.md` companion note that pulls
+   the four-or-five most relevant papers into one "what's the actual inference path"
+   writeup? Mentioned in BitNet v2 and 2B4T notes.
+
+5. Should the KB v1 embedding pipeline use the recipe from Stankevičius & Lukoševičius
+   (idf weighting + first+last layers + quantile-u normalization), and should that
+   paper's ablation methodology be lifted into a `docs/experimental-protocol.md`
+   Linus-house style guide for benchmark design? Mentioned in the embeddings note.
+
+6. Should there be a `docs/specs/kb-architecture.md` that walks through the Hogan et al.
+   KG survey section by section and records the design choice + rationale for each KB
+   layer (data model, schema, identity, context, query language, deductive layer,
+   inductive layer)? Mentioned in the KG-survey note.
+
+7. Should KB embeddings be PCA-reduced before indexing, and should the KB observability
+   dashboard track distance discrimination `|D_max − D_min| / D_min` as a health metric?
+   Mentioned in the Curse of Dimensionality note. Both are small-effort, large-payoff
+   implementations.
