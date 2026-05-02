@@ -23,8 +23,9 @@ easier and to be a pleasure to build.
 
 ## Status
 
-**Phase 0 — Foundation.** Repo scaffolding, documentation, environment setup. See
-[ROADMAP.md](ROADMAP.md) for the phased plan.
+**Phase 1 — Recon and Baselines** (in progress). Phase 0 closed. Repo synthesis notes
+largely complete; pmetal evaluation underway (built from source, smoke tests pass).
+See [ROADMAP.md](ROADMAP.md) for the phased plan.
 
 ## Principles
 

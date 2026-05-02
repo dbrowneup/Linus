@@ -17,43 +17,31 @@ question whether the next phase's scope can be deleted or simplified.
 
 ## Phase 0 — Foundation
 
-**Target duration:** closing now
+**Target duration:** closed
 
 **Goal:** scaffolding, docs, environment ready, first local model answering prompts.
 
-**Status:**
-
-- Repo created locally and on GitHub (`dbrowneup/Linus`, private)
-- Folder structure established: `src/`, `repos/`, `modules/`, `context/`,
-  `benchmarks/`, `experiments/`, `docs/`
-- All reference repos cloned into `repos/` (gitignored): BitNet, Bonsai-demo, ANE,
-  flash-moe, mlx-flash, pmetal, claw-code, claw-code-local, autoresearch, openclaw, cline,
-  project-nomad
-- KnowledgeBase added as submodule at `modules/KnowledgeBase/`
-- `ollama run qwen2.5-coder:7b` confirmed working
-- Cline installed in VS Code; VS Code Chat also configured with Ollama
-- Markdown docs drafted (this file and siblings)
-
-**Remaining to close Phase 0:**
-
-- Generate and commit the full markdown doc set (this commit)
-- Generate `environment.yml` and `pyproject.toml`
-- Move remaining context files into `context/` subdirectories
-- Create `.claude/settings.json` with ruff hooks
-- Populate DECISIONS.md with DEC-0001 through DEC-0010 covering all decisions from
-  the planning conversation
-- First real commit on `src/` — a placeholder `linus/__init__.py` and a `linus/__about__.py`
-- `conda env create -f environment.yml` — stand up the `linus` env
-- `conda activate linus && pip install -e .` — editable install
-
-**Gate:** Phase 0 closes when `conda activate linus && python -c "import linus; print(linus.__version__)"`
-prints a version string, and the full doc set is committed to the repo.
+**Status: COMPLETE.** Repo scaffolded, all reference repos cloned, KnowledgeBase
+submodule added, conda env stood up, full doc set committed, `.claude/settings.json`
+with ruff hooks in place, DEC-0001 through DEC-0011 logged. Phase 0 gate satisfied.
 
 ---
 
 ## Phase 1 — Recon and Baselines
 
-**Target duration:** 2 weeks
+**Target duration:** 2 weeks (in progress; ~halfway through as of 2026-05-01)
+
+**Status snapshot (2026-05-01):**
+
+- **1a — Repo synthesis notes:** largely complete. Twelve original repo notes written.
+  Likely scope expansion to add a small set of new repos surfaced in the LLM wiki and
+  skills syntheses (omega-memory, keppi, agentmemory, openaugi, fastmcp, Task Master AI,
+  claude-squad, etc.) — to be folded in either as 1a addenda or as a new 1f bucket
+  (decided in this planning refresh).
+- **1b — pmetal deep evaluation:** in progress. Built from source successfully; smoke
+  tests pass; initial impressions strongly positive. LoRA trial, serve trial, and
+  comparative benchmark vs. Ollama still to run before the ADR is written.
+- **1c, 1d, 1e:** not yet started.
 
 **Goal:** know what each repo is, know how our worker models perform on real tasks, and
 have the first Maestro/Worker loop on record.
