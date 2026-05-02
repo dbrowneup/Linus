@@ -38,6 +38,26 @@ verification. Document the dependency philosophy in CLAUDE.md.
 
 ---
 
+### 1. Write and commit an incident response protocol to SAFETY.md
+
+The litellm supply chain incident was discovered accidentally via a RAM crash. A more subtle
+attack would not announce itself. Having a written protocol before an incident occurs makes it
+far more likely to be executed correctly under stress.
+
+The protocol should cover: (1) trigger — what constitutes a confirmed or suspected supply
+chain compromise; (2) containment — env teardown, session log audit, what the compromised
+package had access to; (3) credential rotation scope — which credentials need rotating and in
+what order; (4) attestation — how to verify the rebuilt env is clean before resuming work.
+
+**Action**: Draft and commit a "Supply Chain Incident Response" section to SAFETY.md before
+Phase 2 expands the network-egress surface. One session of work; no architecture decision
+required.
+
+**Source**: `docs/syntheses/security-synthesis.md` Q5; `docs/landscapes/synthesis-landscape.md`
+cross-cutting open questions; `docs/questions/open-questions.md` Part 3 / Security Q5.
+
+---
+
 ## Tier 1 — Decisions that block Phase 1 / Phase 2
 
 These determine what gets built first, and several other questions resolve
@@ -102,6 +122,28 @@ answer is empirical, but the *intent* shapes Phase 5 budget.
 
 **Source notes:** cline (Q1), claw-code (Q1), claw-code-local (Q1), openclaw
 (Q1), repo-landscape "Harnesses."
+
+### 6. KB ingest quality gate: what are the right domain criteria for Dan's scientific fields?
+
+**Why it leads.** The LLM wiki synthesis establishes that filtering noise at the door beats
+any retrieval improvement downstream, and the gate should be an auditable YAML domain editorial
+policy. But the right criteria for Dan's specific domains (genomics, computational biology,
+environmental science) have not been specified. This decision shapes the Phase 2 KB schema
+before the first paper is formally ingested — getting it wrong means the KB accumulates
+low-quality content that corrupts retrieval and, eventually, the Phase 6 fine-tuning corpus.
+
+**Sub-decisions inside this:**
+- What field-specific signals should the gate encode? Candidates: journal tier, methodology
+  rigor, peer review status, data availability, reproducibility markers.
+- Binary (accept/reject) or scored (score + threshold + manual review lane)?
+- Where do preprints (arXiv, bioRxiv) land? Dan's domains move fast; blanket rejection loses
+  signal, but blanket acceptance opens the noise floor.
+- Should FineWeb's "compare known-good vs. known-bad statistics" methodology be adapted as a
+  template for this gate?
+
+**Source notes**: `docs/syntheses/llm-wiki-synthesis.md` quality gate section;
+`docs/landscapes/synthesis-landscape.md` cross-cutting open questions; FineWeb (Q2);
+`docs/questions/open-questions.md` Part 2 / FineWeb Q2; Part 3 / LLM Wiki Q5.
 
 ---
 
@@ -197,6 +239,25 @@ agent surface. The roadmap's 5c fallback ("a small custom terminal agent
 ~500 lines of Python") may be dead on arrival. Mark Phase 5c as "adopt
 claw-code-local," or keep the custom-agent option open? *(claw-code-local
 Q1; claw-code Q1.)*
+
+### 16. Parallel Worker KB write coordination
+
+**Why it belongs in Tier 2.** The write-back rule — every Worker task ends with KB update
+proposals — is straightforward for a single Worker. For Phase 3's multi-agent fan-out,
+multiple Workers may simultaneously propose updates to the same KB pages. Git-branch-per-ingest
+and last-write-wins are partial answers, but neither handles the general case: git branches
+require a merge strategy; last-write-wins silently discards concurrent updates.
+
+The right coordination mechanism should be designed into the Phase 3 KB architecture spec
+*before* the first multi-agent session is spawned. The cost of designing it in Phase 2 is low;
+retrofitting it after the first conflicting write is high.
+
+**Sub-decisions**: serialized KB writes even during parallel fan-out (simplest, no
+coordination needed) vs. merge-on-human-review vs. automated reconciliation; whether
+contradiction detection runs at write time or read time.
+
+*(LLM wiki synthesis Q1; `docs/questions/open-questions.md` Part 3 / LLM Wiki Q1;
+`docs/landscapes/synthesis-landscape.md` cross-cutting open questions.)*
 
 ---
 
@@ -318,16 +379,20 @@ Q3.)*
 
 ## How to use this document
 
-**Tier 0** is new: concrete, immediate actions (remove pre-emptive ML dependencies, add lock
-file) that should happen before Phase 1 starts. No discussion needed — just do them.
+**Tier 0** items are concrete immediate actions — no discussion needed, just execute. Two
+currently: (0) remove pre-emptive ML dependencies and add a hash-pinned lock file; (1) write
+and commit an incident response protocol to SAFETY.md. Both should be done before Phase 1 starts.
 
-The plan is to walk Tier 1 first as a focused conversation, with Tier 2 as
-the natural follow-up. Tier 3 is a reservoir to dip into when context
-suggests one of those threads matters now (e.g., Phase 4 starts → revisit
-Tier 3 #15).
+Walk Tier 1 as a focused conversation, with Tier 2 as the natural follow-up. Tier 3 is a
+reservoir to dip into when context suggests one of those threads matters now (e.g., Phase 4
+starts → revisit Tier 3 #15).
 
-Each Tier 1 answer typically resolves 2–3 downstream questions automatically,
-so progress will compound. As decisions are made, mark them resolved here
-and propagate the resulting changes into [total-landscape.md](total-landscape.md),
-ROADMAP.md, DECISIONS.md (an ADR per Tier 1 decision is appropriate), and
-the relevant per-note `Open questions for Dan` sections.
+Each Tier 1 answer typically resolves 2–3 downstream questions automatically, so progress will
+compound. As decisions are made, mark them resolved here and propagate the resulting changes
+into [total-landscape.md](total-landscape.md), ROADMAP.md, DECISIONS.md (an ADR per Tier 1
+decision is appropriate), and the relevant per-note `Open questions for Dan` sections.
+
+[total-landscape.md](total-landscape.md) is the map — it now integrates repos, papers, and
+all three practitioner syntheses into a single cross-cutting view. [open-questions.md](open-questions.md)
+is the full archive; it now includes a Part 3 sourced from the synthesis documents. Questions in
+`top-questions.md` are a prioritized distillation of that archive.
