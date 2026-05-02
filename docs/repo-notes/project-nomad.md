@@ -32,27 +32,42 @@ home network. No built-in telemetry. A community leaderboard at
 ## 3. What's reusable in Linus
 
 The component list. Phase 4 of Linus's roadmap (Data Sovereignty
-Layer) names three of the same pieces — **Kiwix** for offline
-Wikipedia, **ProtoMaps** for OSM tiles, and **data package version
-tracking** — plus optionally **Qdrant** and **CyberChef** (explicitly
-called out as Docker-acceptable stateless services). NOMAD is proof
-these components compose reasonably and that the operational pattern
-("dockerized stateless services, native inference") works. Linus's
-Phase 4 should treat NOMAD as a recipe to consult, not code to vendor:
-install Kiwix natively on macOS (its native binary works fine and
-avoids the Docker-on-macOS Metal/ANE trap), PMTiles as a static file
-served by any local web server, Qdrant in Docker if KnowledgeBase's
-numpy path hits its limit.
+Layer) adopts four of the same pieces as first-class components:
+**Kiwix** for offline Wikipedia and reference ZIMs, **Kolibri** for
+structured Khan Academy courseware, **ProtoMaps** for OSM tiles, and
+**data package version tracking** — plus optionally **Qdrant** and
+**CyberChef** (explicitly called out as Docker-acceptable stateless
+services). NOMAD is proof these components compose reasonably and that
+the operational pattern ("dockerized stateless services, native
+inference") works.
+
+Linus's Phase 4 should treat NOMAD as a recipe to consult, not code
+to vendor: install Kiwix natively on macOS (its native binary works
+fine and avoids the Docker-on-macOS Metal/ANE trap), install Kolibri
+natively (also has a macOS app; avoids Docker), PMTiles as a static
+file served by any local web server, Qdrant in Docker if
+KnowledgeBase's numpy path hits its limit.
+
+Kiwix and Kolibri are complementary, not duplicates. Kiwix serves
+reference lookups (Wikipedia articles, ebook ZIMs); Kolibri serves
+structured pedagogy (Khan Academy's learning tree, with worked
+examples and exercises). A query like "explain the Needleman-Wunsch
+algorithm" is better served by Kolibri's curriculum tree than by a
+Kiwix article.
 
 ## 4. What's inspiration only
 
 The *posture* — sovereignty as a first-class concern, privacy by
 default, no telemetry, works in a Faraday cage — is aligned with
-Linus's stance and worth articulating explicitly in VISION.md if it
-isn't already. The `~/.linus/data_packages.json` + update-check tool
-pattern in Phase 4 of the roadmap is effectively the same idea as
-NOMAD's Command Center, simplified for a single-user CLI-first
-context.
+Linus's stance and is now articulated explicitly in VISION.md. The
+`~/.linus/data_packages.json` + update-check tool pattern in Phase 4
+of the roadmap is effectively the same idea as NOMAD's Command Center,
+simplified for a single-user CLI-first context.
+
+FlatNotes (NOMAD's local Markdown notes component) has no role in
+Linus's stack. Obsidian is a materially better fit: local-first,
+mature plugin ecosystem, already part of Dan's workflow, and well-
+suited to integration with a Linus tool that reads the vault.
 
 ## 5. What's incompatible or out of scope
 
@@ -81,12 +96,12 @@ carefully. Nothing beyond that.
 
 ## 7. Questions for Dan
 
-- **Phase 4 scope ambition.** Roadmap Phase 4 is deliberately bounded
-  to Kiwix + PMTiles + Qdrant + dataset version tracking. NOMAD
-  hints at more (Kolibri for education content, FlatNotes for
-  notes, CyberChef for data tooling). Do any of those belong in
-  Linus Phase 4, or is notes-taking/data-tooling a non-goal for a
-  personal research assistant?
+- **Phase 4 scope ambition.** Roadmap Phase 4 now includes Kolibri
+  as a named integration target alongside Kiwix and PMTiles. CyberChef
+  is noted as a Docker-acceptable stateless service if data-munging
+  tooling is wanted. FlatNotes is replaced by Obsidian vault
+  integration. The open question: is CyberChef worth adding as a
+  Phase 4 tool, or is it out of scope for a research assistant?
 - **Kiwix ZIM selection.** The practical question that NOMAD
   resolves by asking the user: which Wikipedia subset? Full English
   is ~100 GB; Simple English is ~1 GB; there are topical ZIMs

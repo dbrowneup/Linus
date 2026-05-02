@@ -32,7 +32,7 @@ The repos cluster naturally into four layers that map onto Linus's architecture:
 - `flash-moe` — also the keep-or-revert experiment-log discipline, canonical form
 
 **Data Sovereignty** — what Linus can know offline
-- `project-nomad` — component catalog: Kiwix, ProtoMaps, Qdrant, CyberChef; not code to adopt
+- `project-nomad` — component catalog: Kiwix, Kolibri, ProtoMaps, Qdrant, CyberChef; not code to adopt
 
 ---
 
@@ -127,14 +127,30 @@ but the loop structure — edit, train, compare, keep or revert — is unchanged
 
 ## Data Sovereignty: A Component Catalog, Not a Framework
 
-project-nomad's value to Linus is its curated list: Kiwix for offline Wikipedia, ProtoMaps
-for offline maps, Qdrant for vector search, CyberChef for data tooling, Ollama + Qdrant for
-local AI with RAG. NOMAD itself is Debian-first, Docker-orchestrated, and
-NVIDIA-GPU-recommended — none of those fit Linus. But three of its four named components
-appear directly in Linus's Phase 4 roadmap, and NOMAD's curation decisions (which Wikipedia
-ZIM subsets to install, which PMTiles region files to default to) are worth consulting when
-Phase 4 begins. NOMAD is proof the pattern works; Linus extracts the components and
-discards the orchestration layer.
+project-nomad's value to Linus is its curated list: Kiwix for offline Wikipedia and ebook
+ZIMs, Kolibri for structured Khan Academy courseware, ProtoMaps for offline maps, Qdrant for
+vector search, CyberChef for data tooling, and Ollama + Qdrant for local AI with RAG. NOMAD
+itself is Debian-first, Docker-orchestrated, and NVIDIA-GPU-recommended — none of those fit
+Linus. But four of its named components enter Linus's Phase 4 roadmap, and NOMAD's curation
+decisions (which Wikipedia ZIM subsets to install, which PMTiles region files to default to)
+are worth consulting when Phase 4 begins. NOMAD is proof the pattern works; Linus extracts
+the components and discards the orchestration layer.
+
+Kolibri is worth calling out separately. It is the right tool for structured educational
+content — Khan Academy's curriculum is organized as a learning tree, not as an encyclopedia,
+and Kolibri's native app (cross-platform, macOS-compatible, no Docker needed) presents it
+that way. Kiwix is for reference lookup; Kolibri is for worked explanations, exercises, and
+domain walkthroughs. For a research assistant supporting scientific and computational work,
+the distinction matters: when Linus needs to explain a statistical method or walk through
+a genomics algorithm, Kolibri's Khan Academy tree has structured pedagogy where a Kiwix
+article is a definition. Phase 4 should install both and expose them through separate tools.
+
+NOMAD's posture — "Knowledge That Never Goes Offline," zero telemetry, no authentication by
+default, the network boundary as the trust boundary — is the right stance for Linus and
+should be articulated explicitly in VISION.md if it isn't already. The Phase 4 data
+sovereignty layer is not a feature bolted onto a cloud-dependent system; it is a design
+constraint. Linus must be able to operate completely offline, with all data under Dan's
+physical control, in any condition including the field.
 
 ---
 
@@ -203,11 +219,16 @@ opening the VS Code path without any code changes on the Linus side.
 
 **Phase 4 — Data Sovereignty**
 
-Consult project-nomad's component list when this phase begins: Kiwix for offline Wikipedia
-(install the native macOS binary, not the Docker container), ProtoMaps PMTiles served by
-a static local server, and Qdrant in Docker if KnowledgeBase's numpy similarity search
-hits its limits. Use NOMAD's ZIM selection curation as a starting point for which Wikipedia
-subsets to download.
+Consult project-nomad's component list when this phase begins. Kiwix for offline Wikipedia
+(install the native macOS binary, not the Docker container); use NOMAD's ZIM selection
+curation as a starting point for which subsets to download. Kolibri for structured Khan
+Academy courseware — install the native macOS app, configure for local-only access, and
+expose a `linus.kolibri.search(topic)` tool alongside the Kiwix tool; these serve different
+needs and both belong in Phase 4. ProtoMaps PMTiles served by a static local server. Qdrant
+in Docker if KnowledgeBase's numpy similarity search hits its limits. For notes and
+personal knowledge, Obsidian is a better fit than NOMAD's FlatNotes — it is already the
+standard in Dan's workflow and has a mature local-first model that integrates naturally
+with Linus tools.
 
 **Phase 5 — Interface Refinement**
 

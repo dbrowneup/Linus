@@ -242,19 +242,25 @@ model, and can execute multi-subtask jobs in parallel with observable speedup.
 
 **Target duration:** 2 weeks (can run partly in parallel with Phase 3)
 
-**Goal:** Linus's knowledge scope extends beyond the personal library to curated
-external corpora, with proper version tracking.
+**Goal:** Linus's knowledge scope extends beyond the personal library to curated external
+corpora, all stored locally and accessible completely offline. Phase 4 makes explicit what
+has always been implicit: Linus must operate without network access, with every data source
+under Dan's physical control.
 
 **Core:**
 
 - Kiwix running natively on macOS
-- ZIMs installed: English Wikipedia (selection), Simple English Wikipedia, Khan Academy
-  content
+- ZIMs installed: English Wikipedia (full or curated selection), Simple English Wikipedia;
+  topical ZIMs (medical, genomics/biochem if available) evaluated at install time
+- Kolibri running natively on macOS for structured Khan Academy courseware; Kolibri serves
+  curriculum-depth content (worked explanations, exercises, learning trees) where Kiwix
+  serves reference lookups — both belong, as distinct tools
 - ProtoMaps PMTiles with OSM data for offline geographic queries
 - Dataset version tracking: `~/.linus/data_packages.json` registry
 - Update check tool: `linus.data.check_updates` polls upstream, reports available
   updates, user approves downloads
 - `linus.kiwix.search(zim, query)` tool wrapping Kiwix's HTTP API
+- `linus.kolibri.search(topic)` tool wrapping Kolibri's local API
 - `linus.maps.query(bbox)` tool wrapping PMTiles
 - `linus.data.list` tool for listing installed packages
 
@@ -262,14 +268,20 @@ external corpora, with proper version tracking.
 
 - Qdrant in Docker (if KnowledgeBase's native search hits scalability limits)
 - Any other stateless services nomad-inspired: CyberChef, ArchiveBox, etc.
-- Rule from earlier discussion: Docker for stateless services only; inference stays
-  native
+- Rule from earlier discussion: Docker for stateless services only; inference stays native
+
+**Obsidian vault integration (stretch):**
+
+- `linus.obsidian.search(query)` over Dan's local Obsidian vault, treated as a personal
+  note corpus alongside the paper KnowledgeBase; Obsidian replaces FlatNotes from the
+  NOMAD stack as the notes layer
 
 **Explicit non-goal:** cloning project-nomad's full scope. Borrow what serves Linus;
 delete the rest.
 
-**Gate to Phase 5:** Dan can ask Linus "what's in this region of Oregon" or "summarize
-the Wikipedia article on electronegativity" and get an offline-served answer.
+**Gate to Phase 5:** Dan can ask Linus "what's in this region of Oregon," "summarize the
+Wikipedia article on electronegativity," or "explain Needleman-Wunsch step by step" and
+get an offline-served answer from the appropriate local source — with no network required.
 
 ---
 

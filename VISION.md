@@ -5,7 +5,9 @@
 Linus is a personal AI orchestration backend that runs on Dan's Apple Silicon hardware,
 exposes an OpenAI-compatible endpoint for any front-end to use, and provides domain-specific
 tools backed by Dan's accumulated knowledge: papers, notes, corpora, and eventually
-fine-tuned models trained on his own data.
+fine-tuned models trained on his own data. Linus is designed to operate completely offline
+and privately — all models, knowledge, conversations, and corpora live on Dan's hardware
+and never need to leave it. The network is optional, not load-bearing.
 
 Linus is not an attempt to replace hosted frontier models. It is an attempt to own the
 infrastructure between intent and output — the layer where domain knowledge, tools, skills,
@@ -50,7 +52,12 @@ What Linus the project inherits from Pauling:
 - **Cross-domain fluency as a multiplier.** The biggest wins come from bringing frameworks
   from one field to problems in another.
 - **Principled independence.** Local-first AI with privacy and data sovereignty isn't a
-  feature — it's a stance.
+  feature — it's a stance. Linus can operate entirely without network access: no telemetry,
+  no API keys required for daily operation, no cloud dependency in the critical path. Every
+  source of knowledge it draws on — papers, notes, Wikipedia, structured courseware, maps,
+  fine-tuned model weights — is stored locally, versioned, and under Dan's physical control.
+  "Knowledge That Never Goes Offline" isn't a tagline borrowed from an inspiration project;
+  it is a hard design constraint that every phase must respect.
 - **Long horizons.** Two Nobels, decades apart, in different fields. Linus the project has
   no v1 deadline. It is an open-ended practice.
 
