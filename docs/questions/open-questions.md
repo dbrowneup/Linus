@@ -662,7 +662,7 @@ For a smaller, prioritized subset focused on the most consequential decisions, s
 
 ---
 
-# Part 3 — From `docs/` synthesis documents
+# Part 3 — From `docs/syntheses` documents
 
 ## LLM Wiki & Community Insights (docs/llm-wiki-synthesis.md)
 
