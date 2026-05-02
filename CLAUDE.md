@@ -147,8 +147,8 @@ Linus/
 
 See [ROADMAP.md](ROADMAP.md) for full detail. Current phase markers:
 
-- **Phase 0 — Foundation** *(closing)*: scaffolding, docs, env
-- **Phase 1 — Recon & Baselines** *(next)*: synthesis notes, benchmarks, pmetal eval, first loop
+- **Phase 0 — Foundation** *(closed)*: scaffolding, docs, env
+- **Phase 1 — Recon & Baselines** *(in progress)*: synthesis notes, benchmarks, pmetal eval, first loop
 - **Phase 2 — Linus MVP**: orchestration backend, chat UI, KnowledgeBase v1
 - **Phase 3 — Knowledge & Parallel Agents**: deeper KB integration, agent fan-out
 - **Phase 4 — Data Sovereignty**: Kiwix, ProtoMaps/OSM, versioned datasets
@@ -277,7 +277,7 @@ When Claude Code opens a session in this repo:
 8. Before long runs: smoke-test on a sample.
 9. On session end or significant pauses: commit with a clean message.
 
-## Maestro/Worker Protocol (summary, full version in docs/)
+## Maestro/Worker Protocol (summary, full version in docs/protocols/)
 
 For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 
