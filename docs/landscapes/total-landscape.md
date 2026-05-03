@@ -3,12 +3,12 @@
 ## What This Document Is
 
 Four inputs feed into Linus's working picture: twelve cloned repos
-([repo-landscape.md](repo-landscape.md)), fifteen papers
-([paper-landscape.md](paper-landscape.md)), three practitioner syntheses
-([synthesis-landscape.md](synthesis-landscape.md)), and this document.
-The first three describe their own domains well; this document crosses all of them —
-pointing out where code, theory, and practice reinforce each other, where they are in
-tension, and where the gaps between them are the work Linus actually has to do.
+([repo-landscape.md](repo-landscape.md)), twenty-six papers (the original fifteen plus
+eleven added in the 2026-05 memory-pillar pass; see [paper-landscape.md](paper-landscape.md)),
+four practitioner / research syntheses ([synthesis-landscape.md](synthesis-landscape.md)),
+and this document. The first three describe their own domains well; this document crosses
+all of them — pointing out where code, theory, and practice reinforce each other, where
+they are in tension, and where the gaps between them are the work Linus actually has to do.
 
 It is intentionally a complement to [top-questions.md](top-questions.md): the question
 file is the working agenda, this file is the map. Read this once before working through
@@ -38,8 +38,9 @@ theme has only one or two anchors, the gap is work Linus has to do:
 | **Security posture** | (none — practitioner synthesis) | `environment.yml`, `.claude/settings.json`, `SAFETY.md` | Security synthesis: pip-audit + hash lock file + remove future-phase deps; trust-tier tagging for KB content; incident response protocol before Phase 2 | Phase 0 immediate (dep cleanup); Phase 2 (endpoint + prompt injection); Phase 3+ (audit cadence) |
 | **Skills, practices & entrepreneurial** | (none — practitioner threads) | `repos/cline`; emerging: Task Master AI, claude-squad | Skills synthesis: 10 collaboration practices; 13 skills; 7 entrepreneurial opportunities filtered for Dan's PhD-biochemist/genomics profile; domain expertise is the moat | Phase 1 (closed loop); commercial surface Phase 1+ |
 | **Hypercube projections (orthogonal layer)** | Horiike-Fujishiro Phys. Rev. E | (none) | — | Curiosity / biology overlap; not phase-blocking |
+| **Memory & universal computation** | Garrison thesis ([2412.17794](../../context/papers/2412.17794v1.pdf)) + complexity-theory pair ([2305.15408](../paper-notes/2305.15408v5.md), [2310.07923](../paper-notes/2310.07923v5.md)); empirics ([Kojima 2205.11916](../paper-notes/2205.11916v4.md), [Sparks 2303.12712](../paper-notes/2303.12712v5.md)); substrate alternatives ([minGRU 2410.01201](../paper-notes/2410.01201v3.md), [Coconut 2412.06769](../paper-notes/2412.06769v3.md), [TTT 2411.07279](../paper-notes/2411.07279v2.md)); wall-of-attention case studies ([TimeSformer 2102.05095](../paper-notes/2102.05095v4.md), [Chinchilla 2203.15556](../paper-notes/2203.15556v1.md), [Llama 3 2407.21783](../paper-notes/2407.21783v3.md)); cost-of-no-memory ([ARC Prize 2024 2412.04604](../paper-notes/2412.04604v2.md)) | (no Linus code yet — gap to be closed by Phase 2 episodic store) | Memory synthesis: lift memory architecture from Phase 3+ to Phase 2 first-class layer; scratchpad as durable artifact; v0 episodic store; per-call CoT budget + memory mode router primitives; in-context cap policy | Phase 2 first-class architectural pillar; Phase 3 parallel-write coordination; Phase 6 substrate experiments (TTT, minGRU MLX); Phase 8 BitNet × minGRU cross-product |
 
-Five observations fall out of this table:
+Six observations fall out of this table:
 
 **The BitNet thread is the most internally-coherent one.** Six papers and three repos line up
 tightly enough that the right Phase 1 action — pull `bitnet-b1.58-2B-4T-gguf`, build
@@ -67,6 +68,17 @@ the orchestration logic is Linus's core competency and shouldn't be outsourced.
 security synthesis identified that SAFETY.md is well-designed for operational autonomy control
 but addresses a completely different threat class than supply chain attacks or prompt injection.
 These gaps need to close before Phase 2 expands the network-egress surface.
+
+**Memory is now the largest single thread in the corpus and the load-bearing pillar.** Eleven
+new papers (the Garrison thread) plus the proof paper itself collectively argue that
+single-pass transformers are stuck in TC0, that the only escape is recursive state
+maintenance plus reliable history access, and that the operationally interesting capability
+gains in 2024 are all ways of buying memory reliability through compute. The memory
+synthesis ([docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md)) argues
+that memory architecture should be promoted from a Phase 3+ deferred concern to a Phase 2
+first-class layer — every use case that needs the assistant to build on its own work
+across sessions depends on the same primitive, so the requirement is upstream of the use
+cases. This is a substantial restructuring of Phase 2 scope.
 
 ---
 
@@ -217,6 +229,66 @@ write-back rule extends to Maestro/Dan + Claude planning sessions, not just Work
 tasks. At the close of every multi-question planning session, allocate time for
 core-file write-back.
 
+### Crossing 5 — Memory as the load-bearing pillar (new, 2026-05)
+
+This crossing entered the landscape in May 2026 with the addition of the Garrison thread
+to the paper corpus and the writing of [docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md).
+Like Crossing 4, it lacks a direct repo anchor today — it is a research-and-theory
+finding that has architectural consequences Linus has not yet built into.
+
+The eleven Garrison-thread papers, plus Garrison's own proof paper, collectively argue
+that **memory is not a feature to be deferred, it is the load-bearing primitive that
+universality depends on.** The complexity-theory pair
+([2305.15408](../paper-notes/2305.15408v5.md), [2310.07923](../paper-notes/2310.07923v5.md))
+proves the formal claim: single-pass transformers live in TC0 and cannot solve arithmetic,
+linear-equation systems, or general dynamic programming by direct prediction; intermediate
+decoding tokens lift them above TC0 (linear steps recognise all regular languages;
+polynomial steps recognise exactly P). The empirical anchors
+([Kojima 2205.11916](../paper-notes/2205.11916v4.md),
+[Sparks 2303.12712](../paper-notes/2303.12712v5.md))
+make the gap visible: a single trigger phrase delivers 60+ point absolute jumps on
+arithmetic at scale, and frontier models fail predictably on multi-step reasoning that
+recovers when external scratchpad is provided. The substrate alternatives
+([minGRU 2410.01201](../paper-notes/2410.01201v3.md),
+[Coconut 2412.06769](../paper-notes/2412.06769v3.md),
+[TTT 2411.07279](../paper-notes/2411.07279v2.md))
+each present a different mechanism for satisfying the recursive-state-maintenance
+requirement. The cost-of-no-memory case studies
+([TimeSformer 2102.05095](../paper-notes/2102.05095v4.md),
+[Llama 3 2407.21783](../paper-notes/2407.21783v3.md),
+[ARC Prize 2024 2412.04604](../paper-notes/2412.04604v2.md))
+quantify what the no-memory path actually costs — A100 OOM at 32-frame video clips,
+gigawatt-class compute for 128K context simulation, $1.15M for the last 9 points on
+ARC-AGI.
+
+The decision shape is **how aggressively Linus restructures Phase 2 to make memory
+first-class**. The synthesis recommends four practical layers (intra-step latent /
+within-session scratchpad / cross-session episodic / semantic-knowledge), with a v0
+implementation in Phase 2 (SQLite + content hashes + git as persistence substrate for
+the episodic layer; scratchpad retention as default in the orchestration layer; per-call
+CoT budget and per-call memory mode as router primitives). Layers A (latent) and the
+ambitious substrate experiments (Coconut, TTT, minGRU MLX) defer to Phase 6+ once Phase
+1c and Phase 2 measurements exist to inform substrate choice.
+
+The crossing is also where the Garrison thread reinforces several existing crossings
+from a different angle. Crossing 1 (BitNet → Apple Silicon → ANE) gains an additional
+substrate target: minGRU with BitLinear gates is the most extreme hardware-friendly
+recurrent + 1-bit substrate the corpus collectively points at, and a Phase 8 research
+direction. Crossing 2 (mlx-flash vs. flash-moe) is sharpened by the observation that a
+recurrent or SSM model of competitive quality may not need streaming at all in the
+parameter ranges Linus would train. Crossing 3 (KnowledgeBase as graph + vector
+substrate) is reframed: KnowledgeBase is the *semantic-memory* layer (Layer D) of a
+larger memory pillar that also needs episodic and scratchpad layers, with a uniform
+read API across all three so Workers cannot tell which layer context came from. Crossing
+4 (structure as the operational bottleneck) is given formal teeth: the practitioner
+finding that "structure compounds, capability does not" now has a complexity-theoretic
+floor under it.
+
+**STATUS (2026-05):** Newly surfaced; the synthesis recommends Phase 2 restructuring;
+top-questions.md adds a Tier 1 entry (lift memory architecture from Phase 3+ to Phase 2)
+and several Tier 2 entries (substrate choice for Layer C; per-call CoT budget policy;
+in-context window cap policy). Decision pending the next planning session.
+
 ---
 
 ## The three layers Linus actually has to build
@@ -274,6 +346,34 @@ deliverable before the wall is hit, not after. And the write-back rule — every
 ends with KB update proposals, not just a primary result — should be structural in Worker
 task specs from Phase 2, not a convention added later.
 
+The [memory synthesis](../syntheses/memory-synthesis.md) reframes this layer as the
+*semantic-memory* component (Layer D in its taxonomy) of a larger memory pillar. The Garrison
+framework argues that semantic memory (KnowledgeBase), episodic memory (cross-session
+history — currently missing from Linus), within-session scratchpad memory, and intra-step
+latent state should share a uniform read API at the orchestration layer, with substrate
+variation hidden behind it. A Worker should not know whether a piece of context came from
+its own scratchpad, a prior session, or KnowledgeBase — all three satisfy the same
+reliable-history-access contract.
+
+### Layer D (new) — The memory pillar
+
+The four-layer memory architecture from the [memory synthesis](../syntheses/memory-synthesis.md)
+adds a layer Linus's planning has not previously named as a distinct deliverable. Layer C
+(KnowledgeBase) covers semantic memory; the missing pieces are within-session scratchpad
+(reasoning trace retention as a first-class addressable artifact, addressed by `(session_id,
+turn_id)`, hashed for integrity), cross-session episodic memory (the assistant's own
+durable history of prior tasks, decisions, and tool outputs — initial substrate: SQLite +
+content hashes + git as persistence layer; later substrate experiments: Akyürek-style TTT
+adapter consolidation), and intra-step latent state (today's transformers' opaque hidden
+states, named in the architecture even if not actively manipulated; foundation for later
+Coconut-style or minGRU-style substrate experiments).
+
+The decision shape for Phase 2 is whether to commit to a `docs/specs/memory-architecture.md`
+spec walking through all four layers, the four sub-requirement obligations (addressability,
+disambiguation, temporal order, integrity), and the substrate choice per layer — *before*
+the orchestration layer's session and dispatch primitives are written. The synthesis argues
+yes; the formal complexity-theoretic results give the architectural pressure.
+
 ---
 
 ## Where the gaps are
@@ -284,10 +384,22 @@ task specs from Phase 2, not a convention added later.
 Seven places where neither a repo, a paper, nor a practitioner synthesis currently delivers
 what Linus will eventually need:
 
+**A Linus episodic-memory implementation.** Today there is no in-repo episodic-memory
+substrate; the closest thing is the conversation transcript captured by the chat harness.
+The memory synthesis names this as the load-bearing Phase 2 gap and recommends a v0
+implementation (SQLite + content hashes + git as persistence substrate, with the four
+sub-requirement obligations from Garrison's framework — addressability, disambiguation,
+temporal order, integrity — built in from the start). A Phase 2 deliverable; not phase-blocking
+for Phase 1, but blocking for any meaningful "Linus remembers what we did last session"
+capability. **OPEN as of 2026-05-03.**
+
 **A unified BitNet × MoE × Streaming codebase.** The BitNet papers, Flash-MoE, and JPmHC
 together gesture at "ternary-stable-streamed-MoE" — but no codebase combines all three. This
 is the natural Phase 8 research direction, entered by committing to a fine-tuned BitNet Worker
-first (Phase 6) and a flash-streaming benchmark second (Phase 6d).
+first (Phase 6) and a flash-streaming benchmark second (Phase 6d). The
+[memory synthesis](../syntheses/memory-synthesis.md) extends this gap with an additional
+research direction: **minGRU with BitLinear gates** as the most extreme hardware-friendly
+recurrent + 1-bit substrate the corpus collectively points at. Phase 8 candidate.
 
 **An MLX Cayley parametrization layer.** JPmHC validated the orthogonal-group constraint on a
 7M TRM at 8× B200, but no MLX implementation exists yet. Phase 6 architecture decision; not
@@ -388,6 +500,17 @@ questions.
 [docs/syntheses/skills-and-practices-synthesis.md](../syntheses/skills-and-practices-synthesis.md)
 — synthesis of the Claude skills and best-practices threads. Covers 10 collaboration practices,
 13 skills, 13 repo candidates, 7 entrepreneurial opportunities, and 5 open questions.
+
+[docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md) — synthesis of the
+Garrison "Memory makes computation universal, remember?" thesis (blog + arXiv proof paper)
+plus eleven cited arXiv papers (now in [paper-notes/](../paper-notes/) under the new
+memory-pillar grouping). Argues memory architecture is the load-bearing primitive Linus
+must commit to in Phase 2 rather than defer. Decomposes memory into four layers (intra-step
+latent / within-session scratchpad / cross-session episodic / semantic-knowledge), maps
+Garrison's two requirements and four sub-requirements onto concrete design constraints, and
+recommends Phase 2 restructuring with concrete deliverables (memory-architecture spec, v0
+episodic store, scratchpad retention default, per-call CoT budget + memory mode router
+primitives).
 
 The intended workflow is to walk `top-questions.md` Tier 0 (immediate actions) first, then
 Tier 1 in conversation, with `total-landscape.md` open as the map. Update both this file and

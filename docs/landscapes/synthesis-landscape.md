@@ -2,18 +2,22 @@
 
 ## What This Document Is
 
-Three synthesis documents sit in `docs/syntheses/`, each distilling a different body of
-practitioner knowledge: security posture (supply chain and prompt injection), the LLM wiki
-pattern (compiled knowledge bases and session architecture), and skills and practices
-(collaboration patterns, entrepreneurial opportunities, and tooling). Read the individual
-syntheses for depth; read this document for the cross-cutting picture — what they agree on,
-where they're in tension, and what Linus should do about it.
+Four synthesis documents sit in `docs/syntheses/`, each distilling a different body of
+knowledge: security posture (supply chain and prompt injection), the LLM wiki
+pattern (compiled knowledge bases and session architecture), skills and practices
+(collaboration patterns, entrepreneurial opportunities, and tooling), and the
+**memory pillar** (a research-driven synthesis built around Garrison's "Memory makes
+computation universal, remember?" thesis and eleven of the arXiv references it cites,
+arguing that memory architecture is the load-bearing primitive Linus must commit to in
+Phase 2 rather than defer). Read the individual syntheses for depth; read this document
+for the cross-cutting picture — what they agree on, where they're in tension, and what
+Linus should do about it.
 
 ---
 
 ## The Unifying Thesis
 
-All three syntheses, from completely different starting points, converge on the same
+All four syntheses, from completely different starting points, converge on the same
 underlying claim: the bottleneck has shifted from capability to structure.
 
 The skills synthesis calls it "architectural clarity": agents can execute at speed, but only
@@ -24,13 +28,17 @@ policy, and epistemic standards, an LLM wiki is just a junk drawer that grows fa
 security synthesis calls it "design decisions baked into the orchestration layer": tiered
 trust, input provenance tagging, and dependency minimization are properties that cannot be
 retrofitted — they must be encoded from the beginning, the same way a KB schema must be
-designed before the first ingest, not after the first thousand notes.
+designed before the first ingest, not after the first thousand notes. The memory synthesis
+calls it "structure as the precondition for capability": single-pass transformers are
+provably stuck in TC0, and the only escape is recursive state maintenance plus reliable
+history access, both of which are *architectural* properties of the orchestration layer
+that cannot be retrofitted onto a memoryless Worker after the fact.
 
-They are describing the same leverage point from three angles. For Linus, this means the
+They are describing the same leverage point from four angles. For Linus, this means the
 most important work in Phase 1 is not running benchmarks or standing up services — it is
-getting the schemas, specs, and standards right, because those compound over every subsequent
-phase. Every correction filed back into CLAUDE.md is worth more than ten implementation
-shortcuts.
+getting the schemas, specs, standards, and *memory architecture* right, because those
+compound over every subsequent phase. Every correction filed back into CLAUDE.md is worth
+more than ten implementation shortcuts.
 
 ---
 
@@ -159,6 +167,88 @@ multiplies the attack surface.
 
 ---
 
+## Memory as the load-bearing pillar
+
+The memory synthesis ([docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md))
+is built around Garrison's [*Memory makes computation universal, remember?*](../../context/notes/garrison_memory_makes_computation_universal.md)
+plus eleven of the arXiv references it cites, now summarized one-pager-per-paper in
+[`paper-notes/`](../paper-notes/) under the new memory-pillar grouping in
+[paper-landscape.md](paper-landscape.md). Three things make this synthesis structurally
+different from the prior three.
+
+**It carries a formal result, not just practitioner consensus.** The complexity-theory
+papers ([2305.15408](../paper-notes/2305.15408v5.md),
+[2310.07923](../paper-notes/2310.07923v5.md)) prove that single-pass transformers are
+stuck in TC0 — too weak to count past a fixed threshold, simulate a finite automaton on
+long inputs, or recognise balanced parentheses at unbounded depth. The constructive escape
+is intermediate decoding tokens: linear-step chain-of-thought lifts the model above TC0,
+polynomial-step lifts it to exactly P. Garrison's two requirements (recursive state
+maintenance, reliable history access) and his Theorem 1 (universality at logarithmic
+overhead) are the same statement at the framework level. **For Linus this is not a
+preference; it is the floor.** Any Worker that produces its answer in one pass is, by
+theorem, a TC0 device, and any inference path that silently truncates reasoning between
+turns collapses the Worker back toward TC0.
+
+**It identifies a load-bearing layer that current Linus planning treats as deferred.** The
+existing roadmap defers long-term and episodic memory to Phase 3+ pending concrete use
+cases. The Garrison framework argues this sequencing is wrong: the requirement is upstream
+of the use cases, because every use case that needs the assistant to build on its own work
+across sessions, carry a long task across many tool calls, or maintain a durable view of
+Dan's projects depends on the same primitive. The memory synthesis recommends lifting
+memory architecture from Phase 3+ to a Phase 2 first-class deliverable, with an explicit
+spec ([`docs/specs/memory-architecture.md`](../specs/) — to be written) walking through
+four memory layers and their substrate choices.
+
+**It reframes several open questions the other three syntheses had separately surfaced.**
+The LLM wiki synthesis's *write-back rule*, the skills synthesis's *uncertainty protocol*
+and *spec discipline*, and the security synthesis's *trust-tier tagging* are all special
+cases of the same underlying contract — the orchestration layer must externalise what the
+model cannot internalise, and what it externalises must be addressable, distinguishable,
+temporally ordered, and integrity-preserving (Garrison's four sub-requirements on reliable
+history access). The four-layer decomposition the memory synthesis proposes (intra-step
+latent / within-session scratchpad / cross-session episodic / semantic-knowledge) is the
+shared substrate behind all of those individual practitioner findings.
+
+Three patterns deserve immediate encoding alongside the existing claim-typing and content-
+hashing patterns from the LLM wiki synthesis:
+
+**Scratchpad as a first-class durable artifact.** The Merrill & Sabharwal complexity result
+makes this not optional. Every Worker invocation's reasoning trace is addressed by
+`(session_id, turn_id)`, hashed for integrity, and retained by default. The o1 anti-pattern
+(silently truncating reasoning between turns) is forbidden in the Worker protocol spec.
+
+**Per-call CoT budget and memory mode as router primitives.** Algorithmic tasks (math,
+dependency resolution, multi-step planning) get linear or polynomial reasoning budgets with
+full retention; lookup tasks get logarithmic budgets with truncation. The router also knows
+whether each call is stateless, session-stateful, or project-stateful, and loads the
+appropriate prefix from the appropriate memory layer before dispatch.
+
+**In-context window cap policy.** Even when the underlying Worker supports 128K context
+(Llama 3.1 8B does), Linus deliberately caps in-context usage at 8–16K and routes beyond
+that through the episodic store. Llama 3's 128K is a quadratic-cost simulation of memory
+inside attention; the cap prevents the lazy "just stuff everything in context" pattern that
+gives away the architectural advantage of having a real episodic store.
+
+The substrate choice for the cross-session episodic layer (Layer C in the synthesis) opens
+a new architectural question that did not exist in the prior three syntheses: should
+episodic memory be *structured-text-and-hashes* (SQLite + git, conservative, debuggable) or
+*parametric-via-LoRA-consolidation* (test-time training applied to session transcripts,
+ambitious, opaque)? The synthesis recommends starting with the conservative path in Phase
+2 and treating TTT as a Phase 6 spike informed by the [Akyürek paper
+(2411.07279)](../paper-notes/2411.07279v2.md), with a Phase 1 Apple-Silicon viability
+smoke test of the TTT recipe to inform that decision before Phase 6 begins.
+
+The synthesis also strengthens the recurrent / state-space / 1-bit substrate bet that the
+[BitNet thread](paper-landscape.md) and the [mlx-flash repo](../../repos/mlx-flash/) work
+already pointed at. The [minGRU paper (2410.01201)](../paper-notes/2410.01201v3.md) shows
+that minimal-state recurrence reorganised for parallel training matches transformer-class
+sequence models with 13–38% of the parameters and 175–1361× faster training on T4-class
+hardware. Combined with BitNet-style ternary weights, this is the most extreme
+hardware-friendly substrate the corpus collectively points at — a Phase 8 research
+direction worth flagging now even though no concrete Phase 6/7 work is gated on it.
+
+---
+
 ## Entrepreneurial Leverage
 
 The skills synthesis maps seven opportunities against Dan's specific profile — PhD biochemistry,
@@ -210,6 +300,13 @@ as Phase 1 stopgaps and Phase 2 architecture inputs before committing to a custo
 layer. Formalize a `session/hot.md` hot-cache convention in the CLAUDE.md session startup
 protocol.
 
+From the memory synthesis: add a per-Worker CoT-gap measurement (50 items, MultiArith-style)
+to the Phase 1 benchmark protocol so every Ollama-pulled model carries the metric in the
+model registry. Adopt the Kojima two-stage pattern (reasoning extraction → answer extraction
+with explicit separation) as the default Worker invocation template. Forbid the o1
+anti-pattern (silently truncating reasoning between turns) in the Worker protocol spec — any
+Worker integration that does this is non-conformant.
+
 **Phase 2 — Linus MVP**
 
 Design input trust tagging into the context assembly pipeline from day one: every item in a
@@ -222,6 +319,20 @@ fastmcp (`jlowin/fastmcp`) for MCP server construction before Phase 3's MCP adop
 decision. Instrument the KB index file size and establish the hybrid retrieval upgrade
 trigger threshold.
 
+From the memory synthesis: lift memory architecture from Phase 3+ to a Phase 2 first-class
+deliverable. Write `docs/specs/memory-architecture.md` walking through the four memory layers
+(intra-step latent / within-session scratchpad / cross-session episodic / semantic-knowledge),
+their substrate choices, and the read/write API the orchestration layer exposes. Implement a
+v0 episodic store (SQLite + content hashes + git as persistence substrate) wired into the
+Maestro/Worker protocol. Default scratchpad retention as a first-class artifact addressed by
+`(session_id, turn_id)`. Add two new router primitives: per-call CoT budget (linear for
+algorithmic tasks, logarithmic for lookups) and per-call memory mode (stateless /
+session-stateful / project-stateful). Cap in-context window usage at 8–16K and route beyond
+that through the episodic store, even when the underlying Worker supports 128K. Add a
+"memory-aware Worker selection" benchmark to `benchmarks/dan_tasks/` comparing a small Worker
+with generous CoT budget against a larger Worker with terse output on inherently sequential
+tasks.
+
 **Phase 3 — Knowledge and Parallel Agents**
 
 Implement hybrid retrieval (BM25 plus vector plus graph traversal) as the context scoping
@@ -233,6 +344,13 @@ testing alongside the sandbox enforcement tests. Add a quality gate at KB ingest
 domain editorial policy against which sources are scored before compilation, with failures
 routed to `raw/FILTERED.md` with an explanation. Implement the contradiction policy in the
 KnowledgeBase schema: flag at write time, require human resolution before marking canonical.
+
+From the memory synthesis: extend parallel-write coordination from KB writes to episodic-store
+writes — the same contention pattern applies one layer up. Run a diagnostic ARC-AGI experiment
+(50–100 public-eval tasks, small Linus Worker, with and without episodic memory) to turn the
+memory-architecture claim into a number. Unify the read API across scratchpad, episodic store,
+and KnowledgeBase so Workers cannot tell which layer context came from — different decay
+rates and authority levels, but uniform shape.
 
 ---
 
@@ -346,7 +464,8 @@ mitigation). **Layered architecture:** linus conda env (production, hash-pinned 
 | Security | Linus has operational safety but no supply chain or input-integrity controls | pip-audit + hash lock file + remove future-phase deps | Now |
 | LLM Wiki | Compile-don't-retrieve; the schema is the product; write-back is the discipline | Claim typing + content hashing in KB schema | Phase 2 |
 | Skills & Practices | Bottleneck is clarity, not execution; encode standards in files | Hot cache convention + Worker spec uncertainty protocol | Now / Phase 2 |
-| All three | Every dependency is a trust relationship; orchestration logic is Linus's core | Delete langchain/langgraph; evaluate Task Master AI before building custom router | Phase 2 design |
+| Memory | Single-pass transformers are TC0; recursive state + reliable history access are the only escape; memory is upstream of use cases, not downstream | Lift memory architecture to Phase 2; scratchpad as durable artifact; v0 episodic store; per-call CoT budget + memory mode router primitives | Now / Phase 2 |
+| All four | Every dependency is a trust relationship; orchestration logic is Linus's core; structure compounds, capability does not | Delete langchain/langgraph; evaluate Task Master AI before building custom router; commit to memory architecture spec before Phase 2 implementation | Phase 2 design |
 
 ---
 

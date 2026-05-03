@@ -194,6 +194,92 @@ cleanly onto the Maestro/Worker architecture. Neither paper contains code or alg
   For Linus: this deepens the Maestro/Worker analogy — Workers handle the high-bandwidth
   sensorimotor-equivalent substrate; Maestro handles the narrow conscious synthesis channel.
 
+## Memory & universal computation (the new pillar)
+
+The largest single thread in the corpus. Eleven papers cited by Erik Garrison's January 2025
+essay [*Memory makes computation universal, remember?*](../../context/notes/garrison_memory_makes_computation_universal.md)
+(blog) and its companion arXiv proof paper ([2412.17794](../../context/papers/2412.17794v1.pdf),
+already absorbed into the blog note). The thread argues that **universality requires only
+recursive state maintenance and reliable history access**, that single-pass transformers
+satisfy neither (TC0 ceiling), and that the operationally interesting capability gains in
+2024 (o3, ARC-AGI, test-time training) are all ways of buying memory reliability through
+compute. The cross-thread synthesis lives at
+[`docs/syntheses/memory-synthesis.md`](../syntheses/memory-synthesis.md), which is the
+recommended entry point — the per-paper notes below feed into it.
+
+The thread divides naturally into three sub-threads.
+
+**Complexity theory — the formal ceiling and the formal escape.**
+
+- [Towards Revealing the Mystery behind Chain of Thought (Feng, Zhang et al., NeurIPS 2023)](paper-notes/2305.15408v5.md)
+  — Constructive proof that constant-size autoregressive transformers can solve arithmetic,
+  linear-equation systems, and broad classes of dynamic programming via chain-of-thought,
+  while bounded-depth transformers of polynomial size cannot solve any of them by direct
+  prediction. Mechanism: CoT raises effective depth proportional to generation length.
+- [The Expressive Power of Transformers with Chain of Thought (Merrill & Sabharwal, ICLR 2024)](paper-notes/2310.07923v5.md)
+  — Characterises how scratchpad step count maps to complexity classes. Logarithmic steps lift
+  the upper bound only to L; linear steps recognise all regular languages and exit TC0;
+  polynomial steps recognise exactly P. Includes the constructive "layer-norm hash" device for
+  using emitted tokens as addressable, content-distinguishable, temporally-ordered storage.
+  The two papers are formal twins of the same observation.
+
+**Empirical phenomena — the gap is real and visible at scale.**
+
+- [Large Language Models are Zero-Shot Reasoners (Kojima et al., NeurIPS 2022)](paper-notes/2205.11916v4.md)
+  — The "Let's think step by step" paper. MultiArith 17.7%→78.7%, GSM8K 10.4%→40.7% with a
+  single trigger phrase. The gap is emergent at scale (negligible below ~60B in 2022 GPT-3),
+  task-class-conditional (works on system-2; flat or negative on commonsense), and
+  trigger-sensitive (45.7%–78.7% spread across 16 instructive variants). The empirical anchor
+  for the formal complexity-theory results.
+- [Sparks of Artificial General Intelligence (Bubeck et al., MSR 2023)](paper-notes/2303.12712v5.md)
+  — The TikZ unicorn paper. Sections 1–7 catalogue transferred capability (cognitive patterns
+  internalised from training data); Section 8 catalogues memory-deficit failure modes
+  (multi-digit arithmetic, Tower of Hanoi, constraint satisfaction with global structure) that
+  recover when external scratchpad is provided. The "what gets transferred when a model is
+  exposed to enough human writing" anchor.
+
+**Substrate alternatives — what does memory done right look like?**
+
+- [Were RNNs All We Needed? (Feng et al., 2024)](paper-notes/2410.01201v3.md) — minLSTM and
+  minGRU, parallelizable via prefix-sum, 13–38% of classical parameter count, matching Mamba
+  and Transformers on selective copy / RL / Shakespeare-scale LM with 175–1361× faster
+  training. The most direct architectural pointer in the corpus to Garrison's "recurrent
+  approaches with rolling hidden state" path-forward.
+- [Training LLMs to Reason in a Continuous Latent Space (Hao et al., 2024 — Coconut)](paper-notes/2412.06769v3.md)
+  — Feeds the model's last hidden state back as the next input embedding, bypassing the
+  vocabulary. A single continuous thought superposes candidate next steps. Outperforms
+  language-CoT on planning-heavy DAG reasoning while emitting fewer tokens. The clean
+  substrate for "real-valued recurrence carry."
+- [The Surprising Effectiveness of Test-Time Training (Akyürek et al., 2024)](paper-notes/2411.07279v2.md)
+  — Per-task LoRA on synthetic leave-one-out demonstrations. Llama 8B from 45% to 53% on ARC,
+  ensembled with program synthesis to 61.9% (average human). The candidate substrate for
+  episodic memory consolidation: collapse a session transcript into a transient adapter.
+
+**Wall-of-attention case studies — the cost of the no-memory path.**
+
+- [Is Space-Time Attention All You Need for Video Understanding? (Bertasius et al., ICML 2021)](paper-notes/2102.05095v4.md)
+  — TimeSformer. Joint space-time attention literally OOMs on A100 at 448px crops or 32-frame
+  clips; "divided" factorisation pushes the wall back constant-factor without removing it.
+  TimeSformer-L's "long-range" 96-frame regime is one minute forty seconds of video. The
+  quadratic wall in a non-text domain.
+- [Training Compute-Optimal Large Language Models (Hoffmann et al., 2022 — Chinchilla)](paper-notes/2203.15556v1.md)
+  — N_opt ∝ C^0.5, D_opt ∝ C^0.5; Chinchilla (70B/1.4T tokens) beats Gopher (280B/300B
+  tokens) at the same compute. The data-and-parameter optimum *inside* the bounded
+  regime — does not move the architectural ceiling.
+- [The Llama 3 Herd of Models (Meta, 2024)](paper-notes/2407.21783v3.md) — 405B dense
+  Transformer, 15.6T tokens, 128K context bolted on via continued-pre-training, 98.1
+  multi-needle at 128K. The high-water mark of "buy memory by extending context" — proves
+  the simulation works, also proves it costs gigawatt-class compute and still tops out at the
+  architectural ceiling. The 8B variant is a credible Linus Worker candidate.
+
+**Frontier empirics — the cost of brute-forcing memory through compute.**
+
+- [ARC Prize 2024 Technical Report (Chollet et al., 2024)](paper-notes/2412.04604v2.md) —
+  State-of-the-art jumped from 33% (2023) to 55.5% (MindsAI, end of 2024) after five years of
+  stagnation, driven by **test-time training and program synthesis** rather than scale. o3
+  reached 91.5% at ~$1.15M / 9.5B tokens — 172× more compute for the last 9 points. The most
+  expensive empirical evidence that frontier systems are spending compute to fake memory.
+
 ---
 
 ## Reading orders by Linus phase
@@ -233,6 +319,28 @@ LLM in a Flash → Flash-MoE.
 **Phase 8 (research directions)**:
 JPmHC → Flash-MoE → all four BitNet papers, as the seed for a
 "BitNet-MoE-streaming-with-Cayley-stability" synthesis.
+
+**Memory pillar (cross-cutting, Phase 2 onwards)**:
+Read [the synthesis](../syntheses/memory-synthesis.md) first.
+Then the Garrison nucleus
+([context/notes/garrison_memory_makes_computation_universal.md](../../context/notes/garrison_memory_makes_computation_universal.md)).
+Then the formal-theory pair
+([2305.15408](paper-notes/2305.15408v5.md) → [2310.07923](paper-notes/2310.07923v5.md))
+for the TC0-ceiling-and-CoT-escape complexity result.
+Then the empirical anchor ([Kojima 2205.11916](paper-notes/2205.11916v4.md)) and
+the capability-vs-failure-mode survey ([Sparks 2303.12712](paper-notes/2303.12712v5.md))
+for the gap-is-real evidence.
+Then the substrate alternatives
+([minGRU 2410.01201](paper-notes/2410.01201v3.md) →
+[Coconut 2412.06769](paper-notes/2412.06769v3.md) →
+[TTT 2411.07279](paper-notes/2411.07279v2.md))
+for the candidate memory mechanisms.
+The wall-of-attention case studies
+([TimeSformer 2102.05095](paper-notes/2102.05095v4.md),
+[Chinchilla 2203.15556](paper-notes/2203.15556v1.md),
+[Llama 3 2407.21783](paper-notes/2407.21783v3.md))
+and the brute-force-compute case study ([ARC Prize 2024 2412.04604](paper-notes/2412.04604v2.md))
+are calibration references — they show what the no-memory path costs and where it stops.
 
 ## Cross-cutting open questions
 

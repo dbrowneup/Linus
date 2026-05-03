@@ -12,6 +12,142 @@ documentation cadence.
 
 ---
 
+## NEW: Memory Pillar (added 2026-05-03)
+
+A new round of questions surfaced by the [memory synthesis](../syntheses/memory-synthesis.md)
+and the eleven Garrison-thread paper notes. The full set lives in
+[open-questions.md](open-questions.md) under "Memory pillar — Garrison thread" and
+"Memory Synthesis"; the items below are the ones that *change next concrete action* and
+deserve a slot in the next planning session. None are resolved.
+
+**Tier 1 (memory-pillar) — block Phase 2 architecture decisions**
+
+- **M1. Lift memory architecture from Phase 3+ to a Phase 2 first-class deliverable.** Write
+  `docs/specs/memory-architecture.md` walking through four layers (intra-step latent /
+  within-session scratchpad / cross-session episodic / semantic-knowledge), the four
+  sub-requirement obligations from Garrison's framework (addressability, disambiguation,
+  temporal order, integrity), and the substrate choice per layer, *before* the orchestration
+  layer's session and dispatch primitives are written. The synthesis argues this is the
+  load-bearing Phase 2 commitment; the complexity-theoretic results
+  ([2305.15408](../paper-notes/2305.15408v5.md), [2310.07923](../paper-notes/2310.07923v5.md))
+  supply the formal pressure. *(Source: memory synthesis Q6; spans most papers in the
+  Garrison thread.)*
+
+- **M2. Substrate choice for cross-session episodic memory (Layer C).** Conservative
+  v0 (SQLite + content hashes + git as persistence substrate) vs. ambitious
+  parametric-via-LoRA-consolidation (Akyürek-style TTT applied to session transcripts) vs.
+  hybrid where knowledge graduates from text into LoRA after sufficient repeated access?
+  The Phase 2 spec should not commit to (3) but should not preclude it either.
+  *(Source: memory synthesis Q1; [TTT 2411.07279 Q1](../paper-notes/2411.07279v2.md);
+  [TTT Q3](../paper-notes/2411.07279v2.md).)*
+
+- **M3. Scratchpad as a first-class durable artifact (forbid the o1 anti-pattern).**
+  Phase 2 session store treats reasoning tokens as durable, addressable artifacts on
+  equal footing with final answers and tool outputs (addressed by `(session_id, turn_id)`,
+  hashed for integrity). The Worker protocol spec explicitly forbids any integration that
+  silently truncates reasoning between turns. The complexity-theoretic results say this is
+  not optional. *(Source: [Merrill & Sabharwal 2310.07923 Q1](../paper-notes/2310.07923v5.md);
+  [Feng et al. 2305.15408 Q1](../paper-notes/2305.15408v5.md);
+  [Sparks 2303.12712 Q1](../paper-notes/2303.12712v5.md);
+  [Kojima 2205.11916 Q1](../paper-notes/2205.11916v4.md).)*
+
+- **M4. Two new router primitives: per-call CoT budget and per-call memory mode.** CoT
+  budget (logarithmic / linear / polynomial per Merrill & Sabharwal regimes) is set per
+  task class. Memory mode (stateless / session-stateful / project-stateful) determines
+  which prefix is loaded from which memory layer before dispatch. Both are router
+  *primitives* — adding them later is harder than building them in.
+  *(Source: memory synthesis Q5; [Feng et al. 2305.15408 Q2](../paper-notes/2305.15408v5.md);
+  [Merrill & Sabharwal 2310.07923 Q2](../paper-notes/2310.07923v5.md).)*
+
+- **M5. In-context window cap policy.** Even when the underlying Worker supports 128K
+  context (Llama 3.1 8B does), Linus deliberately caps in-context usage at 8–16K and
+  routes beyond that through the episodic store. Setting the policy up front prevents
+  the lazy "just stuff everything in context" pattern that gives away the architectural
+  advantage of having a real episodic store.
+  *(Source: [Llama 3 2407.21783 Q2](../paper-notes/2407.21783v3.md); memory synthesis
+  hype filter.)*
+
+**Tier 2 (memory-pillar) — shape Phase 2–6 architecture**
+
+- **M6. Per-Worker CoT-gap fingerprint as a registry property.** Run a 50-item
+  MultiArith-style smoke test on every Ollama-pulled model, store
+  `accuracy_with_CoT - accuracy_without_CoT` in the model registry. The router uses the
+  delta to decide whether to inject a CoT trigger and how much budget to allocate. Cheap
+  to run, expensive to omit. *(Source: [Kojima 2205.11916 Q3](../paper-notes/2205.11916v4.md).)*
+
+- **M7. Worker-size vs CoT-length empirical comparison.** Phase 1 benchmark: a 7B Worker
+  with generous CoT budget vs. a 14B Worker with terse output on Dan's task suite. Theory
+  predicts small-with-CoT wins on inherently sequential tasks; this is a falsifiable claim
+  worth testing before committing to Worker-selection heuristics.
+  *(Source: [Feng et al. 2305.15408 Q3](../paper-notes/2305.15408v5.md);
+  [Kojima 2205.11916 Q5](../paper-notes/2205.11916v4.md).)*
+
+- **M8. ARC-AGI as a memory diagnostic (not a target).** Take 50–100 ARC-AGI public-eval
+  tasks, run a small Linus Worker against them twice — once without episodic memory,
+  once with — and measure the delta. Turns the memory thesis into a number; costs nothing
+  in Maestro tokens. *(Source: [ARC Prize 2024 2412.04604 Q1](../paper-notes/2412.04604v2.md);
+  memory synthesis Q4.)*
+
+- **M9. KV-cache continuity as an architectural constraint.** Linus inference layer
+  commits to preserving KV cache across Worker turns within a session as a hard
+  requirement, given that recursion-via-feedback is what the expressivity result hinges
+  on. Affects which inference servers (Ollama, mlx-lm, future pmetal) are viable Worker
+  backends. *(Source: [Feng et al. 2305.15408 Q4](../paper-notes/2305.15408v5.md).)*
+
+- **M10. Apple-Silicon viability of TTT.** Phase 1 spike: 10 ARC tasks, Llama-3.2-1B,
+  mlx-lm LoRA, leave-one-out synthetic data — purely to measure per-task compute cost on
+  M1 Max. Determines whether parametric episodic-memory consolidation is on the table at
+  all for Phase 6+. *(Source: [TTT 2411.07279 Q2](../paper-notes/2411.07279v2.md).)*
+
+- **M11. minGRU MLX port as a memory-substrate spike.** Port the few-line minGRU/minLSTM
+  PyTorch reference to MLX, run the Shakespeare experiment on M1 Max, publish the result.
+  Low-cost, high-information experiment that establishes whether parallel-scan recurrence
+  is a real local training option for memory-pillar components.
+  *(Source: [Were RNNs all we needed? 2410.01201 Q2](../paper-notes/2410.01201v3.md).)*
+
+- **M12. Compute-as-memory accounting in ARCHITECTURE.md.** Treat memory budget as a
+  first-class architectural quantity, with the o3 figure ($1.15M for 91.5% on ARC-AGI) as
+  the cautionary upper bound and human-with-pen-and-paper as the lower bound. The point is
+  to make implicit "we'll just retry until it works" choices legible.
+  *(Source: [ARC Prize 2024 2412.04604 Q5](../paper-notes/2412.04604v2.md); memory
+  synthesis Q3.)*
+
+**Tier 3 (memory-pillar) — documentation, conventions, longer-horizon scope**
+
+- **M13. Episodic memory schema for multi-step Worker tasks.** Full reasoning trace per
+  step, summary, or hybrid (full at the leaf, summary at the parent)? Decides shortly after
+  the v0 episodic store is built. *(Source: [Kojima 2205.11916 Q4](../paper-notes/2205.11916v4.md);
+  [Coconut 2412.06769 Q2](../paper-notes/2412.06769v3.md).)*
+
+- **M14. Faithfulness audit of stored reasoning traces.** Phase 3 component that audits
+  CoT for self-consistency, or out of scope until specific failure modes appear?
+  *(Source: [Feng et al. 2305.15408 Q5](../paper-notes/2305.15408v5.md); memory
+  synthesis Q2.)*
+
+- **M15. minGRU + BitNet cross-product as Phase 8 research direction.** "minGRU with
+  BitLinear gates" as the most extreme hardware-friendly substrate (recurrent + 1-bit +
+  Apple-Silicon-friendly). Phase 8 candidate; no Phase 6/7 work gated on it.
+  *(Source: [Were RNNs all we needed? 2410.01201 Q4](../paper-notes/2410.01201v3.md);
+  [BitNet line](../paper-notes/2402.17764v1.md).)*
+
+- **M16. Coconut-style latent recurrence as a Phase 6 substrate experiment.** Is the Meta
+  reference implementation MLX-portable, or is iCoT the more practical lead for Linus's
+  compute budget? *(Source: [Coconut 2412.06769 Q3](../paper-notes/2412.06769v3.md).)*
+
+- **M17. Memory mode as a Linus-trained model fine-tuning target.** Phase 6 fine-tune
+  absorbs the trigger sentence so that step-by-step decomposition for system-2 queries is
+  default behavior — and additionally trains the model to produce *episodic-store-friendly*
+  output (typed tags on facts, deliberation vs. conclusion separation, branch-point
+  surfacing per Coconut).
+  *(Source: [Kojima 2205.11916 Q6](../paper-notes/2205.11916v4.md);
+  [Coconut 2412.06769 Q2](../paper-notes/2412.06769v3.md).)*
+
+The memory-pillar items above are *unresolved* as of 2026-05-03; the existing Tier 0/1/2/3
+items below the line carry their previous (May 2026) resolutions. The next planning session
+should walk M1–M5 first (the Tier 1 set), then sample from M6–M12 as time allows.
+
+---
+
 ## Resolution Log (2026-05-03)
 
 All Tier 0, 1, 2, and 3 items resolved in a Maestro/Dan planning session on 2026-05-03.

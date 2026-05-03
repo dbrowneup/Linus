@@ -678,6 +678,274 @@ on the current critical path.
 
 ---
 
+## Memory pillar — Garrison thread (added 2026-05)
+
+Eleven papers cited by Erik Garrison's [Memory makes computation universal, remember?](../../context/notes/garrison_memory_makes_computation_universal.md)
+plus the proof paper itself. The cross-thread synthesis is at
+[docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md). Per-paper open
+questions follow; the memory-pillar items most likely to surface to top-questions.md are
+flagged inline.
+
+### Zero-Shot Reasoners — "Let's think step by step" (2205.11916v4)
+
+1. **Reasoning traces as first-class memory objects.** Should Linus's session store treat
+   the reasoning trace `z` (Stage 1 of Zero-shot-CoT) as a separately addressable artifact
+   alongside the final answer, or as one concatenated record? The Garrison framework argues
+   for separation; separation costs schema complexity. Worth resolving before the Phase 2
+   schema is set. **[memory-pillar candidate]**
+
+2. **Router policy for trigger injection.** Inject "let's think step by step" automatically
+   based on a task-class classifier (arithmetic / symbolic / logical → yes; commonsense /
+   retrieval / short-answer → no), or always defer to the caller? Blanket policy is wrong;
+   classifier is one more component to maintain. Where does the complexity belong?
+   **[memory-pillar candidate]**
+
+3. **Trigger-gap as a Worker fingerprint.** Run a small smoke test (50 items,
+   MultiArith-style) on every Ollama-pulled model, measure
+   `accuracy_with_CoT - accuracy_without_CoT` as a per-model property in the model registry.
+   Cheap to run, expensive to omit. **[memory-pillar candidate, immediate]**
+
+4. **Episodic memory schema for multi-step tasks.** Full reasoning trace per step, summary,
+   or hybrid (full trace at the leaf, summary at the parent)?
+
+5. **Do modern instruction-tuned 7B Workers still need the trigger?** Kojima's 60-point gap
+   was on a 2022 base model; Qwen2.5-Coder, Llama-3, and Mistral are RLHF'd on CoT-style
+   data. The operational question may have flipped to "when do we *suppress* unnecessary
+   reasoning to save tokens?"
+
+6. **Trigger sensitivity and the fine-tuning roadmap.** For a fine-tuned Linus model,
+   trigger-invariant (any reasonable instruction unlocks step-by-step) or standardize on
+   one canonical trigger?
+
+### Coconut — Continuous Latent Reasoning (2412.06769v3)
+
+1. **Memory boundary in the Worker protocol.** Garrison's framework distinguishes session,
+   episodic, and knowledge memory. Coconut highlights a fourth — *intra-step latent state*
+   inside a single Worker invocation. Does the Maestro-Worker protocol need to name this
+   layer explicitly? **[memory-pillar candidate]**
+
+2. **Retain considered alternatives.** If continuous thoughts can superpose multiple
+   candidate next steps, should the episodic store make branch points (what was considered,
+   what was chosen, what got pruned) first-class entries? Phase 2 architecture question.
+   **[memory-pillar candidate]**
+
+3. **Coconut on Apple Silicon.** Is the Meta reference implementation MLX-portable, or does
+   it depend on CUDA-specific kernels? A small spike would tell us whether Coconut-style
+   training is on the table for Phase 6 fine-tuning.
+
+4. **Interpretability vs. expressivity.** Linus's bias is toward inspectable artifacts;
+   Coconut deliberately moves reasoning into a space humans cannot read. Right stance:
+   "language by default, latent only when task type warrants" — and who decides?
+
+5. **Benchmark on ProsQA-style planning.** Worth adding a planning-flavored benchmark to
+   `benchmarks/dan_tasks/` so future Worker-model evaluations can detect whether a model is
+   doing real BFS-style search?
+
+### Were RNNs All We Needed? — minLSTM/minGRU (2410.01201v3)
+
+1. **Memory-pillar substrate question.** Is minGRU (or a minGRU-flavored recurrence) the
+   right candidate for Linus's session-memory encoder — the thing that compresses a long
+   Worker turn history into a fixed-size rolling state without paying quadratic cost?
+   **[memory-pillar candidate]**
+
+2. **MLX port and Apple-Silicon benchmark.** Worth a Phase 1 spike to port the few-line
+   minGRU/minLSTM PyTorch reference to MLX, run the Shakespeare experiment on M1 Max, and
+   publish the result?
+
+3. **Substrate for a future Linus-trained model.** Train a small (100M–500M parameter)
+   minGRU/xLSTM/Mamba-style model from scratch on Dan's domain corpus in Phase 6, or stay
+   with LoRA-on-Qwen as the safer bet?
+
+4. **minGRU + BitNet cross-product.** Phase 6 (or earlier) experiment: minGRU with
+   BitLinear gates as the most extreme hardware-friendly substrate (recurrent + 1-bit +
+   Apple-Silicon-friendly)? **[Phase 8 research direction]**
+
+5. **Minimum useful sequence length for Linus's recurrent components.** The paper stops at
+   4096 tokens; the case for recurrence over attention is strongest at 16k–64k. Worth a
+   Phase 1 benchmark at those lengths to validate the extrapolation?
+
+### TimeSformer — Space-Time Attention (2102.05095v4)
+
+1. **Memory framing for the Linus architecture.** Add a "memory-architecture survey"
+   deliverable that explicitly inventories factorization tricks (divided attention,
+   sliding window, sparse, axial) alongside structural alternatives (Mamba, RWKV, retentive
+   networks)? **[memory-pillar candidate]**
+
+2. **Quadratic-wall budget for Linus's session memory.** At what conversation length on
+   M1 Max with 32 GB unified memory does a Qwen-7B / Mistral-7B Worker hit a comparable
+   wall, measured in turns / tokens / tool-output payload size? **[memory-pillar candidate,
+   diagnostic]**
+
+3. **Factorization vs. external memory as the first move.** When Linus exceeds a Worker's
+   context window, factorization trick (sliding window, KV-cache compression) or
+   external-memory trick (retrieval, summarization, episodic store)? Garrison says the
+   second; engineering instinct often reaches for the first.
+
+4. **Video as a future Linus modality.** Out of scope today; if microscope time-series,
+   recorded meetings, screencast analysis, lab video become in-scope, this paper is the
+   known-good baseline.
+
+5. **Pretraining-cost asymmetry on Apple Silicon.** TimeSformer drops 13 points without
+   ImageNet-21K pretraining. Should Linus ever attempt domain-specific pretraining or
+   stay strictly in the LoRA / fine-tune regime?
+
+### ARC Prize 2024 (2412.04604v2)
+
+1. **ARC-AGI as an episodic-memory diagnostic.** Take a small Linus Worker, run it against
+   50–100 ARC-AGI public-eval tasks twice — once without episodic memory, once with — and
+   measure the delta. The experiment that turns the memory claim into a number.
+   **[memory-pillar candidate, Phase 2/3]**
+
+2. **Memory architecture's lower bound.** o3 at $1.15M for 91.5% is the upper bound on what
+   bad memory architecture costs. What is the lower bound — how much of o3's gain over the
+   55.5% open-source SOTA is recoverable by a small model with clean episodic memory and
+   TTT?
+
+3. **TTT as a Linus primitive.** Phase 6 fine-tuning roadmap: treat TTT as a first-class
+   capability (Worker can request "spawn a fine-tuned variant of yourself for this task"),
+   or keep training-time and inference-time concerns separate?
+
+4. **ARC-AGI-2 timing.** Wait for ARC-AGI-2 (cleaner, fewer brute-force-solvable items),
+   or is ARC-AGI-1 good enough for diagnostic use?
+
+5. **Compute-as-memory accounting.** Track "memory budget" as a first-class architectural
+   quantity in ARCHITECTURE.md or its own ADR — o3 as the upper bound, human-with-pen-and-
+   paper as the lower bound? **[memory-pillar candidate]**
+
+### Test-Time Training (2411.07279v2)
+
+1. **TTT as episodic memory consolidation.** Should Linus's episodic memory layer be
+   designed around periodic LoRA consolidation of session transcripts? Convert memory into
+   the same substrate the model already uses. Worth a Phase 3 spike, or premature?
+   **[memory-pillar candidate]**
+
+2. **Apple Silicon viability smoke test.** Phase 1 reproduction: 10 ARC tasks,
+   Llama-3.2-1B, mlx-lm LoRA, leave-one-out synthetic data — purely to measure per-task
+   compute cost on M1 Max. **[memory-pillar candidate]**
+
+3. **TTT vs. KnowledgeBase as memory substrates.** TTT-on-session-tuples for the episodic
+   layer while KnowledgeBase keeps serving the semantic layer? Or are they two ends of a
+   continuum where the right answer is "KB entries that have been read/used recently get
+   consolidated into a rolling LoRA adapter"?
+
+4. **Skill-specific adapters.** In Phase 7, each Linus skill ships with canonical
+   examples and uses TTT to fit a transient adapter on invocation, with adapter caching?
+
+5. **Compute-vs-memory budget.** Linus's scarce M1 Max compute on TTT, or invest the same
+   effort in a more durable explicit episodic-memory store? **[central architectural
+   tradeoff]**
+
+### Llama 3 Herd (2407.21783v3)
+
+1. **Worker bake-off scope.** Add Llama 3.1 8B Instruct (Q4_K_M / Q5_K_M via Ollama) to the
+   Phase 1 bake-off alongside Qwen2.5-Coder-7B and Mistral-7B, with the Speed paper's
+   three-task protocol as the measurement schema?
+
+2. **Long context vs. episodic store.** Llama 3 bets "buy memory by extending context to
+   128K." Phase 2 design: deliberately *cap* in-context window usage at 8–16K and route
+   beyond that through a real episodic store, even if the underlying Worker supports 128K?
+   **[memory-pillar candidate, central design choice]**
+
+3. **Multi-needle as an episodic-store benchmark.** Add a synthetic multi-needle task to
+   `benchmarks/dan_tasks/` evaluated against Linus's *episodic store* rather than against
+   a model context, to verify the four sub-requirements?
+
+4. **Distillation rather than fine-tuning.** Phase 6 path: hosted Llama 3.1 405B (or
+   Claude) as a teacher to distill domain-specific behaviors into a local 8B or BitNet
+   student?
+
+5. **Open-weights longevity.** Llama 3 is Llama 3 Community License (not OSI-open).
+   Linus principle of "fully under Dan's control" — treat Llama 3 as transitional, replace
+   when a fully-open or BitNet-class equivalent appears?
+
+### Sparks of AGI (2303.12712v5)
+
+1. **Memory substrate decision, forced by Sparks Section 8.** Phase 2 MVP commits upfront
+   to an explicit scratchpad protocol — every Worker invocation gets a writable, durable
+   scratch region the orchestration layer manages — rather than relying on the chat
+   template? **[memory-pillar candidate]**
+
+2. **Which of Dan's domains has the most useful transferred priors?** Run a small
+   Sparks-style qualitative probe on three or four cross-domain prompts against current
+   Ollama models?
+
+3. **Episodic memory as the o1 anti-pattern.** Persist not just final outputs but
+   *intermediate reasoning traces* of a Worker, so next session can build on the
+   deliberation, not just the conclusion? **[memory-pillar candidate]**
+
+4. **Evaluation philosophy.** Lean explicitly into Sparks methodology — small numbers of
+   perturbed, open-ended tasks judged by Dan — alongside the quantitative tok/s and
+   task-completion-time measurements?
+
+### Chinchilla (2203.15556v1)
+
+1. **Data axis for fine-tuning.** What does Linus's "1.4T tokens equivalent" look like —
+   the realistic upper bound on high-quality, well-filtered tokens we can assemble from
+   Dan's papers, threads, code, and notes, and is it large enough relative to a 7B LoRA
+   target to matter?
+
+2. **Memory vs. scaling, in concrete terms.** Linus's bet is "use a small Chinchilla-era
+   model + strong episodic/semantic memory" instead of "use a bigger model with weaker
+   memory." Architectural commitment in Phase 2; what is the test that would falsify it?
+   **[memory-pillar candidate]**
+
+3. **Inference-economics overshoot.** Llama-3-style overtrained smaller models as the
+   default Worker substrate, since inference cost on M1 Max is the binding constraint?
+
+4. **Curation as a first-class Linus activity.** KnowledgeBase ingestion pipeline
+   versions, hashes, and quality-scores corpus subsets the way pretraining labs version
+   their data mixes — "corpus version 0.3 with stricter dedup" as a first-class artifact?
+
+### CoT Theory — Feng, Zhang et al. (2305.15408v5)
+
+1. **Scratchpad as first-class memory object.** Phase 2 session store treats reasoning
+   tokens as durable artifacts by default — versioned, addressable, replayable — or as
+   ephemeral generation byproducts? Expressivity argument says the former; chat harnesses
+   default to the latter. **[memory-pillar candidate, Phase 2 critical]**
+
+2. **Reasoning-token budget per task class.** Router maps task-class to CoT-budget
+   (DP-shaped tasks get up to 4096 reasoning tokens with full retention; lookup tasks
+   get 256 with truncation), or uniform budgeting until benchmarks force the issue?
+   **[memory-pillar candidate]**
+
+3. **Worker-size vs CoT-length tradeoff.** Empirical Phase 1 benchmark: a 7B Worker with
+   generous CoT budget vs. a 14B Worker with terse output on Dan's task suite. Theory
+   predicts small-with-CoT wins on inherently sequential tasks. **[memory-pillar
+   candidate, falsifiable]**
+
+4. **KV-cache continuity as architectural constraint.** Linus inference layer commits to
+   preserving KV cache across Worker turns within a session as a hard requirement, or
+   treat as later optimization? Affects which inference servers (Ollama, mlx-lm, future
+   pmetal) are viable Worker backends. **[memory-pillar candidate]**
+
+5. **Faithfulness check for retained reasoning.** Phase 3 component that audits CoT for
+   self-consistency, or out of scope until specific failure modes appear?
+
+### Expressive Power of Transformers with CoT — Merrill & Sabharwal (2310.07923v5)
+
+1. **Scratchpad as first-class artifact.** Phase 2 session store treats model
+   scratchpad / chain-of-thought tokens as durable, addressable artifacts on equal footing
+   with final answers and tool outputs? Smallest viable schema (turn id, scratchpad blob,
+   hash, timestamp) that satisfies Garrison's four sub-requirements?
+   **[memory-pillar candidate]**
+
+2. **Linear vs. polynomial scratchpad budget per Worker call.** Per-call scratchpad
+   budgets in the router based on task type / deadline / energy budget?
+   **[memory-pillar candidate]**
+
+3. **Recurrence as a memory-cost optimization.** Phase 6 actively prefers state-space or
+   hybrid architectures for the default Linus Worker because they implement the
+   Garrison/Merrill-Sabharwal recursion requirement at lower per-step cost on a 32 GB
+   unified-memory budget? Connects to Bonsai / pmetal / mlx-flash thread.
+   **[memory-pillar candidate]**
+
+4. **Cross-session episodic memory as the "outer scratchpad."** What experiment would
+   distinguish a Linus with a thin episodic store from one without, in a way sensitive to
+   the hypothesized expressivity gap rather than just to convenience?
+   **[memory-pillar candidate]**
+
+---
+
 # Part 3 — From `docs/syntheses` documents
 
 ## LLM Wiki & Community Insights (docs/llm-wiki-synthesis.md)
@@ -711,6 +979,51 @@ on the current critical path.
 4. **What is the right fine-tuning target in Phase 6, and does it change the entrepreneurial calculus?** A genomics-specialized model opens the scientific intelligence opportunities; a coding-specialized model accelerates Linus's own development. This decision should probably be made by Phase 3, not deferred to Phase 6.
 
 5. **Is Dan's domain expertise (biochemistry, genomics, environmental science) the scarce input at Maestro time, rather than task decomposition skill?** This shapes how the Maestro/Worker boundary is drawn — domain expertise applied to problems Workers cannot touch may be higher-leverage than decomposing tasks for Workers to execute.
+
+---
+
+## Memory Synthesis (docs/syntheses/memory-synthesis.md)
+
+Cross-cutting questions surfaced by the [memory synthesis](../syntheses/memory-synthesis.md)
+that supplement the per-paper questions in the Memory pillar section above. These are the
+items that synthesize across multiple papers in the Garrison thread.
+
+1. **The substrate question for cross-session episodic memory (Layer C).** SQLite + git as
+   the conservative v0 is an obvious starting point. The Akyürek TTT result is striking
+   enough to warrant explicit consideration: structured-text-and-hashes (debuggable,
+   inspectable, slow to consult) or parametric-via-LoRA-consolidation (fast, opaque,
+   training pass per consolidation event)? Or two ends of a continuum where knowledge
+   graduates from text into LoRA after sufficient repeated access? Phase 2 spec should not
+   commit to (3) but should not preclude it either. **[memory-pillar candidate]**
+
+2. **Faithfulness of retained reasoning.** Stored reasoning traces surfaced to Dan are
+   implicitly endorsed, but Kojima's error analysis notes traces sometimes generate
+   unnecessary steps after reaching the correct answer or just rephrase the question.
+   Phase 3 component that audits CoT for self-consistency, or out of scope until specific
+   failure modes appear?
+
+3. **Memory budget as a first-class accounting quantity.** o3 paid $1.15M to brute-force
+   memory reliability through parallel search. Linus's local hardware budget is a few tens
+   of dollars of electricity per day. ARCHITECTURE.md (or a new ADR) treats memory budget
+   as a first-class quantity with the o3 number as cautionary upper bound and
+   human-with-pen-and-paper as the lower bound? **[memory-pillar candidate]**
+
+4. **ARC-AGI as a memory diagnostic, not a target.** `benchmarks/dan_tasks/` includes
+   50–100 public-eval ARC-AGI tasks, run with and without the episodic store as a
+   memory-architecture probe? Not a Linus capability target; one of the few public-domain
+   proxies for "reliable computation across many steps on a novel task."
+
+5. **Scratchpad-budget policy per task class.** Router enforces per-call CoT budgets
+   based on task class, with a v0 mapping (DP-shaped tasks → 4096 tokens with full
+   retention; lookup tasks → 256 with truncation)? Cheap to implement; would generate
+   data to inform a more refined policy. **[memory-pillar candidate]**
+
+6. **Memory architecture spec as a Phase 2 deliverable.** Commit to writing
+   `docs/specs/memory-architecture.md` walking through Layers A–D, the four
+   sub-requirement obligations, and the substrate choice per layer — *before* the
+   orchestration layer's session and dispatch primitives are written? The synthesis says
+   yes; the formal complexity-theoretic results give the architectural pressure.
+   **[memory-pillar Tier 1 candidate]**
 
 ---
 
