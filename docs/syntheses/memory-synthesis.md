@@ -75,6 +75,23 @@ The eleven papers do not agree on a recipe. They agree on a diagnosis.
 count, training data, or attention engineering tricks.** That is the
 sentence the rest of this synthesis unpacks.
 
+A practitioner-side anchor on the same finding lands from the opposite
+direction. Ayesha Mughal's March 2026 piece
+[*Why Claude Gets Dumber the Longer Your Session Runs*](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+documents the operational degradation visible inside a single hosted-Claude
+session — the same architectural deficit, observed at the keyboard rather
+than proved on paper. Her mechanism is two-part: "lost in the middle"
+attention degradation (instructions buried under hours of tool output get
+weighted a fraction of what they were when fresh) and a real-vs-nominal
+token budget (a 200K nominal window in which performance starts measurably
+degrading around 147K, with system prompts, tool schemas, and MCP servers
+already consuming 30K–50K before the user types). Where Garrison argues
+from complexity theory why amnesiac architectures cannot escape TC0,
+Mughal documents how the same gap shows up as drift, contradiction, and
+forgotten decisions inside a session that nominally has plenty of room
+left. The two perspectives reinforce each other; the rest of this
+synthesis treats them as one finding seen from two angles.
+
 ---
 
 ## The three camera angles
@@ -362,6 +379,20 @@ chat template's default truncation behaviour. The o1-forgets failure mode
 is not a quirk to work around; it is a design failure that collapses
 expressivity.
 
+Mughal supplies the operational evidence for the same point from the
+hosted-Claude side. Her measurements (citing SFEIR Institute) put a
+marathon four-hour session at roughly 40–60% of fresh-session quality by
+hour three, while a disciplined sprint-and-compact loop holds 80–85%
+across the same window. The difference is not the model and not the task;
+it is whether scratchpad accumulation is being managed as a durable
+artifact with explicit preservation, or being allowed to silt up the
+attention budget until correct instructions sink into the lossy middle.
+The architectural commitments above — scratchpad as durable artifact,
+two-segment record per turn, explicit prohibition of the o1 truncation
+pattern — are exactly what makes the Linus-side equivalent of those
+mitigations possible. Without the substrate, no compaction discipline can
+recover state that was never durably recorded.
+
 ### Layer C — Cross-session episodic memory (across sessions, days, projects)
 
 This is the layer Linus's current architecture treats as deferred. The
@@ -402,6 +433,19 @@ context should be cheaper to access and more aggressively consulted than
 ancient context, with mechanism for old context to remain reliably
 retrievable when needed. That is a design pattern for retrieval ordering
 over the episodic store, not a separate substrate.
+
+Mughal's session-handoff file (`.claude/session-handoff.md` — written at
+session end with modified files, decisions and their reasoning, current
+state, and the exact next step; read at session start) is the
+hosted-Claude analogue of what the Linus episodic store provides natively.
+It is a volatile addressable artifact at the session boundary, captured
+because nothing else in the hosted environment plays that role. The Linus
+equivalent is not a single overwritten markdown file; it is an entry in
+the addressable episodic substrate, with the same payload (decisions,
+state, next step) but stored as a first-class record alongside the
+session's reasoning traces and tool outputs. The hosted-Claude pattern is
+a workaround for a missing layer; the Linus design treats that layer as
+infrastructure.
 
 ### Layer D — Semantic / knowledge memory (durable, shared, factual)
 
@@ -447,6 +491,20 @@ this task?" The complexity-theoretic results add two new axes:
 
 Both axes are router *primitives*, not optimisations — adding them later
 is harder than building them in.
+
+Mughal's MCP-schema budget discipline maps directly onto the same two
+primitives. Her observation that nine MCP servers can consume 30K–50K of
+context before the user types — and that the right move is to disable
+servers a given task does not need rather than load everything by default
+— is the practitioner-side restatement of "context is a budget, not a
+capacity." `cot_budget` and `memory_mode` are the Linus-side knobs that
+enforce that discipline at the orchestration layer: budget context per
+call, do not load by default. Her empirical numbers — degradation around
+~147K of a 200K window, auto-compaction at 64–75% capacity, performance
+falling to 40–60% by hour three of an unmanaged session — are exactly
+the kind of measurement the router's telemetry should produce per Worker
+for Linus, so that "this Worker degrades past N tokens of context fill"
+becomes a model-registry property rather than folklore.
 
 ### Worker selection gets a memory-aware dimension
 
@@ -510,6 +568,47 @@ TTT-style episodic consolidation; minGRU/minLSTM/SSM Workers), with their
 viability informed by Phase 1c and Phase 2 measurements rather than
 guessed up front.
 
+### Context-window management is an operational concern, not just an architectural one
+
+The eleven-paper corpus and the Garrison nucleus give Linus the
+*substrate*: layered memory, an episodic store, recursive state with
+reliable history access. Mughal's piece supplies the complementary
+*operational pattern* that runs on top of that substrate. The two are not
+in tension. The architectural pillar makes the disciplined operation
+possible; the disciplined operation realises the value the architecture
+was built for. Treating either as sufficient on its own is a category
+error.
+
+Concretely, Linus needs orchestration-layer analogues of the four
+hosted-Claude commands and the PreCompact hook pattern. A diagnostic
+command parallel to `/context` that reports per-call context fill at
+dispatch time, broken down by layer (scratchpad, episodic, semantic,
+system); a full-reset operation parallel to `/clear` for moves to
+unrelated tasks; a summarising compression operation parallel to
+`/compact` that takes explicit preservation instructions about what must
+survive; a surgical rollback operation parallel to `/rewind` that returns
+to a named checkpoint without losing the work before it; and a
+PreCompact-style hook that captures critical state to the durable
+substrate before any lossy compression event fires. The reactive-versus-
+active framing Mughal closes on — context as a resource to manage rather
+than a bucket that fills — is the Maestro/Worker stance Linus should
+adopt by default.
+
+These are not separate from the M-series resolutions; they are the
+orchestration-layer surface that exposes the M-series substrate to the
+Maestro/Worker protocol. The architectural commitment in M3 (scratchpad
+as durable artifact, two-segment record) makes the PreCompact pattern
+trivial to implement, because the critical state is already being written
+durably at every turn — the hook becomes a notification rather than a
+rescue. The architectural commitment in M2 (episodic store as addressable
+substrate) makes the session-handoff pattern trivial, because handoff
+content is just another addressable record at a session boundary. The
+architectural commitment in M4 (router primitives `cot_budget` and
+`memory_mode`) is what makes per-call diagnostic visibility possible at
+all, because per-call budgets are what get reported. Without the
+substrate the operations have nothing to act on; without the operations
+the substrate is unused capacity.
+
 ### The o1 anti-pattern is now a stated failure mode to avoid
 
 OpenAI's documentation that o1 "discards reasoning tokens from its context
@@ -572,6 +671,23 @@ through the episodic store, even when the underlying Worker technically
 supports 128K. Setting that policy up front prevents the lazy
 "just stuff it all in context" pattern.
 
+**Aiming for ever-larger Worker context windows is a long-term goal, not
+a substitute for the memory pillar.** The Garrison formal argument gives
+one reason: a window large enough to hold history is still single-pass
+attention over that history, which is the regime the corpus shows is
+TC0-bounded. Mughal's lost-in-the-middle finding gives the operational
+companion: even *inside* a window the model nominally has, attention on
+content buried in the middle degrades to a fraction of what it was when
+fresh, so a 200K window is in practice a ~100K–120K working budget that
+silts up further with every tool call. The 16K cap M5 sets for Phase 2
+is a floor that can move with confidence as Linus matures and as Worker
+context-handling improves — not a ceiling. What stays regardless of how
+far the cap rises is the rest of the M-series commitment: the episodic
+store as the path for anything beyond the window, the overflow contract
+for what spills, and the explicit-bypass mechanism for the rare case
+where stuffing context is the right answer. Larger windows are useful;
+they do not change the architecture they sit inside.
+
 ---
 
 ## Phase-tagged priorities
@@ -622,6 +738,19 @@ a first-class deliverable. Concretely:
 - In-context window cap policy: deliberately limit Worker context windows
   to 8–16K and route beyond that through the episodic store. Prevents the
   long-context-as-memory-substitute anti-pattern.
+- A first-class diagnostic command in the orchestration surface (the
+  Linus analogue of [`/context`](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt))
+  that reports per-call context fill at dispatch time, broken down by
+  layer (scratchpad, episodic, semantic, system). Visibility is the
+  precondition for active management; without it, every "context is full"
+  decision is folklore.
+- A session-handoff record written to the episodic store at session end
+  and read at session start. The Linus-native analogue of Mughal's
+  `.claude/session-handoff.md`, but addressable via the M2 substrate
+  rather than a single volatile file — which means handoff content is
+  versioned alongside the session it summarises, and a project that
+  spans many sessions accumulates a navigable handoff history rather
+  than overwriting it each time.
 
 **Phase 3 — Knowledge & Parallel Agents**
 
@@ -762,6 +891,14 @@ set:
 - Boyle, Komargodski & Vafa's "Memory checking requires logarithmic
   overhead" (STOC 2024) supplies the tight lower bound used by Garrison's
   Theorem 1.
+- Ayesha Mughal, [*Why Claude Gets Dumber the Longer Your Session Runs
+  (and the Exact Fix)*](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+  (Medium, March 2026) — the practitioner-side companion to the Garrison
+  thread; documents lost-in-the-middle attention degradation, real-vs-
+  nominal token budgets, and the four operational primitives
+  (clear / compact / rewind / diagnostic-context) plus the PreCompact
+  hook and session-handoff patterns that map onto the M2/M3/M4
+  substrate.
 
 ---
 

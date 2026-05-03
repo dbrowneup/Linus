@@ -32,7 +32,11 @@ designed before the first ingest, not after the first thousand notes. The memory
 calls it "structure as the precondition for capability": single-pass transformers are
 provably stuck in TC0, and the only escape is recursive state maintenance plus reliable
 history access, both of which are *architectural* properties of the orchestration layer
-that cannot be retrofitted onto a memoryless Worker after the fact.
+that cannot be retrofitted onto a memoryless Worker after the fact. Mughal's
+practitioner data reinforces the same point from the operational side — disciplined
+context management buys back roughly 25–45 percentage points of session quality across
+long sessions versus unmanaged context, which is the operational shape of the same
+compounding-structure claim.
 
 They are describing the same leverage point from four angles. For Linus, this means the
 most important work in Phase 1 is not running benchmarks or standing up services — it is
@@ -209,6 +213,22 @@ history access). The four-layer decomposition the memory synthesis proposes (int
 latent / within-session scratchpad / cross-session episodic / semantic-knowledge) is the
 shared substrate behind all of those individual practitioner findings.
 
+**It now has a practitioner-side anchor.** Ayesha Mughal's March 2026 Medium piece
+[*Why Claude Gets Dumber the Longer Your Session Runs (and the Exact Fix)*](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+is the practitioner-side companion to the Garrison thread. The empirical finding is sharp:
+unmanaged marathon sessions retain only ~40–60% of fresh-session quality by hour three,
+while disciplined 30-minute-sprint plus targeted-compaction loops hold ~80–85% across the
+same span. The mechanism is exactly the failure mode Garrison's framework predicts at the
+substrate level: lost-in-the-middle attention degradation buries earlier instructions as
+intermediate tokens accumulate, and the *real* token budget is well below the nominal one
+— degradation begins around ~147K of a 200K window, which is why Claude Code's
+auto-compaction now fires at 64–75% capacity rather than 90%. The implication is the joint
+of the two views: Garrison gives the architectural argument that memory mechanisms are
+necessary because single-pass attention cannot indefinitely substitute for them; Mughal
+supplies operational evidence that even *inside* a long context window the model attends
+unevenly, so the substrate (the episodic store) and the discipline (proactive context
+management at the orchestration surface) are both needed — neither alone is sufficient.
+
 Three patterns deserve immediate encoding alongside the existing claim-typing and content-
 hashing patterns from the LLM wiki synthesis:
 
@@ -228,6 +248,21 @@ appropriate prefix from the appropriate memory layer before dispatch.
 that through the episodic store. Llama 3's 128K is a quadratic-cost simulation of memory
 inside attention; the cap prevents the lazy "just stuff everything in context" pattern that
 gives away the architectural advantage of having a real episodic store.
+
+**Context-management primitives in the orchestration surface.** Mughal's four Claude Code
+commands map directly onto operations Linus needs to expose at its own orchestration layer:
+a `/context`-analogue that gives diagnostic visibility into per-call context fill at
+dispatch time, broken down by layer; a `/clear`-analogue that performs a full reset between
+unrelated tasks rather than letting accumulated turns rot a Worker session; a
+`/compact`-analogue that performs a summarising compression with explicit preservation
+arguments rather than relying on a default summariser; and a `/rewind`-analogue that
+allows surgical rollback to a named checkpoint when a Worker has gone down a bad path.
+Underneath all four sits a PreCompact-hook-style pattern: any lossy compression event —
+manual or automatic — must first capture critical state (modified files, decisions,
+in-progress task, open blockers) into the M2 episodic substrate before the lossy step
+runs. These are not new substrate decisions; they are the surface that exposes the
+M-series substrate to the Maestro/Worker protocol so that proactive context discipline
+becomes a first-class operation rather than a per-Worker convention.
 
 The substrate choice for the cross-session episodic layer (Layer C in the synthesis) opens
 a new architectural question that did not exist in the prior three syntheses: should
@@ -305,7 +340,11 @@ to the Phase 1 benchmark protocol so every Ollama-pulled model carries the metri
 model registry. Adopt the Kojima two-stage pattern (reasoning extraction → answer extraction
 with explicit separation) as the default Worker invocation template. Forbid the o1
 anti-pattern (silently truncating reasoning between turns) in the Worker protocol spec — any
-Worker integration that does this is non-conformant.
+Worker integration that does this is non-conformant. Queue Mughal's "treat context as a
+resource to manage, not capacity to fill" framing as a CLAUDE.md engineering convention
+candidate for the next planning session (not this one), and pilot a `session/handoff.md`
+convention in current Claude Code sessions before the Phase 2 episodic store ships, so the
+discipline is in muscle memory by the time the substrate exists to back it.
 
 **Phase 2 — Linus MVP**
 
@@ -331,7 +370,14 @@ session-stateful / project-stateful). Cap in-context window usage at 8–16K and
 that through the episodic store, even when the underlying Worker supports 128K. Add a
 "memory-aware Worker selection" benchmark to `benchmarks/dan_tasks/` comparing a small Worker
 with generous CoT budget against a larger Worker with terse output on inherently sequential
-tasks.
+tasks. Expose a first-class diagnostic command in the orchestration surface — the analogue
+of Mughal's `/context` — that reports per-call context fill at dispatch time, broken down
+by layer (system prompt, tool schemas, scratchpad, episodic recall, KB context, conversation
+turns) so degradation thresholds are observable rather than inferred. Write a session-handoff
+record into the episodic store at session end and read it at session start: the Linus-native
+analogue of Mughal's `.claude/session-handoff.md`, but addressable via the M2 substrate
+rather than a single volatile file, so cross-session continuity is a property of the
+substrate rather than a per-project convention.
 
 **Phase 3 — Knowledge and Parallel Agents**
 
@@ -464,7 +510,7 @@ mitigation). **Layered architecture:** linus conda env (production, hash-pinned 
 | Security | Linus has operational safety but no supply chain or input-integrity controls | pip-audit + hash lock file + remove future-phase deps | Now |
 | LLM Wiki | Compile-don't-retrieve; the schema is the product; write-back is the discipline | Claim typing + content hashing in KB schema | Phase 2 |
 | Skills & Practices | Bottleneck is clarity, not execution; encode standards in files | Hot cache convention + Worker spec uncertainty protocol | Now / Phase 2 |
-| Memory | Single-pass transformers are TC0; recursive state + reliable history access are the only escape; memory is upstream of use cases, not downstream | Lift memory architecture to Phase 2; scratchpad as durable artifact; v0 episodic store; per-call CoT budget + memory mode router primitives | Now / Phase 2 |
+| Memory | Single-pass transformers are TC0; recursive state + reliable history access are the only escape; memory is upstream of use cases, not downstream | Lift memory architecture to Phase 2; scratchpad as durable artifact; v0 episodic store; per-call CoT budget + memory mode router primitives; **diagnostic + sprint-and-compact discipline at the orchestration surface** | Now / Phase 2 |
 | All four | Every dependency is a trust relationship; orchestration logic is Linus's core; structure compounds, capability does not | Delete langchain/langgraph; evaluate Task Master AI before building custom router; commit to memory architecture spec before Phase 2 implementation | Phase 2 design |
 
 ---

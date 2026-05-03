@@ -38,7 +38,7 @@ theme has only one or two anchors, the gap is work Linus has to do:
 | **Security posture** | (none — practitioner synthesis) | `environment.yml`, `.claude/settings.json`, `SAFETY.md` | Security synthesis: pip-audit + hash lock file + remove future-phase deps; trust-tier tagging for KB content; incident response protocol before Phase 2 | Phase 0 immediate (dep cleanup); Phase 2 (endpoint + prompt injection); Phase 3+ (audit cadence) |
 | **Skills, practices & entrepreneurial** | (none — practitioner threads) | `repos/cline`; emerging: Task Master AI, claude-squad | Skills synthesis: 10 collaboration practices; 13 skills; 7 entrepreneurial opportunities filtered for Dan's PhD-biochemist/genomics profile; domain expertise is the moat | Phase 1 (closed loop); commercial surface Phase 1+ |
 | **Hypercube projections (orthogonal layer)** | Horiike-Fujishiro Phys. Rev. E | (none) | — | Curiosity / biology overlap; not phase-blocking |
-| **Memory & universal computation** | Garrison thesis ([2412.17794](../../context/papers/2412.17794v1.pdf)) + complexity-theory pair ([2305.15408](../paper-notes/2305.15408v5.md), [2310.07923](../paper-notes/2310.07923v5.md)); empirics ([Kojima 2205.11916](../paper-notes/2205.11916v4.md), [Sparks 2303.12712](../paper-notes/2303.12712v5.md)); substrate alternatives ([minGRU 2410.01201](../paper-notes/2410.01201v3.md), [Coconut 2412.06769](../paper-notes/2412.06769v3.md), [TTT 2411.07279](../paper-notes/2411.07279v2.md)); wall-of-attention case studies ([TimeSformer 2102.05095](../paper-notes/2102.05095v4.md), [Chinchilla 2203.15556](../paper-notes/2203.15556v1.md), [Llama 3 2407.21783](../paper-notes/2407.21783v3.md)); cost-of-no-memory ([ARC Prize 2024 2412.04604](../paper-notes/2412.04604v2.md)) | (no Linus code yet — gap to be closed by Phase 2 episodic store) | Memory synthesis: lift memory architecture from Phase 3+ to Phase 2 first-class layer; scratchpad as durable artifact; v0 episodic store; per-call CoT budget + memory mode router primitives; in-context cap policy | Phase 2 first-class architectural pillar; Phase 3 parallel-write coordination; Phase 6 substrate experiments (TTT, minGRU MLX); Phase 8 BitNet × minGRU cross-product |
+| **Memory & universal computation** | Garrison thesis ([2412.17794](../../context/papers/2412.17794v1.pdf)) + complexity-theory pair ([2305.15408](../paper-notes/2305.15408v5.md), [2310.07923](../paper-notes/2310.07923v5.md)); empirics ([Kojima 2205.11916](../paper-notes/2205.11916v4.md), [Sparks 2303.12712](../paper-notes/2303.12712v5.md)); substrate alternatives ([minGRU 2410.01201](../paper-notes/2410.01201v3.md), [Coconut 2412.06769](../paper-notes/2412.06769v3.md), [TTT 2411.07279](../paper-notes/2411.07279v2.md)); wall-of-attention case studies ([TimeSformer 2102.05095](../paper-notes/2102.05095v4.md), [Chinchilla 2203.15556](../paper-notes/2203.15556v1.md), [Llama 3 2407.21783](../paper-notes/2407.21783v3.md)); cost-of-no-memory ([ARC Prize 2024 2412.04604](../paper-notes/2412.04604v2.md)) | (no Linus code yet — gap to be closed by Phase 2 episodic store) | Memory synthesis: lift memory architecture from Phase 3+ to Phase 2 first-class layer; scratchpad as durable artifact; v0 episodic store; per-call CoT budget + memory mode router primitives; in-context cap policy. [Mughal "Why Claude Gets Dumber..."](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt) — operational discipline for long-session context management; lost-in-the-middle attention degradation, ~147K-of-200K real budget, sprint+compact loop retains ~80–85% quality vs. ~40–60% in marathon sessions | Phase 2 first-class architectural pillar; Phase 3 parallel-write coordination; Phase 6 substrate experiments (TTT, minGRU MLX); Phase 8 BitNet × minGRU cross-product |
 
 Six observations fall out of this table:
 
@@ -78,7 +78,10 @@ synthesis ([docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md
 that memory architecture should be promoted from a Phase 3+ deferred concern to a Phase 2
 first-class layer — every use case that needs the assistant to build on its own work
 across sessions depends on the same primitive, so the requirement is upstream of the use
-cases. This is a substantial restructuring of Phase 2 scope.
+cases. This is a substantial restructuring of Phase 2 scope. The 2026-05-03 addition of
+Mughal's practitioner article on context-window management closes the practice-column
+gap for the memory row — the architectural argument and the operational pattern now have
+parallel anchors.
 
 ---
 
@@ -284,6 +287,26 @@ read API across all three so Workers cannot tell which layer context came from. 
 finding that "structure compounds, capability does not" now has a complexity-theoretic
 floor under it.
 
+The practitioner-side anchor on the same finding lands in Ayesha Mughal's March 2026
+article [*Why Claude Gets Dumber the Longer Your Session Runs*](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt).
+Mughal reports that disciplined context management recovers roughly 25–45 percentage
+points of effective quality across a four-hour session — sprint-and-compact loops hold
+~80–85% of fresh-session performance where unmanaged marathon sessions decay to
+~40–60%. The mechanism is "lost in the middle" attention degradation: the nominal 200K
+context window is real, but performance starts falling off around ~147K tokens, and
+attention weights on content buried in the middle of a long transcript are a fraction of
+what they were when the same content sat near the top. Mughal is orthogonal to but
+reinforcing of the Garrison thread. Garrison says memory architecture is the load-bearing
+primitive, with theory and complexity arguments behind it. Mughal says context management
+is the operational pattern that exposes the substrate, with measured quality numbers from
+hosted-Claude practice. Linus needs both, and they argue from opposite ends toward the
+same Phase 2 deliverable. The concrete design implication is that Phase 2 needs
+orchestration-surface analogues of Mughal's `/context` (diagnostic), `/clear` (reset),
+`/compact` (lossy summarisation with explicit preservation directives), and `/rewind`
+(rollback to checkpoint) primitives, plus a PreCompact-hook-style "capture critical
+state to durable storage before lossy compression" pattern — all on top of the M2/M3/M4/M5
+substrate decisions the synthesis already names.
+
 **STATUS (2026-05):** Newly surfaced; the synthesis recommends Phase 2 restructuring;
 top-questions.md adds a Tier 1 entry (lift memory architecture from Phase 3+ to Phase 2)
 and several Tier 2 entries (substrate choice for Layer C; per-call CoT budget policy;
@@ -389,9 +412,25 @@ substrate; the closest thing is the conversation transcript captured by the chat
 The memory synthesis names this as the load-bearing Phase 2 gap and recommends a v0
 implementation (SQLite + content hashes + git as persistence substrate, with the four
 sub-requirement obligations from Garrison's framework — addressability, disambiguation,
-temporal order, integrity — built in from the start). A Phase 2 deliverable; not phase-blocking
-for Phase 1, but blocking for any meaningful "Linus remembers what we did last session"
-capability. **OPEN as of 2026-05-03.**
+temporal order, integrity — built in from the start). Mughal's session-handoff file
+pattern (`.claude/session-handoff.md` written at session end, read at session start, kept
+out of git as volatile state) is the hosted-Claude operational analogue and provides a
+reference shape for the Linus-native equivalent — a session-handoff record written and
+read via `linus.memory.episodic.*` rather than as a single volatile file, so handoff
+state inherits the same addressability, disambiguation, temporal-order, and integrity
+guarantees the rest of the episodic layer enforces. A Phase 2 deliverable; not
+phase-blocking for Phase 1, but blocking for any meaningful "Linus remembers what we did
+last session" capability. **OPEN as of 2026-05-03.**
+
+**Orchestration-surface context-management primitives.** Linus has no in-repo equivalent
+of Claude Code's `/context` (diagnostic), `/clear` (reset), `/compact` (summarise with
+preservation), `/rewind` (rollback to checkpoint), nor a PreCompact-hook-style "capture
+critical state before lossy compression" pattern. The Mughal article makes the case that
+these are operationally load-bearing in long sessions even when the substrate (episodic
+store) is in place — without them, the substrate cannot be invoked at the right moment,
+and the in-context budget fills with noise long before the episodic layer is consulted.
+Phase 2 deliverable; not phase-blocking for Phase 1, but blocking for any meaningful
+"Linus stays sharp across long sessions" capability. **OPEN as of 2026-05-03.**
 
 **A unified BitNet × MoE × Streaming codebase.** The BitNet papers, Flash-MoE, and JPmHC
 together gesture at "ternary-stable-streamed-MoE" — but no codebase combines all three. This
