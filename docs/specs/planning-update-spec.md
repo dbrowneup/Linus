@@ -1049,14 +1049,12 @@ Entries are append-only and ordered by date.
 
 ## Format
 
-```
 ## YYYY-MM-DD — <action>: <path>
 
 **Action:** archived | removed
 **Rationale:** <why>
 **Last-commit SHA:** <SHA pointer to commit before action>
 **Source review:** <which quarterly review or planning session triggered the action>
-```
 
 ## Entries
 
