@@ -236,54 +236,21 @@ JPmHC → Flash-MoE → all four BitNet papers, as the seed for a
 
 ## Cross-cutting open questions
 
+> **All cross-cutting questions below resolved 2026-05-03.** See
+> [../questions/top-questions.md](../questions/top-questions.md) Resolution Log and
+> [../specs/planning-update-spec.md](../specs/planning-update-spec.md) for execution
+> detail. Resolutions summarized inline below for reading-in-place.
+
 The notes individually flag questions for Dan; a few reappear across multiple
 notes and may deserve a discussion of their own:
 
-1. **Is the *single most useful Phase 1 spike* "build bitnet.cpp on M1 Max,
-   pull `bitnet-b1.58-2B-4T-gguf`, benchmark vs Ollama-served Qwen and Llama"?**
-   Mentioned in 2B4T, bitnet.cpp, and BitNet Distillation notes.
-2. **Should Linus commit to a BitNet-derived Worker for Phase 6, or keep the
-   FP16-LoRA option open?** Mentioned in BitNet b1.58 and BitNet Distillation
-   notes.
-3. **Is a BitNet × Flash-MoE × JPmHC synthesis a real Phase 8 research
-   direction, or premature speculation?** Mentioned in JPmHC and Flash-MoE notes.
-4. **Should there be a `synthesis-bitnet-on-apple-silicon.md` companion note
-   that pulls the four-or-five most relevant papers into one "what's the actual
-   inference path" writeup?** Mentioned in BitNet v2 and 2B4T notes.
-5. **Should the KB v1 embedding pipeline use the recipe from
-   [Stankevičius & Lukoševičius](paper-notes/2408.08073v2.md)** (idf weighting + first+last
-   layers + quantile-u normalization), and should that paper's ablation
-   methodology be lifted into a `docs/experimental-protocol.md` Linus-house
-   style guide for benchmark design? Mentioned in the embeddings note.
-6. **Should there be a `docs/specs/kb-architecture.md` that walks through the
-   [Hogan et al. KG survey](paper-notes/2003.02320v6.md) section by section
-   and records the design choice + rationale for each KB layer** (data model,
-   schema, identity, context, query language, deductive layer, inductive
-   layer)? Mentioned in the KG-survey note. The KB submodule benefits from
-   this kind of audited design rationale; building it incrementally is much
-   cheaper than retrofitting it.
-7. **Should KB embeddings be PCA-reduced before indexing, and should the KB
-   observability dashboard track distance discrimination
-   `|D_max − D_min| / D_min` as a health metric?** Mentioned in the
-   [Curse of Dimensionality](paper-notes/2401.00422v3.md) note. Both are
-   small-effort, large-payoff implementations.
-
-8. **Should `benchmarks/dan_tasks/` be structured from the start around a
-   three-task schema (minimal, fixed-length, open-ended) with wall-clock
-   task-completion time as the primary metric, rather than tok/s?** The
-   [Speed and LLMs](paper-notes/2502.16721v1.md) paper shows that tok/s
-   rankings frequently invert task-completion rankings, making tok/s
-   an unreliable Worker selection criterion. Getting the benchmark axis right
-   in Phase 1 prevents the tok/s trap.
-
-9. **Should RaKUn 2.0 be the Phase 2 keyphrase extraction layer for KB
-   ingestion, and what merge threshold τ works best for biomedical/genomics
-   papers?** Mentioned in [RaKUn 2.0](paper-notes/2208.07262v1.md). The
-   default τ=1 favors multi-word phrases; a 20-50 paper smoke test on
-   `context/papers/` would validate the setting for Dan's domain.
-
-10. **Should the Phase 2 Linus output interface default to high-information-density
-    concise summaries, explicitly designed around the ~10 bits/s human review
-    throughput limit?** Mentioned in both cognitive throughput papers. Parallel
-    Worker fan-out generates zero throughput gain for Dan unless the Maestro interface
-    sifts outputs to the essential bits first.
+1. **Is the *single most useful Phase 1 spike* "build bitnet.cpp on M1 Max, pull `bitnet-b1.58-2B-4T-gguf`, benchmark vs Ollama-served Qwen and Llama"?** **RESOLVED:** Yes — adopted as first concrete Phase 1c experiment using task-completion-time methodology in `benchmarks/dan_tasks/`.
+2. **Should Linus commit to a BitNet-derived Worker for Phase 6, or keep the FP16-LoRA option open?** **RESOLVED:** Defer the lane decision until Phase 1c BitNet data lands. Phase 6a commits to FP16-LoRA on genomics/biochem corpus regardless. Decision gate at Phase 6a/6b boundary.
+3. **Is a BitNet × Flash-MoE × JPmHC synthesis a real Phase 8 research direction, or premature speculation?** **RESOLVED:** Stays Phase 8 long-horizon research direction in landscape docs; no Phase 6/7 work gated on it. Phase 6d stretch target = opportunistic ternary >8B integration via mlx-flash if community releases.
+4. **Should there be a `synthesis-bitnet-on-apple-silicon.md` companion note?** **RESOLVED:** Defer until Phase 1c BitNet results land. If the spike validates the path, the synthesis earns its writing time then.
+5. **Should the KB v1 embedding pipeline use the recipe from [Stankevičius & Lukoševičius](paper-notes/2408.08073v2.md)?** **RESOLVED:** Run a unified Phase 2 ablation matrix (SPECTER2 raw / +Stankevičius post-processing / BGE-base / +post-processing / random+post-processing) × {full-dim, PCA-256/384/512}. Adopt winning recipe. Methodology folded into `docs/experimental-protocol.md` (Phase 1c). **[KB-spec]**.
+6. **Should there be a `docs/specs/kb-architecture.md`?** **RESOLVED:** Yes — adopted as **[KB-spec] Phase 2 deliverable**, walking the Hogan KG survey section-by-section, reflecting the dual RDF + property graph commitment.
+7. **Should KB embeddings be PCA-reduced before indexing, and should the KB observability dashboard track distance discrimination as a health metric?** **RESOLVED:** Both — folded into the Phase 2 unified embedding ablation (item 5 above) and the KB observability surface.
+8. **Should `benchmarks/dan_tasks/` be structured around a three-task schema with wall-clock task-completion time as the primary metric?** **RESOLVED:** Yes — three-task schema (minimal / fixed-length / open-ended) with wall-clock as **primary** axis. Multiple metrics recorded (tok/s, RSS, TTFT, completion time, quality). Worker selection is **holistic**. Public eval baselines (MBPP/HumanEval/MMLU/GPQA) run alongside.
+9. **Should RaKUn 2.0 be the Phase 2 keyphrase extraction layer for KB ingestion?** **RESOLVED:** **Integrate-and-evaluate, not adopt outright.** RaKUn 2.0 enters KB as additional tool alongside the existing TF-IDF + BERTopic + SPECTER2 + UMAP pipeline. Phase 2 evaluation (overlap with author keywords + Dan manual top-5 + τ ∈ {0.5, 1.0, 1.5} sweep) decides production layer. Possibly retain both as parallel signals. **[KB-spec]**.
+10. **Should the Phase 2 Linus output interface default to high-information-density concise summaries?** **RESOLVED:** Yes — adopt 10-bits/s framing as Phase 2 design principle. **Balanced bullets + prose** (not bullet dumps). **Citations and traceability are first-class.** Worker outputs preserved for Maestro inspection. Opt-in `/verbose`. Reframes Linus as personal LLM Wiki at scale.

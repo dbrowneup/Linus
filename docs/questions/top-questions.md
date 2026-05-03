@@ -12,7 +12,68 @@ documentation cadence.
 
 ---
 
+## Resolution Log (2026-05-03)
+
+All Tier 0, 1, 2, and 3 items resolved in a Maestro/Dan planning session on 2026-05-03.
+Each entry below uses `[Q]: <one-line resolution>` where `Q` links to the in-document
+question. Full implementation detail is in
+[../specs/planning-update-spec.md](../specs/planning-update-spec.md).
+
+**Tier 0 — Immediate actions**
+
+- [Q](#0-remove-pre-emptive-ml-framework-dependencies-from-environmentyml): Confirmed; remove langchain/langgraph/haystack-ai from environment.yml; add hash-pinned `requirements-locked.txt` via `pip-compile --generate-hashes`; document dep philosophy in CLAUDE.md. streamlit and lm-eval stay (closer-term Phase 1c/2). → spec task.
+- [Q](#1-write-and-commit-an-incident-response-protocol-to-safetymd): Confirmed; draft "Supply Chain Incident Response" section in SAFETY.md covering trigger / containment / credential rotation / attestation. → spec task.
+
+**Tier 1 — Decisions blocking Phase 1 / Phase 2**
+
+- [Q](#1-is-the-first-concrete-phase-1-spike-bitnet-2b4t--bitnetcpp-on-m1-max-benchmark-vs-ollama-qwen25llama-32): Adopt as the first concrete Phase 1c experiment using task-completion-time methodology in `benchmarks/dan_tasks/`. Threads with Tier 3 #19 and 1-bit viability question. → DEC.
+- [Q](#2-inference-backend-pmetal-vs-ollamamlx-lm-ft-decided-by-phase-1b-evaluation): pmetal is the lead pending Phase 1b verdict. Build flags: `--features serve,mlx,trainer` for 1b; defer `ane,distill,data`. Concurrency: single-request tok/s + RSS for verdict; 5-concurrent is Phase 2a concern. Dependency risk: pin commit, document Ollama+mlx-lm-ft fallback in ADR 0001, revisit quarterly. → DEC.
+- [Q](#3-phase-6-fine-tuning-path-native-1-bit-bonsai2b4t-vs-bitdistill-fp16--158-bit-vs-fp16-lora-fallback): Defer the lane decision until Phase 1c BitNet data lands. Phase 6a commits to FP16-LoRA on genomics/biochem corpus regardless. Decision gate at Phase 6a/6b boundary. → DEC.
+- [Q](#4-knowledgebase-data-model-rdf-vs-property-graph): **Dual approach** — both RDF (rdflib + optional Oxigraph) and property graph (networkx; Kuzu evaluated later). KB already started both with rdflib + networkx as deps. Linus exposes both via separate tool families. Introduces **[KB-spec] split convention** for spec-parts that primarily impact KnowledgeBase. → DEC × 2.
+- [Q](#5-harness-plurality-converge-to-one-front-end-or-run-all-four-indefinitely): Maintain plurality through Phase 5 with explicit role designations. Claude Code = hosted Maestro; cline = VS Code Worker; claw-code-local = terminal local-model; openclaw = chat/voice/canvas/mobile. No per-harness gold-plating. Pre-answers Tier 2 #6: adopt MCP. → DEC.
+- [Q](#6-kb-ingest-quality-gate-what-are-the-right-domain-criteria-for-dans-scientific-fields): YAML-policy framework adopted as a **quality surface, not a hard gate** (Dan is the primary filter). Domain-agnostic baseline signals; preprints flagged not rejected; no hard reject lane in Phase 2. FineWeb-style calibration deferred to Phase 3 as a learning exercise. **[KB-spec]** item. → DEC.
+
+**Tier 2 — Decisions shaping Phase 2–6 architecture**
+
+- [Q](#6-mcp-as-the-extensibility-substrate): Adopt MCP. Phase 2 tool registry built MCP-shape from the start. pmetal's 45-tool MCP server is first external integration target. Evaluate `fastmcp`. Updates DEC-0005. → DEC.
+- [Q](#7-kb-embedding-pipeline-idf--firstlast--quantile-u-recipe-vs-modern-encoder-bgee5-baseline): Run a unified Phase 2 ablation (SPECTER2 raw / +Stankevičius post-processing / BGE-base / +post-processing / random+post-processing) × {full-dim, PCA-256/384/512}. Distance-discrimination `|D_max − D_min| / D_min` adopted as continuous KB health metric. Resolves Curse-of-Dim Q1+Q2 in one experiment. **[KB-spec]**.
+- [Q](#8-kv-cache-compression-as-a-near-term-linus-feature): Defer as explicit Phase 2 feature. Apply The Algorithm. Enable only if free config flag in pmetal/bitnet.cpp/mlx-flash. Revisit Phase 6+.
+- [Q](#9-ane-in-phase-1b-or-defer-entirely): Defer to Phase 2 as conditional follow-up benchmark, gated on favorable pmetal Phase 1b verdict. Phase 1b/1c primary backends: Ollama-CPU/GPU, pmetal-GPU, bitnet.cpp-CPU.
+- [Q](#10-mlx-flash-vs-flash-moe-philosophy-when-forced-to-choose): Commit Phase 5+ to mlx-flash as the >RAM dense path. flash-moe stays methodology-only reference. → DEC.
+- [Q](#11-streaming--1-bit-composite-path): Phase 6d formal target = mlx-flash streams any fine-tuned model exceeding RAM. Phase 6d stretch target = opportunistic ternary >8B integration if PrismML/community releases. Phase 8 BitNet × Flash-MoE × JPmHC stays long-horizon.
+- [Q](#12-the-flash-moe-target-on-m1-max-32-gb): Commit to the practice. Once Phase 1b closes, draft `docs/specs/phase6d-streaming-target.md` with concrete model + tok/s target.
+- [Q](#13-does-linus-need-a-custom-orchestration-layer-or-will-task-master-ai--cline-cover-phase-2): Keep DEC-0002 (custom orchestration). Algorithm-check primitives via **new Phase 1f deliverable**: evaluate Task Master AI + claude-squad vs. custom prototype vs. pmetal-MCP-as-orchestrator on a real Phase 2 task spec. Adopt PRD→tasks pattern as a skill, not a re-implementation. → DEC refining DEC-0002.
+- [Q](#14-should-dan-start-monetizing-ai-capabilities-now-before-linus-infrastructure-is-ready): Skip the binary. New Phase 2 deliverable: `docs/entrepreneurial-surface.md`. Don't actively pursue clients yet; don't rule out either. Re-evaluate when Linus closer to operational.
+- [Q](#15-phase-5c-deferred-or-done): Mark Phase 5c as "adopt claw-code-local" formally. Remove 500-line custom Python agent fallback from ROADMAP. → DEC amending DEC-0007.
+- [Q](#16-parallel-worker-kb-write-coordination): Serialized writes through coordinator + write-time contradiction surfacing. Workers emit JSON-shaped diff proposals; coordinator merges; conflicts flag for human review. Git-branch-per-ingest underneath. **[KB-spec]**: `docs/specs/kb/parallel-worker-write-coordination.md`.
+
+**Tier 3 — Documentation, conventions, longer-horizon scope**
+
+- [Q](#19-benchmark-architecture-toks-vs-task-completion-time): `benchmarks/dan_tasks/` structured around three-task schema with wall-clock as **primary** axis. Multiple metrics recorded (tok/s, RSS, TTFT, completion time, quality score) — Worker selection holistic. Public eval baselines run alongside.
+- [Q](#20-kb-ingestion-keyphrase-strategy-rakun-20-as-the-phase-2-baseline): **Integrate-and-evaluate, not adopt outright.** RaKUn 2.0 enters KB as additional tool alongside existing TF-IDF + BERTopic + SPECTER2 + UMAP pipeline. Phase 2 evaluation produces empirical comparison; possibly retain both as parallel signals. **[KB-spec]**.
+- [Q](#21-security-posture-decisions-lock-files-dependency-philosophy-incident-protocol): (1) Full hash pinning + monthly pip-audit + quarterly review. (2) **Untrusted experimental packages always in disposable `uv` envs**; uv installed via conda inside linus env. (3) CVE response folded into SAFETY.md incident protocol. → DEC.
+- [Q](#22-output-interface-design-optimize-for-the-10-bitss-human-review-channel): Adopt 10-bits/s framing as Phase 2 design principle. **Balanced bullets + prose** (not bullet dumps). **Citations and traceability are first-class.** Worker outputs preserved for Maestro inspection. Opt-in `/verbose`. **Linus reframed as personal LLM Wiki at scale.** → DEC.
+- [Q](#23-which-community-repos-to-clone-into-repos-as-phase-2-3-references): **Clone all 12 community repos** + future additions. Phase 1a expanded (or 1f addendum) to include their notes. **New curation protocol** for repos/, context/, docs/ with archive log. → DEC.
+- [Q](#14-documentation-cadence-and-synthesis-docs): Two load-bearing notes adopted: `docs/specs/kb-architecture.md` ([KB-spec], Phase 2) and `docs/experimental-protocol.md` (Phase 1c). BitNet-on-Apple-Silicon synthesis deferred to post-Phase 1c results. flash-moe case study deferred to Phase 5+.
+- [Q](#15-phase-4-scope-ambition-how-much-beyond-kiwix--pmtiles--qdrant): Full English Wikipedia (~100 GB) from start as foundation for personal LLM Wiki. **Kolibri as parallel benchmark surface** (`benchmarks/kolibri_tasks/`). Planet-wide PMTiles target with population-density fallback. English-only confirmed. CyberChef/ArchiveBox/Qdrant deferred. Owner location updated (Hawthorn Woods, IL).
+- [Q](#16-linus-practice-and-stance-questions): All six stances adopted with refinements: trust OS page cache (convention); public APIs only for Linus's own code (pmetal uses supported APIs, ANE is the private-API anchor); multi-language stance (Python core, Rust/JS/TS/bash for components); light VISION.md sovereignty refinement; reproducibility + interpretability principle; Obj-C/Metal-direct deferred (not ruled out). → DEC.
+- [Q](#17-methodology-and-tooling): autoresearch program.md → SKILL.md in Phase 7. Per-experiment budget: 30+ min on Dan task suite as default. First autoresearch use: **Phase 1b pmetal LoRA trial.** Cline prompt-variant pattern: Phase 7.
+- [Q](#18-smaller-open-items): All 13 batch items resolved. See spec for one-liner per item.
+
+**New meta-decisions surfaced during the session (not in the original tier list):**
+
+- [KB-spec] split convention for KB-impacting specs (`docs/specs/kb/`).
+- **Planning write-back cadence** — write-back rule (LLM Wiki synthesis) extends to Maestro/Dan + Claude planning sessions; refine core files at the close of every multi-question planning session.
+- **Curation protocol for `repos/`, `context/`, `docs/`** — quarterly review, archive pathway, curation log for what's removed and when.
+- **uv-via-conda layered architecture** — linus conda env (production) + uv disposable envs (experimental) as a hard rule.
+
+---
+
 ## Tier 0 — Immediate actions (Phase 0 / security hygiene, do not wait)
+
+> **TIER 0 — ALL RESOLVED (2026-05-03).** See [Resolution Log](#resolution-log-2026-05-03)
+> for one-line resolutions and [planning-update-spec.md](../specs/planning-update-spec.md)
+> for execution detail.
 
 These are not architectural questions — they are concrete, reversible actions with negligible
 downside that should happen before Phase 1 starts. They don't require answers; they require
@@ -59,6 +120,9 @@ cross-cutting open questions; `docs/questions/open-questions.md` Part 3 / Securi
 ---
 
 ## Tier 1 — Decisions that block Phase 1 / Phase 2
+
+> **TIER 1 — ALL RESOLVED (2026-05-03).** See [Resolution Log](#resolution-log-2026-05-03)
+> and [planning-update-spec.md](../specs/planning-update-spec.md).
 
 These determine what gets built first, and several other questions resolve
 automatically once they are answered.
@@ -148,6 +212,9 @@ low-quality content that corrupts retrieval and, eventually, the Phase 6 fine-tu
 ---
 
 ## Tier 2 — Decisions that shape Phase 2–6 architecture
+
+> **TIER 2 — ALL RESOLVED (2026-05-03).** See [Resolution Log](#resolution-log-2026-05-03)
+> and [planning-update-spec.md](../specs/planning-update-spec.md).
 
 These don't block Phase 1, but the answers steer the next several phases.
 
@@ -262,6 +329,9 @@ contradiction detection runs at write time or read time.
 ---
 
 ## Tier 3 — Decisions that affect documentation, conventions, and longer-horizon scope
+
+> **TIER 3 — ALL RESOLVED (2026-05-03).** See [Resolution Log](#resolution-log-2026-05-03)
+> and [planning-update-spec.md](../specs/planning-update-spec.md).
 
 These are meaningful but don't block any concrete next action. Resolve them
 in batches when there is time.

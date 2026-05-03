@@ -260,12 +260,22 @@ Linus fine-tunes rather than a single generic tool-use prompt.
 
 ## Key Tensions
 
+> **All three tensions resolved 2026-05-03.** See [../questions/top-questions.md](../questions/top-questions.md)
+> Resolution Log and [../specs/planning-update-spec.md](../specs/planning-update-spec.md).
+> Resolutions noted inline below.
+
 Three questions sit at the center of decisions the repos collectively force:
 
 **The inference backend.** pmetal is the clearly-right answer if it passes Phase 1b. If it
 doesn't — stability issues, build problems on M1 Max, unacceptable latency — the fallback
 is Ollama + mlx-lm-ft + Bonsai's llama-server. The evaluation plan is well-scoped; the
 most important thing is running it and writing the ADR rather than deciding in advance.
+
+**RESOLVED:** pmetal is the lead, pending Phase 1b verdict. Build flags `--features
+serve,mlx,trainer` for 1b. Concurrency target single-request tok/s + RSS for verdict.
+Pin a commit; document Ollama+mlx-lm-ft fallback in `docs/adr/0001-inference-backend.md`;
+revisit quarterly. As of 2026-05-03 the build + smoke tests pass with strong initial
+impressions.
 
 **The 1-bit bet.** Bonsai, BitNet, and flash-moe together argue that 1-bit/ternary models
 are the efficient frontier for local inference on constrained memory. The Phase 1c benchmark
@@ -274,6 +284,11 @@ first-class experimental path in Phase 2–3 (given BitNet's 100B model at 7 tok
 Ultra) or stays secondary until Phase 6. The answer depends partly on how much quality
 Bonsai-8B actually sacrifices on Dan task suite — run the benchmark first.
 
+**RESOLVED:** Phase 1c BitNet 2B4T spike (build bitnet.cpp on M1 Max, benchmark vs.
+Ollama-served Qwen2.5/Llama-3.2 using task-completion-time methodology) is adopted as
+the first concrete experiment. Phase 6 fine-tuning lane decision deferred until
+Phase 1c data lands. Phase 6a commits to FP16-LoRA on genomics/biochem regardless.
+
 **MCP as the extensibility substrate.** cline, openclaw, and pmetal all speak MCP.
 Adopting MCP as Linus's tool-registration surface in Phase 3 means tools registered once
 become visible in all three harnesses without custom glue code. That is architecturally
@@ -281,6 +296,12 @@ cleaner but carries MCP's complexity and the risk of a protocol dependency. The 
 is owning tool definitions natively in Linus's orchestration layer and building per-harness
 adapters. This decision should be made explicitly at the start of Phase 3, not inherited
 by accident.
+
+**RESOLVED:** **Adopt MCP** as the extensibility substrate. Phase 2 tool registry is
+built MCP-shape from the start (no Phase 3 refactor — just exposure). Linus exposes a
+Linus-native MCP server AND consumes external MCP servers. **pmetal's 45-tool MCP
+server is the first external integration target.** Evaluate `fastmcp` for server-side
+construction. This updates DEC-0005's "revisit MCP for adoption in Phase 3" to "adopted."
 
 ---
 

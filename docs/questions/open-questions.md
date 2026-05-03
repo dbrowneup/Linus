@@ -9,6 +9,22 @@ For a smaller, prioritized subset focused on the most consequential decisions, s
 
 ---
 
+## Resolution Log (2026-05-03)
+
+All questions in this archive that surfaced into [top-questions.md](top-questions.md) Tier
+0 / 1 / 2 / 3 have been **resolved** as of 2026-05-03 in a Maestro/Dan planning session.
+Per-question resolution one-liners with full traceability live in
+[top-questions.md](top-questions.md) under its Resolution Log. Detailed implementation
+of the resulting changes is captured in
+[../specs/planning-update-spec.md](../specs/planning-update-spec.md), which is the
+actionable spec executed by Workers in subsequent sessions.
+
+Questions in this archive that did **not** propagate to top-questions.md remain
+unresolved here and may surface in future planning sessions; they are deliberately not
+on the current critical path.
+
+---
+
 # Part 1 — From `docs/repo-notes/`
 
 ## pmetal

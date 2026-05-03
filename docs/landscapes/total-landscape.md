@@ -72,6 +72,11 @@ These gaps need to close before Phase 2 expands the network-egress surface.
 
 ## The four crossings worth naming
 
+> **All four crossings have substantively resolved 2026-05-03.** See
+> [../questions/top-questions.md](../questions/top-questions.md) Resolution Log and
+> [../specs/planning-update-spec.md](../specs/planning-update-spec.md). Inline resolutions
+> noted at the bottom of each crossing below.
+
 The cross-cutting bets are places where a code thread, a theory thread, and now a practitioner
 thread meet. Each crossing is one of the central decisions Linus will resolve over the next
 several phases.
@@ -101,6 +106,13 @@ The decision shape is "how many rungs does Phase 2 climb?" not "which one is rig
 complementary, each adding capability at the cost of additional dependency surface (pmetal) or
 private-API risk (ANE).
 
+**RESOLVED (2026-05-03):** Phase 1c climbs rungs 1 (CPU + bitnet.cpp via the BitNet
+2B4T spike) and 2 (GPU + pmetal kernels, evaluated as part of Phase 1b). Rung 3 (ANE)
+defers to Phase 2 as a conditional follow-up benchmark, gated on favorable pmetal
+Phase 1b verdict. Linus's own code stays on public APIs (CoreML/MLX/Metal); pmetal's
+ANE crate is the supported path; the ANE reverse-engineering repo stays methodology
+reference, not vendored.
+
 ### Crossing 2 — The streaming axis: dense (mlx-flash) vs. sparse (flash-moe) vs. composite (1-bit + streamed)
 
 LLM in a Flash is the conceptual foundation for "MacBook ratios are flash-big DRAM-small,
@@ -122,6 +134,15 @@ The axis Linus has to position itself on:
 The cleanest near-term call is "use mlx-flash if a fine-tuned model exceeds RAM, otherwise
 stay in-RAM." The composite path is the more ambitious Phase 6d target — it sits behind the
 answer to Tier 1 #3 (the Phase 6 fine-tuning path).
+
+**RESOLVED (2026-05-03):** Commit Phase 5+ to **mlx-flash as the >RAM dense path.**
+flash-moe stays methodology-only reference (experiment-log discipline + "trust the OS
+page cache" lesson). Phase 6d formal target = mlx-flash streams any fine-tuned model
+that exceeds RAM. Phase 6d *stretch* target = opportunistic ternary >8B integration
+if PrismML or community releases a checkpoint by Phase 6 timeframe. Phase 8 BitNet ×
+Flash-MoE × JPmHC stays long-horizon research direction; no Phase 6/7 work gated on
+it. Concrete Phase 6d target sketched in `docs/specs/phase6d-streaming-target.md`
+once Phase 1b closes.
 
 ### Crossing 3 — The KnowledgeBase as graph + vector layered substrate
 
@@ -145,6 +166,19 @@ The cross-cutting design question — "RDF or property graph?" — is Tier 1 #4 
 subsequent KB decision flows from it. The schema discipline and claim typing are not dependent
 on that choice — they should be implemented in Phase 2 regardless of which graph model is
 selected.
+
+**RESOLVED (2026-05-03):** **Dual approach — both RDF and property graph in
+parallel.** KnowledgeBase already has rdflib + networkx as dependencies and `graph.py`
++ `knowledge_graph.py` as separate modules; the dual-substrate posture is already
+implicit. Linus's adapter exposes both as separate tool families
+(`linus.knowledge.sparql.*` for RDF; `linus.knowledge.graph.*` for property). Embedded
+stores: rdflib (+ optional Oxigraph backend for SPARQL performance) for RDF;
+networkx for property; Kuzu evaluated later if scaling demands. Claim typing,
+content hashing, and the write-back rule baked into Phase 2 KB schema regardless of
+substrate. **`docs/specs/kb-architecture.md` adopted as [KB-spec] Phase 2 deliverable**
+walking the Hogan KG survey section-by-section. **New [KB-spec] split convention**:
+spec-parts that primarily impact KnowledgeBase are tagged and split into
+`docs/specs/kb/` for delivery in the KB repo in partnership with Dan.
 
 ### Crossing 4 — Structure as the operational bottleneck
 
@@ -170,6 +204,18 @@ into CLAUDE.md is worth more than ten implementation shortcuts.
 The practical implication for Phase 2: the engineering plan should allocate explicit time to
 schema design, spec templates, and security posture — not as pre-work before "real"
 implementation, but as the highest-leverage implementation work of Phase 2 itself.
+
+**RESOLVED (2026-05-03):** Adopt 10-bits/s framing as Phase 2 design principle.
+**Balanced bullets + prose** in synthesized Maestro outputs (not bullet dumps).
+**Citations and traceability are first-class.** Worker outputs preserved for Maestro
+inspection; synthesis is a layer over Worker outputs, not a replacement. Drill-down
+UI affordance from synthesized summary to Worker outputs and source citations.
+Opt-in `/verbose`. **Linus reframed as a personal LLM Wiki at scale** — citations,
+traceability, and write-back discipline are core, not optional.
+**Planning write-back cadence** adopted as a CLAUDE.md Engineering Convention: the
+write-back rule extends to Maestro/Dan + Claude planning sessions, not just Worker
+tasks. At the close of every multi-question planning session, allocate time for
+core-file write-back.
 
 ---
 
@@ -232,6 +278,9 @@ task specs from Phase 2, not a convention added later.
 
 ## Where the gaps are
 
+> **2026-05-03 update:** four of the seven gaps below have closed via decisions in
+> the planning session. Status flagged inline.
+
 Seven places where neither a repo, a paper, nor a practitioner synthesis currently delivers
 what Linus will eventually need:
 
@@ -256,6 +305,12 @@ before building. This gap is not a code gap — it is a decision gap that must c
 Phase 2 engineering begins. Run Task Master AI against a real Phase 2 task spec and measure
 whether it covers KnowledgeBase integration and sandbox policy requirements.
 
+**CLOSED (2026-05-03):** Keep DEC-0002 (custom orchestration). Algorithm-check
+primitives via **new Phase 1f deliverable** (Task Master AI + claude-squad vs.
+custom prototype vs. pmetal-MCP-as-orchestrator on real Phase 2 task spec). Adopt
+PRD→tasks pattern as a skill, not a re-implementation. Linus custom layer scope
+clarified: sandbox + KB + MCP registry + audit; no task-decomposition primitives.
+
 **A KB ingest quality gate for Dan's specific scientific domains.** The LLM wiki synthesis
 establishes that filtering noise at the door beats any retrieval improvement downstream, and
 the gate should be an auditable YAML domain editorial policy. But the right criteria for Dan's
@@ -263,11 +318,20 @@ domains (genomics, computational biology, environmental science) have not been s
 What field-specific signals — journal tier, methodology rigor, peer review status, data
 availability — should the gate encode? This shapes the Phase 2 KB schema.
 
+**CLOSED (2026-05-03):** Reframed as a **quality surface, not a hard gate.** Dan is
+the primary filter. Domain-agnostic baseline signals; preprints flagged not rejected;
+no hard reject lane in Phase 2. **[KB-spec]** item.
+
 **A written incident response protocol.** The litellm supply chain incident was discovered
 accidentally via a RAM crash; a more subtle attack would not announce itself. The security
 synthesis identifies this as an open question that should be answered and committed to SAFETY.md
 before Phase 2's network-egress surface expands. This is not a code gap — it closes in one
 session.
+
+**CLOSED (2026-05-03):** Drafted as a SAFETY.md task in the planning-update-spec.
+Covers trigger / containment / credential rotation / attestation, plus pip-audit CVE
+response protocol. Layered architecture: linus conda env (production, hash-pinned)
++ uv disposable envs (experimental).
 
 **A commercial surface and entrepreneurial plan.** Linus's capabilities — domain expertise +
 local AI orchestration + private KnowledgeBase — map onto several monetizable services. The
@@ -277,6 +341,11 @@ recurring revenue while Linus builds, and producing higher-quality signal about 
 pay for than any amount of roadmap speculation. Currently there is no planning document for
 the commercial layer, and the trade-off (client revenue now vs. infrastructure focus) is an
 unresolved values-level question.
+
+**CLOSED (2026-05-03):** New Phase 2 deliverable
+`docs/entrepreneurial-surface.md` articulates the opportunity surface as a
+planning artifact (not a business plan). Until the document lands and a deliberate
+decision is made, don't actively pursue clients but don't rule out either.
 
 ---
 

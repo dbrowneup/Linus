@@ -238,6 +238,11 @@ KnowledgeBase schema: flag at write time, require human resolution before markin
 
 ## Cross-Cutting Open Questions
 
+> **All cross-cutting questions resolved 2026-05-03.** See
+> [../questions/top-questions.md](../questions/top-questions.md) Resolution Log and
+> [../specs/planning-update-spec.md](../specs/planning-update-spec.md). Inline
+> resolutions noted below.
+
 Several questions surface in multiple syntheses or are unresolvable without Dan's input:
 
 **Does Linus need a custom orchestration layer, or does Task Master AI + Cline cover Phase 2?**
@@ -248,6 +253,14 @@ The Algorithm says delete before building. Run Task Master AI against a real Pha
 and measure whether it covers the KnowledgeBase integration and sandbox policy requirements
 before committing to a custom router.
 
+**RESOLVED:** Keep DEC-0002 (custom orchestration layer) as the architectural
+commitment, but Algorithm-check the orchestration *primitives* via a **new Phase 1f
+deliverable**: evaluate Task Master AI + claude-squad vs. custom Linus prototype vs.
+pmetal-MCP-as-orchestrator on a real Phase 2 task spec. Adopt PRD→tasks pattern as a
+**skill** inside Linus, not as a re-implementation. Linus custom layer scope clarified:
+sandbox enforcement + KB integration + MCP registry + audit. Does NOT re-implement
+task decomposition primitives.
+
 **What is the right KB ingest quality gate for Dan's specific scientific domains?** The community
 consensus is that filtering noise at the door beats any retrieval improvement downstream, and
 that the gate should be an auditable YAML policy rather than implicit human judgment. But what
@@ -255,12 +268,28 @@ are the right domain criteria for genomics, computational biology, and environme
 papers? What field-specific quality signals (journal tier, methodology rigor, peer review status,
 data availability) should the gate encode? This shapes the KnowledgeBase schema in Phase 2.
 
+**RESOLVED:** YAML-policy framework adopted as a **quality surface, not a hard gate.**
+Reframing rationale: Dan is the primary filter — content already on his machine has
+passed his download decision. The gate scores items on domain-agnostic baseline
+signals (peer-review status, preprint flag, data/code availability, retraction status,
+RaKUn keyphrase coverage, citation/age signals) and surfaces the score in retrieval
+context. **No hard reject lane in Phase 2.** Preprints flagged (`preprint: true`),
+not rejected. FineWeb-style known-good/known-bad statistical calibration adopted as
+**Phase 3** learning exercise. **[KB-spec]** item.
+
 **How should Linus handle parallel Worker KB writes?** The write-back rule is straightforward
 for a single agent; for Phase 3's fan-out, multiple Workers may simultaneously propose updates
 to the same KB pages. Git-branch-per-ingest and last-write-wins are partial answers, but the
 right coordination mechanism for Linus's specific multi-agent pattern is not obvious. This
 question should be answered in the Phase 3 KB architecture spec before any parallel agent work
 begins.
+
+**RESOLVED:** Adopt **serialized writes through a coordinator + write-time
+contradiction surfacing.** Workers emit JSON-shaped diff proposals; a coordinator
+process merges in order; conflicts on the same entity/page/triple flag for human
+(Dan/Maestro) review before merge. Git-branch-per-ingest as the persistence layer
+underneath. Contradiction detection at write time, not read time. **[KB-spec]:**
+`docs/specs/kb/parallel-worker-write-coordination.md`.
 
 **What is the right fine-tuning target in Phase 6, and when should that decision be made?**
 The skills synthesis argues this decision should be made by Phase 3, not deferred to Phase 6.
@@ -271,6 +300,14 @@ the training data provenance is a supply chain question, and the KB quality cont
 in Phase 2 directly determine the quality of the training corpus in Phase 6. These are not
 independent decisions.
 
+**RESOLVED:** Defer the lane decision (native-1-bit vs. BitDistill vs. FP16-LoRA)
+until Phase 1c BitNet benchmark data lands. **Phase 6a commits to FP16-LoRA on
+genomics/biochem corpus regardless** — safe foundational work and an always-available
+baseline. Explicit decision gate at the Phase 6a/6b boundary informed by Phase 1c
+results and the genomics-vs-coding fine-tune target question. Code-specialized BitNet
+becomes a candidate Phase 6 deliverable iff Phase 1c BitNet 2B4T spike validates the
+1-bit quality path AND code performance is the surfaced gap.
+
 **Should Dan start generating revenue from AI-assisted services now, before Linus is complete?**
 The skills synthesis argues yes, on the grounds that real client feedback about what intelligence
 products are actually useful is more valuable than speculative roadmap planning. Starting one
@@ -279,12 +316,26 @@ Linus builds, without requiring any Linus infrastructure to exist. The counterar
 cost — client work consumes Maestro time, which is the scarce resource. This is a values-level
 question about how Dan wants to allocate the next six months, not a technical one.
 
+**RESOLVED:** Skip the binary. **New Phase 2 deliverable:
+`docs/entrepreneurial-surface.md`** — a planning document articulating the opportunity
+surface (who would buy what, at what price, with what infrastructure). Until that
+document lands and a deliberate decision is made, don't actively pursue clients but
+don't rule it out. Re-evaluate when Linus is closer to operational.
+
 **What is the response protocol when `pip-audit` reports a CVE in the installed environment?**
 The litellm incident was discovered accidentally via a RAM crash. A more subtle attack would not
 announce itself. Having a written incident response protocol — immediate env rebuild, session
 log audit, credential rotation scope — before an incident makes it far more likely to be
 executed correctly under stress. The security synthesis lists this as an open question; it should
 be answered and committed to SAFETY.md before Phase 2's network-egress surface expands.
+
+**RESOLVED:** Tier 0 #1 — draft "Supply Chain Incident Response" section in
+SAFETY.md covering trigger / containment / credential rotation / attestation, plus
+explicit `pip-audit` CVE response protocol (severity triage → patched-version check
+→ env rebuild + lock-file regeneration; if no patch, evaluate removal vs. documented
+mitigation). **Layered architecture:** linus conda env (production, hash-pinned via
+`requirements-locked.txt`, monthly `pip-audit` cadence) + uv disposable envs
+(experimental packages always isolated). uv installed via conda inside linus env.
 
 ---
 
