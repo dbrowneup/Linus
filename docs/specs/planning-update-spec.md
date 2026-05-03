@@ -120,9 +120,10 @@ twelve. Mark complete once the existing notes are reviewed and committed.
 - **First real autoresearch loop application:** the LoRA trial is the first
   autoresearch protocol exercise. `program.md` = "find a LoRA config that converges
   on the toy ShareGPT set against Qwen3-0.6B." (DEC-0027 / Tier 3 #27.)
-- Verdict ADR `docs/adr/0001-inference-backend.md` records: pmetal lead, build flags,
-  concurrency target, dependency-risk mitigation (pin commit, document Ollama+mlx-lm-ft
-  fallback, quarterly review).
+- Verdict ADR (forthcoming, in `docs/adr/`; id assigned at authoring time — next free
+  `DEC-NNNN`, slug `inference-backend`) records: pmetal lead, build flags, concurrency
+  target, dependency-risk mitigation (pin commit, document Ollama+mlx-lm-ft fallback,
+  quarterly review).
 - Read Karpathy autoresearch tweets in batch alongside the LoRA loop.
 
 **1c (lm-evaluation-harness standup + BitNet 2B4T spike) — restructured:**
@@ -751,7 +752,8 @@ real Phase 2 task spec. Output: `docs/specs/orchestration-primitives-eval.md`.
 **5.4.2** **Phase 1b:** update the verdict bullet to reflect DEC-0012 sub-decisions:
 
 ```markdown
-- Verdict one-pager in `docs/adr/0001-inference-backend.md`: pmetal as primary
+- Verdict one-pager as a new ADR in `docs/adr/` (id assigned at authoring time —
+  next free `DEC-NNNN`, slug `inference-backend`): pmetal as primary
   Phase 2a serving + Phase 6 training backbone (DEC-0012); build flags
   `--features serve,mlx,trainer` for 1b; concurrency target single-request tok/s
   + RSS for verdict; pin a commit; document Ollama+mlx-lm-ft fallback;

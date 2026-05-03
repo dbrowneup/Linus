@@ -200,7 +200,8 @@ proves dominant) is a Phase 5 empirical question, not a Phase 1 design decision.
 
 The most important Phase 1 action is running the pmetal evaluation and writing the ADR.
 Build pmetal, smoke-test `pmetal tui` and `pmetal serve`, run a toy LoRA, benchmark against
-Ollama, and commit the verdict to `docs/adr/0001-inference-backend.md`. In parallel, pull
+Ollama, and commit the verdict as a new ADR in `docs/adr/` (forthcoming, id assigned at
+authoring time — next free `DEC-NNNN`, slug `inference-backend`). In parallel, pull
 Bonsai-8B-mlx-1bit, Ternary-Bonsai-8B-mlx-2bit, and BitNet b1.58 2B4T (via Ollama) and
 add them to Phase 1c's benchmark sweep alongside `qwen2.5-coder:7b` and
 `mistral:7b-instruct` — this is a day's work and answers the 1-bit quality-cost question
@@ -273,7 +274,8 @@ most important thing is running it and writing the ADR rather than deciding in a
 
 **RESOLVED:** pmetal is the lead, pending Phase 1b verdict. Build flags `--features
 serve,mlx,trainer` for 1b. Concurrency target single-request tok/s + RSS for verdict.
-Pin a commit; document Ollama+mlx-lm-ft fallback in `docs/adr/0001-inference-backend.md`;
+Pin a commit; document Ollama+mlx-lm-ft fallback in the forthcoming Phase 1b verdict
+ADR in `docs/adr/` (id assigned at authoring time);
 revisit quarterly. As of 2026-05-03 the build + smoke tests pass with strong initial
 impressions.
 

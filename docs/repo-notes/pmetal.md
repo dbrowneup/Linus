@@ -81,8 +81,9 @@ inference-only for training purposes.
 pmetal is the single most consequential repo in the collection for
 Linus. Phase 1b's evaluation plan is correctly scoped: build it,
 smoke-test `pmetal tui` and `pmetal info`, try a toy LoRA, stand up
-`pmetal serve`, benchmark against `ollama serve`, write the verdict to
-`docs/adr/0001-inference-backend.md`. If tok/s, TTFT, RSS, and
+`pmetal serve`, benchmark against `ollama serve`, write the verdict as a new ADR in
+`docs/adr/` (id assigned at authoring time — next free `DEC-NNNN`, slug
+`inference-backend`). If tok/s, TTFT, RSS, and
 5-concurrent throughput are at parity or better and no stability
 deal-breakers surface, adopt pmetal as the Phase 2a serving backend
 and commit to it as the Phase 6 training backbone. If it wobbles,

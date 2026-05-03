@@ -78,7 +78,8 @@ for a future local CLI harness.
   - Time to first token
   - Memory footprint (RSS)
   - Throughput under small concurrent request load (5 parallel)
-- Verdict one-pager in `docs/adr/0001-inference-backend.md`: adopt pmetal, adopt ollama,
+- Verdict one-pager as a new ADR in `docs/adr/` (id assigned at authoring time —
+  the next free `DEC-NNNN`, slug `inference-backend`): adopt pmetal, adopt ollama,
   or use both (e.g., pmetal for serving, ollama as fallback).
 
 **1c — lm-evaluation-harness standup.**
@@ -190,7 +191,8 @@ pattern extends to parallel multi-agent fan-out.
 - Feature branches branch from `develop` instead of `main`
 - Introduce `release/*` and `hotfix/*` branches for release management
 - Tag releases on `main` with semantic version numbers
-- This graduation will be documented in DECISIONS.md with rationale and migration steps.
+- This graduation will be documented as a new ADR in `docs/adr/` (and indexed in
+  DECISIONS.md) with rationale and migration steps.
 
 **3a — KnowledgeBase deepening:**
 
@@ -417,10 +419,12 @@ The Dan task suite is re-run at every phase boundary. Regression is not acceptab
 without a documented reason. Public benchmarks (MBPP, HumanEval, MMLU, GPQA) re-run on
 any model change.
 
-### DECISIONS.md is append-only
+### ADRs are append-only
 
-Every significant decision gets logged. A `DEC-NNNN` id, a date, a context paragraph, a
-decision, and a consequence/rationale paragraph. See DECISIONS.md for format.
+Every significant decision gets its own ADR file at `docs/adr/NNNN-<slug>.md` and is
+indexed in DECISIONS.md. Each ADR has a `DEC-NNNN` id, a date, a status, a context
+paragraph, a decision paragraph, and a consequence/rationale paragraph. See
+[`docs/adr/README.md`](docs/adr/README.md) for the format and authoring procedure.
 
 ### Known Library Quirks grows
 

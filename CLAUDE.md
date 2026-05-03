@@ -102,7 +102,7 @@ Linus/
 ├── ARCHITECTURE.md        # System design, layer boundaries, component diagram
 ├── ROADMAP.md             # Phased plan with targets
 ├── SAFETY.md              # Sandbox policy, autonomy tiers, forbidden ops
-├── DECISIONS.md           # ADR log — every significant decision with rationale
+├── DECISIONS.md           # Pointer + index for the per-file ADRs in docs/adr/
 ├── GLOSSARY.md            # Terms, component names, Linus-specific vocabulary
 ├── README.md              # Entry point for humans
 ├── environment.yml        # conda env spec for `linus`
@@ -138,7 +138,7 @@ Linus/
 │   └── results/           # Dated JSON result files
 ├── experiments/           # Throwaway scripts, ablations, quick tests
 └── docs/                  # Long-form writing, synthesis notes
-    ├── adr/               # Future per-file ADRs (once DECISIONS.md exceeds ~20)
+    ├── adr/               # Per-file ADRs (NNNN-<slug>.md matching DEC-NNNN ids)
     ├── repo-notes/        # One-pager per cloned repo
     └── maestro-worker-protocol.md
 ```
@@ -270,7 +270,8 @@ When Claude Code opens a session in this repo:
 2. Read VISION.md if the task touches project direction.
 3. Read ROADMAP.md if the task relates to phased work.
 4. Read ARCHITECTURE.md if the task involves components or interfaces.
-5. Check DECISIONS.md for any decision relevant to the task.
+5. Check DECISIONS.md (and the per-file ADRs in `docs/adr/`) for any decision relevant
+   to the task.
 6. For any non-trivial change: propose a plan before editing. Use the `[Plan]` → `[Act]`
    workflow pattern.
 7. After 3–4 file edits, post a checkpoint summary.

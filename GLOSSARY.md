@@ -19,7 +19,8 @@ Maestros are not.
 Section leaders + Musicians + Score. See VISION.md for the full extended metaphor.
 
 **Score.** The written guidance everyone follows: CLAUDE.md, VISION.md, ARCHITECTURE.md,
-ROADMAP.md, DECISIONS.md, session-level specs. The canonical reference.
+ROADMAP.md, DECISIONS.md (and the per-file ADRs in `docs/adr/`), session-level specs.
+The canonical reference.
 
 **The Algorithm check.** A behavioral convention: before adding any component, ask
 "can we delete this requirement instead?" Before reaching for a library, ask "does
@@ -183,7 +184,8 @@ usefulness.
 
 ## Abbreviations
 
-- **ADR** — Architecture Decision Record. The format used in DECISIONS.md.
+- **ADR** — Architecture Decision Record. Each Linus decision lives at
+  `docs/adr/NNNN-<slug>.md` with stable id `DEC-NNNN`; DECISIONS.md is the index.
 - **ANE** — Apple Neural Engine. The dedicated neural accelerator on Apple Silicon.
 - **API** — Application Programming Interface.
 - **CLI** — Command Line Interface.

@@ -76,7 +76,7 @@ Linus/
 ├── ARCHITECTURE.md        # Layered design and component boundaries
 ├── ROADMAP.md             # Phased plan with target durations
 ├── SAFETY.md              # Sandbox policy and autonomy tiers
-├── DECISIONS.md           # ADR log
+├── DECISIONS.md           # ADR pointer + index (per-file ADRs in docs/adr/)
 ├── GLOSSARY.md            # Terms and component names
 ├── README.md              # This file
 ├── environment.yml        # Conda environment spec

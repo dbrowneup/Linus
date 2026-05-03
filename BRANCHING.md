@@ -27,8 +27,8 @@ Adopt full gitflow with:
 - `release/*` for release candidates
 - `hotfix/*` for urgent production fixes (branch from `main`, merge to both `main` and `develop`)
 
-This document focuses on the current model. A migration path will be documented in
-DECISIONS.md when Phase 3 begins.
+This document focuses on the current model. A migration path will be documented as a
+new ADR in `docs/adr/` (and indexed in DECISIONS.md) when Phase 3 begins.
 
 ---
 
@@ -406,7 +406,8 @@ gh pr create --title "Add MoE router" --body "..."
 - Tags mark releases on `main`
 - Bugfixes from `release/*` and `hotfix/*` merge back into `develop`
 
-The decision to graduate and the migration procedure will be documented in DECISIONS.md.
+The decision to graduate and the migration procedure will be documented as a new ADR in
+`docs/adr/` (and indexed in DECISIONS.md).
 
 Until then, treat this document as the source of truth.
 
