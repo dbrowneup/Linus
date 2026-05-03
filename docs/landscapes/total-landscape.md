@@ -312,6 +312,25 @@ top-questions.md adds a Tier 1 entry (lift memory architecture from Phase 3+ to 
 and several Tier 2 entries (substrate choice for Layer C; per-call CoT budget policy;
 in-context window cap policy). Decision pending the next planning session.
 
+**RESOLVED (2026-05-03 follow-up planning session — all 17 M-series items closed):**
+Memory architecture **lifted from Phase 3+ to Phase 2 first-class architectural pillar**.
+The decision spans 16 per-file ADRs ([DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md)
+through [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md)), with the
+implementation contract in [`docs/specs/memory-architecture.md`](../specs/memory-architecture.md).
+Phase 2 v0 episodic substrate is SQLite + content hashes + git as persistence (DEC-0029);
+scratchpad becomes a first-class durable artifact and the o1 anti-pattern is forbidden as
+Worker-protocol non-conformance (DEC-0030); router gains `cot_budget` and `memory_mode`
+primitives (DEC-0031); in-context cap is 16K Phase 2 floor with episodic-store overflow
+(DEC-0032). Phase 1c carries three new spike deliverables: per-Worker CoT-gap fingerprint
+(DEC-0033), worker-size-vs-CoT-length comparison (DEC-0034), and TTT Apple-Silicon
+viability spike (DEC-0037). Phase 1f gains the minGRU MLX port spike (DEC-0038). Phase 6
+gains memory-mode-aware fine-tuning targets (DEC-0043). Substrate experiments (Coconut
+DEC-0042; minGRU+BitNet cross-product DEC-0041) gated on Phase 1 spike outcomes.
+[Mughal practitioner article](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+adopted as the operational companion to the Garrison architectural argument and woven
+through the synthesis. See [top-questions.md Memory Pillar Resolution Log](../questions/top-questions.md)
+for per-question detail.
+
 ---
 
 ## The three layers Linus actually has to build

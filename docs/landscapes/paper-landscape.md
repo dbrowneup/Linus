@@ -196,6 +196,15 @@ cleanly onto the Maestro/Worker architecture. Neither paper contains code or alg
 
 ## Memory & universal computation (the new pillar)
 
+> **MEMORY PILLAR — RESOLVED (2026-05-03 follow-up planning session).** All 17 M-series
+> items closed; 16 per-file ADRs ([DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md)
+> through [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md)). Implementation
+> contract in [`docs/specs/memory-architecture.md`](../specs/memory-architecture.md);
+> resolution log in [top-questions.md](../questions/top-questions.md). The eleven paper
+> notes below remain the standing reference material — they are the substrate the
+> resolutions stand on, not artifacts of the resolutions themselves.
+
+
 The largest single thread in the corpus. Eleven papers cited by Erik Garrison's January 2025
 essay [*Memory makes computation universal, remember?*](../../context/notes/garrison_memory_makes_computation_universal.md)
 (blog) and its companion arXiv proof paper ([2412.17794](../../context/papers/2412.17794v1.pdf),

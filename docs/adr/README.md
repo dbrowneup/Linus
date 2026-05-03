@@ -71,5 +71,21 @@ and link to the new ADR.
 | [DEC-0025](0025-curation-protocol.md) | Curation protocol for `repos/`, `context/`, `docs/` | accepted |
 | [DEC-0026](0026-planning-write-back-cadence.md) | Planning write-back cadence: Maestro/Dan + Claude planning sessions refine core files at session close | accepted |
 | [DEC-0027](0027-linus-practice-stance-batch.md) | Linus practice/stance batch (page cache, public APIs, multi-language, sovereignty, reproducibility, Obj-C) | accepted |
+| [DEC-0028](0028-memory-architecture-phase2-pillar.md) | Memory architecture lifted from Phase 3+ to Phase 2 first-class pillar (M1 + M12) | accepted |
+| [DEC-0029](0029-episodic-memory-substrate.md) | Cross-session episodic memory substrate (Layer C): SQLite + content hashes + git (M2) | accepted |
+| [DEC-0030](0030-scratchpad-first-class-artifact.md) | Scratchpad as a first-class durable artifact; o1 anti-pattern forbidden (M3) | accepted |
+| [DEC-0031](0031-router-primitives-cot-budget-memory-mode.md) | Router primitives: per-call CoT budget and per-call memory mode (M4) | accepted |
+| [DEC-0032](0032-in-context-window-cap-policy.md) | In-context window cap policy: 16K Phase 2 floor; episodic store as overflow (M5) | accepted |
+| [DEC-0033](0033-cot-gap-fingerprint-registry-property.md) | Per-Worker CoT-gap fingerprint as a measured registry property (M6) | accepted |
+| [DEC-0034](0034-worker-size-vs-cot-length-comparison.md) | Phase 1c empirical comparison: worker-size vs. CoT-length (M7) | accepted |
+| [DEC-0035](0035-arc-agi-as-memory-diagnostic.md) | ARC-AGI as a memory diagnostic, not a Linus capability target (M8) | accepted |
+| [DEC-0036](0036-kv-cache-continuity-architectural-constraint.md) | KV-cache continuity as an architectural constraint for stateful dispatch (M9) | accepted |
+| [DEC-0037](0037-ttt-apple-silicon-viability-spike.md) | Phase 1c TTT Apple-Silicon viability spike with explicit decision rule (M10) | accepted |
+| [DEC-0038](0038-mingru-mlx-port-spike.md) | Phase 1f minGRU MLX port spike with explicit decision rule (M11) | accepted |
+| [DEC-0039](0039-episodic-schema-hybrid-leaf-summary.md) | Episodic schema for multi-step Worker tasks: hybrid leaf + summary (M13) | accepted |
+| [DEC-0040](0040-faithfulness-audit-deferred.md) | Faithfulness audit of stored reasoning traces deferred to Phase 3 with trigger condition (M14) | accepted |
+| [DEC-0041](0041-mingru-bitnet-phase8-research-direction.md) | minGRU + BitNet cross-product as Phase 8 long-horizon research direction (M15) | accepted |
+| [DEC-0042](0042-coconut-phase6-substrate-experiment.md) | Coconut as Phase 6 candidate substrate experiment, conditional on Phase 1 portability check (M16) | accepted |
+| [DEC-0043](0043-memory-mode-finetuning-targets-phase6.md) | Memory-mode-aware fine-tuning targets in Phase 6a (M17) | accepted |
 
 *New ADRs append to this index with monotonically increasing `DEC-NNNN` ids.*

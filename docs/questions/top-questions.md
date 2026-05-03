@@ -18,7 +18,163 @@ A new round of questions surfaced by the [memory synthesis](../syntheses/memory-
 and the eleven Garrison-thread paper notes. The full set lives in
 [open-questions.md](open-questions.md) under "Memory pillar — Garrison thread" and
 "Memory Synthesis"; the items below are the ones that *change next concrete action* and
-deserve a slot in the next planning session. None are resolved.
+deserve a slot in the next planning session.
+
+> **MEMORY PILLAR — ALL RESOLVED (2026-05-03 follow-up planning session).** See the
+> Memory Pillar Resolution Log immediately below for one-line resolutions and ADR
+> pointers. Each Tier 1 item also has a 2–3 sentence rationale paragraph under the
+> question itself.
+
+### Memory Pillar Resolution Log (2026-05-03)
+
+The eleven Garrison-thread papers, the [Mughal practitioner article](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+on context-window management, and the [memory synthesis](../syntheses/memory-synthesis.md)
+collectively shaped 17 prioritised items (M1–M17). All resolved in a follow-up
+Maestro/Dan planning session on 2026-05-03. ADRs land per-file in
+[`docs/adr/`](../adr/) (the per-file convention adopted at this session — DEC-0027
+was the last entry in the legacy single-file `DECISIONS.md`). The full memory
+architecture spec drafted alongside this resolution log lives at
+[`docs/specs/memory-architecture.md`](../specs/memory-architecture.md).
+
+**Tier 1 — block Phase 2 architecture decisions**
+
+- **[M1]:** Resolved — memory architecture **lifted from Phase 3+ to Phase 2 first-class
+  architectural pillar**. New `docs/specs/memory-architecture.md` drafted as part of this
+  roll-up; sequenced before Phase 2a orchestration backend implementation. Also folds in
+  M12 (memory budget as first-class architectural quantity in ARCHITECTURE.md). →
+  [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md).
+  - **Rationale:** The complexity-theoretic argument (TC0 ceiling, recursive-state
+    escape) plus the empirical evidence (Kojima emergence-at-scale gap, Sparks Section 8
+    failure modes, ARC-AGI 172× compute premium, Mughal lost-in-the-middle degradation)
+    collectively make memory upstream of every concrete Phase 2 use case. Deferring the
+    spec until "concrete use cases surface" is the o1 anti-pattern in planning form: by
+    the time the gap is visible, the orchestration primitives that should have routed
+    around it are already built.
+
+- **[M2]:** Resolved — Phase 2 v0 substrate is **SQLite + content hashes + git as
+  persistence**; TTT-style parametric consolidation kept open as a Phase 6 spike (gated
+  on M10 Phase 1 viability test); hybrid graduation pattern named as Phase 8
+  architectural option, not committed. Linus exposes the layer via
+  `linus.memory.episodic.*` tool family. → [DEC-0029](../adr/0029-episodic-memory-substrate.md).
+  - **Rationale:** The corpus does not yet have a clear winner among the three substrate
+    candidates, so committing to one beyond v0 would be premature optimisation. SQLite +
+    git is the most boring possible choice that satisfies all four sub-requirement
+    obligations from Garrison's framework, costs nothing in Maestro tokens to design, and
+    keeps the more ambitious paths reachable as future spikes.
+
+- **[M3]:** Resolved — scratchpad is a **first-class durable addressable artifact** in
+  the Phase 2 episodic store (two-segment turn record: `scratchpad` / `answer` /
+  `tool_output`, all hashed, parent-pointer-linked). Worker protocol forbids the o1
+  anti-pattern as a non-conformance condition; model registry carries
+  `scratchpad_durability` capability tag (`native` / `partial` / `non_conformant`);
+  router refuses session-stateful or project-stateful dispatch to non-conformant
+  Workers. → [DEC-0030](../adr/0030-scratchpad-first-class-artifact.md).
+  - **Rationale:** Three of the eleven Garrison-thread papers make the same formal
+    point: intermediate decoding tokens are the substrate that lifts a single Worker
+    call out of TC0. Truncating them collapses expressivity formally, not just
+    inconveniently. Linus has the architectural freedom hosted services do not — the
+    orchestration layer can capture and persist what the model emits — and that freedom
+    should be exercised by default.
+
+- **[M4]:** Resolved — router gains two first-class primitives in Phase 2: `cot_budget`
+  (`logarithmic` / `linear` / `polynomial` regimes with v0 token caps, per-Worker
+  overrides via M6 CoT-gap fingerprint) and `memory_mode` (`stateless` /
+  `session_stateful` / `project_stateful`, determining which memory layers are loaded as
+  prefix). Both signals recorded in the audit log; explicit caller annotation in Phase
+  2, automatic task classification deferred to Phase 3+. →
+  [DEC-0031](../adr/0031-router-primitives-cot-budget-memory-mode.md).
+  - **Rationale:** Both primitives are formal handles on what the Worker is being asked
+    to do (per Merrill & Sabharwal complexity regimes; per Garrison's separate-state
+    requirement) and architecturally expensive to retrofit later — every downstream
+    consumer (logging, benchmarking, skill registry, eventual auto-classifier) will
+    assume they exist or assume they don't.
+
+- **[M5]:** Resolved — Phase 2 default in-context cap is **16K tokens per Worker call**,
+  with per-`memory_mode` budget allocation across task spec / KB context / scratchpad /
+  episodic prefix / system. Overflow routes through the episodic store via
+  summarization-or-retrieval; cap bypass is explicit, annotated, and audit-logged.
+  128K-class native windows are a Phase 8 explicit-bypass capability, not a Phase 2
+  default. **The 16K cap is a floor we move with confidence as Linus matures and Worker
+  context windows grow, not a permanent ceiling**; the episodic store, overflow
+  contract, and explicit-bypass mechanism stay regardless because attention degrades
+  inside the window even when the window is large
+  ([Mughal](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+  lost-in-the-middle finding). → [DEC-0032](../adr/0032-in-context-window-cap-policy.md).
+  - **Rationale:** Llama 3's 128K window proves the simulation works and also costs
+    gigawatt-class compute at the scale that earned it; Linus has the unusual freedom
+    to actually have a separate episodic store, and the only way that freedom delivers
+    value is if the orchestration layer prefers the store over the long context as a
+    matter of policy rather than after-the-fact optimisation. The cap moves up
+    empirically, but the substrate-and-policy stays.
+
+**Tier 2 — shape Phase 2–6 architecture**
+
+- **[M6]:** Resolved — per-Worker CoT-gap fingerprint as a measured registry property,
+  run via 50-item MultiArith-style smoke test in Phase 1c. Router consults delta for
+  trigger injection and per-Worker `cot_budget` scaling. →
+  [DEC-0033](../adr/0033-cot-gap-fingerprint-registry-property.md).
+- **[M7]:** Resolved — Phase 1c empirical comparison of `(worker_size, cot_budget)`
+  configurations on sequential-task subset of `dan_tasks/`. Result feeds Phase 6a/6b
+  lane decision and per-task-class dispatch heuristics. →
+  [DEC-0034](../adr/0034-worker-size-vs-cot-length-comparison.md).
+- **[M8]:** Resolved — Phase 2/3 diagnostic experiment using ARC-AGI-1 public-eval tasks
+  (50–100), measuring stateless vs. session_stateful delta with M2 episodic store. Not
+  a Linus capability target. → [DEC-0035](../adr/0035-arc-agi-as-memory-diagnostic.md).
+- **[M9]:** Resolved — KV-cache continuity is a hard requirement for
+  `session_stateful`/`project_stateful` Worker backends; router refuses dispatch to
+  non-conformant backends (verified per backend in Phase 1b/1c). →
+  [DEC-0036](../adr/0036-kv-cache-continuity-architectural-constraint.md).
+- **[M10]:** Resolved — Phase 1c TTT viability spike (10 ARC tasks, Llama-3.2-1B,
+  mlx-lm LoRA). Decision rule: per-task cost <5 min wall-clock graduates TTT to Phase 6
+  candidate substrate for episodic consolidation; else deferred to Phase 8. →
+  [DEC-0037](../adr/0037-ttt-apple-silicon-viability-spike.md).
+- **[M11]:** Resolved — Phase 1f minGRU MLX port + Shakespeare benchmark spike. Decision
+  rule: within 2× of paper's T4 numbers AND matched perplexity graduates minGRU to Phase
+  6 candidate substrate; else deferred to Phase 8. →
+  [DEC-0038](../adr/0038-mingru-mlx-port-spike.md).
+- **[M12]:** Resolved — Memory budget as a first-class architectural quantity in
+  ARCHITECTURE.md, with o3 as upper bound and human-with-pen-and-paper as lower bound.
+  **Folded into [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md)** (M1
+  memory-architecture pillar) as a sub-section.
+
+**Tier 3 — documentation, conventions, longer-horizon scope**
+
+- **[M13]:** Resolved — hybrid episodic memory schema: full M3 two-segment record at the
+  leaf, deterministic structural summary at the parent, both addressable. Default
+  `recall` returns summary; explicit `recall_full(parent_id)` rehydrates from leaves.
+  Learned summarizer deferred to Phase 6+. →
+  [DEC-0039](../adr/0039-episodic-schema-hybrid-leaf-summary.md).
+- **[M14]:** Resolved — faithfulness audit of stored reasoning traces is out of scope
+  for Phase 2; deferred to Phase 3 with an explicit trigger condition (measurable
+  failure mode in practice). The Algorithm check: build the audit when there is a real
+  failure to detect, not before. → [DEC-0040](../adr/0040-faithfulness-audit-deferred.md).
+- **[M15]:** Resolved — minGRU + BitNet cross-product confirmed as Phase 8 long-horizon
+  research direction; promotion to planned deliverable requires both M11 and M10
+  graduation. No Phase 6/7 work gated on it. →
+  [DEC-0041](../adr/0041-mingru-bitnet-phase8-research-direction.md).
+- **[M16]:** Resolved — Coconut as Phase 6 candidate substrate experiment, conditional
+  on Phase 1 MLX-portability check vs. iCoT alternative. Decision rule: MLX-tractable +
+  comparable training cost to LoRA → Phase 6 candidate; else Phase 8. →
+  [DEC-0042](../adr/0042-coconut-phase6-substrate-experiment.md).
+- **[M17]:** Resolved — two memory-related fine-tuning targets added to Phase 6a
+  deliverable: trigger-invariant step-by-step decomposition (CoT-gap shrinkage as
+  measurement), and episodic-store-friendly output structure (scratchpad/answer
+  separation, claim-typing tags, branch-point surfacing). Training-data shape
+  decisions, no compute cost beyond curation. →
+  [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md).
+
+**Side-quest addition during this session:**
+
+- **Mughal "Why Claude Gets Dumber" article** woven through
+  [memory-synthesis.md](../syntheses/memory-synthesis.md),
+  [synthesis-landscape.md](../landscapes/synthesis-landscape.md), and
+  [total-landscape.md](../landscapes/total-landscape.md) as the practitioner-side
+  anchor for the Garrison-thread architectural argument. No new questions; reinforces
+  M3, M4, M5 resolutions with operational evidence (lost-in-the-middle attention,
+  ~147K real budget inside 200K nominal, sprint+compact loop retains ~80–85% quality
+  vs. ~40–60% in marathon sessions).
+
+---
 
 **Tier 1 (memory-pillar) — block Phase 2 architecture decisions**
 

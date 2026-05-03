@@ -173,6 +173,19 @@ multiplies the attack surface.
 
 ## Memory as the load-bearing pillar
 
+> **MEMORY PILLAR — RESOLVED (2026-05-03 follow-up planning session).** All 17 M-series
+> items closed; 16 per-file ADRs ([DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md)
+> through [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md)) ratify the
+> memory pillar promotion to Phase 2; full implementation contract in
+> [`docs/specs/memory-architecture.md`](../specs/memory-architecture.md). The
+> synthesis-landscape entries below remain accurate as background/rationale; the
+> [Memory Pillar Resolution Log in top-questions.md](../questions/top-questions.md)
+> carries the resolved positions. The
+> [Mughal practitioner article](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+> woven through this section is the operational companion to the Garrison architectural
+> argument that motivated the resolution.
+
+
 The memory synthesis ([docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md))
 is built around Garrison's [*Memory makes computation universal, remember?*](../../context/notes/garrison_memory_makes_computation_universal.md)
 plus eleven of the arXiv references it cites, now summarized one-pager-per-paper in

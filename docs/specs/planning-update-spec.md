@@ -9,6 +9,18 @@ DEC-0027 for the formal decision records).
 
 This spec supersedes the previous `planning-update-spec.md` draft of 2026-05-01.
 
+> **Memory Pillar follow-up addendum (2026-05-03):** the same-day follow-up planning
+> session resolved 17 memory-pillar items (M1–M17) surfaced by the
+> [memory synthesis](../syntheses/memory-synthesis.md). The corresponding ADRs land
+> per-file at [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md) through
+> [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md). The implementation
+> contract is at [`docs/specs/memory-architecture.md`](memory-architecture.md). The
+> Phase-by-phase change list and File-by-file edit plan in this spec are extended by
+> **Section 10 — Memory Pillar additions** at the bottom of this document. Worker
+> sessions executing this spec should walk Section 10 immediately after Sections 5.4
+> (ROADMAP.md) and 5.3 (ARCHITECTURE.md) so the memory-pillar additions land in those
+> files alongside the existing planning-spec edits.
+
 ## How to use this spec
 
 This spec is the **handoff artifact** between the Maestro planning session and the
@@ -1246,4 +1258,310 @@ the next iteration's `open-questions.md` rather than being resolved now:
 *Spec produced 2026-05-03 from a Maestro/Dan multi-question planning session.
 Walks through every Tier 0, Tier 1, Tier 2, and Tier 3 item in
 [../questions/top-questions.md](../questions/top-questions.md) and converts the
-answers into actionable Worker tasks. Supersedes the 2026-05-01 draft.*
+answers into actionable Worker tasks. Supersedes the 2026-05-01 draft. Extended
+the same day with Section 10 (Memory Pillar additions) from the follow-up
+planning session.*
+
+---
+
+## Section 10 — Memory Pillar additions (2026-05-03 follow-up)
+
+This section extends the Phase-by-phase change list (Section 2) and File-by-file
+edit plan (Section 5) with the 17 memory-pillar resolutions (M1–M17) and the side-
+quest addition (Mughal practitioner article). Sources of truth: the
+[Memory Pillar Resolution Log in top-questions.md](../questions/top-questions.md),
+the 16 per-file ADRs at [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md)
+through [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md), and the
+implementation contract in [`docs/specs/memory-architecture.md`](memory-architecture.md).
+
+### 10.1 — Phase-by-phase additions
+
+**Phase 1c additions (memory-pillar Phase 1c spikes):**
+
+- **CoT-gap fingerprint runner** (DEC-0033): 50-item MultiArith-style smoke test
+  per model in the registry. Output to `benchmarks/results/cot_gap_<YYYY-MM-DD>.json`
+  and mirrored into `~/.linus/registry/models.json`. Run alongside the existing
+  BitNet 2B4T spike (DEC-0013).
+- **Worker-size-vs-CoT-length comparison** (DEC-0034): four-configuration sweep
+  on sequential-task subset of `dan_tasks/`. Output to
+  `benchmarks/results/cot_length_vs_size_<YYYY-MM-DD>.json`. Sequenced after the
+  CoT-gap fingerprint lands so configurations are calibrated per-Worker.
+- **TTT Apple-Silicon viability spike** (DEC-0037): 10 ARC validation tasks,
+  Llama-3.2-1B base, mlx-lm LoRA pipeline, leave-one-out synthetic data with
+  geometric augmentations. Output to `experiments/ttt-mlx-arc-spike/results.md` +
+  `benchmarks/results/ttt_viability_<YYYY-MM-DD>.json`. Decision rule
+  (under-5-minutes-per-task wall-clock) gates whether TTT graduates to a Phase 6
+  candidate substrate (DEC-0029).
+
+**Phase 1f additions:**
+
+- **minGRU MLX port spike** (DEC-0038): port the few-line minGRU/minLSTM PyTorch
+  reference to MLX using MLX's scan primitives + Heinsen 2023 log-space scan; run
+  Shakespeare benchmark (~1M chars) on M1 Max; compare against vanilla MLX LSTM
+  baseline. Output to `experiments/mingru-mlx-shakespeare/results.md` +
+  `benchmarks/results/mingru_mlx_<YYYY-MM-DD>.json`. Decision rule (within 2× of
+  paper's T4 numbers AND matched perplexity) gates whether minGRU graduates to a
+  Phase 6 candidate substrate.
+
+**Phase 2 additions (memory pillar as first-class deliverable):**
+
+- **`docs/specs/memory-architecture.md` is the prerequisite** for Phase 2a
+  orchestration backend implementation. Already drafted as part of the 2026-05-03
+  follow-up roll-up; Phase 2a Worker tasks must read it before implementation.
+- **2h — Memory pillar v0 implementation** (new sub-deliverable):
+  1. SQLite schema at `~/.linus/episodic.db` with the DEC-0029 record shape.
+     Migration script. Hash-computation helpers.
+  2. Audit log writer at `~/.linus/audit.jsonl` (append-only) with the
+     DEC-0030/0031/0032 contract.
+  3. `linus.memory.episodic.*` tool family (reads, writes, admin) per the
+     memory-architecture spec API surface.
+  4. `linus.memory.scratchpad.*` thin facade over the episodic substrate.
+  5. Dispatch-layer prefix loader implementing the per-`memory_mode` cap
+     allocation from DEC-0032; summarisation-or-retrieval on overflow; dispatch
+     metadata reporting.
+  6. Router primitive plumbing — `cot_budget` and `memory_mode` as first-class
+     fields in the dispatch struct; explicit caller annotation in v0; both
+     recorded in audit log.
+  7. Worker registry — `scratchpad_durability` capability tag (DEC-0030) and
+     per-Worker `cot_budget` overrides populated by the DEC-0033 fingerprint
+     measurement.
+- **2i — ARC-AGI memory diagnostic** (new sub-deliverable, DEC-0035): 50–100
+  public-eval ARC-AGI-1 tasks, run twice (stateless vs. session_stateful)
+  against a small Linus Worker. Output to `benchmarks/arc_agi_diagnostic/`. Not
+  added to `dan_tasks/`; lives separately as a memory-architecture probe.
+- **2j — Worker protocol non-conformance constraints** (new): Phase 2 Worker
+  protocol spec at `docs/protocols/maestro-worker-protocol.md` (new file)
+  formalises the DEC-0030 forbidden patterns (silently truncating reasoning
+  between turns, concatenating scratchpad into answer such that the boundary is
+  unrecoverable, routing reasoning through a non-capturable channel) and the
+  DEC-0036 KV-cache continuity requirement.
+
+**Phase 3 additions:**
+
+- **Faithfulness audit trigger condition** (DEC-0040): no Phase 3 deliverable
+  scoped today; trigger is a measurable failure mode (Worker reasoning trace
+  claims X but answer reflects Y, or downstream Worker inherits trace error).
+  When the trigger fires, an audit-component spec goes into the Phase 3 backlog
+  with concrete failure cases as design input.
+- **Per-task automatic classification** for `cot_budget` and `memory_mode`
+  (DEC-0031 Phase 3+ scope): a small task classifier that populates the router
+  primitives without requiring caller annotation. Phase 2 ships with explicit
+  caller annotation; Phase 3 may replace with the classifier.
+- **Parallel-write coordination of episodic-store writes** (extension of
+  DEC-0022 from KB writes): the same coordinator pattern applies one layer up.
+  When the first multi-agent fan-out lands, episodic-store writes from parallel
+  Workers route through the coordinator to prevent contention.
+
+**Phase 6 additions:**
+
+- **6a memory-mode-aware fine-tuning targets** (DEC-0043): two new training-data
+  shape requirements integrated into the existing FP16-LoRA-on-genomics
+  deliverable. (1) Step-by-step decomposition for system-2 queries as default
+  behavior (CoT-gap shrinkage measurable post-fine-tune via the DEC-0033
+  fingerprint). (2) Episodic-store-friendly output structure (explicit
+  `scratchpad`/`answer` separation via structural marker; claim-typing tags
+  `[!source]`/`[!analysis]`/`[!unverified]`/`[!gap]`; branch-point surfacing).
+  No compute cost beyond curating the training set.
+- **6e — TTT-as-episodic-consolidation spike** (conditional on DEC-0037
+  graduation): Akyürek-style per-project LoRA consolidation experiment using
+  the v0 SQLite store as input. Output: measured cost-per-consolidation on
+  M1 Max + retrieval-quality delta vs. SQLite-only baseline. Decides whether
+  Linus's Layer C (DEC-0029) gains a parametric upgrade path.
+- **6f — Coconut substrate experiment** (conditional on DEC-0042 graduation):
+  Phase 1 prerequisite spike checks MLX-portability of Meta's reference
+  implementation vs. iCoT alternative; if tractable + comparable cost to LoRA,
+  Coconut joins minGRU and TTT on the Phase 6 substrate menu.
+
+**Phase 8 additions:**
+
+- **minGRU + BitNet cross-product** (DEC-0041): long-horizon research direction.
+  Promotion to planned deliverable requires both DEC-0038 graduation (minGRU MLX
+  spike passes) and DEC-0037 graduation (TTT validates Apple-Silicon training
+  viability for ternary architectures). No Phase 6/7 work gated on it.
+- **Hybrid Layer C graduation pattern** (DEC-0029 Phase 8 architectural option):
+  text → LoRA after sufficient repeated access. Promotion gated on the Phase 6
+  TTT spike result.
+- **Layer A active management** via Coconut-style or minGRU-style substrate
+  (DEC-0042, DEC-0038): Phase 6+ pending the spike outcomes; Phase 8 if the
+  spikes don't graduate to Phase 6.
+
+### 10.2 — File-by-file edit plan (memory-pillar additions)
+
+**10.2.1 — CLAUDE.md additions.** Add a new **Engineering Convention: Memory
+pillar discipline** section under the existing Engineering Conventions block,
+after the existing "Curation cadence" / "Planning write-back cadence" entries:
+
+```markdown
+### Memory pillar discipline
+
+Memory is the load-bearing architectural pillar (DEC-0028). Four layers:
+intra-step latent (Layer A), within-session scratchpad (Layer B),
+cross-session episodic (Layer C), semantic-knowledge (Layer D, served by
+KnowledgeBase). The implementation contract is at
+[docs/specs/memory-architecture.md](docs/specs/memory-architecture.md).
+
+Three discipline rules apply across all Worker work:
+- **Scratchpad is durable.** Reasoning tokens are first-class addressable
+  artifacts (DEC-0030); the o1 anti-pattern (silently truncating reasoning
+  between turns) is forbidden.
+- **Context is a resource to manage, not a capacity to fill.** Phase 2
+  default in-context cap is 16K tokens per Worker call (DEC-0032); overflow
+  routes through the episodic store; explicit cap-bypass is annotated and
+  audit-logged. The cap moves up empirically as Linus matures, not as a
+  matter of taste.
+- **Memory mode is dispatch-time-explicit.** Every Worker call carries a
+  `memory_mode` (`stateless` / `session_stateful` / `project_stateful`) and
+  a `cot_budget` (`logarithmic` / `linear` / `polynomial`) per DEC-0031.
+  Both are recorded in the audit log.
+```
+
+**10.2.2 — ARCHITECTURE.md additions.** Add a new top-level section
+**"Memory pillar"** after the existing Layer C (KnowledgeBase) section.
+Reference the spec at `docs/specs/memory-architecture.md` for implementation
+detail; ARCHITECTURE.md carries the four-layer overview, the four
+sub-requirement obligations from Garrison's framework, and the **"Memory
+Budget Accounting"** sub-section per DEC-0028 (M12) naming memory budget as a
+first-class architectural quantity with o3 (~$1.15M for 91.5% on ARC-AGI-1)
+as upper bound and human-with-pen-and-paper as lower bound. Linus's design
+target: tens of dollars of electricity per day on a single M1 Max, narrowing
+the gap to the lower bound through substrate (DEC-0029), discipline
+(DEC-0030, 0031, 0032), and measurement (DEC-0033, 0035).
+
+The existing **Open architectural questions** subsection's
+"Long-term memory design — deferred until concrete use case surfaces"
+entry is **superseded** by this section and the spec — replace with a
+pointer to `docs/specs/memory-architecture.md`.
+
+**10.2.3 — ROADMAP.md additions.**
+
+- **Phase 1c**: append the three memory-pillar Phase 1c spikes from §10.1
+  above (CoT-gap fingerprint, worker-size-vs-CoT-length, TTT viability) to
+  the Phase 1c block.
+- **Phase 1f**: append the minGRU MLX port spike to the Phase 1f block.
+- **Phase 2**: insert a new **2h — Memory pillar v0** sub-section listing
+  the seven implementation deliverables from §10.1. Insert a new
+  **2i — ARC-AGI memory diagnostic** sub-section. Insert a new
+  **2j — Worker protocol non-conformance constraints** sub-section pointing
+  to `docs/protocols/maestro-worker-protocol.md`.
+- **Phase 3**: extend the existing parallel-write coordination block to
+  include episodic-store writes alongside KB writes. Add a "faithfulness
+  audit trigger condition" note (DEC-0040). Add an "auto-classifier for
+  `cot_budget`/`memory_mode`" note (DEC-0031 Phase 3+ scope).
+- **Phase 6**: extend Phase 6a per DEC-0043 (memory-mode-aware fine-tuning
+  targets). Add new **6e — TTT-as-episodic-consolidation spike** and
+  **6f — Coconut substrate experiment** sub-sections, both conditional on
+  Phase 1 spike graduation.
+- **Phase 8**: append minGRU + BitNet cross-product, hybrid Layer C
+  graduation pattern, and Layer A active management to the existing
+  long-horizon research directions list.
+
+**10.2.4 — `docs/protocols/maestro-worker-protocol.md` (new file).**
+Worker protocol spec formalising:
+- DEC-0030 forbidden patterns (silently truncating reasoning, concatenating
+  scratchpad into answer, routing reasoning through non-capturable channel).
+- DEC-0036 KV-cache continuity requirement for stateful dispatch.
+- DEC-0030 `scratchpad_durability` capability tag values and registry shape.
+- DEC-0030 two-segment record shape (`scratchpad`/`answer`/`tool_output`)
+  per turn.
+- The dispatch contract: a Worker integration that violates these is
+  non-conformant; Phase 2 will not ship with a non-conformant Worker as a
+  default backend.
+
+**10.2.5 — `~/.linus/` runtime directory layout** (documented in
+ARCHITECTURE.md and the memory-architecture spec):
+
+```
+~/.linus/
+├── episodic.db              # SQLite, Layer B + C substrate (DEC-0029)
+├── audit.jsonl              # append-only audit log (DEC-0030/0031/0032)
+├── registry/
+│   └── models.json          # Worker registry with capability tags + CoT-gap fingerprints
+└── incidents/               # incident snapshots per SAFETY.md
+```
+
+### 10.3 — DECISIONS.md / per-file ADR additions checklist
+
+The following ADRs landed per-file in [`docs/adr/`](../adr/) (the per-file
+convention adopted at the 2026-05-03 follow-up session — DEC-0027 was the last
+entry in the legacy single-file `DECISIONS.md`). Verify presence as part of
+spec execution; do not duplicate:
+
+- [x] [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md) — Memory architecture lifted to Phase 2 first-class pillar (M1 + M12)
+- [x] [DEC-0029](../adr/0029-episodic-memory-substrate.md) — Layer C substrate (M2)
+- [x] [DEC-0030](../adr/0030-scratchpad-first-class-artifact.md) — Scratchpad first-class; o1 anti-pattern forbidden (M3)
+- [x] [DEC-0031](../adr/0031-router-primitives-cot-budget-memory-mode.md) — Router primitives `cot_budget` and `memory_mode` (M4)
+- [x] [DEC-0032](../adr/0032-in-context-window-cap-policy.md) — In-context window cap policy (M5)
+- [x] [DEC-0033](../adr/0033-cot-gap-fingerprint-registry-property.md) — CoT-gap fingerprint as registry property (M6)
+- [x] [DEC-0034](../adr/0034-worker-size-vs-cot-length-comparison.md) — Worker-size vs. CoT-length comparison (M7)
+- [x] [DEC-0035](../adr/0035-arc-agi-as-memory-diagnostic.md) — ARC-AGI as memory diagnostic (M8)
+- [x] [DEC-0036](../adr/0036-kv-cache-continuity-architectural-constraint.md) — KV-cache continuity constraint (M9)
+- [x] [DEC-0037](../adr/0037-ttt-apple-silicon-viability-spike.md) — TTT viability spike (M10)
+- [x] [DEC-0038](../adr/0038-mingru-mlx-port-spike.md) — minGRU MLX port spike (M11)
+- [x] [DEC-0039](../adr/0039-episodic-schema-hybrid-leaf-summary.md) — Episodic schema hybrid leaf+summary (M13)
+- [x] [DEC-0040](../adr/0040-faithfulness-audit-deferred.md) — Faithfulness audit deferred (M14)
+- [x] [DEC-0041](../adr/0041-mingru-bitnet-phase8-research-direction.md) — minGRU + BitNet Phase 8 research direction (M15)
+- [x] [DEC-0042](../adr/0042-coconut-phase6-substrate-experiment.md) — Coconut Phase 6 substrate experiment (M16)
+- [x] [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md) — Memory-mode-aware Phase 6a fine-tuning targets (M17)
+
+[`docs/adr/README.md`](../adr/README.md) index updated. The legacy single-file
+`DECISIONS.md` at the repo root remains as the brief pointer + index it
+became after DEC-0027.
+
+### 10.4 — Worker invocation guide for the memory-pillar additions
+
+Recommended execution order for Section 10:
+
+1. **§10.2.4 — `docs/protocols/maestro-worker-protocol.md` (new file)** —
+   small, self-contained, single Haiku Worker session per Pattern 2.
+2. **§10.2.1 — CLAUDE.md memory pillar discipline section** — small, single
+   Worker session.
+3. **§10.2.2 — ARCHITECTURE.md memory pillar section** — medium, single
+   Worker session referring to the memory-architecture spec.
+4. **§10.2.3 — ROADMAP.md additions** — medium-to-large, single Worker
+   session walking the ROADMAP block-by-block.
+5. **§10.2.5 — `~/.linus/` runtime directory documentation** — small,
+   already covered by the memory-architecture spec; ARCHITECTURE.md edit
+   in step 3 references it.
+
+The implementation work itself (the seven Phase 2 v0 deliverables in §10.1)
+is **out of scope for the spec-execution session**; it lives in Phase 2a
+Worker sessions that happen after this spec lands.
+
+### 10.5 — Open questions surfaced during the memory-pillar session
+
+Items surfaced during the 2026-05-03 follow-up planning session that propagate
+into the next iteration's `open-questions.md`:
+
+1. **Per-domain CoT-gap variance.** The DEC-0033 fingerprint runs MultiArith-
+   style problems. Does Dan's task distribution (genomics, bioinformatics,
+   scientific Python) produce a meaningfully different CoT-gap profile per
+   Worker? A small Phase 1c+ extension to the fingerprint with domain-specific
+   probes would tell us; queued for next iteration.
+2. **In-context cap empirical revision schedule.** DEC-0032 sets 16K as a
+   floor that moves with confidence as measurements accumulate. What is the
+   trigger condition for moving the cap up — periodic review (quarterly?), a
+   measured fraction of Worker calls hitting the cap, or a Worker-class
+   transition (when fine-tuned BitNet 3B lands)? Queued for next iteration.
+3. **Episodic-store retention pruning policy.** DEC-0030 keeps everything in
+   v0; "retain unless explicitly archived" is the default. What is the actual
+   long-tail behavior — when does the database start being unwieldy, and what
+   does the first pruning policy look like? Queued for next iteration; will
+   surface naturally as Phase 2 ships and v0 accumulates real data.
+4. **Hybrid summary function quality.** DEC-0039's deterministic structural
+   summary is a v0 choice; a learned summarizer is Phase 6+. What is the
+   trigger condition for moving from deterministic to learned? Queued for
+   next iteration.
+5. **Per-domain memory-mode defaults.** DEC-0031's v0 heuristic is
+   session-continuity-based. Are there domain-specific defaults worth encoding
+   (e.g., genomics literature review → `project_stateful` by default; quick
+   Q&A → `stateless`)? Queued for the Phase 7 skills design conversation.
+
+---
+
+*Section 10 produced 2026-05-03 from the same-day follow-up planning session
+covering the 17 M-series memory-pillar items. The Phase-by-phase change list
+in §10.1 and the file-by-file edit plan in §10.2 supplement Sections 2 and 5
+of this spec; the Worker invocation guide in §10.4 supplements Section 8.
+The 16 ADRs in §10.3 and the implementation contract at
+[`docs/specs/memory-architecture.md`](memory-architecture.md) are the
+authoritative artifacts.*
