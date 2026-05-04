@@ -1,5 +1,12 @@
 {
   "$comment": "Claude Code settings for the Linus repo. PostToolUse hooks run ruff format, isort-via-ruff, and ruff check on Python file edits. See CLAUDE.md for the full engineering-conventions section.",
+  "permissions": {
+    "allow": [
+      "Bash(pdftotext *)",
+      "Bash(pdfinfo *)",
+      "Bash(pdftoppm *)"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
