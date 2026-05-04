@@ -27,7 +27,16 @@
       "Bash(gh pr comment *)",
       "Bash(pip show *)",
       "Bash(prettier --write /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
-      "Bash(prettier --check /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)"
+      "Bash(prettier --check /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
+      "Bash(prettier --write docs/*)",
+      "Bash(prettier --check docs/*)",
+      "Bash(prettier --write docs/*.md)",
+      "Bash(git add docs/*)",
+      "Bash(git add docs/*.md)",
+      "Bash(ls -1 docs/*)",
+      "Bash(wc -l docs/*)",
+      "Bash(grep -E * docs/*)",
+      "Bash(md5sum docs/*)"
     ]
   },
   "hooks": {
