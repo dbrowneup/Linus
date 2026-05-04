@@ -1,14 +1,12 @@
 # Linus — Git Branching Model
 
-This document specifies how branches are created, used, and merged in the Linus repository
-to enable safe, auditable, parallel development with agentic Workers and human Maestro
-review.
+This document specifies how branches are created, used, and merged in the Linus repository to enable safe, auditable,
+parallel development with agentic Workers and human Maestro review.
 
 ## Overview
 
-Linus uses a **lightweight branching model now** (through Phase 2) that scales to full
-**Driessen gitflow** in Phase 3+, when we have versioned releases and need the ceremony
-of `develop`, `release/*`, and `hotfix/*` branches.
+Linus uses a **lightweight branching model now** (through Phase 2) that scales to full **Driessen gitflow** in Phase 3+,
+when we have versioned releases and need the ceremony of `develop`, `release/*`, and `hotfix/*` branches.
 
 **Current model (Phase 0–2):**
 
@@ -21,14 +19,15 @@ of `develop`, `release/*`, and `hotfix/*` branches.
 **Future model (Phase 3+):**
 
 Adopt full gitflow with:
+
 - `main` for production releases (tagged)
 - `develop` for integration of next-release features
 - `feature/*` branching from `develop`
 - `release/*` for release candidates
 - `hotfix/*` for urgent production fixes (branch from `main`, merge to both `main` and `develop`)
 
-This document focuses on the current model. A migration path will be documented as a
-new ADR in `docs/adr/` (and indexed in DECISIONS.md) when Phase 3 begins.
+This document focuses on the current model. A migration path will be documented as a new ADR in `docs/adr/` (and indexed
+in DECISIONS.md) when Phase 3 begins.
 
 ---
 
@@ -36,10 +35,10 @@ new ADR in `docs/adr/` (and indexed in DECISIONS.md) when Phase 3 begins.
 
 ### `main`
 
-**Purpose:** Integration, CI/CD, code review hub. The branch Dan points at when sharing
-Linus with peers.
+**Purpose:** Integration, CI/CD, code review hub. The branch Dan points at when sharing Linus with peers.
 
 **Policy:**
+
 - Always buildable and passing tests
 - Only accepts merges via pull request (never direct commits for non-trivial work)
 - Reviewed by Dan before merge
@@ -58,12 +57,14 @@ Linus with peers.
 **Naming:** `feature/kb-sync`, `feature/ollama-backend`, `feature/dark-mode-ui`
 
 **Policy:**
+
 - Branch from: `main`
 - Merge back to: `main` via PR
 - Reviewed by: Dan
 - Lifetime: short (1–7 days typically)
 
 **Examples:**
+
 ```
 git switch main
 git pull origin main
@@ -77,13 +78,13 @@ gh pr create --title "Add KnowledgeBase sync tool" --body "..."
 
 ### `agent/<task-id>/<slug>`
 
-**Purpose:** Worker-spawned branches for delegated specs. The `task-id` is the identifier
-from the spec; `slug` is a short kebab-case description.
+**Purpose:** Worker-spawned branches for delegated specs. The `task-id` is the identifier from the spec; `slug` is a
+short kebab-case description.
 
-**Naming:** `agent/1k8j-kb-indexing/add-specter-embeddings`,
-`agent/2m4n-inference/pmetal-evaluation`
+**Naming:** `agent/1k8j-kb-indexing/add-specter-embeddings`, `agent/2m4n-inference/pmetal-evaluation`
 
 **Policy:**
+
 - Branch from: `main`
 - Merge back to: `main` via PR
 - Reviewed by: Dan (creator is a Worker, not a human)
@@ -92,24 +93,25 @@ from the spec; `slug` is a short kebab-case description.
 - Commits authored by: Worker (e.g., `Co-Authored-By: Ollama-Qwen2.5-Coder`)
 
 **Worker workflow:**
+
 1. Maestro writes a spec in `experiments/<task-id>.md` or `docs/specs/<task-id>.md`
 2. Spec includes: goal, inputs, outputs, success criteria, smoke test
 3. Worker is invoked with the spec
 4. Worker creates branch: `agent/<task-id>/<slug>`
 5. Worker implements, commits, and pushes to remote
-6. Worker opens PR: `gh pr create --title "Spec: <task-id>" --body "..." --draft` (optional draft
-   while still developing)
+6. Worker opens PR: `gh pr create --title "Spec: <task-id>" --body "..." --draft` (optional draft while still
+   developing)
 7. Maestro (Dan) reviews the PR in GitHub
 8. Maestro approves and merges, or requests changes
 9. Branch is deleted after merge (GitHub's default)
 
-**Parallel workers on the same feature:**
-If multiple Workers collaborate on a single feature, create sibling branches:
+**Parallel workers on the same feature:** If multiple Workers collaborate on a single feature, create sibling branches:
+
 - `agent/<task-id>/worker-1`
 - `agent/<task-id>/worker-2`
 
-They coordinate via intermediate branch (`agent/<task-id>/merge-point`) or merge
-sequentially to avoid conflicts. Maestro coordinates the merge order.
+They coordinate via intermediate branch (`agent/<task-id>/merge-point`) or merge sequentially to avoid conflicts.
+Maestro coordinates the merge order.
 
 ---
 
@@ -120,6 +122,7 @@ sequentially to avoid conflicts. Maestro coordinates the merge order.
 **Naming:** `fix/ollama-port-conflict`, `fix/sqlite-timeout-edge-case`
 
 **Policy:**
+
 - Branch from: `main`
 - Merge back to: `main` via PR
 - Reviewed by: Dan
@@ -127,6 +130,7 @@ sequentially to avoid conflicts. Maestro coordinates the merge order.
 - Urgency: higher priority than feature branches; aim to merge within 24h
 
 **Examples:**
+
 ```
 git switch main
 git pull origin main
@@ -140,23 +144,23 @@ gh pr create --title "Fix Ollama port 11434 conflict recovery" --body "..."
 
 ### `experiment/<name>` or `spike/<name>`
 
-**Purpose:** Throwaway exploration, ablations, quick tests. Not intended to merge to
-`main` in the finished form.
+**Purpose:** Throwaway exploration, ablations, quick tests. Not intended to merge to `main` in the finished form.
 
-**Naming:** `experiment/moe-router-ablation`, `spike/pmetal-eval-trial`,
-`experiment/flash-attention-benchmark`
+**Naming:** `experiment/moe-router-ablation`, `spike/pmetal-eval-trial`, `experiment/flash-attention-benchmark`
 
 **Policy:**
+
 - Branch from: `main` (or another experiment branch)
 - Merge back to: Typically no — these are ephemeral
 - No PR required if it's your own personal exploration
 - Can be deleted without review if > 2 weeks old with no activity
-- If an experiment proves valuable and should graduate to a feature, rewrite it as
-  `feature/<name>` with a fresh branch and PR
+- If an experiment proves valuable and should graduate to a feature, rewrite it as `feature/<name>` with a fresh branch
+  and PR
 
 **Lifetime:** Days to weeks; cleaned up regularly
 
 **Examples:**
+
 ```
 git switch main
 git switch -c experiment/moe-router-ablation
@@ -176,6 +180,7 @@ git switch -c experiment/moe-router-ablation
 **Naming:** `dan/kb-prototype`, `dan/benchmark-refactor`
 
 **Policy:**
+
 - Branch from: `main`
 - Only used by Dan
 - Never merge directly; when ready, rewrite as `feature/<name>` or `fix/<name>` with a PR
@@ -183,6 +188,7 @@ git switch -c experiment/moe-router-ablation
 - Lifetime: hours to days; should be short-lived
 
 **Examples:**
+
 ```
 git switch main
 git switch -c dan/kb-prototype
@@ -200,8 +206,8 @@ git switch -c feature/kb-prototype-v1  # new branch from main
 
 ### Merging to `main`
 
-All changes to `main` **except minor documentation fixes and config updates** must be
-reviewed before merge. Use the GitHub PR workflow:
+All changes to `main` **except minor documentation fixes and config updates** must be reviewed before merge. Use the
+GitHub PR workflow:
 
 ```bash
 # After pushing your branch:
@@ -242,6 +248,7 @@ Closes #42
 ```
 
 **Not:**
+
 - "Added KnowledgeBase sync tool"
 - "Fixed the sync bug"
 - "WIP: experimenting with KB" (use branches instead)
@@ -250,16 +257,15 @@ Closes #42
 
 **Never force-push to `main`.** Force-push is forbidden by default (see SAFETY.md).
 
-For your own feature branches (before opening a PR), force-push is OK to clean up local
-history:
+For your own feature branches (before opening a PR), force-push is OK to clean up local history:
+
 ```bash
 git rebase -i origin/main
 git push -f origin feature/my-feature  # only your branch, before PR is opened
 ```
 
-Once a PR is open, **do not force-push.** If you need to update, add new commits (GitHub
-shows the diff over time). If a rebase is truly necessary, coordinate with Dan and create
-a new branch instead.
+Once a PR is open, **do not force-push.** If you need to update, add new commits (GitHub shows the diff over time). If a
+rebase is truly necessary, coordinate with Dan and create a new branch instead.
 
 ---
 
@@ -291,52 +297,59 @@ git switch main && git pull origin main
 **Maestro (Dan) side:**
 
 1. Write spec: `experiments/kb-sync.md`
+
    ```markdown
    # Spec: KB Sync Tool
-   
+
    ## Goal
+
    Implement a background job that syncs the KnowledgeBase embeddings every 6 hours.
-   
+
    ## Inputs
+
    - KnowledgeBase path: `modules/KnowledgeBase/`
    - Current embeddings index: `~/.linus/kb_embeddings.db`
-   
+
    ## Outputs
+
    - Updated embeddings index
    - Log file: `~/.linus/kb_sync.log`
-   
+
    ## Success criteria
+
    - Sync completes without errors on 100-paper subset
    - Embeddings match expected SPECTER2 dimension (768)
    - Existing embeddings are updated, not duplicated
-   
+
    ## Smoke test
+
    - Run on 10-paper subset first
    - Verify log output and embeddings count
    ```
 
-2. Delegate to Worker (Cline, Ollama, future Linus backend):
-   "Implement the spec at `experiments/kb-sync.md`. Create branch `agent/kb-sync/v1`."
+2. Delegate to Worker (Cline, Ollama, future Linus backend): "Implement the spec at `experiments/kb-sync.md`. Create
+   branch `agent/kb-sync/v1`."
 
 **Worker side:**
 
 3. Create and implement:
+
    ```bash
    git switch main && git pull origin main
    git switch -c agent/kb-sync/v1
-   
+
    # Implement per spec
    # ... write code, test on smoke-test subset ...
-   
+
    git add src/linus/knowledge/sync.py src/linus/jobs/scheduler.py tests/
    git commit -m "Implement KB sync background job
-   
+
    - Scheduled sync every 6 hours via apscheduler
    - SPECTER2 embeddings updated in-place to ~/.linus/kb_embeddings.db
    - Tested on 10-paper subset; all embeddings verified
-   
+
    Co-Authored-By: Ollama-Qwen2.5-Coder"
-   
+
    git push -u origin agent/kb-sync/v1
    gh pr create --title "Spec: KB sync tool" --body "Implements background KB sync."
    ```
@@ -359,11 +372,11 @@ Feature: "Inference backend evaluation" (`agent/infer-eval/worker-*`)
 - Worker 1 evaluates Ollama: `agent/infer-eval/ollama-bench`
 - Worker 2 evaluates pmetal: `agent/infer-eval/pmetal-bench`
 
-Merge order: Both workers push their branches and open PRs. Maestro reviews them
-independently (they shouldn't conflict), approves both, merges them in sequence.
+Merge order: Both workers push their branches and open PRs. Maestro reviews them independently (they shouldn't
+conflict), approves both, merges them in sequence.
 
-If there is a conflict, Maestro decides which branch merges first, then coordinates
-re-basing the second worker's branch.
+If there is a conflict, Maestro decides which branch merges first, then coordinates re-basing the second worker's
+branch.
 
 ### Scenario 4: Quick experiment, not merged
 
@@ -406,8 +419,8 @@ gh pr create --title "Add MoE router" --body "..."
 - Tags mark releases on `main`
 - Bugfixes from `release/*` and `hotfix/*` merge back into `develop`
 
-The decision to graduate and the migration procedure will be documented as a new ADR in
-`docs/adr/` (and indexed in DECISIONS.md).
+The decision to graduate and the migration procedure will be documented as a new ADR in `docs/adr/` (and indexed in
+DECISIONS.md).
 
 Until then, treat this document as the source of truth.
 
@@ -418,12 +431,12 @@ Until then, treat this document as the source of truth.
 See SAFETY.md for the complete autonomy tier and tool use policy. Branch-specific rules:
 
 - **Never force-push to `main`.** Forbidden always. (SAFETY.md blocklist)
-- **Never delete another person's branch without asking.** If a branch is stale (> 2
-  weeks, no commits, no PR activity), Dan can clean it up.
-- **Never commit directly to `main` for non-trivial work.** Always use a branch and PR.
-  Exception: single-line doc fixes or config updates with obvious correctness.
-- **`gh pr create` is auto-execute for Workers.** Once a spec is implemented, a Worker
-  can open a PR without confirmation. (Details in tool use policy.)
+- **Never delete another person's branch without asking.** If a branch is stale (> 2 weeks, no commits, no PR activity),
+  Dan can clean it up.
+- **Never commit directly to `main` for non-trivial work.** Always use a branch and PR. Exception: single-line doc fixes
+  or config updates with obvious correctness.
+- **`gh pr create` is auto-execute for Workers.** Once a spec is implemented, a Worker can open a PR without
+  confirmation. (Details in tool use policy.)
 - **Protected branches on GitHub.** `main` requires:
   - Pull request review (at least 1 approval, by Dan)
   - Status checks passing (CI/CD, tests)
@@ -435,6 +448,6 @@ See SAFETY.md for the complete autonomy tier and tool use policy. Branch-specifi
 
 - [CLAUDE.md](CLAUDE.md) — session protocol, tool use policy
 - [SAFETY.md](SAFETY.md) — autonomy tiers, branch-level safety, audit log
-- [docs/maestro-worker-protocol.md](docs/maestro-worker-protocol.md) — end-to-end workflow for spec → implementation → review
+- [docs/maestro-worker-protocol.md](docs/maestro-worker-protocol.md) — end-to-end workflow for spec → implementation →
+  review
 - [ROADMAP.md](ROADMAP.md#phase-3--knowledge-integration-and-parallel-agents) — Phase 3 branching model migration
-

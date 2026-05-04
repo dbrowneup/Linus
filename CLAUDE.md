@@ -2,10 +2,10 @@
 
 ## Project Purpose
 
-Build a private, local, modular AI assistant named **Linus** that runs on Apple Silicon,
-provides Claude-equivalent capabilities for Dan's scientific and software work, and stays
-fully under Dan's control. Named after Linus Pauling (scientist, humanitarian, Oregonian)
-and Linus Torvalds (engineer, open-source advocate, Oregonian). Logo: a carbon atom.
+Build a private, local, modular AI assistant named **Linus** that runs on Apple Silicon, provides Claude-equivalent
+capabilities for Dan's scientific and software work, and stays fully under Dan's control. Named after Linus Pauling
+(scientist, humanitarian, Oregonian) and Linus Torvalds (engineer, open-source advocate, Oregonian). Logo: a carbon
+atom.
 
 ## Owner Background
 
@@ -29,10 +29,10 @@ A personal AI orchestration backend that:
 - Enforces sandbox policy regardless of front-end
 - Evolves toward hosting fine-tuned, Dan-specific models
 
-Linus is NOT intended to replace hosted Claude. Hosted Claude plus Dan remains the Maestro for
-complex reasoning and architecture. Linus is the Worker orchestra that executes under Claude's
-and Dan's direction and serves Dan directly when private/offline operation is needed. Eventually, 
-as Linus gets better, it can become part of the Maestro team too, directing instantiated Workers.
+Linus is NOT intended to replace hosted Claude. Hosted Claude plus Dan remains the Maestro for complex reasoning and
+architecture. Linus is the Worker orchestra that executes under Claude's and Dan's direction and serves Dan directly
+when private/offline operation is needed. Eventually, as Linus gets better, it can become part of the Maestro team too,
+directing instantiated Workers.
 
 ## Guiding Principles
 
@@ -46,50 +46,48 @@ Applied to every design decision, in order:
 4. **Accelerate cycle time.** Short loops produce more information than long plans.
 5. **Automate.** Last, not first. Automating a bad step industrializes the badness.
 
-**The Algorithm check**: Before adding any component to Linus, ask "can we delete this
-requirement instead?" Before reaching for a new library, ask "does something we already
-have serve this purpose?"
+**The Algorithm check**: Before adding any component to Linus, ask "can we delete this requirement instead?" Before
+reaching for a new library, ask "does something we already have serve this purpose?"
 
 ### Blitzscaling mindset (Hoffman & Yeh)
 
-Speed is information. Short cycle times on real tasks produce better decisions than long
-planning on hypothetical ones. Ship rough, learn, iterate.
+Speed is information. Short cycle times on real tasks produce better decisions than long planning on hypothetical ones.
+Ship rough, learn, iterate.
 
 ### Maestro/Worker discipline
 
-- **Maestro** = Dan + hosted Claude (this chat, Claude Code, Claude.ai). Architecture, planning,
-  spec writing, hard debugging, taste-level decisions.
-- **Worker** = local models (Qwen2.5-Coder, Mistral-7B, future fine-tuned Linus). Bulk
-  implementation, test generation, refactors, pipeline execution.
+- **Maestro** = Dan + hosted Claude (this chat, Claude Code, Claude.ai). Architecture, planning, spec writing, hard
+  debugging, taste-level decisions.
+- **Worker** = local models (Qwen2.5-Coder, Mistral-7B, future fine-tuned Linus). Bulk implementation, test generation,
+  refactors, pipeline execution.
 - Maestro attention is the scarce resource. Push any well-specified task to Workers.
 
 ### Evidence beats intuition
 
-Plateau points get resolved by measurement, not argument. Flash-moe pattern: set a metric, set
-a goal, devise tests, and iterate until the goal is hit. Keep-or-revert by git. 42% of experiments being
-discarded is a sign the search is working.
+Plateau points get resolved by measurement, not argument. Flash-moe pattern: set a metric, set a goal, devise tests, and
+iterate until the goal is hit. Keep-or-revert by git. 42% of experiments being discarded is a sign the search is
+working.
 
 ## Hardware Constraints
 
 - **No CUDA.** Everything runs on Apple Silicon (Metal, ANE, unified memory).
 - **Metal/MPS for GPU compute.** MLX is the primary ML framework.
 - **ANE is accessible** via pmetal and Core ML; underutilized by most frameworks.
-- **32 GB unified memory** is a hard constraint for fine-tuning. LoRA/QLoRA on 7–14B models is
-  tractable. Full fine-tuning of 8B+ is at the edge. Streaming-based training (optimizer state
-  on SSD) is open research; deferred.
-- **Docker runs in a VM on macOS** and does NOT pass through Metal/ANE. Use Docker for
-  stateless services only (Qdrant, Kiwix, CyberChef). Inference stays native.
+- **32 GB unified memory** is a hard constraint for fine-tuning. LoRA/QLoRA on 7–14B models is tractable. Full
+  fine-tuning of 8B+ is at the edge. Streaming-based training (optimizer state on SSD) is open research; deferred.
+- **Docker runs in a VM on macOS** and does NOT pass through Metal/ANE. Use Docker for stateless services only (Qdrant,
+  Kiwix, CyberChef). Inference stays native.
 
 ## Environment
 
 - **Package/env manager**: `mambaforge` (conda-forge) + `conda`. Base env has Python 3.12.
 - **Linus env**: `conda activate linus` (set up via `environment.yml` at repo root)
-- **Homebrew-installed ML tools**: `mlx`, `mlx-c`, `ollama`. Do NOT reinstall via conda — the
-  brew versions are optimized for Apple Silicon.
+- **Homebrew-installed ML tools**: `mlx`, `mlx-c`, `ollama`. Do NOT reinstall via conda — the brew versions are
+  optimized for Apple Silicon.
 - **Ollama** is the first worker-model server; runs on port 11434 via `brew services`.
 - **Rust** is installed inside the linus conda env via `conda install rust` (needed for pmetal).
-- **uv** is installed inside the linus conda env for fast Python package operations when
-  needed (e.g., autoresearch-mlx).
+- **uv** is installed inside the linus conda env for fast Python package operations when needed (e.g.,
+  autoresearch-mlx).
 - **node/npm** installable inside conda env if openclaw or other JS-based components are used.
 - **poppler** is available via a Homebrew install to read PDF files in the context folder.
 
@@ -147,8 +145,8 @@ Linus/
 
 See [ROADMAP.md](ROADMAP.md) for full detail. Current phase markers:
 
-- **Phase 0 — Foundation** *(closed)*: scaffolding, docs, env
-- **Phase 1 — Recon & Baselines** *(in progress)*: synthesis notes, benchmarks, pmetal eval, first loop
+- **Phase 0 — Foundation** _(closed)_: scaffolding, docs, env
+- **Phase 1 — Recon & Baselines** _(in progress)_: synthesis notes, benchmarks, pmetal eval, first loop
 - **Phase 2 — Linus MVP**: orchestration backend, chat UI, KnowledgeBase v1
 - **Phase 3 — Knowledge & Parallel Agents**: deeper KB integration, agent fan-out
 - **Phase 4 — Data Sovereignty**: Kiwix, ProtoMaps/OSM, versioned datasets
@@ -177,109 +175,110 @@ See [ROADMAP.md](ROADMAP.md) for full detail. Current phase markers:
   mlx-flash (larger-than-RAM)
 ```
 
-Harness ≠ Orchestration. Harnesses (Cline, claw-code, Claude Code) are coding workflows
-tied to a UX surface. The orchestration layer is the product backend: Linus-specific tools,
-persistent state, cross-harness policy. Front-ends come and go; the orchestration layer
-accrues value. See GLOSSARY.md.
+Harness ≠ Orchestration. Harnesses (Cline, claw-code, Claude Code) are coding workflows tied to a UX surface. The
+orchestration layer is the product backend: Linus-specific tools, persistent state, cross-harness policy. Front-ends
+come and go; the orchestration layer accrues value. See GLOSSARY.md.
 
 ## Engineering Conventions
 
 ### Smoke-test gates
 
-No pipeline change runs on a full dataset without a 10–50-item sample passing first.
-Late-stage failures on long runs are the most expensive bug class. Smoke tests are cheap.
+No pipeline change runs on a full dataset without a 10–50-item sample passing first. Late-stage failures on long runs
+are the most expensive bug class. Smoke tests are cheap.
 
 ### Known Library Quirks
 
-A section maintained at the bottom of this file. When a tricky constant, config value, or
-library gotcha is resolved, it goes here immediately — same session, not "later." Claude
-Code: if you resolve one, append it.
+A section maintained at the bottom of this file. When a tricky constant, config value, or library gotcha is resolved, it
+goes here immediately — same session, not "later." Claude Code: if you resolve one, append it.
 
 ### Checkpoint discipline
 
-Multi-file edits produce a checkpoint summary every 3–4 file edits: files changed, what each
-change does, remaining TODOs. Makes long sessions resumable if interrupted.
+Multi-file edits produce a checkpoint summary every 3–4 file edits: files changed, what each change does, remaining
+TODOs. Makes long sessions resumable if interrupted.
 
 ### Hooks
 
-`.claude/settings.json` runs a `PostToolUse` hook on `Edit|Write`. Each
-sub-command guards on the file extension so unrelated edits skip cleanly.
-Python edits are formatted by `ruff format` at line length 120, import-sorted
-by `ruff check --select I --fix`, then linted by `ruff check`. Markdown edits
-are formatted by `prettier --write`; the prettier config at
-`.prettierrc.json` overrides `printWidth: 120` and `proseWrap: always` for
-`*.md` files, so markdown prose is actively re-wrapped to 120 columns
-(matching the Python convention) rather than preserving original line breaks.
-`.prettierignore` keeps `repos/`, `modules/`, `context/`, and lockfiles out
-of prettier's reach as defense-in-depth.
+`.claude/settings.json` runs a `PostToolUse` hook on `Edit|Write`. Each sub-command guards on the file extension so
+unrelated edits skip cleanly. Python edits are formatted by `ruff format` at line length 120, import-sorted by
+`ruff check --select I --fix`, then linted by `ruff check`. Markdown edits are formatted by `prettier --write`; the
+prettier config at `.prettierrc.json` overrides `printWidth: 120` and `proseWrap: always` for `*.md` files, so markdown
+prose is actively re-wrapped to 120 columns (matching the Python convention) rather than preserving original line
+breaks. `.prettierignore` keeps `repos/`, `modules/`, `context/`, and lockfiles out of prettier's reach as
+defense-in-depth.
 
 ```json
 {
   "hooks": {
-    "PostToolUse": [{
-      "matcher": "Edit|Write",
-      "hooks": [
-        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff format --line-length 120 \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"},
-        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check --select I --fix \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"},
-        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"},
-        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.md ]]; then prettier --write \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"}
-      ]
-    }]
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff format --line-length 120 \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check --select I --fix \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.md ]]; then prettier --write \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
 
-`mdlint` (the Markdown linter — pip-installed alongside prettier in the linus
-env) is **deliberately not in the hook chain.** mdlint 0.3.15's `check`
-subcommand silently auto-fixes some rules (notably MD004 list marker style)
-even without `--fix`, which can corrupt prose containing characters that look
-like list markers — e.g. `+` in the middle of a sentence about feature flags
-gets rewritten to `-`. Run mdlint manually with confirmation when you want
-lint feedback; do not put it in the auto-format chain. See Known Library
-Quirks below.
+`mdlint` (the Markdown linter — pip-installed alongside prettier in the linus env) is **deliberately not in the hook
+chain.** mdlint 0.3.15's `check` subcommand silently auto-fixes some rules (notably MD004 list marker style) even
+without `--fix`, which can corrupt prose containing characters that look like list markers — e.g. `+` in the middle of a
+sentence about feature flags gets rewritten to `-`. Run mdlint manually with confirmation when you want lint feedback;
+do not put it in the auto-format chain. See Known Library Quirks below.
 
 ### Commit discipline
 
-Atomic commits per resolved issue. Descriptive messages in imperative mood
-("Add Linus tool registry" not "Added tool registry"). Scope tags welcome
-(`[orch]`, `[kb]`, `[infer]`, `[docs]`).
+Atomic commits per resolved issue. Descriptive messages in imperative mood ("Add Linus tool registry" not "Added tool
+registry"). Scope tags welcome (`[orch]`, `[kb]`, `[infer]`, `[docs]`).
 
 ### Parallel by default
 
-Multi-file audit, multi-repo synthesis, multi-paper analysis, benchmark sweeps — all fan
-out to parallel Task agents or multiple Worker processes. Sequential is the exception, not
-the default.
+Multi-file audit, multi-repo synthesis, multi-paper analysis, benchmark sweeps — all fan out to parallel Task agents or
+multiple Worker processes. Sequential is the exception, not the default.
 
 ### Maestro budget discipline
 
-When interacting with hosted Claude (via Claude Code or this chat): arrive with context
-gathered, questions sharpened, and the task well-specified. Don't use Maestro tokens to
-read files Claude can't cache; pull excerpts and paste. Don't use Maestro tokens for
-well-specified implementation; hand the spec to a Worker.
+When interacting with hosted Claude (via Claude Code or this chat): arrive with context gathered, questions sharpened,
+and the task well-specified. Don't use Maestro tokens to read files Claude can't cache; pull excerpts and paste. Don't
+use Maestro tokens for well-specified implementation; hand the spec to a Worker.
 
 ### Writing style for docs
 
-Prose over bullet-heavy dumps for anything a human will read. Markdown files in this repo
-communicate reasoning, not just facts. Lists where they clarify; paragraphs where they
-reason. Claude Code: when generating docs, follow this style.
+Prose over bullet-heavy dumps for anything a human will read. Markdown files in this repo communicate reasoning, not
+just facts. Lists where they clarify; paragraphs where they reason. Claude Code: when generating docs, follow this
+style.
 
 ### Branch discipline
 
-All changes to `main` require a pull request reviewed by Dan before merge. Branches are
-the unit of parallel work. See [BRANCHING.md](BRANCHING.md) for the complete model:
+All changes to `main` require a pull request reviewed by Dan before merge. Branches are the unit of parallel work. See
+[BRANCHING.md](BRANCHING.md) for the complete model:
 
 - **Feature branches** (`feature/<name>`): new features, reviewed PR to `main`
-- **Agent branches** (`agent/<task-id>/<slug>`): Worker-delegated tasks, always opened as
-  PR by the Worker, reviewed by Dan before merge
+- **Agent branches** (`agent/<task-id>/<slug>`): Worker-delegated tasks, always opened as PR by the Worker, reviewed by
+  Dan before merge
 - **Fix branches** (`fix/<name>`): bug fixes, reviewed PR to `main`
-- **Experiment/spike branches** (`experiment/<name>`, `spike/<name>`): throwaway
-  exploration, no review required, often deleted without merging
+- **Experiment/spike branches** (`experiment/<name>`, `spike/<name>`): throwaway exploration, no review required, often
+  deleted without merging
 - **Personal branches** (`dan/<name>`): Dan's staging branches before formalizing as a PR
 
-Push to origin and use `gh pr create` to open PRs. Maestro (Dan) reviews and merges via
-GitHub. Never force-push to `main`; force-push to your own branch is OK before opening a
-PR. See BRANCHING.md for detailed workflows and examples.
-
+Push to origin and use `gh pr create` to open PRs. Maestro (Dan) reviews and merges via GitHub. Never force-push to
+`main`; force-push to your own branch is OK before opening a PR. See BRANCHING.md for detailed workflows and examples.
 
 ## Session Startup Protocol
 
@@ -289,10 +288,8 @@ When Claude Code opens a session in this repo:
 2. Read VISION.md if the task touches project direction.
 3. Read ROADMAP.md if the task relates to phased work.
 4. Read ARCHITECTURE.md if the task involves components or interfaces.
-5. Check DECISIONS.md (and the per-file ADRs in `docs/adr/`) for any decision relevant
-   to the task.
-6. For any non-trivial change: propose a plan before editing. Use the `[Plan]` → `[Act]`
-   workflow pattern.
+5. Check DECISIONS.md (and the per-file ADRs in `docs/adr/`) for any decision relevant to the task.
+6. For any non-trivial change: propose a plan before editing. Use the `[Plan]` → `[Act]` workflow pattern.
 7. After 3–4 file edits, post a checkpoint summary.
 8. Before long runs: smoke-test on a sample.
 9. On session end or significant pauses: commit with a clean message.
@@ -313,11 +310,12 @@ For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 
 - Read any file under the Linus tree
 - Write/edit files under `src/`, `benchmarks/`, `experiments/`, `docs/`
-- Run `pytest`, `ruff`, `prettier --write|--check` (Linus tree only), `mdlint check` (Linus tree only — but see Known Library Quirks; mdlint mutates), `python` (in linus env), `git add`, `git commit`
+- Run `pytest`, `ruff`, `prettier --write|--check` (Linus tree only), `mdlint check` (Linus tree only — but see Known
+  Library Quirks; mdlint mutates), `python` (in linus env), `git add`, `git commit`
 - Read-only git: `git status`, `git log`, `git diff`, `git branch`, `git show`
 - Branch creation and pushing: `git switch -c <branch>`, `git push -u origin <branch>`
-- Pull request creation and interaction: `gh pr create`, `gh pr view`, `gh pr list`,
-  `gh pr comment`, `gh pr merge` (with Dan approval for merge)
+- Pull request creation and interaction: `gh pr create`, `gh pr view`, `gh pr list`, `gh pr comment`, `gh pr merge`
+  (with Dan approval for merge)
 - `ls`, `cat`, `grep`, `tree`, `wc`, `head`, `tail`
 
 ### Require confirmation (show command, wait for OK)
@@ -347,46 +345,36 @@ See SAFETY.md for autonomy tier graduation and the full policy.
 
 ## Known Library Quirks
 
-*(This section grows over time. Append entries as issues are resolved.)*
+_(This section grows over time. Append entries as issues are resolved.)_
 
-**Ollama via conda is CPU-only.** Use the Homebrew install (`brew install ollama` +
-`brew services start ollama`). The conda build lacks Metal acceleration. Inherited from
+**Ollama via conda is CPU-only.** Use the Homebrew install (`brew install ollama` + `brew services start ollama`). The
+conda build lacks Metal acceleration. Inherited from KnowledgeBase.
+
+**Ollama port conflict recovery.** If a stale `ollama serve` from a conda shell holds port 11434, `brew services` fails
+with `fork/exec`. Fix: `pkill -f 'ollama serve' && brew services restart ollama`. Inherited from KnowledgeBase.
+
+**Optional Ollama speed env vars**: `OLLAMA_FLASH_ATTENTION=1`, `OLLAMA_KV_CACHE_TYPE=q8_0`. Set before
+`brew services start`.
+
+**pypdf decompression limit**: disable with `sys.maxsize`, NOT `0` or `2**63`. Inherited from KnowledgeBase.
+
+**SQLite large writes**: batch commits in chunks of 100–500 rows. Single transactions on 10k+ rows fail. Inherited from
 KnowledgeBase.
 
-**Ollama port conflict recovery.** If a stale `ollama serve` from a conda shell holds
-port 11434, `brew services` fails with `fork/exec`. Fix:
-`pkill -f 'ollama serve' && brew services restart ollama`. Inherited from KnowledgeBase.
+**`mdlint check` 0.3.15 silently auto-fixes some rules.** Despite the `--fix` flag being documented as opt-in,
+`mdlint check` applies "safe" fixes unconditionally — notably MD004 (list marker style). On prose containing characters
+that look like list markers (e.g. a `+` in the middle of "ANE + MLX + serve") this corrupts the meaning by rewriting `+`
+to `-`. Consequence: mdlint is **not** in the `PostToolUse` hook chain (only `prettier --write` is). Run
+`mdlint check <file>` manually with confirmation when you want lint feedback, and inspect the diff before keeping it.
 
-**Optional Ollama speed env vars**: `OLLAMA_FLASH_ATTENTION=1`, `OLLAMA_KV_CACHE_TYPE=q8_0`.
-Set before `brew services start`.
-
-**pypdf decompression limit**: disable with `sys.maxsize`, NOT `0` or `2**63`.
-Inherited from KnowledgeBase.
-
-**SQLite large writes**: batch commits in chunks of 100–500 rows. Single transactions
-on 10k+ rows fail. Inherited from KnowledgeBase.
-
-**`mdlint check` 0.3.15 silently auto-fixes some rules.** Despite the
-`--fix` flag being documented as opt-in, `mdlint check` applies "safe" fixes
-unconditionally — notably MD004 (list marker style). On prose containing
-characters that look like list markers (e.g. a `+` in the middle of "ANE +
-MLX + serve") this corrupts the meaning by rewriting `+` to `-`. Consequence:
-mdlint is **not** in the `PostToolUse` hook chain (only `prettier --write` is).
-Run `mdlint check <file>` manually with confirmation when you want lint
-feedback, and inspect the diff before keeping it.
-
-**`prettier` markdown config: `printWidth: 120`, `proseWrap: always`.** Set
-in `.prettierrc.json` via an `*.md` override to match the Python ruff
-convention (also 120). With `proseWrap: always`, prettier actively re-wraps
-prose to fit the column budget — paragraphs become long lines wrapped at
-120, not the older 60–65-character convention. The full corpus was
-bulk-reformatted in a single commit (see git log for `[format] prettier
---write`); subsequent edits should not produce noisy reformatting diffs.
-Prettier also normalizes heading style, list marker style at true list
-positions (distinguishes from in-prose `+`), trailing whitespace, and
-final newlines.
+**`prettier` markdown config: `printWidth: 120`, `proseWrap: always`.** Set in `.prettierrc.json` via an `*.md` override
+to match the Python ruff convention (also 120). With `proseWrap: always`, prettier actively re-wraps prose to fit the
+column budget — paragraphs become long lines wrapped at 120, not the older 60–65-character convention. The full corpus
+was bulk-reformatted in a single commit (see git log for `[format] prettier --write`); subsequent edits should not
+produce noisy reformatting diffs. Prettier also normalizes heading style, list marker style at true list positions
+(distinguishes from in-prose `+`), trailing whitespace, and final newlines.
 
 ---
 
-*This file is the contract between Dan and Claude (Maestro), and any Worker operating in the
-Linus repo. Update it when conventions change. Don't silently drift.*
+_This file is the contract between Dan and Claude (Maestro), and any Worker operating in the Linus repo. Update it when
+conventions change. Don't silently drift._

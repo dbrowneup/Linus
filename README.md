@@ -2,36 +2,31 @@
 
 A personal AI orchestration backend for Apple Silicon.
 
-Named after Linus Pauling and Linus Torvalds. Runs locally. Respects your data. Gets
-better at your work over time.
+Named after Linus Pauling and Linus Torvalds. Runs locally. Respects your data. Gets better at your work over time.
 
 ## What this is
 
-Linus is an OpenAI-compatible AI backend that runs on a MacBook Pro, exposes
-domain-specific tools backed by a personal knowledge base, coordinates multiple local
-models in parallel, enforces sandbox policy regardless of front-end, and is designed to
-evolve toward fine-tuned models trained on its owner's own data.
+Linus is an OpenAI-compatible AI backend that runs on a MacBook Pro, exposes domain-specific tools backed by a personal
+knowledge base, coordinates multiple local models in parallel, enforces sandbox policy regardless of front-end, and is
+designed to evolve toward fine-tuned models trained on its owner's own data.
 
-It's not a replacement for hosted frontier models — hosted Claude plus owner remains the 
-primary Maestro for complex reasoning and architecture. Linus is the orchestra that Claude
-plus owner conducts, and the assistant that serves its owner directly when private or offline
-operation is needed.
+It's not a replacement for hosted frontier models — hosted Claude plus owner remains the primary Maestro for complex
+reasoning and architecture. Linus is the orchestra that Claude plus owner conducts, and the assistant that serves its
+owner directly when private or offline operation is needed.
 
-This is a personal project, not a product. There is no company, no users to serve, no
-deadline. The code, decisions, and documentation exist to make the author's own work
-easier and to be a pleasure to build.
+This is a personal project, not a product. There is no company, no users to serve, no deadline. The code, decisions, and
+documentation exist to make the author's own work easier and to be a pleasure to build.
 
 ## Status
 
-**Phase 1 — Recon and Baselines** (in progress). Phase 0 closed. Repo synthesis notes
-largely complete; pmetal evaluation underway (built from source, smoke tests pass).
-See [ROADMAP.md](ROADMAP.md) for the phased plan.
+**Phase 1 — Recon and Baselines** (in progress). Phase 0 closed. Repo synthesis notes largely complete; pmetal
+evaluation underway (built from source, smoke tests pass). See [ROADMAP.md](ROADMAP.md) for the phased plan.
 
 ## Principles
 
 Applied in every design decision:
 
-1. **Question every requirement.** From *The Algorithm* by Jon McNeill.
+1. **Question every requirement.** From _The Algorithm_ by Jon McNeill.
 2. **Delete every possible step.** Err aggressive.
 3. **Simplify.** Only after deletion.
 4. **Accelerate cycle time.** Speed is information.
@@ -121,8 +116,8 @@ ollama pull mistral:7b-instruct
 
 ## For Claude Code sessions
 
-Start every session by reading [CLAUDE.md](CLAUDE.md). It contains the behavioral
-contract, coding conventions, sandbox policy, and session protocol.
+Start every session by reading [CLAUDE.md](CLAUDE.md). It contains the behavioral contract, coding conventions, sandbox
+policy, and session protocol.
 
 Key habits:
 
@@ -137,32 +132,27 @@ Key habits:
 
 The project is named after two Linuses, both Oregonians:
 
-**Linus Pauling** (1901–1994) — Two-time Nobel laureate (Chemistry 1954, Peace 1963).
-Self-taught basement-lab hacker who became the founder of molecular biology, author of
-*The Nature of the Chemical Bond*, and organizer of the petition that led to the 1963
-nuclear test ban treaty.
+**Linus Pauling** (1901–1994) — Two-time Nobel laureate (Chemistry 1954, Peace 1963). Self-taught basement-lab hacker
+who became the founder of molecular biology, author of _The Nature of the Chemical Bond_, and organizer of the petition
+that led to the 1963 nuclear test ban treaty.
 
-**Linus Torvalds** (1969–) — Creator of Linux and Git. Principled engineer whose work
-underpins most of the world's software infrastructure.
+**Linus Torvalds** (1969–) — Creator of Linux and Git. Principled engineer whose work underpins most of the world's
+software infrastructure.
 
-Logo: a carbon atom. Pauling's early work was on carbon's tetravalent sp³
-hybridization; carbon is the foundation of biochemistry (the project owner's field); and
-the hardware/silicon-wetware/carbon interface is a nice conceptual hook for what Linus
-does.
+Logo: a carbon atom. Pauling's early work was on carbon's tetravalent sp³ hybridization; carbon is the foundation of
+biochemistry (the project owner's field); and the hardware/silicon-wetware/carbon interface is a nice conceptual hook
+for what Linus does.
 
 See [VISION.md](VISION.md) for the extended rationale.
 
 ## License
 
-TBD. Default intent: permissive open source for the Linus code itself, with
-acknowledgment that Linus depends on submodules (KnowledgeBase) and reference repos
-under their own licenses.
+TBD. Default intent: permissive open source for the Linus code itself, with acknowledgment that Linus depends on
+submodules (KnowledgeBase) and reference repos under their own licenses.
 
 ## Acknowledgments
 
 - Anthropic for Claude, a key part of the Maestro that makes this project possible
 - Apple's MLX team for making Apple Silicon a real ML platform
-- Every repo in `repos/` and their authors — see `docs/repo-notes/` (Phase 1+) for
-  per-repo credit
-- Linus Pauling and Linus Torvalds, for the legacies this project tries, in its small
-  way, to honor
+- Every repo in `repos/` and their authors — see `docs/repo-notes/` (Phase 1+) for per-repo credit
+- Linus Pauling and Linus Torvalds, for the legacies this project tries, in its small way, to honor

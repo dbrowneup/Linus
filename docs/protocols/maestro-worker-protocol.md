@@ -1,11 +1,10 @@
 # Maestro/Worker Protocol
 
-This document describes the end-to-end workflow for delegating tasks from Maestro (Dan,
-operating via hosted Claude / Claude Code) to Workers (local models like Qwen2.5-Coder
-via Ollama, or future autonomous Linus agents).
+This document describes the end-to-end workflow for delegating tasks from Maestro (Dan, operating via hosted Claude /
+Claude Code) to Workers (local models like Qwen2.5-Coder via Ollama, or future autonomous Linus agents).
 
-The protocol ensures safe, auditable, traceable work and keeps Dan in the review loop
-while enabling parallel task execution.
+The protocol ensures safe, auditable, traceable work and keeps Dan in the review loop while enabling parallel task
+execution.
 
 ## Summary
 
@@ -25,8 +24,8 @@ while enabling parallel task execution.
 Write specs in one of these locations:
 
 - **Task-scoped**: `experiments/<task-id>.md` for one-off delegations
-- **Domain-scoped**: `docs/specs/<domain>/<spec-name>.md` for specs that may be reused
-  or become standing practices (e.g., `docs/specs/inference/ollama-benchmark.md`)
+- **Domain-scoped**: `docs/specs/<domain>/<spec-name>.md` for specs that may be reused or become standing practices
+  (e.g., `docs/specs/inference/ollama-benchmark.md`)
 
 ### Format
 
@@ -57,6 +56,7 @@ One paragraph: what we're trying to learn or build, why it matters.
 ## Success Criteria
 
 Bullet list. Be specific. Examples:
+
 - "Inference completes in < 5 seconds per example"
 - "All 100 test cases pass with no errors"
 - "Embeddings match expected SPECTER2 dimensionality (768)"
@@ -65,6 +65,7 @@ Bullet list. Be specific. Examples:
 ## Smoke Test
 
 Before running on the full scope, validate on a sample. Examples:
+
 - "Test on 10-paper subset of KnowledgeBase first"
 - "Run on first 100 examples before the full 10k-example suite"
 - "Validate output schema on single model before sweeping all models"
@@ -89,9 +90,8 @@ Task ID: kb-sync-v1
 
 ## Goal
 
-Implement a background job that automatically syncs the KnowledgeBase embeddings every
-6 hours. This enables Linus to stay up-to-date as new papers are added to the knowledge
-base without manual intervention.
+Implement a background job that automatically syncs the KnowledgeBase embeddings every 6 hours. This enables Linus to
+stay up-to-date as new papers are added to the knowledge base without manual intervention.
 
 ## Inputs
 
@@ -124,8 +124,7 @@ base without manual intervention.
 
 - Use `apscheduler` for the background scheduler (already in environment.yml)
 - Embeddings are stored in SQLite; batch inserts in chunks of 100 to avoid timeout
-- If a sync fails mid-run, the next sync should resume from where it left off
-  (idempotent)
+- If a sync fails mid-run, the next sync should resume from where it left off (idempotent)
 
 ## Related
 
@@ -137,8 +136,7 @@ base without manual intervention.
 
 ## Phase 2: Delegation (Maestro)
 
-When the spec is ready, delegate to the Worker. The exact mechanism depends on your
-harness:
+When the spec is ready, delegate to the Worker. The exact mechanism depends on your harness:
 
 ### Via Claude Code (invoking Cline or local orchestration)
 
@@ -183,14 +181,15 @@ git switch -c agent/kb-sync-v1/implementation
 ```
 
 Branch naming follows BRANCHING.md:
+
 - Format: `agent/<task-id>/<slug>`
 - `<task-id>` matches the spec ID (e.g., "kb-sync-v1")
-- `<slug>` briefly describes the implementation approach (e.g., "implementation",
-  "with-scheduler", "v1-draft")
+- `<slug>` briefly describes the implementation approach (e.g., "implementation", "with-scheduler", "v1-draft")
 
 ### 3b. Implement
 
 Implement per the spec:
+
 - Create/modify files under `src/`, `tests/`, `docs/` as needed
 - Run smoke test (subset from spec) **before** committing
 - Commit frequently with clear messages
@@ -294,7 +293,7 @@ Comment on the PR via GitHub UI:
 
 ```
 // On the PR:
-"The sync should handle a network timeout gracefully. Currently it 
+"The sync should handle a network timeout gracefully. Currently it
 fails the whole job. Can we add retry logic with exponential backoff?"
 ```
 
@@ -306,9 +305,9 @@ If the approach is fundamentally wrong or needs a major rethink:
 
 ```
 // Close the PR and create an issue or new spec:
-"This approach is on the right track, but the scheduler 
-integration is too tightly coupled. Let's revise the spec 
-at experiments/kb-sync-v2.md to separate concerns. 
+"This approach is on the right track, but the scheduler
+integration is too tightly coupled. Let's revise the spec
+at experiments/kb-sync-v2.md to separate concerns.
 I'll assign this to you as a new task."
 ```
 
@@ -342,12 +341,9 @@ Task ID: kb-sync-v1
 
 ## Lessons Learned / Retro
 
-- Initial estimate was 30 seconds per full sync; actual is 8 seconds. Faster
-  than expected due to index caching.
-- Network timeout handling proved critical. Future specs should always include
-  a "failure modes" section.
-- SQLite batch size of 100 was good; we could try 200 for faster bulk writes
-  on next iteration.
+- Initial estimate was 30 seconds per full sync; actual is 8 seconds. Faster than expected due to index caching.
+- Network timeout handling proved critical. Future specs should always include a "failure modes" section.
+- SQLite batch size of 100 was good; we could try 200 for faster bulk writes on next iteration.
 
 ## Status
 
@@ -395,8 +391,8 @@ agent/infer-eval-v1/ollama-bench  [Worker 1]
 agent/infer-eval-v1/pmetal-bench  [Worker 2]
 ```
 
-Both push and open PRs independently. Maestro reviews both, approves both, merges them
-sequentially (if no conflicts) or coordinates conflict resolution.
+Both push and open PRs independently. Maestro reviews both, approves both, merges them sequentially (if no conflicts) or
+coordinates conflict resolution.
 
 ### Case 3: Merge coordination
 
@@ -420,13 +416,12 @@ Specs are not archived after completion. They become templates for similar futur
 If the same category of task appears again:
 
 1. Copy the closed spec: `cp experiments/kb-sync-v1.md experiments/kb-sync-v2.md`
-2. Update it: incorporate lessons learned, adjust success criteria based on new
-   requirements
+2. Update it: incorporate lessons learned, adjust success criteria based on new requirements
 3. Increment the version number
 4. Delegate to a Worker
 
-Over time, frequently-used specs become standing specifications in `docs/specs/` and
-may be executed multiple times with minor tweaks.
+Over time, frequently-used specs become standing specifications in `docs/specs/` and may be executed multiple times with
+minor tweaks.
 
 ---
 
@@ -435,5 +430,4 @@ may be executed multiple times with minor tweaks.
 - [BRANCHING.md](../BRANCHING.md) — branch naming and merge policy
 - [CLAUDE.md](../CLAUDE.md) — session protocol and tool use policy
 - [SAFETY.md](../SAFETY.md) — autonomy tiers and audit logging
-- [ROADMAP.md](../ROADMAP.md#phase-1--recon--baselines) — Phase 1 spec for the first
-  Maestro/Worker loop
+- [ROADMAP.md](../ROADMAP.md#phase-1--recon--baselines) — Phase 1 spec for the first Maestro/Worker loop
