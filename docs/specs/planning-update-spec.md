@@ -987,6 +987,10 @@ expand to:
 
 ### 5.6 — `docs/curation-protocol.md` (new file)
 
+**STATUS (2026-05-04):** DONE. Created on `main` in commit `1d00467`
+(`[planning-spec 5.6+5.7+7.4] add curation protocol and log`). Content matches
+the spec verbatim.
+
 **5.6.1** Create `docs/curation-protocol.md` with content (DEC-0025):
 
 ```markdown
@@ -1051,6 +1055,15 @@ At the start of each quarter:
 
 ### 5.7 — `docs/curation-log.md` (new file)
 
+**STATUS (2026-05-04):** DONE. Created on `main` in commit `1d00467`
+(`[planning-spec 5.6+5.7+7.4] add curation protocol and log`). Format extended
+beyond the original spec to include an explicit `added` template alongside the
+`archived | removed` template — needed because Section 7.4 uses an `added`
+entry but the original spec body only documented removal/archive shape. Initial
+entry covers Dan's manual clone of 67 community repos to `repos/` (see Section
+7.1 STATUS for scope expansion). New entries are appended at the bottom of the
+**Entries** section.
+
 **5.7.1** Create `docs/curation-log.md` with content:
 
 ```markdown
@@ -1079,6 +1092,10 @@ Entries are append-only and ordered by date.
 
 ## Section 6 — Curation protocol setup
 
+**STATUS (2026-05-04):** Files DONE (commit `1d00467`). Quarterly-review
+schedule still pending: protocol reference not yet added to CLAUDE.md (Section
+5.1.6), and the first quarterly review for 2026-06-01 not yet calendared.
+
 The `docs/curation-protocol.md` and `docs/curation-log.md` files are created in
 Section 5.6 and 5.7 above. Once committed:
 
@@ -1090,7 +1107,27 @@ Section 5.6 and 5.7 above. Once committed:
 
 ## Section 7 — Repos to clone + notes to write
 
+**STATUS (2026-05-04):** Section 7.1 (clones) DONE manually by Dan with
+substantial scope expansion. Section 7.2/7.3 (repo-note writing) IN PROGRESS as
+ten themed group batches; Group 1 (Apple Silicon — `autoresearch-mlx`) complete
+on `feature/repo-notes-g1-apple-silicon` (commit `bce023c`), Groups 2–10
+queued. Section 7.4 (curation-log entry) DONE as a single batch entry on `main`
+covering all 67 clones; per-group PRs deliberately do NOT touch the curation
+log — see 7.4 STATUS.
+
 ### 7.1 — Clone commands
+
+**STATUS (2026-05-04):** DONE manually by Dan. Scope expanded substantially
+beyond the original 12-repo list below: 67 community repos cloned, organized
+into ten cross-cutting themes (Apple Silicon inference; LLM Wiki engines; LLM
+Wiki agent-driven build patterns; agent persistent memory; KG/network tooling;
+MCP and code-context tools; agent harnesses and orchestration; scientific
+reasoning agents — primarily the FutureHouse stack; bioinformatics models;
+finance and quant agents). Full enumeration with theme breakdown is captured
+in the `2026-05-04 — added: 67 community repos to repos/` entry of
+`docs/curation-log.md`. The original 12-repo list below is retained as
+historical reference; the slug-verification note no longer applies (Dan
+resolved all slugs at clone time).
 
 Run from repo root (the `repos/` directory is gitignored, so cloning here doesn't
 pollute the Linus repo):
@@ -1118,6 +1155,30 @@ fails to resolve, log the failure in the spec execution checkpoint summary.
 
 ### 7.2 — Repo note shape
 
+**STATUS (2026-05-04):** Shape clarified during Group 1 execution. The actual
+existing notes (e.g. `docs/repo-notes/pmetal.md`, `docs/repo-notes/cline.md`)
+use **numbered sections** rather than the bullet list originally drafted here,
+and there is no separate "TL;DR" section — the opening paragraph of `Purpose
+and scope` carries the TL;DR. The canonical shape, in use as of Group 1, is:
+
+```
+# <name> (`<github-org>/<repo>`)
+
+## 1. Purpose and scope
+## 2. Architecture summary  (or content overview if not code)
+## 3. What's reusable in Linus
+## 4. What's inspiration only
+## 5. What's incompatible or out of scope
+## 6. Recommendation: **<Integrate / Study / Ignore>**
+## 7. Questions for Dan  (3–5 specific, non-generic; carry forward to open-questions.md)
+```
+
+Style rules (per `CLAUDE.md` docs convention): prose over bullets, ≤120 lines,
+concrete file/module/crate names where they exist, reference Linus phases by
+name where relevant, no emojis.
+
+The original spec bullet list is retained below as historical record.
+
 Each cloned repo gets a one-page note in `docs/repo-notes/<name>.md` following
 the existing shape established by the original twelve repo notes:
 
@@ -1132,6 +1193,48 @@ the existing shape established by the original twelve repo notes:
 
 ### 7.3 — Worker prompt template for repo notes (Pattern 2)
 
+**STATUS (2026-05-04):** Refined during Group 1 execution. The original
+single-paragraph Worker prompt (retained below) was replaced with the
+group-batched Maestro/Worker pattern in current use: Maestro spawns one
+Haiku 4.5 Worker per repo within a group, fans out in parallel via the `Agent`
+tool with `subagent_type=general-purpose`, then reviews and commits the
+returned notes itself. Workers do NOT commit (avoids race conditions on the
+branch). Workers DO NOT touch `docs/curation-log.md` (see 7.4 STATUS).
+
+#### Group-batched Worker prompt (in use as of 2026-05-04)
+
+For each repo in a group, Maestro spawns a Worker with a brief covering:
+
+1. **Reading order** — style references first (`docs/repo-notes/pmetal.md` and
+   one other thematically adjacent existing note), then the target repo
+   (README → `pyproject.toml`/`Cargo.toml`/`package.json` → 1–2 illustrative
+   source files; do not deep-read the whole tree), then the project context
+   (`CLAUDE.md` skim).
+2. **Group context line** — one sentence naming the sibling repos in the same
+   group and the differentiation question the note must answer (e.g. "How does
+   this differ from `link`, `llmwiki`, `wikiloom` in the LLM Wiki engine
+   cluster?").
+3. **Output shape** — exactly the numbered sections from Section 7.2 above.
+4. **Style rules** — prose over bullets, ≤120 lines, concrete names,
+   phase-tagged recommendations, no emojis.
+5. **STOP conditions** — repo not cloned, README missing, can't tell within
+   ~10 minutes what the repo does. Report rather than guess.
+6. **Commit policy** — Worker writes the file but does NOT commit; returns the
+   absolute path plus a 2-sentence summary of the recommendation. Maestro
+   reviews, spot-checks 2–3 specific factual claims against the actual repo,
+   then commits the whole group as a single atomic commit per Section 8.1.
+
+#### Branch and commit conventions (in use)
+
+- Per-group branch: `feature/repo-notes-g<N>-<theme-slug>`, branched from
+  `main` after the curation-log commit (`1d00467`) so all groups share a
+  conflict-free baseline.
+- Per-group commit message: `[planning-spec 7.G<N>] add repo notes for <theme>`.
+- One PR per group; PRs opened as a batch at the end of all ten groups, not
+  per-group, so review can sequence cleanly.
+
+#### Original Pattern 2 prompt (historical reference)
+
 ```
 Read planning-update-spec.md at docs/specs/planning-update-spec.md Section 7.
 Write a one-page repo-note for the cloned repo at repos/<NAME>/ following the
@@ -1143,8 +1246,19 @@ or if any required source-of-truth file is missing — report and don't guess.
 
 ### 7.4 — Curation log entry on clone
 
-After cloning, append the additions to `docs/curation-log.md` as a single batch
-entry:
+**STATUS (2026-05-04):** DONE on `main` in commit `1d00467`. The actual entry
+covers 67 repos (not 12) with a per-theme breakdown, dated 2026-05-04 (not
+2026-05-03), and lives as the first entry in the **Entries** section of
+`docs/curation-log.md`.
+
+**Decision: per-group repo-note PRs do NOT touch `docs/curation-log.md`.** The
+curation-log entry covers the **clone event**, which already happened once on
+main. Per-repo rationale lives in each repo-note itself, per the curation
+protocol's "Add with rationale in the originating note" rule. This eliminates
+merge conflicts on the curation log when the ten group PRs land in any order.
+
+The original single-batch entry template is retained below as historical
+reference:
 
 ```markdown
 ## 2026-05-03 — added: 12 community repos to repos/
@@ -1170,12 +1284,19 @@ material. See planning-update-spec.md Section 7.1 for full list.
 4. **Section 5.2 — VISION.md** edits (small, single Worker session).
 5. **Section 5.3 — ARCHITECTURE.md** edits (medium, single Worker session).
 6. **Section 5.4 — ROADMAP.md** edits (medium-to-large, single Worker session).
-7. **Section 5.6 + 5.7** — curation protocol and log (two new files).
+7. **Section 5.6 + 5.7** — curation protocol and log (two new files). **DONE
+   2026-05-04 (commit `1d00467` on `main`).**
 8. **Section 7.1 — clone repos** (terminal task; no Claude Code involvement
-   beyond verification).
-9. **Section 7.2/7.3 — write repo notes** (parallel-by-default; one Worker per
-   repo via Pattern 2; or one Maestro Opus session that delegates per repo via
-   Task tool).
+   beyond verification). **DONE manually by Dan; expanded from 12 to 67 repos
+   across ten themes — see Section 7.1 STATUS.**
+9. **Section 7.2/7.3 — write repo notes** — current pattern is **per-group
+   parallel fan-out**: ten themed group batches, one Maestro/Worker session per
+   group, Workers fanned out in parallel via the `Agent` tool, Maestro reviews
+   and commits per-group. **IN PROGRESS:** Group 1 (Apple Silicon —
+   `autoresearch-mlx`) DONE on `feature/repo-notes-g1-apple-silicon`
+   (commit `bce023c`); Groups 2–10 queued. PRs batched at the end of all ten
+   groups, not per-group. See Section 7.3 STATUS for the prompt template and
+   branch convention in current use.
 10. **Section 3 — [KB-spec]** items delivered to KnowledgeBase repo via PRs.
 
 ### 8.2 — Maestro session prompt (Pattern 1, full execution)
