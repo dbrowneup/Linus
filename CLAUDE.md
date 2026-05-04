@@ -204,10 +204,14 @@ change does, remaining TODOs. Makes long sessions resumable if interrupted.
 
 `.claude/settings.json` runs a `PostToolUse` hook on `Edit|Write`. Each
 sub-command guards on the file extension so unrelated edits skip cleanly.
-Python edits are formatted by `ruff format`, import-sorted by `ruff check
---select I --fix`, then linted by `ruff check`. Markdown edits are formatted
-by `prettier --write` (proseWrap defaults to `preserve` for markdown so prose
-line breaks are not re-flowed).
+Python edits are formatted by `ruff format` at line length 120, import-sorted
+by `ruff check --select I --fix`, then linted by `ruff check`. Markdown edits
+are formatted by `prettier --write`; the prettier config at
+`.prettierrc.json` overrides `printWidth: 120` and `proseWrap: always` for
+`*.md` files, so markdown prose is actively re-wrapped to 120 columns
+(matching the Python convention) rather than preserving original line breaks.
+`.prettierignore` keeps `repos/`, `modules/`, `context/`, and lockfiles out
+of prettier's reach as defense-in-depth.
 
 ```json
 {
@@ -371,13 +375,16 @@ mdlint is **not** in the `PostToolUse` hook chain (only `prettier --write` is).
 Run `mdlint check <file>` manually with confirmation when you want lint
 feedback, and inspect the diff before keeping it.
 
-**`prettier` markdown defaults are safe to auto-run.** `proseWrap` defaults
-to `preserve` for Markdown, so prettier does NOT re-wrap paragraph prose. It
-normalizes heading style, list marker style (`+` → `-` at line start, but
-only when actually a list — distinguishes from in-prose `+`), trailing
-whitespace, and final newlines. Existing repo notes (e.g. `pmetal.md`) have
-small style diffs against prettier (`*italic*` → `_italic_`, etc.) that will
-land the next time each file is edited via the hook.
+**`prettier` markdown config: `printWidth: 120`, `proseWrap: always`.** Set
+in `.prettierrc.json` via an `*.md` override to match the Python ruff
+convention (also 120). With `proseWrap: always`, prettier actively re-wraps
+prose to fit the column budget — paragraphs become long lines wrapped at
+120, not the older 60–65-character convention. The full corpus was
+bulk-reformatted in a single commit (see git log for `[format] prettier
+--write`); subsequent edits should not produce noisy reformatting diffs.
+Prettier also normalizes heading style, list marker style at true list
+positions (distinguishes from in-prose `+`), trailing whitespace, and
+final newlines.
 
 ---
 

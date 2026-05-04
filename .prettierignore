@@ -1,0 +1,12 @@
+# Defense-in-depth: even though prettier honors .gitignore by default, name
+# the directories we never want prettier to touch explicitly so a `prettier
+# --write .` from repo root cannot accidentally reformat third-party code,
+# personal context, or KnowledgeBase submodule content.
+
+repos/
+modules/
+context/
+node_modules/
+.git/
+*.lock
+*.lockb
