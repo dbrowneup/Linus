@@ -202,7 +202,12 @@ change does, remaining TODOs. Makes long sessions resumable if interrupted.
 
 ### Hooks
 
-`.claude/settings.json` runs a `PostToolUse` hook on `Edit|Write`:
+`.claude/settings.json` runs a `PostToolUse` hook on `Edit|Write`. Each
+sub-command guards on the file extension so unrelated edits skip cleanly.
+Python edits are formatted by `ruff format`, import-sorted by `ruff check
+--select I --fix`, then linted by `ruff check`. Markdown edits are formatted
+by `prettier --write` (proseWrap defaults to `preserve` for markdown so prose
+line breaks are not re-flowed).
 
 ```json
 {
@@ -210,14 +215,24 @@ change does, remaining TODOs. Makes long sessions resumable if interrupted.
     "PostToolUse": [{
       "matcher": "Edit|Write",
       "hooks": [
-        {"type": "command", "command": "ruff format --line-length 120 $CLAUDE_FILE_PATH 2>&1 || true"},
-        {"type": "command", "command": "ruff check --select I --fix $CLAUDE_FILE_PATH 2>&1 || true"},
-        {"type": "command", "command": "ruff check $CLAUDE_FILE_PATH 2>&1 || true"}
+        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff format --line-length 120 \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"},
+        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check --select I --fix \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"},
+        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"},
+        {"type": "command", "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.md ]]; then prettier --write \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"}
       ]
     }]
   }
 }
 ```
+
+`mdlint` (the Markdown linter — pip-installed alongside prettier in the linus
+env) is **deliberately not in the hook chain.** mdlint 0.3.15's `check`
+subcommand silently auto-fixes some rules (notably MD004 list marker style)
+even without `--fix`, which can corrupt prose containing characters that look
+like list markers — e.g. `+` in the middle of a sentence about feature flags
+gets rewritten to `-`. Run mdlint manually with confirmation when you want
+lint feedback; do not put it in the auto-format chain. See Known Library
+Quirks below.
 
 ### Commit discipline
 
@@ -294,7 +309,7 @@ For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 
 - Read any file under the Linus tree
 - Write/edit files under `src/`, `benchmarks/`, `experiments/`, `docs/`
-- Run `pytest`, `ruff`, `python` (in linus env), `git add`, `git commit`
+- Run `pytest`, `ruff`, `prettier --write|--check` (Linus tree only), `mdlint check` (Linus tree only — but see Known Library Quirks; mdlint mutates), `python` (in linus env), `git add`, `git commit`
 - Read-only git: `git status`, `git log`, `git diff`, `git branch`, `git show`
 - Branch creation and pushing: `git switch -c <branch>`, `git push -u origin <branch>`
 - Pull request creation and interaction: `gh pr create`, `gh pr view`, `gh pr list`,
@@ -346,6 +361,23 @@ Inherited from KnowledgeBase.
 
 **SQLite large writes**: batch commits in chunks of 100–500 rows. Single transactions
 on 10k+ rows fail. Inherited from KnowledgeBase.
+
+**`mdlint check` 0.3.15 silently auto-fixes some rules.** Despite the
+`--fix` flag being documented as opt-in, `mdlint check` applies "safe" fixes
+unconditionally — notably MD004 (list marker style). On prose containing
+characters that look like list markers (e.g. a `+` in the middle of "ANE +
+MLX + serve") this corrupts the meaning by rewriting `+` to `-`. Consequence:
+mdlint is **not** in the `PostToolUse` hook chain (only `prettier --write` is).
+Run `mdlint check <file>` manually with confirmation when you want lint
+feedback, and inspect the diff before keeping it.
+
+**`prettier` markdown defaults are safe to auto-run.** `proseWrap` defaults
+to `preserve` for Markdown, so prettier does NOT re-wrap paragraph prose. It
+normalizes heading style, list marker style (`+` → `-` at line start, but
+only when actually a list — distinguishes from in-prose `+`), trailing
+whitespace, and final newlines. Existing repo notes (e.g. `pmetal.md`) have
+small style diffs against prettier (`*italic*` → `_italic_`, etc.) that will
+land the next time each file is edited via the hook.
 
 ---
 

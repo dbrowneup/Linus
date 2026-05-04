@@ -1,10 +1,33 @@
 {
-  "$comment": "Claude Code settings for the Linus repo. PostToolUse hooks run ruff format, isort-via-ruff, and ruff check on Python file edits. See CLAUDE.md for the full engineering-conventions section.",
+  "$comment": "Claude Code settings for the Linus repo. PostToolUse hooks run ruff format/isort-via-ruff/ruff check on Python file edits and prettier --write on Markdown file edits. mdlint is deliberately NOT in the hook chain — mdlint 0.3.15's `check` subcommand silently auto-fixes some rules (e.g. MD004 list marker style) even without --fix, which can corrupt prose containing characters that look like list markers. Use mdlint manually with confirmation. Permissions allowlist is path-scoped where the command takes a file argument (PDF tools, mkdir, git add, prettier) so we cannot accidentally auto-run on paths outside the Linus tree. See CLAUDE.md (Tool Use Policy) and BRANCHING.md (allowed branch types) for the source-of-truth policy this list enforces.",
   "permissions": {
     "allow": [
-      "Bash(pdftotext *)",
-      "Bash(pdfinfo *)",
-      "Bash(pdftoppm *)"
+      "Bash(pdftotext /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
+      "Bash(pdftotext /Users/dbrowne/Desktop/Programming/Papers_Analysis/*)",
+      "Bash(pdfinfo /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
+      "Bash(pdfinfo /Users/dbrowne/Desktop/Programming/Papers_Analysis/*)",
+      "Bash(pdftoppm /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
+      "Bash(pdftoppm /Users/dbrowne/Desktop/Programming/Papers_Analysis/*)",
+      "Bash(mkdir /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
+      "Bash(mkdir -p /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
+      "Bash(git switch *)",
+      "Bash(git switch -c *)",
+      "Bash(git add docs/*)",
+      "Bash(git add src/*)",
+      "Bash(git add benchmarks/*)",
+      "Bash(git add experiments/*)",
+      "Bash(git commit -m *)",
+      "Bash(git push -u origin feature/*)",
+      "Bash(git push -u origin agent/*)",
+      "Bash(git push -u origin fix/*)",
+      "Bash(git push -u origin experiment/*)",
+      "Bash(git push -u origin spike/*)",
+      "Bash(git push -u origin dan/*)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr comment *)",
+      "Bash(pip show *)",
+      "Bash(prettier --write /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)",
+      "Bash(prettier --check /Users/dbrowne/Desktop/Programming/GitHub/Linus/*)"
     ]
   },
   "hooks": {
@@ -23,6 +46,10 @@
           {
             "type": "command",
             "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.md ]]; then prettier --write \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
           }
         ]
       }
