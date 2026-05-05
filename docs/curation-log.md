@@ -1,7 +1,7 @@
 # Curation Log
 
 Memory of what was added, removed, or archived from `repos/`, `context/`, and `docs/`, when, and why. See
-[curation-protocol.md](curation-protocol.md) for the policy.
+[curation-protocol.md](protocols/curation-protocol.md) for the policy.
 
 Entries are append-only and ordered by date. New entries are added at the bottom of the **Entries** section.
 

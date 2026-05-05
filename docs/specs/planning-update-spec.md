@@ -32,7 +32,7 @@ rationale stays linked to the action.
    verification.
 5. **File-by-file edit plan** — concrete edits to CLAUDE.md, VISION.md, ARCHITECTURE.md, ROADMAP.md, SAFETY.md, with
    target before/after text where the edit is small and bullet checklists where the edit is larger.
-6. **Curation protocol setup** — `docs/curation-protocol.md` + `docs/curation-log.md`.
+6. **Curation protocol setup** — `docs/protocols/curation-protocol.md` + `docs/curation-log.md`.
 7. **Repos to clone + notes to write** — the 12 community repos plus the curation entry.
 8. **Worker invocation guide** — how Dan should spin up Worker sessions to execute the spec.
 
@@ -473,7 +473,7 @@ JavaScript/TypeScript (some node/npm familiarity), and bash (stringing CLI tools
 ### Curation cadence
 
 `repos/`, `context/`, and `docs/` grow rapidly with reference material, papers, and synthesis. Apply the curation
-protocol at `docs/curation-protocol.md` (DEC-0025): quarterly review with explicit archive/removal pathway; removed
+protocol at `docs/protocols/curation-protocol.md` (DEC-0025): quarterly review with explicit archive/removal pathway; removed
 content recorded in `docs/curation-log.md` with rationale and timestamp. Apply The Algorithm at each curation review:
 question every requirement; delete what no longer earns its keep.
 ```
@@ -856,12 +856,12 @@ Find the line in **Network safety** about `PyPI / conda-forge / crates.io` and e
   in disposable `uv` envs per DEC-0024, never in the linus conda env)
 ```
 
-### 5.6 — `docs/curation-protocol.md` (new file)
+### 5.6 — `docs/protocols/curation-protocol.md` (new file)
 
 **STATUS (2026-05-04):** DONE. Created on `main` in commit `1d00467`
 (`[planning-spec 5.6+5.7+7.4] add curation protocol and log`). Content matches the spec verbatim.
 
-**5.6.1** Create `docs/curation-protocol.md` with content (DEC-0025):
+**5.6.1** Create `docs/protocols/curation-protocol.md` with content (DEC-0025):
 
 ```markdown
 # Curation Protocol
@@ -930,7 +930,7 @@ community repos to `repos/` (see Section 7.1 STATUS for scope expansion). New en
 # Curation Log
 
 Memory of what was removed or archived from `repos/`, `context/`, and `docs/`, when, and why. See
-[curation-protocol.md](curation-protocol.md) for the policy.
+[curation-protocol.md](protocols/curation-protocol.md) for the policy.
 
 Entries are append-only and ordered by date.
 
@@ -953,7 +953,7 @@ review:** <which quarterly review or planning session triggered the action>
 **STATUS (2026-05-04):** Files DONE (commit `1d00467`). Quarterly-review schedule still pending: protocol reference not
 yet added to CLAUDE.md (Section 5.1.6), and the first quarterly review for 2026-06-01 not yet calendared.
 
-The `docs/curation-protocol.md` and `docs/curation-log.md` files are created in Section 5.6 and 5.7 above. Once
+The `docs/protocols/curation-protocol.md` and `docs/curation-log.md` files are created in Section 5.6 and 5.7 above. Once
 committed:
 
 - Add the protocol reference to CLAUDE.md (Section 5.1.6 above).

@@ -10,7 +10,7 @@ whichever subtree matches the current task.
 
 ## Top-level files
 
-- [curation-protocol.md](curation-protocol.md) — policy for adding, pruning, and archiving material in `repos/`,
+- [curation-protocol.md](protocols/curation-protocol.md) — policy for adding, pruning, and archiving material in `repos/`,
   `context/`, and `docs/`. Adopted in DEC-0025.
 - [curation-log.md](curation-log.md) — running memory of what was added, removed, or archived under that protocol, with
   dates and rationale.

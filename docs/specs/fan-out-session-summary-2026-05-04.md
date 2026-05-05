@@ -18,7 +18,7 @@ G1–G10 feature branches would inherit a consistent baseline and the per-group 
 without merge conflicts:
 
 1. **`1d00467` — `[planning-spec 5.6+5.7+7.4] add curation protocol and log`**
-   Created `docs/curation-protocol.md` and `docs/curation-log.md` with the spec content.
+   Created `docs/protocols/curation-protocol.md` and `docs/curation-log.md` with the spec content.
    Initial entry covers the manual clone of 67 community repos to `repos/` on 2026-05-04
    (scope expanded substantially from the original spec's 12-repo list).
    **Decision recorded**: per-group repo-note PRs do NOT touch `docs/curation-log.md`. The clone

@@ -10,7 +10,7 @@ with memory of what was pruned and when.
 **Decision.** Adopt a lightweight curation protocol covering: (a) when/why content is added (with rationale captured in
 synthesis or repo notes); (b) cadence of review (quarterly); (c) explicit archive/removal pathway; (d) **memory of what
 was removed and when** via `docs/curation-log.md`. The Algorithm is applied at each curation-review checkpoint. Protocol
-documented in `docs/curation-protocol.md` and indexed in CLAUDE.md Engineering Conventions.
+documented in `docs/protocols/curation-protocol.md` and indexed in CLAUDE.md Engineering Conventions.
 
 **Consequence.** Content can grow boldly because pruning is principled. Removed content remains discoverable for
 reflection. Quarterly cadence makes the protocol sustainable.
