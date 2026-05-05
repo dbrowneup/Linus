@@ -8,9 +8,10 @@ The master integration map across the four kinds of input Linus has accumulated:
   [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md).
 - **80 repo notes** in [`docs/repo-notes/`](../repo-notes/) — flat lookup in
   [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md).
-- **13 thematic syntheses** in [`docs/syntheses/`](../syntheses/) — security, llm-wiki, skills-and-practices, memory,
+- **14 thematic syntheses** in [`docs/syntheses/`](../syntheses/) — security, llm-wiki, skills-and-practices, memory,
   humans-teams-performance, generative-biology, infra-foundations, native-low-bit-apple-silicon, llms-in-science,
-  function-annotation-discovery, agentic-systems, safety-alignment-privacy, biological-foundation-models.
+  function-annotation-discovery, agentic-systems, safety-alignment-privacy, biological-foundation-models,
+  entrepreneurship (added 2026-05-05).
 - **10 repo-cluster syntheses** in [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/) — `g1`–`g10`,
   written 2026-05-04 over the post-fan-out repo notes.
 
@@ -39,25 +40,30 @@ Read this once before working through Tier 1; refer back as decisions land.
 
 ## How the syntheses align
 
-The 23 syntheses (13 thematic + 10 repo-cluster) cover overlapping but distinguishable territory. The matrix below
+The 24 syntheses (14 thematic + 10 repo-cluster) cover overlapping but distinguishable territory. The matrix below
 crosses each thematic synthesis against the architectural layers it informs and the closest cluster synthesis it
 shares territory with. Cells with `—` are deliberate: not every theme touches every layer.
+
+The 2026-05-05 remapping closed all unmapped repo-cluster anchors (g5, g8, g10) and added a 14th synthesis
+(entrepreneurship) anchored on g10-finance. BixBench and LAB-Bench moved from agentic-systems to infra-foundations
+as benchmark anchors, with a one-line cross-link kept in agentic-systems for their agent-loop aspect.
 
 | Thematic synthesis | Architectural layers it informs | Closest cluster synthesis | Tier-1-equivalent action |
 | --- | --- | --- | --- |
 | **memory** | Orchestration (router, session store, audit log); KB | g4-memory | Phase 2 first-class memory pillar; v0 episodic store; `cot_budget` + `memory_mode` router primitives. **Resolved in M1–M17 (DEC-0028…0043).** |
 | **security** | Orchestration (sandbox, endpoint, deps); KB ingest | g6-mcp-tools (indirectly, via fastmcp) | pip-audit + hash lock file + remove pre-emptive deps + incident protocol. **Resolved in 2026-05-03 Tier 0.** |
 | **llm-wiki** | KB substrate; orchestration (write-back, hot cache) | g2-wiki-engines, g3-wiki-patterns | Compile-not-retrieve; schema-as-product; claim typing + content hashing + write-back as Phase 2 KB deliverables. |
-| **skills-and-practices** | Maestro/Worker discipline; entrepreneurial surface | g7-harnesses (Task Master AI, claude-squad) | Hot-cache convention; Worker-spec uncertainty protocol; entrepreneurial-surface document as Phase 2 deliverable. |
-| **agentic-systems** | Phase 3 spawner; multi-agent protocol | g7-harnesses (workgraph as runtime) | Role + typed `AgentReport` + investigation-memory layer ADR before spawner ships. |
-| **infra-foundations** | Foundational reference; benchmarks (energy ledger) | — | Wh-per-task as benchmark or ledger column; "world model" terminology hygiene before Phase 3. |
+| **skills-and-practices** | Maestro/Worker discipline | g7-harnesses (Task Master AI, claude-squad) | Hot-cache convention; Worker-spec uncertainty protocol. (Entrepreneurship content extracted to its own synthesis 2026-05-05.) |
+| **agentic-systems** | Phase 3 spawner; multi-agent protocol | g7-harnesses (workgraph as runtime) | Role + typed `AgentReport` + investigation-memory layer ADR before spawner ships. (BixBench/LAB-Bench moved to infra-foundations 2026-05-05; cross-link retained for agent-loop aspect.) |
+| **infra-foundations** | Foundational reference; benchmarks (energy ledger, agent harnesses); KB tooling | g5-graph-tools | Wh-per-task as benchmark or ledger column; "world model" terminology hygiene before Phase 3; LAB-Bench MCQ + BixBench as Phase 1 baseline (moved here 2026-05-05); hyalo + keppi as Phase 3 KB tooling layer. |
 | **native-low-bit-apple-silicon** | Inference + training (Phase 1b/1c/6) | g1-apple-silicon | Phase 1c unified four-way Worker-selection methodology (Bonsai 8B + ternary + 2B4T + FP16). |
-| **llms-in-science** | VISION-level posture; benchmarks (Maestro tier) | — | Maestro-class evaluation tier in `benchmarks/dan_tasks/`; VISION.md citation of Binz framework. |
-| **function-annotation-discovery** | Phase 7 skills (biology); KB (model-prediction edges) | g9-bio | LAB-Bench MCQ + BixBench as Phase 1 baseline; pick first protein-function skill on benchmark. |
+| **llms-in-science** | VISION-level posture; benchmarks (Maestro tier); scientific-agent prior art | g8-sci-agents | Maestro-class evaluation tier in `benchmarks/dan_tasks/`; VISION.md citation of Binz framework; paper-qa as Phase 2 KB substrate default integration target (g8 anchor). |
+| **function-annotation-discovery** | Phase 7 skills (biology); KB (model-prediction edges) | g9-bio | Pick first protein-function skill (ProtHGT vs Horizyn-1 vs BioReason-Pro). Benchmark anchors (LAB-Bench, BixBench) live in infra-foundations as of 2026-05-05; cross-reference for skill evaluation. |
 | **generative-biology** | Phase 7 skills (biology); SAFETY (whole-genome tier); tool registry (`external_api_tool`) | g9-bio | SAFETY.md tier-control as Phase 1 deliverable; `external_api_tool` registry class + ADR. |
 | **biological-foundation-models** | Phase 7 (LucaOne anchor); KB (model_prediction edges); tool registry | g9-bio | KB `model_prediction` edge class with provenance before Group A skills write back. |
 | **safety-alignment-privacy** | SAFETY; orchestration (activation hooks); benchmarks (values eval) | — | Activation-hooks API stub Phase 1, feasibility spike Phase 2 against mlx-lm. |
 | **humans-teams-performance** | VISION-level (multidisciplinary preservation); Maestro/Worker timescales | — | Decide on `goal_orientation` field in Worker spec template; preserve-multidisciplinary as VISION/CLAUDE/ROADMAP entry. |
+| **entrepreneurship** _(added 2026-05-05)_ | VISION-level (commercial surface); Phase 2 entrepreneurial-surface document; Phase 7 skills (biology pillar productization); orchestration (Maestro/Worker context-management transferable patterns) | g10-finance | First-class entrepreneurial-surface document (extracted from skills-and-practices); Tier 1/2/3 questions on commercial sequencing, biotech-team literature-intelligence productization, and transferable quant-agent context-management patterns. |
 
 Several observations fall out of this view:
 
@@ -83,9 +89,12 @@ build-vs-adopt question (Task Master AI, claude-squad); the agentic-systems synt
 system (Role, AgentReport, validation gates, critic tier). Phase 3 spawner design is where they meet — and the
 g7-harnesses cluster's workgraph finding is the most directly liftable runtime.
 
-**Some thematic syntheses lack repo-cluster anchors.** infra-foundations, llms-in-science, safety-alignment-privacy,
-humans-teams-performance — these are theory-and-practice threads with no corresponding code cluster yet. That's not
-a gap to fix; it's a property of the topic. They feed VISION/SAFETY/benchmark-design, not a tool integration.
+**Two thematic syntheses are intentionally repo-unmapped.** safety-alignment-privacy and humans-teams-performance
+remain theory-and-practice threads with no corresponding code cluster — and that's a property of the topic, not a
+gap. They feed VISION/SAFETY/benchmark-design, not a tool integration. The 2026-05-05 remapping pulled
+infra-foundations (now anchored on g5-graph-tools + LAB-Bench/BixBench as benchmark anchors) and llms-in-science
+(now anchored on g8-sci-agents) out of the unmapped column, and added the entrepreneurship synthesis anchored on
+g10-finance, leaving zero unmapped repo-cluster groups.
 
 ---
 
@@ -307,8 +316,8 @@ docs/
 ├── repo-notes/*.md           (80 per-repo write-ups)
 │
 ├── syntheses/
-│   ├── *-synthesis.md        (13 thematic syntheses)
-│   └── repo-clusters/*.md    (10 cluster syntheses, g1–g10)
+│   ├── *-synthesis.md        (14 thematic syntheses; entrepreneurship added 2026-05-05)
+│   └── repo-clusters/*.md    (10 cluster syntheses, g1–g10; all anchored to a thematic synthesis as of 2026-05-05)
 │
 ├── landscapes/
 │   ├── synthesis-landscape.md  (cross-synthesis structure: where 23 agree/disagree/overlap)

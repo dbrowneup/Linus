@@ -2,11 +2,16 @@
 
 ## What this document is
 
-The cross-synthesis structural map. Linus has accumulated 23 synthesis documents — 13 thematic syntheses in
+The cross-synthesis structural map. Linus has accumulated 24 synthesis documents — 14 thematic syntheses in
 [`docs/syntheses/`](../syntheses/) and 10 repo-cluster syntheses in
 [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/). Each one is itself a cross-cut: a thematic synthesis
 crosses paper-notes against an architectural or operational concern; a cluster synthesis crosses repo-notes within a
 fan-out group. This document goes one level higher — it crosses the syntheses against each other.
+
+The 2026-05-05 remapping closed all unmapped repo-cluster anchors and added a 14th thematic synthesis
+(entrepreneurship). BixBench and LAB-Bench moved from agentic-systems to infra-foundations as benchmark anchors;
+g5-graph-tools now anchors infra-foundations; g8-sci-agents now anchors llms-in-science; g10-finance anchors the new
+entrepreneurship synthesis.
 
 This is intentionally a complement to [`total-landscape.md`](total-landscape.md). The total landscape is the master
 integration map (architecture × roadmap × open questions in one place); this file is the structural map across the
@@ -20,25 +25,26 @@ in `top-questions.md`; refer back as decisions land.
 
 ---
 
-## The 23 syntheses
+## The 24 syntheses
 
-### Thematic syntheses (13)
+### Thematic syntheses (14)
 
 | Synthesis | One-line characterization |
 | --- | --- |
 | [`security`](../syntheses/security-synthesis.md) | Supply chain + dependency surface + endpoint security + prompt-injection threat model. Triggered by litellm. |
 | [`llm-wiki`](../syntheses/llm-wiki-synthesis.md) | LLM Wiki pattern: compile-not-retrieve, schema-as-product, claim typing, content hashing, write-back, hot cache. |
-| [`skills-and-practices`](../syntheses/skills-and-practices-synthesis.md) | Practitioner collaboration patterns + Claude skills + entrepreneurial opportunities filtered for Dan's profile. |
+| [`skills-and-practices`](../syntheses/skills-and-practices-synthesis.md) | Practitioner collaboration patterns + Claude skills filtered for Dan's profile. (Entrepreneurship content extracted to its own synthesis 2026-05-05.) |
 | [`memory`](../syntheses/memory-synthesis.md) | Garrison thread + Mughal practitioner article: memory as Phase 2 first-class pillar, four-layer architecture. |
 | [`humans-teams-performance`](../syntheses/humans-teams-performance-synthesis.md) | Güllich on multidisciplinary expertise + Harvey on team rhythm; Maestro/Worker analogy at three timescales. |
-| [`infra-foundations`](../syntheses/infra-foundations-synthesis.md) | Foundational references (attention paper, flow matching, PAN, Google AI energy, WHAM) — methodology + watch-the-field. |
+| [`infra-foundations`](../syntheses/infra-foundations-synthesis.md) | Foundational references (attention paper, flow matching, PAN, Google AI energy, WHAM) + benchmarks (LAB-Bench, BixBench moved here 2026-05-05) + KG/network tooling (g5 anchor) — methodology + watch-the-field. |
 | [`native-low-bit-apple-silicon`](../syntheses/native-low-bit-apple-silicon-synthesis.md) | BitNet + Bonsai + bitnet.cpp + flash-streaming on Apple Silicon — research → engineering → productization arc. |
-| [`llms-in-science`](../syntheses/llms-in-science-synthesis.md) | Binz et al. four-perspectives framework + Knuth optimistic anchor; Linus's posture in that frame. |
-| [`function-annotation-discovery`](../syntheses/function-annotation-discovery-synthesis.md) | Methods (ProtHGT, Horizyn-1, BioReason-Pro, DeepClust) + reasoning + benchmarks (LAB-Bench, BixBench). |
+| [`llms-in-science`](../syntheses/llms-in-science-synthesis.md) | Binz et al. four-perspectives framework + Knuth optimistic anchor + scientific-agent prior art (g8 anchor 2026-05-05); Linus's posture in that frame. |
+| [`function-annotation-discovery`](../syntheses/function-annotation-discovery-synthesis.md) | Methods (ProtHGT, Horizyn-1, BioReason-Pro, DeepClust) + reasoning. Benchmarks (LAB-Bench, BixBench) moved to infra-foundations 2026-05-05; cross-reference for skill evaluation. |
 | [`generative-biology`](../syntheses/generative-biology-synthesis.md) | Generative biological artifacts at scales from residue → genome; SAFETY tier-control + external_api_tool registry class. |
 | [`biological-foundation-models`](../syntheses/biological-foundation-models-synthesis.md) | Pretrained FMs over DNA/RNA/protein/bacterial genome; LucaOne as KG anchor + specialists as Workers. |
 | [`safety-alignment-privacy`](../syntheses/safety-alignment-privacy-synthesis.md) | Activation observability + values + dual-use uplift + privacy through local execution. |
-| [`agentic-systems`](../syntheses/agentic-systems-synthesis.md) | Multi-agent role specialization + typed messages + validation gates + critic tier; first formal theory result (regret bound). |
+| [`agentic-systems`](../syntheses/agentic-systems-synthesis.md) | Multi-agent role specialization + typed messages + validation gates + critic tier; first formal theory result (regret bound). (BixBench/LAB-Bench's agent-loop aspect cross-linked to infra-foundations as of 2026-05-05.) |
+| [`entrepreneurship`](../syntheses/entrepreneurship-synthesis.md) _(added 2026-05-05)_ | Commercial surface for Linus + biotech-team literature-intelligence productization + transferable Maestro/Worker context-management patterns from quant-agent prior art (g10 anchor). |
 
 ### Repo-cluster syntheses (10)
 
@@ -53,15 +59,15 @@ in `top-questions.md`; refer back as decisions land.
 | [`g7-harnesses`](../syntheses/repo-clusters/g7-harnesses.md) | 9 agent harnesses; workgraph JSONL DAG + dispatch as recommended Phase 2a session-store shape. |
 | [`g8-sci-agents`](../syntheses/repo-clusters/g8-sci-agents.md) | 11 scientific reasoning agents; paper-qa as first paper-corpus Integrate; LAB-Bench canary blocklist obligation. |
 | [`g9-bio`](../syntheses/repo-clusters/g9-bio.md) | 4 bioinformatics models; bioSkills as Phase 7 inaugural skills bundle (~438 bio skills). |
-| [`g10-finance`](../syntheses/repo-clusters/g10-finance.md) | 5 finance/quant agents (off-mission); transferable patterns for Maestro/Worker context management. |
+| [`g10-finance`](../syntheses/repo-clusters/g10-finance.md) | 5 finance/quant agents; transferable Maestro/Worker context-management patterns. Anchors the entrepreneurship thematic synthesis (2026-05-05). |
 
 ---
 
 ## The unifying thesis (expanded)
 
-Across all 23 syntheses, from completely different starting points, the same underlying claim recurs: **the bottleneck
+Across all 24 syntheses, from completely different starting points, the same underlying claim recurs: **the bottleneck
 has shifted from capability to structure.** The earlier four-synthesis version of this document already named four
-angles on this; the expanded set adds three more.
+angles on this; the expanded set adds four more.
 
 - **The skills synthesis** calls it _architectural clarity_: agents can execute at speed, but only a human who has
   decomposed the task correctly, encoded the standards in files, and specified the uncertainty protocol gets useful
@@ -84,6 +90,11 @@ Three more angles entered with the post-fan-out work:
 - **The humans-teams-performance synthesis** calls it _preserve room for multidisciplinary work_: Güllich's evidence
   on generative expertise generalizes to the AI collaboration setting — narrow specialization is the wrong shape
   for Maestro tasks even when it looks more efficient locally.
+- **The entrepreneurship synthesis** (added 2026-05-05) calls it _commercial surface only crystallizes when the
+  underlying schemas, citation discipline, and Maestro/Worker context-management patterns are right_: the g10-finance
+  quant-agent prior art shows that the same context-budget and dispatch primitives Linus needs internally are also
+  what make the literature-intelligence offering credible to a biotech buyer. Productization is downstream of
+  structure, not upstream of it.
 
 Mughal's practitioner data adds the operational shape of the same claim from yet another angle (disciplined context
 management buys back ~25–45 percentage points of session quality across long sessions versus unmanaged context).
@@ -147,6 +158,29 @@ The biology pillar is overdetermined: three thematic syntheses + a cluster + the
 bioSkills, scientific-agent-skills) + the M1-Max-realistic broad-bio FM (Bacformer) make Phase 7 biology its own
 sub-roadmap rather than a scattered set of skills.
 
+### Infra-foundations now anchors benchmarks + KG tooling (updated 2026-05-05)
+
+- **infra-foundations** synthesis was previously theory-and-practice-only with no repo-cluster anchor. The 2026-05-05
+  remapping added two anchors:
+  - **g5-graph-tools** cluster (hyalo, keppi, py3plex, others) supplies the Phase 3 KB tooling layer (lint +
+    transactional link rewrites + bounded-BFS-with-decay context_pack retrieval).
+  - **LAB-Bench (FutureHouse)** and **BixBench** moved from agentic-systems to infra-foundations as Phase 1
+    Worker-selection benchmarks. Their agent-loop aspect is cross-linked from agentic-systems but the benchmark
+    obligation (canary blocklist, Phase 1 baseline adoption with caveats, FutureHouse evaluation philosophy ADR) lives
+    here.
+
+This consolidates the benchmark and KB-tooling threads in one synthesis rather than scattered between agentic-systems
+and function-annotation-discovery.
+
+### llms-in-science now anchors scientific-agent prior art (updated 2026-05-05)
+
+- **llms-in-science** synthesis was previously theory-and-practice-only with no repo-cluster anchor.
+- **g8-sci-agents** cluster supplies the scientific-agent prior art (paper-qa as first paper-corpus Integrate;
+  research-agent harnesses for literature work; LAB-Bench canary blocklist obligation). paper-qa specifically reframes
+  Phase 2 KB substrate from "build" to "adopt + extend."
+
+The llms-in-science thread is now substrate-grounded rather than purely posture-shaping.
+
 ### Inference / training has one synthesis + one cluster
 
 - **native-low-bit-apple-silicon** covers the full BitNet + Bonsai + bitnet.cpp + flash-streaming arc.
@@ -157,6 +191,18 @@ Plus the original repo-landscape's pre-fan-out cluster (pmetal, mlx-flash, flash
 is woven into the synthesis rather than carrying a separate cluster doc. The convergence here is operational more
 than architectural: the same conclusions ("trust the OS page cache," "1-bit and ternary are the efficient frontier
 on M1 Max," "pmetal is the inference-backend lead pending Phase 1b verdict") show up under both substrates.
+
+### Entrepreneurship now has its own synthesis + one cluster (added 2026-05-05)
+
+- **entrepreneurship** synthesis pulls Dan-profile-relevant commercial surface out of skills-and-practices into a
+  first-class thread, anchored on g10-finance and pairing with the biology pillar's literature-intelligence stack.
+- **g10-finance** cluster (TradingAgents, both QuantAgents, etc.) supplies transferable Maestro/Worker
+  context-management patterns and a worked-example domain (quant) where structured agent loops have already shipped
+  to a paying audience. The patterns generalize — the domain does not.
+
+The entrepreneurship synthesis is intentionally cross-cutting: it reads Phase 7 biology output (paper-qa + bioSkills +
+Bacformer + LAB-Bench + KnowledgeBase) as the inaugural commercial surface, and reads g10's harnesses as the
+context-management pattern library.
 
 ### Orchestration has three syntheses + one cluster
 
@@ -237,14 +283,16 @@ The Phase 2 KB schema must encode, before the first Worker writes back:
 - **SAFETY.md tier-control for generative whole-genome design** — Phase 1 deliverable (S5 — pending).
 - **Four SAFETY.md additions as single PR with per-section Dan review** (S58 — pending).
 
-### Phase 7 skills + entrepreneurial surface (consolidated from biology trio + skills + g8/g9)
+### Phase 7 skills + entrepreneurial surface (consolidated from biology trio + entrepreneurship + g8/g9/g10)
 
 - **Inaugural Phase 7 skills bundle:** bioSkills (~438 bio skills) + scientific-agent-skills (~135 broad science
   skills) = ~573 total (S30).
 - **Literature intelligence stack:** paper-qa + bioSkills + Bacformer + LAB-Bench + KnowledgeBase as the concrete
-  components for `docs/entrepreneurial-surface.md`.
+  components for `docs/entrepreneurial-surface.md` — now owned by the entrepreneurship synthesis (added 2026-05-05).
 - **Generalist × specialist FM combinations sequencing:** Trias+GenNA, REBEAN+DeepSeMS, Bacformer+DeepSeMS first
   three Phase 7-tractable; mCSM-metal+DISCO and AlphaGenome+GenNA Phase 8 (S31).
+- **Transferable Maestro/Worker context-management patterns** from g10-finance quant-agent prior art applied to the
+  biotech literature-intelligence offering (entrepreneurship synthesis).
 
 ---
 
