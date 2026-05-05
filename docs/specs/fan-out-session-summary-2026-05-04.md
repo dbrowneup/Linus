@@ -377,7 +377,7 @@ without merge conflicts:
 >
 > **Cross-cutting insight:** The entrepreneurial-surface "scientific literature intelligence
 > for biotech teams" opportunity is now substantially more concrete: **bioSkills + Bacformer
-> + paper-qa (G8) + KnowledgeBase = a working stack a biotech client could pay for.**
+> \+ paper-qa (G8) + KnowledgeBase = a working stack a biotech client could pay for.**
 
 ---
 
