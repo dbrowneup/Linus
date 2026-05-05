@@ -252,6 +252,23 @@ registry"). Scope tags welcome (`[orch]`, `[kb]`, `[infer]`, `[docs]`).
 Multi-file audit, multi-repo synthesis, multi-paper analysis, benchmark sweeps — all fan out to parallel Task agents or
 multiple Worker processes. Sequential is the exception, not the default.
 
+### MCP as tool substrate (resolved 2026-05-04)
+
+After the Section 7 fan-out, MCP-as-Linus-tool-substrate is no longer an open question — only the policy details (which
+tools, what permissions, which transport) remain. Six independent repos in the cloned collection ship MCP servers
+(pmetal-mcp, openclaw, py3plex*mcp, agentmemory's 51-tool MCP, keppi, plus fastmcp as the underlying framework). The G6
+synthesis (`docs/syntheses/repo-clusters/g6-mcp-tools.md`) canonicalizes the verdict: in-house Linus MCP servers build
+\_on* fastmcp's decorator API + middleware pipeline, not parallel to it. The MCP adoption ADR should be written at Phase
+2a planning time rather than deferred to Phase 3.
+
+### Workgraph JSONL as the Phase 2a session-store shape (recommended)
+
+The G7 synthesis (`docs/syntheses/repo-clusters/g7-harnesses.md`) identifies workgraph's `.workgraph/graph.jsonl`
+append-only DAG plus `handler_for_model.rs` dispatch as the most directly liftable orchestration runtime in the entire
+cloned-repo collection — recommended as the Phase 2a session-store and audit-log format before any other format is
+committed to. The Rust crate doesn't need to be vendored; the JSONL shape and dispatch pattern can be ported to Python.
+Caveat: workgraph's tree-kill is Linux `/proc`-only; macOS port needs a `psutil`-based equivalent.
+
 ### Maestro budget discipline
 
 When interacting with hosted Claude (via Claude Code or this chat): arrive with context gathered, questions sharpened,
@@ -366,6 +383,13 @@ KnowledgeBase.
 that look like list markers (e.g. a `+` in the middle of "ANE + MLX + serve") this corrupts the meaning by rewriting `+`
 to `-`. Consequence: mdlint is **not** in the `PostToolUse` hook chain (only `prettier --write` is). Run
 `mdlint check <file>` manually with confirmation when you want lint feedback, and inspect the diff before keeping it.
+
+**Trust the OS page cache for memory-mapped file workloads.** From the flash-moe study (G1 synthesis,
+`docs/syntheses/repo-clusters/g1-apple-silicon.md`): a hand-engineered 9.8 GB Metal LRU cache wrapping mmap'd weight
+shards _hurt_ throughput by 38%; deleting the cache and trusting the macOS unified-buffer cache produced the speedup.
+The principle generalizes — application-level caches that compete with the OS buffer cache typically harm performance on
+macOS unified memory. Profile before adding any caching layer over `mmap`'d files; default position is "let the OS
+handle it."
 
 **`prettier` markdown config: `printWidth: 120`, `proseWrap: always`.** Set in `.prettierrc.json` via an `*.md` override
 to match the Python ruff convention (also 120). With `proseWrap: always`, prettier actively re-wraps prose to fit the
