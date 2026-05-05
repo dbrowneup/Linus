@@ -2629,3 +2629,256 @@ both are preserved here so the dedupe pass can be done deliberately rather than 
    ever grows a financial skill — even research-only — worth adding an explicit tier that forbids broker API calls and
    wallet signing regardless of what a Worker requests? Pre-committing this constraint before the capability exists is
    cheaper than adding it after.
+
+---
+
+# Thematic syntheses — 2026-05-04 sweep
+
+The nine thematic syntheses written during the post-fan-out integration pass each surface their own "Tensions and open
+questions" section. The items below are the verbatim distillation of those sections, kept here as the per-source
+archive. Promotion candidates (Tier 1 / Tier 2 / Tier 3) live in
+[top-questions.md](top-questions.md) under the "Sweep promotions (added 2026-05-04)" section.
+
+## Humans, Teams & Performance Synthesis (docs/syntheses/humans-teams-performance-synthesis.md)
+
+1. **Promote "preserve room for Dan's multidisciplinary work" to explicit Linus design constraint?** VISION.md
+   prominence vs softer location (CLAUDE.md engineering convention or ROADMAP.md phase note). Güllich evidence
+   supports the constraint; the question is the right home.
+2. **Worker-spec template: `goal_orientation` as hard requirement or optional annotation?** Hard requirement forces
+   spec authors to think about orientation explicitly (source of most value) but adds friction to throwaway specs.
+   Optional annotation captures intent but loses much of the discipline.
+3. **Update skills synthesis inline now or hold for post-Phase-1 revision pass?** Change small enough that inline is
+   cheap; risk is drift across syntheses if landscape doc isn't re-read immediately after.
+4. **Session-rhythm metric — worth tracking, or would degrade into theatre?** Cheap to prototype on existing commit
+   history; compute retrospectively before instrumenting as prospective gate.
+5. **(Personal, not Linus.)** Whether the Güllich finding actually changes current time allocation. Implication may
+   be "protect the shape, don't change it" — be explicit about the budget so Linus, which is engrossing, does not
+   silently consume it.
+
+## Generative Biology Synthesis (docs/syntheses/generative-biology-synthesis.md)
+
+1. **"Generate → score → filter → wet-lab validate" as a named Linus generative-biology archetype now, or wait for a
+   second in-corpus instance beyond DISCO and generative phages?** Recommendation: write the archetype paired with
+   Evo 2 paper-note as canonical worked example.
+2. **Evo 2 + generative-phages pairing as a focused mini-synthesis?** Wave 3 deliverable. Pairing forces sharp answer
+   to the local-vs-remote-Evo-2 question, the SAFETY.md tier-3 policy, and the external-Worker-tier infrastructure
+   question.
+3. **Pattern for wrapping webserver-only tools (mCSM-metal, AlphaGenome API, hosted Evo 2)?** `external_api_tool`
+   registry class plus an ADR. Deeper question: registry treats external tools as first-class Workers or degraded
+   path. Synthesis-level argument is _first-class_.
+4. **SAFETY.md tier-control for generative whole-genome design before Phase 7 starts?** Yes — write three-tier policy
+   as Phase 1 deliverable.
+5. **Generalist Group A FMs × specialist Group B generators — which combinations to implement first?** Recommended
+   pairs: Trias+GenNA; REBEAN+DeepSeMS; Bacformer+DeepSeMS; mCSM-metal+DISCO (Phase 8); AlphaGenome+GenNA (Phase 8).
+6. **DeepSeMS Pfam-domain input modernised with LucaOne or ProteinReasoner before being exposed as a Linus skill?**
+   Phase 6 spike worth recommending in either case.
+7. **FKC steering as a generic Linus inference-time pattern?** Mathematically principled where best-of-N is heuristic;
+   pattern applies wherever a per-trajectory reward is available. Record on second instance.
+
+## Infrastructure Foundations Synthesis (docs/syntheses/infra-foundations-synthesis.md)
+
+1. **"World model as orchestration primitive" — useful design concept or term too overloaded?** PAN, WHAM, Kosmos,
+   memory pillar all use the phrase to mean different things. Phase 3 design might be cleaner picking
+   `task_state`/`shared_context`/`belief_state` for orchestration-layer surface, reserving "world model" for citation.
+2. **Wh per task as first-class column in `benchmarks/dan_tasks/` vs separate energy ledger?** Per-prompt measurement
+   (benchmark column) gives per-model comparability; `~/.linus/energy.jsonl` ledger gives per-project honesty.
+   Different artifacts; sequencing matters for Phase 1 vs Phase 5.
+3. **When does Linus need diffusion-model internals vs treating them as black boxes?** Working rule: black-box for
+   any consumed model (image generators, AlphaFold3 outputs); internals only when reading a paper deeply enough to
+   evaluate methodology. Worth committing to the rule explicitly.
+4. **"Modern Transformer reference" paper to bridge 2017 → 2025?** RoPE, RMSNorm, SwiGLU, GQA, pre-norm conventions
+   are spread across many papers without a clean survey companion. Short reference paper or Karpathy-style writeup
+   would lower cost of every quantization/fine-tuning/KV-cache conversation.
+5. **Local actually greener than hosted when boundary is drawn comprehensively?** Honest answer is "measure both" —
+   commit to one focused local-vs-hosted comparison experiment now, or defer to Phase 5.
+6. **WHAM consistency/diversity/persistency triple lifted wholesale or derived from Dan-specific workflow
+   introspection first?** WHAM playbook says _derive, then evaluate_; vocabulary may serve as starting template.
+
+## Native Low-Bit Apple Silicon Synthesis (docs/syntheses/native-low-bit-apple-silicon-synthesis.md)
+
+1. **Phase 1c benchmark Bonsai 8B and BitNet 2B4T together under unified Worker-selection methodology?** Four-way
+   comparison with one unified harness, scoring on joint cost/quality/latency Pareto position. Methodology authority
+   in `docs/specs/phase1c-spike.md` (proposed) vs `docs/experimental-protocol.md` (existing) — second is more
+   durable.
+2. **MLX ternary kernel gap as a Linus contribution?** Single best-scoped contribution opportunity in the corpus.
+   Phase 1d (immediately, while spike measurement is fresh) vs Phase 6d (deferred until streaming-or-not scoping).
+3. **Bonsai 1-bit vs ternary as the right Worker default?** At 8B, ternary's 95% quality recovery vs binary's 89% is
+   substantial; 0.6 GB extra footprint is small relative to 32 GB. Binary as opt-in for footprint-critical paths.
+4. **pmetal low-bit Rust kernels evaluated as alternative to MLX-native Bonsai serving?** Long-term: pin to PrismML
+   fork (real maintenance liability), contribute upstream MLX scale-only quant support, or wait for pmetal to
+   subsume both. Deserves own ADR before inference layer hardens.
+5. **Phase 6 BitDistill on small fine-tuned Worker more tractable than waiting for or reverse-engineering Bonsai
+   PTQ?** Cost dominated by ~10B tokens of continued pretraining; on M1 Max could be hours/days/weeks. Spike timing:
+   Phase 6a vs 6b vs deferred until PrismML's posture clarifies.
+6. **"Native Low-Bit Apple Silicon" worth dedicated benchmark suite distinct from `benchmarks/dan_tasks/`?** Bonsai
+   uses six-benchmark suite (MMLU-Redux, MuSR, GSM8K, HumanEval+, IFEval, BFCLv3); mirroring in `benchmarks/low_bit/`
+   would let Linus reproduce published numbers and track the low-bit landscape over time.
+7. **Is mlx-flash deprecated for Phase 6d's _original_ purpose?** Bonsai's compactness makes 8B class fit trivially.
+   Honest answer: not deprecated, _narrowed in scope_. Phase 6d formal target should be rewritten — fine-tuned
+   models that genuinely exceed RAM remain the proper streaming targets.
+
+## LLMs in Science Synthesis (docs/syntheses/llms-in-science-synthesis.md)
+
+1. **VISION.md cite Binz et al. and stake out Linus's positions explicitly?** One-paragraph addition naming four
+   perspectives and Linus's hybrid converts implicit bets into reviewable design philosophy. Sub-question: whether
+   to acknowledge tension points (the "Linus joins the Maestro team" line is in slight tension with strict
+   Botvinick/Gershman reading).
+2. **`docs/maestro-worker-protocol.md` Philosophy section naming Schulz/Marelli/Botvinick-Gershman blend?**
+   Editorial work, but makes the connection between Binz-level commitments and Worker-level mechanics legible.
+3. **`docs/EPISTEMIC-STANDARDS.md` analogous to LLM-wiki claim-typing?** Marelli calls for clear quality criteria
+   defined before using LLMs. Short doc defining claim categories Linus distinguishes (verified-against-source,
+   model-asserted-uncited, gap-flagged, contradiction-flagged) operationalizes Marelli explicitly and generalizes
+   the LLM-wiki KB categories.
+4. **(Personal.)** For Dan: which of the four perspectives most resonates, and is that reflected in current docs?
+   Implicit answer reads as Marelli-flavored hybrid with Botvinick/Gershman on roadmap agency and Schulz on
+   open-source. If accurate, say so; if not, the gap is worth surfacing.
+5. **Maestro-class evaluation tier in `benchmarks/dan_tasks/` distinct from Worker benchmarks?** Knuth case is the
+   cleanest argument that Maestro and Worker workloads are categorically different. Small Maestro-class eval
+   (Hamiltonian-decomposition or Cayley-graph cycle puzzle) would formalize the role distinction.
+
+## Function Annotation, Reasoning & Discovery Synthesis (docs/syntheses/function-annotation-discovery-synthesis.md)
+
+1. **ProtHGT vs Horizyn-1 vs BioReason-Pro for first protein-function skill — picking criteria?** Pick on benchmark
+   against Dan-authored protein-function eval; deeper question is which axis matters (latency, narrative quality,
+   GO-Fmax, low-similarity robustness, ease of local deployment, agreement with experimental controls).
+   BioReason-Pro's four-tier evaluation is a credible scaled-down picking template.
+2. **LAB-Bench MCQ + BixBench agent harness as Phase 1 baseline for Worker selection?** Adopt now, supplement with
+   Dan-authored capsules over Phase 1–3, reserve right to weight categories differently than source papers.
+3. **FutureHouse evaluation philosophy worth adopting wholesale?** Insufficient-info option, open-answer-vs-MCQ
+   contrast, 80/20 public/private split, LLM-judge for open-answer grading, pure-recall calibration baseline. Yes,
+   with caveat: LLM-judge dependency on hosted Claude is not aligned with local-first posture; Phase 4 should target
+   local judge or accept hybrid where hosted is benchmarking-only. Deserves explicit ADR.
+4. **BioReason-Pro encoder swap to LucaOne or ProteinReasoner?** Frozen-encoder design makes swap mechanically cheap.
+   Phase 6/7 spike: rerun the harness with each substituted, report deltas. Pending ProteinReasoner checkpoint
+   release.
+5. **"PLM + heterogeneous KG + graph transformer" as named Linus archetype?** ≥3 corpus papers (ProtHGT, DeepHGAT,
+   PSPGO) are variants. Name after second independent replication outside this corpus, with ProtHGT as lead worked
+   example.
+6. **"Dual-encoder cross-modal retrieval" as named Linus archetype?** Pattern well-established externally (CLIP,
+   CLAP, VideoCLIP, CodeBERT, ProtST); Horizyn-1 is first scientific-discovery instantiation. Name now with
+   Horizyn-1 as lead worked example — external priors strong enough that pattern is not speculative.
+7. **Default mode for function prediction?** Linus needs all three (KG-grounded, FM-with-typed-companion, pure FM),
+   but default for new skills should be what orchestration layer audits most cleanly. Recommended: typed structured
+   prediction wrapping free-text rationale (BioReason-Pro shape).
+
+## Agentic Systems Synthesis (docs/syntheses/agentic-systems-synthesis.md)
+
+1. **Role as first-class type in Phase 3 agent spawner?** ADR before Phase 3. Five+ corpus papers argue yes; Kosmos
+   minimalism is the only counter-data-point; expanded set tilts strongly toward yes.
+2. **Fifth memory layer for "investigation memory"?** Kosmos world model, Sketch2Simulation IR, HKUST QuantAgent
+   context buffer all occupy a layer the four-layer pillar lacks (task-scoped, multi-agent, single-investigation
+   lifetime). Resolve before Phase 3.
+3. **"Validation gate" primitive in spawner, or sandbox layer's job?** Sketch2Simulation argues per-stage hooks make
+   failures localizable; HKUST QuantAgent two-loop judge/reviewer and WikiAutoGen four-viewpoint critic block
+   strengthen the case.
+4. **"12-hour autonomous Linus run on Dan-supplied dataset" as Phase 7 north-star?** Concrete, falsifiable, inherits
+   Kosmos's evaluation. Honest concern: gated on hosted-model-class capability local Workers may not reach on M1
+   Max.
+5. **Linus's policy on hosted-model fallback?** Critic-tier thread reframes: not "do we ever call hosted Claude?"
+   but "which Roles are tagged as critic-tier and what is the budget policy?"
+6. **Adversarial debate as Worker primitive?** Each round costs 2N+1 model calls; TradingAgents has no ablation
+   isolating debate; Stony Brook QuantAgent is partial counter (works without debate, majority-with-confirmation as
+   integrator). Empirical question for `benchmarks/dan_tasks/`.
+7. **Typed inter-agent message format?** TradingAgents, both QuantAgents, WikiAutoGen, BioGuider, Sketch2Simulation
+   all use typed structured outputs; only Kosmos hides schema in shared state object. Default to typed `AgentReport`
+   with free text confined to named rationale field. ADR before spawner ships.
+8. **Agentic-system theory as first-class architectural input alongside memory-pillar theory?** HKUST QuantAgent
+   regret bound is the first formal result. Design intuition (KB coverage growth as dominant lever on suboptimality)
+   worth promoting to design constraint. Brief "applicable theory" section in Phase 3 spawner ADR.
+
+## Safety, Alignment & Privacy Synthesis (docs/syntheses/safety-alignment-privacy-synthesis.md)
+
+1. **Linus local Worker inference layer expose activation hooks, on what schedule?** Black-box (faster to ship) vs
+   per-block hooks (more engineering, enables steering/monitoring/future tooling). Stub API in Phase 1, feasibility
+   spike in Phase 2 against Llama-3.1-8B-4bit on mlx-lm, commit to Phase 6 or 7 deliverable based on spike result.
+2. **KnowledgeBase content ever flow to hosted Maestro?** Conservative: forbidden by default, opt-in per request.
+   Open: whether even opt-in path is safe for genuinely sensitive content (Dan's notes, draft writing), or whether a
+   category should be marked `hosted-forbidden` with no override.
+3. **`docs/maestro-protocol.md`?** Values paper argues Maestro is not a black box and Linus depends on specific
+   characterized behaviors. Cleaner than extending VISION.md because dependencies are operational rather than
+   aspirational.
+4. **Four SAFETY.md additions: single PR or staged?** Synthesis-internal: single PR (four form coherent posture).
+   Pragmatic counter: four substantive policy changes at once gives less time to think about each. Single PR with
+   explicit per-section Dan review.
+5. **Supervised activation steering as cheaper alternative to LoRA fine-tuning?** Cost case strong. Open: does it
+   generalize to modulations Linus actually wants (terseness, domain terminology, hallucination suppression in RAG),
+   and does it compose without behavioral collapse?
+6. **Activation steering on extremely-quantized models (BitNet)?** Beaglehole validates 4-bit Llama; BitNet ternary
+   weights might break linearity assumption. Small experiment in `experiments/` if BitNet becomes serious target.
+7. **First concept-vector dataset source?** Pipeline assumes GPT-4o-generated statements. Local generation gives
+   lower quality; hosted generation pushes Linus-generated content to Anthropic, which deanonymization paper makes
+   uncomfortable. Local for non-safety concepts, hosted for safety-critical concepts where data is generic enough
+   not to carry Dan-specific identity signal.
+8. **Mirroring vs sycophancy detection on Maestro outputs?** Periodic checking on Linus's own Maestro prompts could
+   detect drift toward sycophancy — implementable as small audit-log extraction pipeline.
+
+## Biological Foundation Models Synthesis (docs/syntheses/biological-foundation-models-synthesis.md)
+
+1. **Generalist vs specialist Worker strategy — right Phase 7 default?** Recommended split (LucaOne as KG anchor,
+   specialists as task workers) is a hedge; whether also right answer is empirical. Sub-question: benchmark LucaOne
+   against RiNALMo on Dan-relevant RNA task and against AlphaGenome on variant scoring task before committing
+   registry architecture.
+2. **Evo 2 vs AlphaGenome for variant prediction — both, or pick one?** Hybrid depends on both being operationally
+   available locally; Evo 2 faces real plumbing risk (StripedHyena 2 quantization tooling). Sub-question: hybrid
+   worth the operational cost, or right Phase 7 commitment is "AlphaGenome variant scoring + Evo 2 generative DNA
+   skill" with no internal routing?
+3. **Tool registry `external_api_tool` class for non-locally-deployable models?** AlphaGenome hybrid release
+   motivating case; Evo 2 40B second. Explicit auth, rate-limiting, cost accounting, graceful offline fallback,
+   trust-tier tagging — recommend ADR.
+4. **METL simulation-pretrained pattern worth applying to other Linus domains now or wait for second instance?**
+   Recommend waiting; this synthesis is the placeholder. Risk of premature naming is generalizing from single case.
+5. **Focused "Evo 2 + Wave 3 generative phage" mini-synthesis?** Pairing would land at "what does a private
+   generative-biology workflow look like in Linus" and force sharp answer to local-vs-remote-Evo-2 question.
+   Recommend yes, 1500–2000 words, scheduled as Wave 3 prep.
+6. **Faithfulness of model-derived KG content.** First Wave 1 batch where volume of model-derived KG content is
+   large enough to make claim-typing load-bearing. Sub-question: KnowledgeBase schema needs `model_prediction` edge
+   class with explicit producing-model + version + confidence + content-hash provenance before Group A skills start
+   writing back? Recommend yes.
+7. **ProteinReasoner checkpoint release** — low-priority watch on BioMap GitHub and `airkingbd` HuggingFace org.
+8. **AlphaGenome non-commercial license — does it constrain Linus's long-term posture?** If Linus is offered as a
+   service, API path is closed and only legal path is released weights run locally. Hybrid release means workable
+   iff local-deployability spike lands cleanly.
+
+---
+
+# Fan-out outstanding items — 2026-05-04
+
+The Section 7 fan-out summary closed with 13 outstanding items. They're recapped here for archival completeness; the
+ones promoted to top-questions.md are noted inline.
+
+## Categorization
+
+1. **prompt-vault placement** — miscategorized prompt cookbook; drop from G4 synthesis or create a tiny
+   "miscellaneous prompt libraries" group at the end. → S41.
+
+## Process / substrate
+
+2. **Ollama-vs-non-Ollama Worker mix for the synthesis pass** — heavier per-document and lower-parallelism than the
+   fan-out reads + writes. Worth deciding model strategy before kicking it off. → S42.
+3. **Sub-agent hook bypass.** Sub-agent Write tool calls did NOT trigger the prettier hook — the pattern is "Worker
+   writes, Maestro formats, Maestro commits." → S43.
+4. **Internal-error edge case on result messages.** Two batches (G6, G8) had Worker result messages dropped due to
+   internal error; Workers had completed and written files. Protocol: check filesystem state first when results are
+   missing. → S44.
+
+## Decisions surfaced by the integrate verdicts
+
+5. **Phase 2 KB substrate decision: paper-qa as default integration target?** → S1 (Tier 1).
+6. **LAB-Bench canary string blocklist** as Phase 2 ingestion obligation. → S2 (Tier 1).
+7. **Phase 7 skills bundle: bioSkills + scientific-agent-skills as inaugural pair.** → S30.
+8. **hyalo + keppi as Phase 3 KB tooling layer.** → S26.
+9. **Maestro codebase navigation: ontomics vs codesight vs both.** → S27.
+10. **fastmcp as MCP framework default.** Should land as explicit DEC-NNNN ADR before Phase 2 MCP-server work begins.
+    → S3 (Tier 1).
+
+## Cross-cutting findings
+
+11. **Entrepreneurial-surface "biotech literature intelligence" stack now concrete:** bioSkills + paper-qa +
+    Bacformer + LAB-Bench + KnowledgeBase. Fills `docs/entrepreneurial-surface.md` deliverable from
+    planning-update-spec.
+12. **MCP as tool substrate is now overdetermined.** Six repos in the run ship MCP servers (pmetal, openclaw,
+    py3plex_mcp, agentmemory, keppi, plus fastmcp as framework). Phase 3 MCP adoption is no longer an open question
+    — only policy details remain. Resolved via CLAUDE.md update.
+13. **"No stateful Docker on macOS" rule well-validated by counter-examples.** anamnesis (Postgres+pgvector), WeKnora
+    (6–10 container stack), finch (x86_64 miniconda) all trip on it. Worth referencing in eventual Phase 8 "what we
+    don't build" section. → S60.

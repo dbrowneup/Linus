@@ -251,6 +251,52 @@ In execution order:
 Items 1–7 are Phase 2 prerequisites for the orchestration backend per DEC-0028. Items 8–9 are Phase 1c benchmark
 deliverables that feed Phase 2 calibration.
 
+## Layer E (open question, added 2026-05-04) — Investigation memory
+
+A fifth named layer was surfaced by the [agentic-systems synthesis](../syntheses/agentic-systems-synthesis.md)
+during the post-fan-out integration pass. Three corpus papers (Kosmos's world model, Sketch2Simulation's IR, the
+HKUST QuantAgent's context buffer) all occupy a layer the four-layer architecture above does not name: a
+**task-scoped, multi-agent, single-investigation lifetime** memory shared across the Workers participating in one
+investigation but not persisted as cross-session episodic state.
+
+This spec does **not** yet commit to Layer E. The open question lives at
+[`top-questions.md` S13](../questions/top-questions.md) and resolves at the next planning session. Three resolutions
+are plausible:
+
+1. **Add Layer E.** New named layer with its own substrate (initial proposal: shared in-memory store with overflow
+   to Layer C on session-end), its own `linus.memory.investigation.*` API, and its own retention policy
+   (investigation-scoped, not session-scoped).
+2. **Extend Layer C.** Treat investigation memory as a Layer C scope with a new `investigation_id` tag alongside
+   `session_id` and `project_tag`. No new API; the same `linus.memory.episodic.*` reads with a richer query
+   surface.
+3. **Extend Layer B.** Treat it as a multi-Worker scratchpad — share Layer B writes within an investigation
+   regardless of which Worker emitted them. Conceptually closer to "investigation = group of sessions" than
+   "investigation = a memory layer."
+
+The choice is forced by the Phase 3 multi-agent spawner design (a single investigation is the natural unit a
+spawner manages). Resolution should land before `docs/specs/phase3-spawner.md` ships.
+
+## Implementation prior art (added 2026-05-04)
+
+The Section 7 fan-out surfaced two repos that are concrete prior art for the Phase 2 substrate decisions in this
+spec. Neither replaces a substrate choice already made; both inform the implementation.
+
+- **[openaugi](../repo-notes/openaugi.md)** is the closest existing match to the DEC-0029 v0 substrate. Two-table
+  SQLite + sqlite-vec + FTS5 with deterministic content-hash IDs — essentially the schema this spec already
+  commits to. The g4-memory cluster synthesis flags openaugi as the strongest "lift the implementation"
+  candidate the post-fan-out work surfaced. Not a vendoring decision; a reference implementation when the v0
+  episodic store goes from spec to code.
+- **[agentmemory](../repo-notes/agentmemory.md)** ships a 51-tool MCP surface plus lease/signal/checkpoint
+  primitives that map directly onto the parallel-Worker write coordination problem named in §3 of this spec
+  (and resolved at the policy level by the [KB-spec parallel-worker-write-coordination](../specs/kb/) item).
+  Concrete prior art for the implementation pattern; the lease and checkpoint primitives are the parts to study,
+  not the MCP surface.
+
+A third repo, **[remember](../repo-notes/remember.md)**, surfaced a different implementation pattern worth noting:
+its `scripts/extract.js` walker can backfill an episodic store from existing `~/.claude/projects/*.jsonl`
+transcripts. If the Phase 2 v0 episodic store ships and Linus wants to bootstrap from existing Claude Code session
+history rather than start with an empty store, this is the worked-example pattern.
+
 ## What this spec deliberately leaves open
 
 - **Layer A active management** (Coconut-style latent recurrence, minGRU-style minimal recurrence) — Phase 6+ pending

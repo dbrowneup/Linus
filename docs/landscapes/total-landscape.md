@@ -1,488 +1,335 @@
 # Total Landscape
 
-## What This Document Is
+## What this document is
 
-Four inputs feed into Linus's working picture: twelve cloned repos ([repo-landscape.md](repo-landscape.md)), twenty-six
-papers (the original fifteen plus eleven added in the 2026-05 memory-pillar pass; see
-[paper-landscape.md](paper-landscape.md)), four practitioner / research syntheses
-([synthesis-landscape.md](synthesis-landscape.md)), and this document. The first three describe their own domains well;
-this document crosses all of them — pointing out where code, theory, and practice reinforce each other, where they are
-in tension, and where the gaps between them are the work Linus actually has to do.
+The master integration map across the four kinds of input Linus has accumulated:
 
-It is intentionally a complement to [top-questions.md](top-questions.md): the question file is the working agenda, this
-file is the map. Read this once before working through Tier 1; refer back as decisions land.
+- **78 paper notes** in [`docs/paper-notes/`](../paper-notes/) — flat lookup in
+  [`docs/papers/INDEX.md`](../papers/INDEX.md).
+- **80 repo notes** in [`docs/repo-notes/`](../repo-notes/) — flat lookup in
+  [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md).
+- **13 thematic syntheses** in [`docs/syntheses/`](../syntheses/) — security, llm-wiki, skills-and-practices, memory,
+  humans-teams-performance, generative-biology, infra-foundations, native-low-bit-apple-silicon, llms-in-science,
+  function-annotation-discovery, agentic-systems, safety-alignment-privacy, biological-foundation-models.
+- **10 repo-cluster syntheses** in [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/) — `g1`–`g10`,
+  written 2026-05-04 over the post-fan-out repo notes.
 
----
+This document does not enumerate the underlying notes (the indexes do that) and does not retell the syntheses
+(those documents do that themselves). It crosses _the syntheses_ — pointing out where independent threads converge,
+where they remain in tension, and where the gaps between them are the work Linus actually has to do. It is the
+companion to [`top-questions.md`](../questions/top-questions.md): this file is the map; the question file is the
+working agenda.
 
-## How code, theory, and practice align
+The previous landscape architecture had four documents (`paper-landscape`, `repo-landscape`, `synthesis-landscape`,
+`total-landscape`) each crossing a different slice. After the post-fan-out integration pass that ratio inverted —
+the syntheses became the primary unit of analysis and the older landscapes were duplicating content. The current
+architecture is:
 
-The repos, papers, and practitioner syntheses are not independent collections — they are three views of one technical
-bet. Most major themes now have anchors in all three; where a theme has only one or two anchors, the gap is work Linus
-has to do:
+- **Indexes** for navigation (papers, repo-notes).
+- **`synthesis-landscape.md`** for cross-synthesis structure (where 23 syntheses agree, disagree, and what's the
+  meta-shape across them).
+- **`total-landscape.md`** (this file) for the master integration — synthesis × architecture × roadmap × open
+  questions, in one place.
+- **`paper-landscape.md`** and **`repo-landscape.md`** are deprecated stubs that point to the indexes and syntheses;
+  they're kept to preserve link integrity.
 
-| Theme                                        | Theory (`paper-notes/`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Code (`repos/`)                                                  | Practice (`synthesis-landscape.md`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Linus role                                                                                                                                                            |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1-bit / ternary inference**                | BitNet line: 2310.11453 → 2402.17764 → 2411.04965 → 2504.18415 → 2504.12285 (the released 2B4T) → 2502.11880 (bitnet.cpp) → 2510.13998 (BitDistill)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `BitNet`, `Bonsai-demo`, `pmetal` (kernels)                      | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Phase 1c benchmark sweep; Phase 6 fine-tuning lane                                                                                                                    |
-| **>RAM streaming**                           | LLM in a Flash (2312.11514) → Flash-MoE (flash_moe.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `mlx-flash`, `flash-moe`                                         | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Phase 5+ inference path for fine-tuned/large models                                                                                                                   |
-| **Training stability at depth**              | JPmHC (2602.18308) — Cayley-constrained Hyper-Connections                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | (no code yet — gap)                                              | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Phase 6 architecture choice; possible Phase 8 synthesis                                                                                                               |
-| **Methodology / experiment loops**           | Karpathy autoresearch tweets via `program.md`; Flash-MoE 90-experiment log                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `autoresearch`, `autoresearch-mlx`                               | Skills synthesis: keep-or-revert as an explicit named practice; 42% discard rate as a sign search is working                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Phase 6d overnight optimization template                                                                                                                              |
-| **Pretraining data**                         | FineWeb / FineWeb-Edu (2406.17557)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | (no code anchor — would be `datatrove`)                          | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Phase 6 continued-pretraining corpus; Phase 4 versioned-dataset pattern                                                                                               |
-| **KnowledgeBase substrate**                  | Hogan KG survey (2003.02320); Stankevičius embeddings (2408.08073); Curse of Dimensionality (2401.00422)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `modules/KnowledgeBase/` (submodule)                             | LLM wiki synthesis: compile-don't-retrieve; schema is the product; hot-cache pattern (~500 words, 2.7× context savings); retrieval scaling wall at 100–200 nodes                                                                                                                                                                                                                                                                                                                                                                                                       | Phase 2a / Phase 3 KB design and retrieval                                                                                                                            |
-| **KB ingestion — keyphrase extraction**      | RaKUn 2.0 (2208.07262) Phase 2 baseline; KGRank (s41019-017-0055-z) Phase 3 enriched path                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `modules/KnowledgeBase/`                                         | LLM wiki synthesis: claim typing (`[!source]` / `[!analysis]` / `[!unverified]` / `[!gap]`), content hashing for staleness, write-back rule, quality gate at ingest                                                                                                                                                                                                                                                                                                                                                                                                    | Phase 2 ingestion pipeline; Phase 3 ontology-grounded indexing                                                                                                        |
-| **Benchmarking & inference evaluation**      | Speed and LLMs (2502.16721) — task-completion time as primary metric; tok/s is misleading                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `benchmarks/dan_tasks/` (design target)                          | Skills synthesis: task-completion time as the Worker selection axis; Worker spec uncertainty protocols to prevent misleading autonomous runs                                                                                                                                                                                                                                                                                                                                                                                                                           | Phase 1 benchmark design; Worker selection methodology                                                                                                                |
-| **Cognitive throughput / output interface**  | Zheng-Meister Neuron 2025 (PIIS0896627324008080) + Sauerbrei-Pruszynski rebuttal (nihms-2096004)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | (no code anchor — design heuristic)                              | Skills synthesis: parallel Worker fan-out gains zero throughput for Dan unless the Maestro interface compresses outputs to the essential bits first; default to high-density concise outputs                                                                                                                                                                                                                                                                                                                                                                           | Phase 2 interface design; Maestro/Worker analogy grounding                                                                                                            |
-| **Harnesses and orchestration**              | (no paper — practitioner thread)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `cline`, `claw-code-local`, `claw-code`, `openclaw`              | Skills synthesis: Task Master AI + claude-squad as Phase 2 off-the-shelf candidates; evaluate before building custom router; The Algorithm says delete before building                                                                                                                                                                                                                                                                                                                                                                                                 | Phase 1e/2/5 front-ends                                                                                                                                               |
-| **Data sovereignty (component catalog)**     | (none — pragmatic)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `project-nomad`                                                  | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Phase 4 reference catalog only                                                                                                                                        |
-| **Security posture**                         | (none — practitioner synthesis)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | `environment.yml`, `.claude/settings.json`, `SAFETY.md`          | Security synthesis: pip-audit + hash lock file + remove future-phase deps; trust-tier tagging for KB content; incident response protocol before Phase 2                                                                                                                                                                                                                                                                                                                                                                                                                | Phase 0 immediate (dep cleanup); Phase 2 (endpoint + prompt injection); Phase 3+ (audit cadence)                                                                      |
-| **Skills, practices & entrepreneurial**      | (none — practitioner threads)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `repos/cline`; emerging: Task Master AI, claude-squad            | Skills synthesis: 10 collaboration practices; 13 skills; 7 entrepreneurial opportunities filtered for Dan's PhD-biochemist/genomics profile; domain expertise is the moat                                                                                                                                                                                                                                                                                                                                                                                              | Phase 1 (closed loop); commercial surface Phase 1+                                                                                                                    |
-| **Hypercube projections (orthogonal layer)** | Horiike-Fujishiro Phys. Rev. E                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | (none)                                                           | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Curiosity / biology overlap; not phase-blocking                                                                                                                       |
-| **Memory & universal computation**           | Garrison thesis ([2412.17794](../../context/papers/2412.17794v1.pdf)) + complexity-theory pair ([2305.15408](../paper-notes/2305.15408v5.md), [2310.07923](../paper-notes/2310.07923v5.md)); empirics ([Kojima 2205.11916](../paper-notes/2205.11916v4.md), [Sparks 2303.12712](../paper-notes/2303.12712v5.md)); substrate alternatives ([minGRU 2410.01201](../paper-notes/2410.01201v3.md), [Coconut 2412.06769](../paper-notes/2412.06769v3.md), [TTT 2411.07279](../paper-notes/2411.07279v2.md)); wall-of-attention case studies ([TimeSformer 2102.05095](../paper-notes/2102.05095v4.md), [Chinchilla 2203.15556](../paper-notes/2203.15556v1.md), [Llama 3 2407.21783](../paper-notes/2407.21783v3.md)); cost-of-no-memory ([ARC Prize 2024 2412.04604](../paper-notes/2412.04604v2.md)) | (no Linus code yet — gap to be closed by Phase 2 episodic store) | Memory synthesis: lift memory architecture from Phase 3+ to Phase 2 first-class layer; scratchpad as durable artifact; v0 episodic store; per-call CoT budget + memory mode router primitives; in-context cap policy. [Mughal "Why Claude Gets Dumber..."](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt) — operational discipline for long-session context management; lost-in-the-middle attention degradation, ~147K-of-200K real budget, sprint+compact loop retains ~80–85% quality vs. ~40–60% in marathon sessions | Phase 2 first-class architectural pillar; Phase 3 parallel-write coordination; Phase 6 substrate experiments (TTT, minGRU MLX); Phase 8 BitNet × minGRU cross-product |
-
-Six observations fall out of this table:
-
-**The BitNet thread is the most internally-coherent one.** Six papers and three repos line up tightly enough that the
-right Phase 1 action — pull `bitnet-b1.58-2B-4T-gguf`, build bitnet.cpp on M1 Max, benchmark — is _overdetermined_,
-recurring across the 2B4T note, the bitnet.cpp note, the BitDistill note, and [top-questions.md](top-questions.md) Tier
-1 #1.
-
-**JPmHC and FineWeb are theory without code anchors.** Both are Phase 6+ candidates by virtue of where the code gap
-lives — adopting either means writing new code (a Cayley parametrization layer for MLX; a `datatrove`-style ingestion
-pipeline).
-
-**The keyphrase extraction papers close a gap in the KB ingestion pipeline.** Previously there was no paper anchor for
-_how_ documents get indexed when they enter the KnowledgeBase. RaKUn 2.0 provides the Phase 2 baseline (fast,
-unsupervised, CPU-only); KGRank provides the Phase 3 upgrade path (ontology-grounded, semantic). Together they give the
-KB ingestion stack a complete theory-to-implementation path.
-
-**The practitioner syntheses fill the operational gap that repos and papers leave open.** The security, LLM wiki, and
-skills syntheses now provide the "how to operate" layer — KB schema discipline, Worker spec uncertainty protocols,
-dependency philosophy, session architecture. Most strikingly, the security and skills syntheses independently arrive at
-the same recommendation to remove langchain/langgraph: one for supply chain risk, the other because the orchestration
-logic is Linus's core competency and shouldn't be outsourced.
-
-**Security is now a first-class cross-cutting concern with a full practitioner anchor.** The security synthesis
-identified that SAFETY.md is well-designed for operational autonomy control but addresses a completely different threat
-class than supply chain attacks or prompt injection. These gaps need to close before Phase 2 expands the network-egress
-surface.
-
-**Memory is now the largest single thread in the corpus and the load-bearing pillar.** Eleven new papers (the Garrison
-thread) plus the proof paper itself collectively argue that single-pass transformers are stuck in TC0, that the only
-escape is recursive state maintenance plus reliable history access, and that the operationally interesting capability
-gains in 2024 are all ways of buying memory reliability through compute. The memory synthesis
-([docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md)) argues that memory architecture should be
-promoted from a Phase 3+ deferred concern to a Phase 2 first-class layer — every use case that needs the assistant to
-build on its own work across sessions depends on the same primitive, so the requirement is upstream of the use cases.
-This is a substantial restructuring of Phase 2 scope. The 2026-05-03 addition of Mughal's practitioner article on
-context-window management closes the practice-column gap for the memory row — the architectural argument and the
-operational pattern now have parallel anchors.
+Read this once before working through Tier 1; refer back as decisions land.
 
 ---
 
-## The four crossings worth naming
+## How the syntheses align
 
-> **All four crossings have substantively resolved 2026-05-03.** See
-> [../questions/top-questions.md](../questions/top-questions.md) Resolution Log and
-> [../specs/planning-update-spec.md](../specs/planning-update-spec.md). Inline resolutions noted at the bottom of each
-> crossing below.
+The 23 syntheses (13 thematic + 10 repo-cluster) cover overlapping but distinguishable territory. The matrix below
+crosses each thematic synthesis against the architectural layers it informs and the closest cluster synthesis it
+shares territory with. Cells with `—` are deliberate: not every theme touches every layer.
 
-The cross-cutting bets are places where a code thread, a theory thread, and now a practitioner thread meet. Each
-crossing is one of the central decisions Linus will resolve over the next several phases.
+| Thematic synthesis | Architectural layers it informs | Closest cluster synthesis | Tier-1-equivalent action |
+| --- | --- | --- | --- |
+| **memory** | Orchestration (router, session store, audit log); KB | g4-memory | Phase 2 first-class memory pillar; v0 episodic store; `cot_budget` + `memory_mode` router primitives. **Resolved in M1–M17 (DEC-0028…0043).** |
+| **security** | Orchestration (sandbox, endpoint, deps); KB ingest | g6-mcp-tools (indirectly, via fastmcp) | pip-audit + hash lock file + remove pre-emptive deps + incident protocol. **Resolved in 2026-05-03 Tier 0.** |
+| **llm-wiki** | KB substrate; orchestration (write-back, hot cache) | g2-wiki-engines, g3-wiki-patterns | Compile-not-retrieve; schema-as-product; claim typing + content hashing + write-back as Phase 2 KB deliverables. |
+| **skills-and-practices** | Maestro/Worker discipline; entrepreneurial surface | g7-harnesses (Task Master AI, claude-squad) | Hot-cache convention; Worker-spec uncertainty protocol; entrepreneurial-surface document as Phase 2 deliverable. |
+| **agentic-systems** | Phase 3 spawner; multi-agent protocol | g7-harnesses (workgraph as runtime) | Role + typed `AgentReport` + investigation-memory layer ADR before spawner ships. |
+| **infra-foundations** | Foundational reference; benchmarks (energy ledger) | — | Wh-per-task as benchmark or ledger column; "world model" terminology hygiene before Phase 3. |
+| **native-low-bit-apple-silicon** | Inference + training (Phase 1b/1c/6) | g1-apple-silicon | Phase 1c unified four-way Worker-selection methodology (Bonsai 8B + ternary + 2B4T + FP16). |
+| **llms-in-science** | VISION-level posture; benchmarks (Maestro tier) | — | Maestro-class evaluation tier in `benchmarks/dan_tasks/`; VISION.md citation of Binz framework. |
+| **function-annotation-discovery** | Phase 7 skills (biology); KB (model-prediction edges) | g9-bio | LAB-Bench MCQ + BixBench as Phase 1 baseline; pick first protein-function skill on benchmark. |
+| **generative-biology** | Phase 7 skills (biology); SAFETY (whole-genome tier); tool registry (`external_api_tool`) | g9-bio | SAFETY.md tier-control as Phase 1 deliverable; `external_api_tool` registry class + ADR. |
+| **biological-foundation-models** | Phase 7 (LucaOne anchor); KB (model_prediction edges); tool registry | g9-bio | KB `model_prediction` edge class with provenance before Group A skills write back. |
+| **safety-alignment-privacy** | SAFETY; orchestration (activation hooks); benchmarks (values eval) | — | Activation-hooks API stub Phase 1, feasibility spike Phase 2 against mlx-lm. |
+| **humans-teams-performance** | VISION-level (multidisciplinary preservation); Maestro/Worker timescales | — | Decide on `goal_orientation` field in Worker spec template; preserve-multidisciplinary as VISION/CLAUDE/ROADMAP entry. |
+
+Several observations fall out of this view:
+
+**Memory and KB are the densest convergence points.** The memory synthesis maps onto the orchestration layer's
+session/router primitives, the KB substrate (Layer D), and the g4-memory cluster's substrate evidence (openaugi as
+closest existing match to DEC-0029 v0; agentmemory as parallel-write coordination prior art). The llm-wiki
+synthesis touches almost the same surface from a different angle (compile-not-retrieve, claim typing, write-back as
+operational discipline). The agentic-systems synthesis adds a fifth layer (investigation memory) that the four-layer
+pillar doesn't yet name. These three theses point at one substrate; building it well in Phase 2 satisfies all three.
+
+**Biology is overdetermined now.** Three thematic syntheses (function-annotation-discovery,
+biological-foundation-models, generative-biology) plus the g9-bio cluster overlap heavily. The integrate-verdict
+trio (paper-qa, bioSkills, scientific-agent-skills) plus the Phase 7 entrepreneurial stack (paper-qa + bioSkills +
+Bacformer + LAB-Bench + KnowledgeBase) gives the biology pillar enough mass that it deserves an explicit Phase 7
+sub-roadmap rather than scattered skill commitments.
+
+**Safety has two complementary syntheses.** `security-synthesis.md` (supply chain + dep + endpoint) and
+`safety-alignment-privacy-synthesis.md` (activation observability + values + dual-use uplift + privacy) are
+non-overlapping. Together they cover the full safety surface; SAFETY.md needs additions from both sides.
+
+**Agentic-systems and skills-and-practices are converging.** The skills synthesis treats orchestration mostly as a
+build-vs-adopt question (Task Master AI, claude-squad); the agentic-systems synthesis goes deeper into the type
+system (Role, AgentReport, validation gates, critic tier). Phase 3 spawner design is where they meet — and the
+g7-harnesses cluster's workgraph finding is the most directly liftable runtime.
+
+**Some thematic syntheses lack repo-cluster anchors.** infra-foundations, llms-in-science, safety-alignment-privacy,
+humans-teams-performance — these are theory-and-practice threads with no corresponding code cluster yet. That's not
+a gap to fix; it's a property of the topic. They feed VISION/SAFETY/benchmark-design, not a tool integration.
+
+---
+
+## The crossings
+
+The following are the substantive cross-synthesis bets — places where multiple syntheses agree on what's load-bearing
+for Linus's near-term architecture. Each crossing is one of the central decisions Linus has resolved or will resolve
+over the next several phases.
 
 ### Crossing 1 — The BitNet → Apple Silicon → ANE bridge
 
-The BitNet papers argue, in increasingly specific terms across six releases, that "design hardware for ternary models"
-is a real efficiency frontier. The ANE repo proves the missing software half exists: backprop _and_ inference can run on
-Apple's Neural Engine via reverse-engineered private APIs. pmetal hardens the same engineering patterns into a
-maintained Rust platform. And bitnet.cpp publishes Apple M2 Ultra throughput numbers (2.15× → 4.91× over FP16) on plain
-CPU SIMD without using the GPU or ANE at all.
+The native-low-bit-apple-silicon synthesis canonicalizes the path: six BitNet papers + three Bonsai-related papers
++ pmetal kernels + bitnet.cpp's Apple M2 Ultra throughput numbers. The g1-apple-silicon cluster confirms
+operational feasibility (autoresearch-mlx as the runnable methodology substrate). Three rungs are climbable: CPU +
+bitnet.cpp (operational today), GPU + pmetal kernels (Phase 1b verdict), ANE + pmetal/Maderix patterns (Phase 2
+conditional follow-up).
 
-The bridge to be built — and the question that recurs across notes — is which of three rungs Linus actually needs to
-climb:
-
-1. **CPU + bitnet.cpp** is operational today, ships from the same GitHub repo as the BitNet model code, and is the
-   simplest path to "1.58-bit Worker running on Linus." It leaves the GPU and ANE on the table.
-2. **GPU + pmetal kernels** is the next rung; pmetal's `pmetal-metal` crate has fused low-bit kernels in production.
-   Phase 1b's evaluation tells us whether this rung is climbable today.
-3. **ANE + pmetal/Maderix patterns** is the third rung. The existence proof exists; pmetal ships an ANE pipeline; the
-   question is whether Linus benchmarks "ANE prefill + GPU decode" as an explicit configuration in Phase 1b or defers to
-   Phase 7+.
-
-The decision shape is "how many rungs does Phase 2 climb?" not "which one is right" — they're complementary, each adding
-capability at the cost of additional dependency surface (pmetal) or private-API risk (ANE).
-
-**RESOLVED (2026-05-03):** Phase 1c climbs rungs 1 (CPU + bitnet.cpp via the BitNet 2B4T spike) and 2 (GPU + pmetal
-kernels, evaluated as part of Phase 1b). Rung 3 (ANE) defers to Phase 2 as a conditional follow-up benchmark, gated on
-favorable pmetal Phase 1b verdict. Linus's own code stays on public APIs (CoreML/MLX/Metal); pmetal's ANE crate is the
-supported path; the ANE reverse-engineering repo stays methodology reference, not vendored.
+**Status (2026-05-04):** Phase 1c climbs rungs 1 and 2 under a unified four-way Worker-selection methodology. Rung 3
+defers to Phase 2 conditional on favorable pmetal verdict. **New sub-question (S8):** pmetal Rust kernels vs.
+MLX-native PrismML fork — ADR before the inference layer hardens.
 
 ### Crossing 2 — The streaming axis: dense (mlx-flash) vs. sparse (flash-moe) vs. composite (1-bit + streamed)
 
-LLM in a Flash is the conceptual foundation for "MacBook ratios are flash-big DRAM-small, design for that." mlx-flash
-operationalizes this for dense MLX models with predictive scheduling and bit-perfect parity. Flash-MoE extends it to
-MoE's extreme 2% activation sparsity with custom Metal/Obj-C, hitting 397B at 5.74 tok/s on 48 GB.
+Original framing: LLM in a Flash → mlx-flash (dense, framework-integrated) → flash-moe (sparse, bespoke) → composite
+(1-bit + streamed). The native-low-bit synthesis sharpens this: Bonsai 8B fits in 1.75 GB, which trivializes the
+"dense fine-tuned 8B exceeds RAM" framing of Phase 6d. The g1 synthesis confirms the OS-page-cache discipline
+(application-level caches over mmap'd files _hurt_ throughput on macOS unified memory).
 
-The axis Linus has to position itself on:
+**Status (2026-05-04):** mlx-flash narrowed to "fine-tuned models that genuinely exceed RAM" (Linus-branded 30B+
+or opportunistic ternary 30B+ from PrismML). flash-moe stays methodology-only reference. Phase 8 BitNet × Flash-MoE
+× JPmHC stays long-horizon. **New question (S20):** rewrite Phase 6d framing to reflect the narrower target.
 
-- **Pure dense + streaming** (mlx-flash): integrates immediately, no kernel work, native precision preserved. Right for
-  fine-tuned 7B-class models that exceed RAM at native precision.
-- **MoE + streaming** (flash-moe methodology applied to a smaller MoE): flash-moe's code is too bespoke to vendor, but
-  the methodology applied to Mixtral-8×7B or DeepSeek-V2-Lite is the M1 Max analog of the 397B demo.
-- **Composite: 1-bit + streamed** (Bonsai-Ternary-30B + mlx-flash): a combinatorial efficiency bet that needs a 1-bit
-  checkpoint > 8B, which doesn't yet exist on Apple Silicon. Phase 6d candidate; possibly Phase 8.
+### Crossing 3 — KnowledgeBase as graph + vector layered substrate, now with paper-qa as substrate candidate
 
-The cleanest near-term call is "use mlx-flash if a fine-tuned model exceeds RAM, otherwise stay in-RAM." The composite
-path is the more ambitious Phase 6d target — it sits behind the answer to Tier 1 #3 (the Phase 6 fine-tuning path).
+The Hogan KG survey + Stankevičius embeddings + Curse-of-Dimensionality form the theoretical spine; the llm-wiki
+synthesis adds operational depth (claim typing, content hashing, write-back, hot cache); the g8 cluster surfaces
+**paper-qa as the first paper-corpus-shaped tool to earn an Integrate verdict**. The biological-foundation-models
+synthesis adds the `model_prediction` edge class requirement before Group A Wave 1 skills start writing back to KB.
 
-**RESOLVED (2026-05-03):** Commit Phase 5+ to **mlx-flash as the >RAM dense path.** flash-moe stays methodology-only
-reference (experiment-log discipline + "trust the OS page cache" lesson). Phase 6d formal target = mlx-flash streams any
-fine-tuned model that exceeds RAM. Phase 6d _stretch_ target = opportunistic ternary >8B integration if PrismML or
-community releases a checkpoint by Phase 6 timeframe. Phase 8 BitNet × Flash-MoE × JPmHC stays long-horizon research
-direction; no Phase 6/7 work gated on it. Concrete Phase 6d target sketched in `docs/specs/phase6d-streaming-target.md`
-once Phase 1b closes.
-
-### Crossing 3 — The KnowledgeBase as graph + vector layered substrate
-
-The Hogan KG survey is the spine — every KB design decision (data model, schema, identity, context, query, deductive
-layer, inductive layer) maps to a section of the paper. The Stankevičius embeddings paper is the vector layer over the
-spine; Curse of Dimensionality is the geometric reason why naïve high-dim embeddings fail.
-
-The practitioner layer adds operational depth that neither the paper nor the code currently encodes: the LLM wiki
-synthesis establishes that the schema is the product — without typed entities, a contradiction policy, and epistemic
-standards built in from the beginning, a KB is a junk drawer that grows faster than it can be used. Three patterns must
-be baked into the Phase 2 KB schema before the first paper is formally ingested: claim typing (`[!source]` /
-`[!analysis]` / `[!unverified]` / `[!gap]`), content hashing for staleness detection, and the write-back rule (every
-Worker task ends with KB update proposals, not just a primary result). The security synthesis reinforces claim typing
-from a different direction: prompt injection via KB content is most dangerous when models cannot distinguish grounded
-claims from synthesized ones. Epistemic tagging is both a knowledge-quality mechanism and a security control.
-
-The cross-cutting design question — "RDF or property graph?" — is Tier 1 #4 because every subsequent KB decision flows
-from it. The schema discipline and claim typing are not dependent on that choice — they should be implemented in Phase 2
-regardless of which graph model is selected.
-
-**RESOLVED (2026-05-03):** **Dual approach — both RDF and property graph in parallel.** KnowledgeBase already has
-rdflib + networkx as dependencies and `graph.py`
-
-- `knowledge_graph.py` as separate modules; the dual-substrate posture is already implicit. Linus's adapter exposes both
-  as separate tool families (`linus.knowledge.sparql.*` for RDF; `linus.knowledge.graph.*` for property). Embedded
-  stores: rdflib (+ optional Oxigraph backend for SPARQL performance) for RDF; networkx for property; Kuzu evaluated
-  later if scaling demands. Claim typing, content hashing, and the write-back rule baked into Phase 2 KB schema
-  regardless of substrate. **`docs/specs/kb-architecture.md` adopted as [KB-spec] Phase 2 deliverable** walking the
-  Hogan KG survey section-by-section. **New [KB-spec] split convention**: spec-parts that primarily impact KnowledgeBase
-  are tagged and split into `docs/specs/kb/` for delivery in the KB repo in partnership with Dan.
+**Status (2026-05-04):** Dual RDF + property graph (DEC-0015) substrate stands. **New Tier 1 question (S1):**
+paper-qa as Phase 2 KB substrate default integration target — reframes Phase 2 as "adopt + extend" rather than
+"build from scratch." **New Tier 1 question (S6):** `model_prediction` edge class with provenance before Group A
+writes back. **New Tier 1 obligation (S2):** LAB-Bench canary blocklist before any KB ingestion runs.
 
 ### Crossing 4 — Structure as the operational bottleneck
 
-This crossing did not exist in earlier versions of this document. It emerged from the practitioner synthesis layer and
-has no direct paper or code anchor — it is a practitioner finding that reframes what the code and theory layers are
-actually pointing at.
+The earlier total-landscape's Crossing 4 (the practitioner finding that the bottleneck has shifted from capability
+to structure) now has formal teeth from the memory pillar's complexity-theoretic floor. The infra-foundations
+synthesis adds the methodology dimension (capability-first measurement, Wh-per-task accounting). The llms-in-science
+synthesis adds the epistemic dimension (claim categories, EPISTEMIC-STANDARDS.md candidate). The agentic-systems
+synthesis adds the multi-agent dimension (Role types, typed messages, validation gates).
 
-All three syntheses, from completely different starting points, converge on the same claim: the bottleneck has shifted
-from capability to structure. The skills synthesis calls it "architectural clarity" — agents can execute at speed, but
-only a human who has already decomposed the task correctly, encoded the standards in files, and specified the
-uncertainty protocol gets useful output. The LLM wiki synthesis calls it "the schema is the product." The security
-synthesis calls it "design decisions baked into the orchestration layer" — tiered trust, input provenance tagging, and
-dependency minimization cannot be retrofitted.
+**Status (2026-05-04):** 10-bits/s framing adopted as Phase 2 design principle; balanced bullets + prose; citations
+and traceability first-class; planning write-back cadence as a CLAUDE.md engineering convention. **New questions:**
+S22 (`docs/EPISTEMIC-STANDARDS.md`); S23 (Maestro-class evaluation tier); S57 (`docs/maestro-protocol.md`).
 
-This crossing changes the reading of what Phase 1's most important work actually is. Running benchmarks and standing up
-services are necessary Phase 1 deliverables, but they do not compound across phases. The compound-interest work is
-encoding KB schema design, Worker spec uncertainty protocols, CLAUDE.md session standards, and dependency philosophy
-correctly now, because those decisions propagate through every subsequent phase. Every correction filed back into
-CLAUDE.md is worth more than ten implementation shortcuts.
+### Crossing 5 — Memory as the load-bearing pillar (resolved 2026-05-03; substrate evidence sharpened by g4)
 
-The practical implication for Phase 2: the engineering plan should allocate explicit time to schema design, spec
-templates, and security posture — not as pre-work before "real" implementation, but as the highest-leverage
-implementation work of Phase 2 itself.
+The Garrison thread + Mughal practitioner article established memory as a Phase 2 first-class pillar in 16 ADRs
+(DEC-0028…0043); the g4-memory cluster surfaced **openaugi as the closest existing match to the DEC-0029 v0
+substrate** (two-table SQLite + sqlite-vec + FTS5 with deterministic content-hash IDs) and **agentmemory's
+lease/signal/checkpoint primitives as concrete prior art for parallel-Worker write coordination**. The
+agentic-systems synthesis adds a previously-unnamed fifth layer (investigation memory: task-scoped, multi-agent,
+single-investigation lifetime — the Kosmos world model, Sketch2Simulation IR, HKUST QuantAgent context buffer
+shape).
 
-**RESOLVED (2026-05-03):** Adopt 10-bits/s framing as Phase 2 design principle. **Balanced bullets + prose** in
-synthesized Maestro outputs (not bullet dumps). **Citations and traceability are first-class.** Worker outputs preserved
-for Maestro inspection; synthesis is a layer over Worker outputs, not a replacement. Drill-down UI affordance from
-synthesized summary to Worker outputs and source citations. Opt-in `/verbose`. **Linus reframed as a personal LLM Wiki
-at scale** — citations, traceability, and write-back discipline are core, not optional. **Planning write-back cadence**
-adopted as a CLAUDE.md Engineering Convention: the write-back rule extends to Maestro/Dan + Claude planning sessions,
-not just Worker tasks. At the close of every multi-question planning session, allocate time for core-file write-back.
+**Status (2026-05-04):** M1–M17 resolved. **New Tier 2 question (S13):** fifth memory layer for "investigation
+memory" — touches `memory-architecture.md`, resolve before Phase 3.
 
-### Crossing 5 — Memory as the load-bearing pillar (new, 2026-05)
+### Crossing 6 — Biology as a pillar, not a scattered set of skills (new, 2026-05-04)
 
-This crossing entered the landscape in May 2026 with the addition of the Garrison thread to the paper corpus and the
-writing of [docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md). Like Crossing 4, it lacks a direct
-repo anchor today — it is a research-and-theory finding that has architectural consequences Linus has not yet built
-into.
+This crossing did not exist in the prior total-landscape because the biology corpus was a few papers in a thematic
+thread, not its own pillar. The post-fan-out work added 14 paper notes (Group A foundation models + Group B
+generators + Group C function annotation + a dual-encoder enzyme-discovery paper) and the g9-bio cluster surfaced
+the integrate trio (Bacformer + bioSkills + paper-qa from g8). The function-annotation-discovery and
+biological-foundation-models and generative-biology syntheses converge on a coherent Phase 7 biology pillar with a
+real entrepreneurial surface (literature intelligence for biotech teams).
 
-The eleven Garrison-thread papers, plus Garrison's own proof paper, collectively argue that **memory is not a feature to
-be deferred, it is the load-bearing primitive that universality depends on.** The complexity-theory pair
-([2305.15408](../paper-notes/2305.15408v5.md), [2310.07923](../paper-notes/2310.07923v5.md)) proves the formal claim:
-single-pass transformers live in TC0 and cannot solve arithmetic, linear-equation systems, or general dynamic
-programming by direct prediction; intermediate decoding tokens lift them above TC0 (linear steps recognise all regular
-languages; polynomial steps recognise exactly P). The empirical anchors
-([Kojima 2205.11916](../paper-notes/2205.11916v4.md), [Sparks 2303.12712](../paper-notes/2303.12712v5.md)) make the gap
-visible: a single trigger phrase delivers 60+ point absolute jumps on arithmetic at scale, and frontier models fail
-predictably on multi-step reasoning that recovers when external scratchpad is provided. The substrate alternatives
-([minGRU 2410.01201](../paper-notes/2410.01201v3.md), [Coconut 2412.06769](../paper-notes/2412.06769v3.md),
-[TTT 2411.07279](../paper-notes/2411.07279v2.md)) each present a different mechanism for satisfying the
-recursive-state-maintenance requirement. The cost-of-no-memory case studies
-([TimeSformer 2102.05095](../paper-notes/2102.05095v4.md), [Llama 3 2407.21783](../paper-notes/2407.21783v3.md),
-[ARC Prize 2024 2412.04604](../paper-notes/2412.04604v2.md)) quantify what the no-memory path actually costs — A100 OOM
-at 32-frame video clips, gigawatt-class compute for 128K context simulation, $1.15M for the last 9 points on ARC-AGI.
+**Status (2026-05-04):** Phase 7 biology pillar emerging; entrepreneurial-surface deliverable can be filled against
+concrete components. **New Tier 1 questions:** S4 (`external_api_tool` registry class), S5 (SAFETY.md whole-genome
+tier-control). **New Tier 2 questions:** S18 (LucaOne as KG anchor), S19 (Evo 2 vs AlphaGenome), S29 (AlphaGenome
+NC-license entrepreneurial implications), S30 (bioSkills + scientific-agent-skills inaugural Phase 7 bundle), S31
+(generalist × specialist FM combinations sequencing).
 
-The decision shape is **how aggressively Linus restructures Phase 2 to make memory first-class**. The synthesis
-recommends four practical layers (intra-step latent / within-session scratchpad / cross-session episodic /
-semantic-knowledge), with a v0 implementation in Phase 2 (SQLite + content hashes + git as persistence substrate for the
-episodic layer; scratchpad retention as default in the orchestration layer; per-call CoT budget and per-call memory mode
-as router primitives). Layers A (latent) and the ambitious substrate experiments (Coconut, TTT, minGRU MLX) defer to
-Phase 6+ once Phase 1c and Phase 2 measurements exist to inform substrate choice.
+### Crossing 7 — Agentic-systems theory as first-class architectural input (new, 2026-05-04)
 
-The crossing is also where the Garrison thread reinforces several existing crossings from a different angle. Crossing 1
-(BitNet → Apple Silicon → ANE) gains an additional substrate target: minGRU with BitLinear gates is the most extreme
-hardware-friendly recurrent + 1-bit substrate the corpus collectively points at, and a Phase 8 research direction.
-Crossing 2 (mlx-flash vs. flash-moe) is sharpened by the observation that a recurrent or SSM model of competitive
-quality may not need streaming at all in the parameter ranges Linus would train. Crossing 3 (KnowledgeBase as graph +
-vector substrate) is reframed: KnowledgeBase is the _semantic-memory_ layer (Layer D) of a larger memory pillar that
-also needs episodic and scratchpad layers, with a uniform read API across all three so Workers cannot tell which layer
-context came from. Crossing 4 (structure as the operational bottleneck) is given formal teeth: the practitioner finding
-that "structure compounds, capability does not" now has a complexity-theoretic floor under it.
+The agentic-systems synthesis is the first thematic thread with formal theoretical content beyond the memory pillar
+(HKUST QuantAgent regret bound; design intuition that KB coverage growth dominates suboptimality). The g7-harnesses
+cluster surfaced workgraph as the most directly liftable orchestration runtime (CLAUDE.md adopts its JSONL DAG +
+dispatch as the recommended Phase 2a session-store shape). Together they push Phase 3 spawner design from
+"deferred decision" to "ADR-shaped" with concrete primitives.
 
-The practitioner-side anchor on the same finding lands in Ayesha Mughal's March 2026 article
-[_Why Claude Gets Dumber the Longer Your Session Runs_](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt).
-Mughal reports that disciplined context management recovers roughly 25–45 percentage points of effective quality across
-a four-hour session — sprint-and-compact loops hold ~80–85% of fresh-session performance where unmanaged marathon
-sessions decay to ~40–60%. The mechanism is "lost in the middle" attention degradation: the nominal 200K context window
-is real, but performance starts falling off around ~147K tokens, and attention weights on content buried in the middle
-of a long transcript are a fraction of what they were when the same content sat near the top. Mughal is orthogonal to
-but reinforcing of the Garrison thread. Garrison says memory architecture is the load-bearing primitive, with theory and
-complexity arguments behind it. Mughal says context management is the operational pattern that exposes the substrate,
-with measured quality numbers from hosted-Claude practice. Linus needs both, and they argue from opposite ends toward
-the same Phase 2 deliverable. The concrete design implication is that Phase 2 needs orchestration-surface analogues of
-Mughal's `/context` (diagnostic), `/clear` (reset), `/compact` (lossy summarisation with explicit preservation
-directives), and `/rewind` (rollback to checkpoint) primitives, plus a PreCompact-hook-style "capture critical state to
-durable storage before lossy compression" pattern — all on top of the M2/M3/M4/M5 substrate decisions the synthesis
-already names.
-
-**STATUS (2026-05):** Newly surfaced; the synthesis recommends Phase 2 restructuring; top-questions.md adds a Tier 1
-entry (lift memory architecture from Phase 3+ to Phase 2) and several Tier 2 entries (substrate choice for Layer C;
-per-call CoT budget policy; in-context window cap policy). Decision pending the next planning session.
-
-**RESOLVED (2026-05-03 follow-up planning session — all 17 M-series items closed):** Memory architecture **lifted from
-Phase 3+ to Phase 2 first-class architectural pillar**. The decision spans 16 per-file ADRs
-([DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md) through
-[DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md)), with the implementation contract in
-[`docs/specs/memory-architecture.md`](../specs/memory-architecture.md). Phase 2 v0 episodic substrate is SQLite +
-content hashes + git as persistence (DEC-0029); scratchpad becomes a first-class durable artifact and the o1
-anti-pattern is forbidden as Worker-protocol non-conformance (DEC-0030); router gains `cot_budget` and `memory_mode`
-primitives (DEC-0031); in-context cap is 16K Phase 2 floor with episodic-store overflow (DEC-0032). Phase 1c carries
-three new spike deliverables: per-Worker CoT-gap fingerprint (DEC-0033), worker-size-vs-CoT-length comparison
-(DEC-0034), and TTT Apple-Silicon viability spike (DEC-0037). Phase 1f gains the minGRU MLX port spike (DEC-0038). Phase
-6 gains memory-mode-aware fine-tuning targets (DEC-0043). Substrate experiments (Coconut DEC-0042; minGRU+BitNet
-cross-product DEC-0041) gated on Phase 1 spike outcomes.
-[Mughal practitioner article](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
-adopted as the operational companion to the Garrison architectural argument and woven through the synthesis. See
-[top-questions.md Memory Pillar Resolution Log](../questions/top-questions.md) for per-question detail.
+**Status (2026-05-04):** **New Tier 1 questions:** S9 (Role as first-class type), S10 (typed inter-agent message
+format ADR). **New Tier 2 questions:** S14 (hosted-model fallback policy reframed as critic-tier-and-budget), S15
+(validation gate primitive in spawner vs sandbox). **New Tier 3:** S55 (adversarial debate as Worker primitive),
+S56 (agentic-system theory in Phase 3 spawner ADR).
 
 ---
 
-## The three layers Linus actually has to build
+## The architectural layers Linus actually has to build
 
-Independent of theme, three distinct engineering layers fall out of the combined landscape. Each has its own decision
-shape and dependency structure.
+Independent of theme, these are the distinct engineering layers that fall out of the combined landscape. Each has
+its own decision shape and dependency structure.
 
-### Layer A — The orchestration layer (Linus proper)
+### Layer A — Orchestration layer (Linus proper)
 
 The product, in `src/linus/`. OpenAI-compatible endpoint, session store, audit log, tool registry, agent spawner,
-sandbox. Speaks to inference backends below it (pmetal-serve / Ollama / bitnet.cpp / mlx-flash) and to harnesses above
-it (cline / claw-code-local / openclaw / Claude Code).
+sandbox. Speaks to inference backends below it (pmetal-serve / Ollama / bitnet.cpp / mlx-flash) and to harnesses
+above it (cline / claw-code-local / openclaw / Claude Code / claude-squad).
 
-The most consequential open question for this layer is now whether to build it at all. The skills synthesis argues that
-Task Master AI implements the PRD-to-structured-tasks-to-execution pattern without the multi-hundred-dependency tree of
-LangChain, and claude-squad provides parallel terminal agents without it. The Algorithm says delete before building. The
-custom orchestration layer is justified if, and only if, KnowledgeBase integration and sandbox policy require custom
-primitives that off-the-shelf tools cannot provide. This should be answered by explicit measurement — running Task
-Master AI against a real Phase 2 task spec — before Phase 2 engineering begins.
+**Updated Phase 2 scope (2026-05-04):**
+- **MCP framework** — fastmcp adopted as default; Phase 2a tool registry built MCP-shape from the start (CLAUDE.md
+  update + S3 + DEC-0026 status).
+- **Session store and audit log** — workgraph-style JSONL DAG + dispatch as recommended shape (CLAUDE.md update +
+  g7 synthesis).
+- **Memory primitives** — `cot_budget` and `memory_mode` as router primitives; episodic substrate API
+  (`linus.memory.episodic.*`); scratchpad as first-class durable artifact (DEC-0030/0031/0032).
+- **Tool registry** — `external_api_tool` class for non-locally-deployable tools (S4, ADR pending).
+- **Activation observability** — API stub in Phase 1, feasibility spike in Phase 2 against mlx-lm/Llama-3.1-8B-4bit
+  (S17).
 
-If a custom layer is built, the security synthesis adds two structural requirements that cannot be retrofitted into
-Phase 3: input trust-tier tagging on every item in every Worker context window, and a static API key gate binding the
-endpoint to `127.0.0.1`. Both are cheap to design in from the start and expensive to add after the first multi-agent
-session.
+### Layer B — Inference / training layer
 
-### Layer B — The inference / training layer
+Worker models and the kernels that run them. pmetal is the top candidate by breadth; bitnet.cpp is a CPU-only
+fallback; mlx-flash is the >RAM dense path; Bonsai's `llama-server` is an interim 1-bit serving path. The
+autoresearch loop drives optimization of this layer.
 
-Worker models and the kernels that run them. pmetal is the top candidate by breadth (serving + training + ANE + 12
-preference-optimization methods + 45-tool MCP). bitnet.cpp is a CPU-only serving fallback. mlx-flash is the >RAM dense
-path. Bonsai's `llama-server` is an interim 1-bit serving path while pmetal is being evaluated. The autoresearch loop is
-the methodology that drives optimization of this layer.
+**Updated Phase 1c shape (2026-05-04):**
+- Phase 1b pmetal verdict still gates inference-backend lock-in.
+- Phase 1c unified four-way methodology (Bonsai 8B 1-bit + ternary + BitNet 2B4T + FP16 baseline) under one harness
+  (S7).
+- pmetal Rust kernels vs. MLX-native PrismML fork ADR before the inference layer hardens (S8).
+- BitDistill spike timing decision (Phase 6a vs 6b vs deferred) (S21).
 
-The single most decisive moment is Phase 1b's pmetal evaluation. It collapses ~6 open questions into one ADR and either
-commits Linus to a single Rust platform that does most of the heavy lifting, or commits Linus to a more federated stack
-of smaller pieces.
+### Layer C — KnowledgeBase / data layer
 
-### Layer C — The KnowledgeBase / data layer
+`modules/KnowledgeBase/` (submodule), plus the data-sovereignty components from Phase 4. Hogan KG survey +
+Stankevičius embeddings + Curse-of-Dimensionality form the theoretical substrate. The llm-wiki synthesis adds
+operational discipline (claim typing, content hashing, write-back, hot cache). The g2/g3 wiki clusters surface
+specific implementation prior art (wikiloom's chunk-id formula, atomic-knowledge's get_context walker,
+llm-research-wiki's typed page schema, obsidian-llm-wiki-local's 3-tier JSON fallback for Ollama Workers).
 
-`modules/KnowledgeBase/` (submodule), plus the data-sovereignty components from Phase 4 (Kiwix, ProtoMaps, Qdrant or
-numpy-similarity, dataset versioning). The Hogan KG survey + Stankevičius embeddings + Curse of Dimensionality form the
-theoretical substrate; FineWeb and FineWeb-Edu are the curated-corpus references.
+**Updated Phase 2 scope (2026-05-04):**
+- **paper-qa** as candidate substrate for the paper-corpus side of KB (S1).
+- **`model_prediction` edge class** with producing-model + version + confidence + content-hash provenance before
+  Group A Wave 1 skills start writing back (S6).
+- **LAB-Bench canary blocklist** at ingestion time before any RAG or fine-tune work (S2).
+- **hyalo + keppi** as Phase 3 KB tooling layer (lint + transactional link rewrites + bounded-BFS-with-decay
+  context_pack retrieval) (S26).
+- **Quality gate as a quality surface, not a hard gate** — Dan is the primary filter (resolved Tier 1 #6,
+  2026-05-03).
+- **Hybrid retrieval** (BM25 + vector + graph traversal, fused via RRF) as Phase 3 deliverable; qmd's RRF logic is
+  liftable.
 
-The practitioner syntheses expand this layer's Phase 2 scope beyond the structural data-model decision. Claim typing and
-content hashing should be built into the KB schema as Phase 2 deliverables — they are both a knowledge-quality mechanism
-and a security control against prompt injection. The retrieval scaling wall (a single index file overflows context at
-roughly 100–200 KB nodes) should be tracked from Phase 2 onwards, with the hybrid retrieval upgrade (BM25 + vector +
-graph traversal, fused via reciprocal rank fusion) scoped as a Phase 3 deliverable before the wall is hit, not after.
-And the write-back rule — every Worker task ends with KB update proposals, not just a primary result — should be
-structural in Worker task specs from Phase 2, not a convention added later.
+### Layer D — Memory pillar
 
-The [memory synthesis](../syntheses/memory-synthesis.md) reframes this layer as the _semantic-memory_ component (Layer D
-in its taxonomy) of a larger memory pillar. The Garrison framework argues that semantic memory (KnowledgeBase), episodic
-memory (cross-session history — currently missing from Linus), within-session scratchpad memory, and intra-step latent
-state should share a uniform read API at the orchestration layer, with substrate variation hidden behind it. A Worker
-should not know whether a piece of context came from its own scratchpad, a prior session, or KnowledgeBase — all three
-satisfy the same reliable-history-access contract.
+Per `docs/specs/memory-architecture.md`. Four layers (intra-step latent / within-session scratchpad / cross-session
+episodic / semantic-knowledge), with KnowledgeBase as Layer D and the new SQLite+content-hashes+git substrate as
+Layers B and C.
 
-### Layer D (new) — The memory pillar
+**Updated 2026-05-04:**
+- **openaugi** is the closest existing match to the DEC-0029 v0 substrate; design ideas may be portable.
+- **agentmemory** lease/signal/checkpoint primitives are concrete prior art for parallel-Worker write coordination.
+- **Investigation memory** as a fifth named layer — open question S13, may amend `memory-architecture.md`.
 
-The four-layer memory architecture from the [memory synthesis](../syntheses/memory-synthesis.md) adds a layer Linus's
-planning has not previously named as a distinct deliverable. Layer C (KnowledgeBase) covers semantic memory; the missing
-pieces are within-session scratchpad (reasoning trace retention as a first-class addressable artifact, addressed by
-`(session_id, turn_id)`, hashed for integrity), cross-session episodic memory (the assistant's own durable history of
-prior tasks, decisions, and tool outputs — initial substrate: SQLite + content hashes + git as persistence layer; later
-substrate experiments: Akyürek-style TTT adapter consolidation), and intra-step latent state (today's transformers'
-opaque hidden states, named in the architecture even if not actively manipulated; foundation for later Coconut-style or
-minGRU-style substrate experiments).
+### Layer E (new, 2026-05-04) — Skills and entrepreneurial surface
 
-The decision shape for Phase 2 is whether to commit to a `docs/specs/memory-architecture.md` spec walking through all
-four layers, the four sub-requirement obligations (addressability, disambiguation, temporal order, integrity), and the
-substrate choice per layer — _before_ the orchestration layer's session and dispatch primitives are written. The
-synthesis argues yes; the formal complexity-theoretic results give the architectural pressure.
+Not an architectural layer in the runtime sense; the Phase 7 capability layer. The g8/g9 fan-out + the biology
+synthesis trio surfaced concrete components: bioSkills (~438 bio skills) + scientific-agent-skills (~135 broad
+science skills) as the inaugural Phase 7 bundle (~573 total); paper-qa as the literature intelligence engine;
+Bacformer as the most M1-Max-realistic broad bio FM; LAB-Bench as the rigorous public benchmark.
 
----
-
-## Where the gaps are
-
-> **2026-05-03 update:** four of the seven gaps below have closed via decisions in the planning session. Status flagged
-> inline.
-
-Seven places where neither a repo, a paper, nor a practitioner synthesis currently delivers what Linus will eventually
-need:
-
-**A Linus episodic-memory implementation.** Today there is no in-repo episodic-memory substrate; the closest thing is
-the conversation transcript captured by the chat harness. The memory synthesis names this as the load-bearing Phase 2
-gap and recommends a v0 implementation (SQLite + content hashes + git as persistence substrate, with the four
-sub-requirement obligations from Garrison's framework — addressability, disambiguation, temporal order, integrity —
-built in from the start). Mughal's session-handoff file pattern (`.claude/session-handoff.md` written at session end,
-read at session start, kept out of git as volatile state) is the hosted-Claude operational analogue and provides a
-reference shape for the Linus-native equivalent — a session-handoff record written and read via
-`linus.memory.episodic.*` rather than as a single volatile file, so handoff state inherits the same addressability,
-disambiguation, temporal-order, and integrity guarantees the rest of the episodic layer enforces. A Phase 2 deliverable;
-not phase-blocking for Phase 1, but blocking for any meaningful "Linus remembers what we did last session" capability.
-**OPEN as of 2026-05-03.**
-
-**Orchestration-surface context-management primitives.** Linus has no in-repo equivalent of Claude Code's `/context`
-(diagnostic), `/clear` (reset), `/compact` (summarise with preservation), `/rewind` (rollback to checkpoint), nor a
-PreCompact-hook-style "capture critical state before lossy compression" pattern. The Mughal article makes the case that
-these are operationally load-bearing in long sessions even when the substrate (episodic store) is in place — without
-them, the substrate cannot be invoked at the right moment, and the in-context budget fills with noise long before the
-episodic layer is consulted. Phase 2 deliverable; not phase-blocking for Phase 1, but blocking for any meaningful "Linus
-stays sharp across long sessions" capability. **OPEN as of 2026-05-03.**
-
-**A unified BitNet × MoE × Streaming codebase.** The BitNet papers, Flash-MoE, and JPmHC together gesture at
-"ternary-stable-streamed-MoE" — but no codebase combines all three. This is the natural Phase 8 research direction,
-entered by committing to a fine-tuned BitNet Worker first (Phase 6) and a flash-streaming benchmark second (Phase 6d).
-The [memory synthesis](../syntheses/memory-synthesis.md) extends this gap with an additional research direction:
-**minGRU with BitLinear gates** as the most extreme hardware-friendly recurrent + 1-bit substrate the corpus
-collectively points at. Phase 8 candidate.
-
-**An MLX Cayley parametrization layer.** JPmHC validated the orthogonal-group constraint on a 7M TRM at 8× B200, but no
-MLX implementation exists yet. Phase 6 architecture decision; not phase-blocking.
-
-**An ANE serving binary that is both production-quality and officially supported.** pmetal uses private APIs. There is
-currently no public-API ANE serving path that performs comparably. The choice is "accept the risk and benefit from
-pmetal-ANE" or "stay GPU-only and revisit if CoreML's posture changes."
-
-**A clear answer on Phase 2 custom orchestration vs. off-the-shelf tools.** The skills and security syntheses both point
-toward minimizing the custom surface; the LLM wiki synthesis implies the KB interaction layer is where the real custom
-work lies. The Algorithm says delete before building. This gap is not a code gap — it is a decision gap that must close
-before Phase 2 engineering begins. Run Task Master AI against a real Phase 2 task spec and measure whether it covers
-KnowledgeBase integration and sandbox policy requirements.
-
-**CLOSED (2026-05-03):** Keep DEC-0002 (custom orchestration). Algorithm-check primitives via **new Phase 1f
-deliverable** (Task Master AI + claude-squad vs. custom prototype vs. pmetal-MCP-as-orchestrator on real Phase 2 task
-spec). Adopt PRD→tasks pattern as a skill, not a re-implementation. Linus custom layer scope clarified: sandbox + KB +
-MCP registry + audit; no task-decomposition primitives.
-
-**A KB ingest quality gate for Dan's specific scientific domains.** The LLM wiki synthesis establishes that filtering
-noise at the door beats any retrieval improvement downstream, and the gate should be an auditable YAML domain editorial
-policy. But the right criteria for Dan's domains (genomics, computational biology, environmental science) have not been
-specified. What field-specific signals — journal tier, methodology rigor, peer review status, data availability — should
-the gate encode? This shapes the Phase 2 KB schema.
-
-**CLOSED (2026-05-03):** Reframed as a **quality surface, not a hard gate.** Dan is the primary filter. Domain-agnostic
-baseline signals; preprints flagged not rejected; no hard reject lane in Phase 2. **[KB-spec]** item.
-
-**A written incident response protocol.** The litellm supply chain incident was discovered accidentally via a RAM crash;
-a more subtle attack would not announce itself. The security synthesis identifies this as an open question that should
-be answered and committed to SAFETY.md before Phase 2's network-egress surface expands. This is not a code gap — it
-closes in one session.
-
-**CLOSED (2026-05-03):** Drafted as a SAFETY.md task in the planning-update-spec. Covers trigger / containment /
-credential rotation / attestation, plus pip-audit CVE response protocol. Layered architecture: linus conda env
-(production, hash-pinned)
-
-- uv disposable envs (experimental).
-
-**A commercial surface and entrepreneurial plan.** Linus's capabilities — domain expertise + local AI orchestration +
-private KnowledgeBase — map onto several monetizable services. The skills synthesis argues that scientific literature
-intelligence for biotech teams is buildable today with Phase 1 infrastructure and hosted Claude, generating
-$3,000–$15,000/month in recurring revenue while Linus builds, and producing higher-quality signal about what clients pay
-for than any amount of roadmap speculation. Currently there is no planning document for the commercial layer, and the
-trade-off (client revenue now vs. infrastructure focus) is an unresolved values-level question.
-
-**CLOSED (2026-05-03):** New Phase 2 deliverable `docs/entrepreneurial-surface.md` articulates the opportunity surface
-as a planning artifact (not a business plan). Until the document lands and a deliberate decision is made, don't actively
-pursue clients but don't rule out either.
+**Phase 2 placeholder:** `docs/entrepreneurial-surface.md` (resolved Tier 2 #14, 2026-05-03) becomes concrete with
+this stack as the first worked example.
 
 ---
 
-## How the six work products fit together
+## Where the gaps are (2026-05-04)
 
-[repo-landscape.md](repo-landscape.md) — describes the 12 cloned repos, grouped into four layers, with phase-by-phase
-entry points and key tensions. Code-side reference.
+The 2026-05-03 gap list closed four of seven items (custom-orchestration vs. off-the-shelf via Phase 1f deliverable;
+KB ingest quality gate via reframe; written incident response protocol; commercial surface via
+entrepreneurial-surface deliverable). The remaining three plus several new ones surfaced by the post-fan-out work:
 
-[paper-landscape.md](paper-landscape.md) — describes the 15 papers, grouped by theme, with reading orders by Linus phase
-and cross-cutting research-direction questions. Theory-side reference.
+**Open from prior list:**
 
-[synthesis-landscape.md](synthesis-landscape.md) — describes the three practitioner syntheses (security posture, LLM
-wiki pattern, skills and practices), with the cross-cutting picture of what they agree on, where they are in tension,
-and phase-tagged priorities. Practitioner-knowledge reference.
+- **A Linus episodic-memory implementation.** v0 substrate (SQLite + content-hashes + git) is specified
+  (DEC-0029) but not yet implemented. Phase 2 deliverable. **OPEN.**
+- **Orchestration-surface context-management primitives.** `/context`, `/clear`, `/compact`, `/rewind` analogues
+  + PreCompact-hook-style "capture critical state before lossy compression" pattern. Phase 2 deliverable. **OPEN.**
+- **A unified BitNet × MoE × Streaming codebase.** Phase 8 research direction; minGRU + BitLinear gates as the
+  hardware-friendly recurrent + 1-bit cross-product. **OPEN.**
+- **An MLX Cayley parametrization layer.** JPmHC validated on 7M TRM at 8× B200; no MLX implementation yet. Phase
+  6 architecture decision; not phase-blocking. **OPEN.**
+- **An ANE serving binary that is both production-quality and officially supported.** pmetal uses private APIs.
+  No public-API ANE serving path currently performs comparably. **OPEN.**
 
-[total-landscape.md](total-landscape.md) (this file) — crosses all three, identifies where code, theory, and practice
-align, names the four crossings worth deciding on, and surfaces the gaps where no current input delivers what Linus will
-need.
+**New 2026-05-04:**
 
-[top-questions.md](top-questions.md) — the working agenda. Three tiers of prioritized questions, with explicit pointers
-back to source notes and synthesis documents.
+- **A Phase 7 biology sub-roadmap.** The biology pillar is overdetermined enough to deserve explicit sequencing
+  beyond skill-by-skill commitment. Should pair with `docs/entrepreneurial-surface.md`. **OPEN.**
+- **A Phase 3 spawner ADR draft.** Role + typed AgentReport + investigation-memory layer are now ADR-shaped per
+  agentic-systems synthesis + g7 cluster. **OPEN.**
+- **An MLX ternary kernel contribution path.** native-low-bit synthesis names this as the single best-scoped
+  external contribution opportunity in the corpus. Phase 1d (immediate) vs Phase 6d (deferred). **OPEN.**
+- **A `docs/maestro-protocol.md` for hosted-Maestro behavioral dependencies.** Values paper argues Maestro is not
+  a black box; safety-alignment-privacy synthesis recommends a separate doc. **OPEN.**
+- **A modern-Transformer-reference paper bridging 2017 → 2025.** Spread across many papers without a clean survey
+  companion. infra-foundations synthesis names this as the gap. **OPEN.**
 
-[open-questions.md](open-questions.md) — the complete archive of every "open question for Dan" extracted from any
-per-repo, per-paper, or synthesis note. The reservoir from which `top-questions.md` was distilled.
+---
 
-**Synthesis documents** in `docs/syntheses/`:
+## How the work products fit together (updated 2026-05-04)
 
-[docs/syntheses/security-synthesis.md](../syntheses/security-synthesis.md) — security posture analysis triggered by the
-litellm supply chain incident. Covers dependency surface, supply chain mitigations, prompt injection threat model,
-endpoint security, and 5 open questions.
+```
+docs/
+├── papers/INDEX.md           (navigation: 78 paper notes → thematic syntheses)
+├── repo-notes/INDEX.md       (navigation: 80 repo notes → cluster + thematic syntheses)
+├── paper-notes/*.md          (78 per-paper write-ups)
+├── repo-notes/*.md           (80 per-repo write-ups)
+│
+├── syntheses/
+│   ├── *-synthesis.md        (13 thematic syntheses)
+│   └── repo-clusters/*.md    (10 cluster syntheses, g1–g10)
+│
+├── landscapes/
+│   ├── synthesis-landscape.md  (cross-synthesis structure: where 23 agree/disagree/overlap)
+│   ├── total-landscape.md      (this file: master integration; crossings; gaps)
+│   ├── paper-landscape.md      (DEPRECATED stub → INDEX + syntheses)
+│   └── repo-landscape.md       (DEPRECATED stub → INDEX + syntheses)
+│
+└── questions/
+    ├── top-questions.md      (working agenda; T0/T1/T2/T3 + memory-pillar M1–M17 + sweep S1–S60)
+    └── open-questions.md     (full archive; per-source records)
+```
 
-[docs/syntheses/llm-wiki-synthesis.md](../syntheses/llm-wiki-synthesis.md) — synthesis of the Karpathy LLM wiki gist,
-community-contributed repos and insights, Rohit's v2 gist, and the autoresearch/Apple Flash thread. Covers 14 KB design
-concepts, 20 relevant repos, and 9 open questions.
+Specs and ADRs live alongside:
 
-[docs/syntheses/skills-and-practices-synthesis.md](../syntheses/skills-and-practices-synthesis.md) — synthesis of the
-Claude skills and best-practices threads. Covers 10 collaboration practices, 13 skills, 13 repo candidates, 7
-entrepreneurial opportunities, and 5 open questions.
+- [`docs/specs/memory-architecture.md`](../specs/memory-architecture.md) — Phase 2 memory pillar contract.
+- [`docs/specs/planning-update-spec.md`](../specs/planning-update-spec.md) — execution detail for resolved items.
+- [`docs/specs/fan-out-session-summary-2026-05-04.md`](../specs/fan-out-session-summary-2026-05-04.md) — read-out
+  from the Section 7 fan-out.
+- `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0043 as of 2026-05-04).
 
-[docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md) — synthesis of the Garrison "Memory makes
-computation universal, remember?" thesis (blog + arXiv proof paper) plus eleven cited arXiv papers (now in
-[paper-notes/](../paper-notes/) under the new memory-pillar grouping). Argues memory architecture is the load-bearing
-primitive Linus must commit to in Phase 2 rather than defer. Decomposes memory into four layers (intra-step latent /
-within-session scratchpad / cross-session episodic / semantic-knowledge), maps Garrison's two requirements and four
-sub-requirements onto concrete design constraints, and recommends Phase 2 restructuring with concrete deliverables
-(memory-architecture spec, v0 episodic store, scratchpad retention default, per-call CoT budget + memory mode router
-primitives).
-
-The intended workflow is to walk `top-questions.md` Tier 0 (immediate actions) first, then Tier 1 in conversation, with
-`total-landscape.md` open as the map. Update both this file and the relevant planning documents (ROADMAP.md,
-DECISIONS.md, CLAUDE.md, the per-note open questions) as each answer lands.
+The intended workflow is: walk `top-questions.md` Tier 1 in conversation, with `total-landscape.md` open as the map,
+`synthesis-landscape.md` open for cross-synthesis context, and the relevant per-synthesis or per-note file open for
+depth. Update `total-landscape.md` and the relevant planning documents (ROADMAP.md, ARCHITECTURE.md, SAFETY.md,
+CLAUDE.md, the specs and ADRs) as each answer lands.
