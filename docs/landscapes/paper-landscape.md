@@ -8,7 +8,7 @@
 ## Where the content went
 
 - **Per-paper notes:** [`docs/paper-notes/`](../paper-notes/) (78 files, unchanged).
-- **Navigation lookup** (paper → covering syntheses): [`docs/papers/INDEX.md`](../papers/INDEX.md).
+- **Navigation lookup** (paper → covering syntheses): [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md).
 - **Thematic groupings** (BitNet thread, larger-than-RAM streaming, KB substrate, memory pillar, etc.): the
   thematic syntheses in [`docs/syntheses/`](../syntheses/), each focused on one theme rather than the survey-style
   overview this document used to provide.
