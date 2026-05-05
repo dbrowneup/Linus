@@ -1,90 +1,24 @@
 # Planning Update Spec — 2026-05-03
 
-A detailed, implementable list of modifications to Linus's core planning documents, synthesizing the Tier 0, Tier 1,
-Tier 2, and Tier 3 question resolutions from the Maestro/Dan planning session of 2026-05-03 (see
-[../questions/top-questions.md](../questions/top-questions.md) Resolution Log for one-line resolutions; see
-[../../DECISIONS.md](../../DECISIONS.md) DEC-0012 through DEC-0027 for the formal decision records).
+Implementable list of modifications to Linus's core planning documents, synthesizing the Tier 0/1/2/3 + Memory Pillar
+M1–M17 + Sweep S1–S60 question resolutions from the Maestro/Dan planning sessions of 2026-05-03 and 2026-05-04. The
+resolved questions paired inline with one-line resolutions live at
+[../questions/answered-questions.md](../questions/answered-questions.md). The formal decision records are the per-file
+ADRs at [`docs/adr/`](../adr/) (DEC-0012 through DEC-0043).
 
-This spec supersedes the previous `planning-update-spec.md` draft of 2026-05-01.
+## Audit summary (2026-05-05)
 
-> **Memory Pillar follow-up addendum (2026-05-03):** the same-day follow-up planning session resolved 17 memory-pillar
-> items (M1–M17) surfaced by the [memory synthesis](../syntheses/memory-synthesis.md). The corresponding ADRs land
-> per-file at [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md) through
-> [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md). The implementation contract is at
-> [`docs/specs/memory-architecture.md`](memory-architecture.md). The Phase-by-phase change list and File-by-file edit
-> plan in this spec are extended by **Section 10 — Memory Pillar additions** at the bottom of this document. Worker
-> sessions executing this spec should walk Section 10 immediately after Sections 5.4 (ROADMAP.md) and 5.3
-> (ARCHITECTURE.md) so the memory-pillar additions land in those files alongside the existing planning-spec edits.
+- **DONE:** §4 (DEC-0012–0027 ADRs), §5.6 + §5.7 (curation files), §7 (67 repos cloned + 81 repo-notes + 10 group PRs
+  merged), §10.2.4 (maestro-worker-protocol.md), §10.3 (DEC-0028–0043 ADRs), §11.5 partial (Layer E added to
+  memory-architecture.md).
+- **PARTIAL:** §6 (files done; CLAUDE.md reference + quarterly-review calendar still owed).
+- **NOT-STARTED:** §5.1–5.5 (CLAUDE.md / VISION.md / ARCHITECTURE.md / ROADMAP.md / SAFETY.md core edits — the spec's
+  headline deliverable), §10.1–10.2.3 (memory-pillar phase additions + file edits), §11.1–11.4 (sweep ADRs, specs,
+  SAFETY, KB-spec), §11.6–§11.7 (VISION sweep, tooling/process).
 
-## How to use this spec
-
-This spec is the **handoff artifact** between the Maestro planning session and the follow-on Worker sessions that will
-execute the changes. Tasks are scoped tight enough that a Haiku-class model running as a Worker (or Claude in a focused
-session) can carry out each one from the spec alone. Tasks reference the originating DEC where applicable, so the
-rationale stays linked to the action.
-
-### Spec structure
-
-1. **Status snapshot** — current Phase posture (Phase 1 in progress, Phase 0 closed).
-2. **Phase-by-phase change list** — what each Phase looks like after the resolutions land.
-3. **[KB-spec] sub-document** — KB-impacting tasks for delivery in the KnowledgeBase repo.
-4. **DECISIONS.md additions** — already appended to the live `DECISIONS.md`; listed here as a checklist for Worker
-   verification.
-5. **File-by-file edit plan** — concrete edits to CLAUDE.md, VISION.md, ARCHITECTURE.md, ROADMAP.md, SAFETY.md, with
-   target before/after text where the edit is small and bullet checklists where the edit is larger.
-6. **Curation protocol setup** — `docs/protocols/curation-protocol.md` + `docs/curation-log.md`.
-7. **Repos to clone + notes to write** — the 12 community repos plus the curation entry.
-8. **Worker invocation guide** — how Dan should spin up Worker sessions to execute the spec.
-
-### How to invoke Workers to execute this spec
-
-**Pattern 1 — Maestro-driven Worker sessions (Claude Opus as Maestro, Claude Haiku or local model as Worker).** Use this
-for tasks with cross-file dependencies or where adjudication of small judgment calls matters.
-
-> Open a fresh Claude Code session (Claude Opus model). At session start, paste:
->
-> ```
-> Read the planning-update-spec.md at docs/specs/planning-update-spec.md. Execute
-> tasks <X.Y through X.Z> in section <N>. Use the Edit tool to make changes. When
-> ambiguity arises that the spec doesn't resolve, surface the question to me before
-> editing — do not improvise. Commit each task as a separate atomic commit with the
-> message "[planning-spec X.Y] <description>". After completing the batch, post a
-> checkpoint summary listing what changed and any open questions raised.
-> ```
->
-> Maestro (Opus) reads the spec and may delegate sub-steps to a Haiku-class Worker via the Task tool, retaining
-> adjudication.
-
-**Pattern 2 — Direct Haiku Worker for self-contained tasks.** Use this for single-file edits where the spec text is
-unambiguous (most CLAUDE.md / VISION.md appendages, README.md tweaks, repo-clone commands).
-
-> Open a fresh Claude Code session (Claude Haiku 4.5 model). At session start, paste:
->
-> ```
-> Read planning-update-spec.md at docs/specs/planning-update-spec.md. Execute
-> EXACTLY task <X.Y>. Use the Edit tool. Make NO changes outside the explicitly
-> specified target file and target string. If anything is ambiguous, STOP and report
-> back — do not guess. Commit with message "[planning-spec X.Y] <description>".
-> ```
->
-> Haiku is reliable when the spec is concrete; ambiguity routes back to Maestro.
-
-**Pattern 3 — Linus-orchestrated Worker (future, Phase 2+).** Once Linus's MVP orchestration is online, the same spec is
-consumable as an MCP-shape task list. Each task in this spec is structured as a discrete unit because the same shape
-will eventually be ingested by Linus's task router. For now, Pattern 1 or 2 above.
-
-### Branching and commit conventions
-
-All execution work happens on a feature branch per the repo's BRANCHING.md model:
-
-```bash
-git switch -c feature/planning-spec-2026-05-03
-# Worker executes tasks, commits atomically as it goes
-git push -u origin feature/planning-spec-2026-05-03
-gh pr create --title "[planning-spec] core file refresh from 2026-05-03 session"
-```
-
-Dan reviews the PR before merging to `main`. Atomic commits per task (one task = one commit) make review tractable.
+The spec retains all section structure for navigation; DONE sections are collapsed to one-line completion notes (the
+canonical artifacts live in the repo and git history). NOT-STARTED sections retain full detail as actionable Worker
+tasks.
 
 ---
 
@@ -372,33 +306,18 @@ for staleness (synthesis-landscape Phase 2 priority).
 
 ## Section 4 — DECISIONS.md additions checklist
 
-The following DEC entries have been appended to `DECISIONS.md` (verify as part of spec execution, do not duplicate):
-
-- [x] DEC-0012 — pmetal as primary Phase 1b candidate (sub-decisions: build flags, concurrency target, dependency risk)
-- [x] DEC-0013 — BitNet 2B4T spike as first Phase 1c experiment
-- [x] DEC-0014 — Phase 6 fine-tuning lane deferred; 6a is FP16-LoRA on genomics
-- [x] DEC-0015 — KB dual data model (RDF + property graph)
-- [x] DEC-0016 — [KB-spec] split convention
-- [x] DEC-0017 — Harness plurality through Phase 5 with role designations
-- [x] DEC-0018 — Adopt MCP as the extensibility substrate
-- [x] DEC-0019 — KB ingest as quality surface, not hard gate
-- [x] DEC-0020 — Linus orchestration scope refinement
-- [x] DEC-0021 — Phase 5c adopts claw-code-local; custom-agent fallback removed
-- [x] DEC-0022 — Parallel Worker KB write coordination
-- [x] DEC-0023 — Output interface design + LLM Wiki framing
-- [x] DEC-0024 — Security posture (hash pinning + uv-via-conda + CVE response)
-- [x] DEC-0025 — Curation protocol for repos/, context/, docs/
-- [x] DEC-0026 — Planning write-back cadence
-- [x] DEC-0027 — Practice/stance batch (page cache, public APIs, multi-language, sovereignty, reproducibility, Obj-C
-      deferred)
-
-DECISIONS.md is now at 27 entries. Per the file's own guidance ("graduate to per-file ADRs in `docs/adr/NNNN-title.md`
-when this file exceeds ~20 entries"), graduation is a near-term task. **Action queued for the next session, not this
-one.**
+**DONE** — DEC-0012 through DEC-0027 graduated to per-file ADRs at [`docs/adr/`](../adr/). Legacy `DECISIONS.md` is
+now a pointer + index.
 
 ---
 
 ## Section 5 — File-by-file edit plan
+
+> **STATUS (audit 2026-05-05):** §5.1–5.5 are **NOT-STARTED.** The May-04 fan-out commit (`dcd762a`) added some related
+> content to CLAUDE.md (MCP substrate note, workgraph reference, page-cache quirk) but did NOT execute the targeted
+> edits prescribed by §5.1.1–5.1.9, §5.2.1–5.2.4, §5.3.1–5.3.4, §5.4.1–5.4.9, or §5.5.1–5.5.2. §5.6 and §5.7 (new
+> curation files) are **DONE** — see their per-section STATUS notes. §6 (curation setup) is **PARTIAL** — files
+> created, calendar + CLAUDE.md reference still owed.
 
 ### 5.1 — CLAUDE.md edits
 
@@ -858,356 +777,82 @@ Find the line in **Network safety** about `PyPI / conda-forge / crates.io` and e
 
 ### 5.6 — `docs/protocols/curation-protocol.md` (new file)
 
-**STATUS (2026-05-04):** DONE. Created on `main` in commit `1d00467`
-(`[planning-spec 5.6+5.7+7.4] add curation protocol and log`). Content matches the spec verbatim.
-
-**5.6.1** Create `docs/protocols/curation-protocol.md` with content (DEC-0025):
-
-```markdown
-# Curation Protocol
-
-Lightweight protocol for managing growth and pruning of `repos/`, `context/`, and `docs/`. Adopted in DEC-0025. Memory
-of removals is captured in [curation-log.md](curation-log.md).
-
-## Principles
-
-1. **Growth is encouraged.** Cloning a reference repo, adding a paper, drafting a synthesis note are all low-cost
-   actions. The default is `add`.
-2. **Pruning is principled.** At quarterly review checkpoints, apply The Algorithm: does this content still earn its
-   keep? If not, archive or remove.
-3. **Memory of pruning is preserved.** Every removal is logged in curation-log.md with rationale, timestamp, and (where
-   applicable) a SHA pointer to the last commit that included the content.
-
-## When to add
-
-- A repo that informs an active phase or open question.
-- A paper that resolves or sharpens an open question.
-- A synthesis note that consolidates ≥3 separate threads of reasoning.
-- A spec that names a deliverable.
-
-Add with a one-paragraph rationale captured in the originating note (synthesis, repo-note, paper-note).
-
-## When to archive vs. remove
-
-- **Archive** (move to `docs/archive/<area>/<name>.md`): historical reference value but no current relevance; might
-  inform future work; should remain searchable.
-- **Remove** (delete via `git rm`): superseded, factually wrong, or cleanly redundant with newer material. Always
-  logged.
-
-Archived content stays in git history regardless; the archive path is for current- state navigation cleanliness.
-
-## Quarterly review checklist
-
-At the start of each quarter:
-
-1. **`repos/`:** for each cloned repo, ask: does any active phase still reference it? Is its purpose now superseded by
-   another resource? Pre-emptive: don't remove repos cited in active synthesis notes.
-2. **`context/`:** review `papers/`, `notes/`, `pics/` for items unread/unused over the last quarter. Archive (not
-   delete) low-engagement items.
-3. **`docs/`:** review `repo-notes/`, `paper-notes/`, `syntheses/`, `landscapes/` for stale claims. Update inline rather
-   than removing if the document still serves; remove only if cleanly superseded.
-4. **Log every removal/archive in `curation-log.md`** with: date, path, action, rationale, last-commit-SHA pointer.
-5. **Apply The Algorithm to surface speculative additions** that haven't earned their keep yet.
-
-## Cadence
-
-- Quarterly full review (March, June, September, December).
-- Ad hoc removal of clearly-superseded items at any time, but logged the same way.
-```
+**DONE** — file at [`docs/protocols/curation-protocol.md`](../protocols/curation-protocol.md) (commit `1d00467`).
 
 ### 5.7 — `docs/curation-log.md` (new file)
 
-**STATUS (2026-05-04):** DONE. Created on `main` in commit `1d00467`
-(`[planning-spec 5.6+5.7+7.4] add curation protocol and log`). Format extended beyond the original spec to include an
-explicit `added` template alongside the `archived | removed` template — needed because Section 7.4 uses an `added` entry
-but the original spec body only documented removal/archive shape. Initial entry covers Dan's manual clone of 67
-community repos to `repos/` (see Section 7.1 STATUS for scope expansion). New entries are appended at the bottom of the
-**Entries** section.
-
-**5.7.1** Create `docs/curation-log.md` with content:
-
-```markdown
-# Curation Log
-
-Memory of what was removed or archived from `repos/`, `context/`, and `docs/`, when, and why. See
-[curation-protocol.md](protocols/curation-protocol.md) for the policy.
-
-Entries are append-only and ordered by date.
-
-## Format
-
-## YYYY-MM-DD — <action>: <path>
-
-**Action:** archived | removed **Rationale:** <why> **Last-commit SHA:** <SHA pointer to commit before action> **Source
-review:** <which quarterly review or planning session triggered the action>
-
-## Entries
-
-(no entries yet — first quarterly review at next quarter boundary)
-```
+**DONE** — file at [`docs/curation-log.md`](../curation-log.md) (commit `1d00467`).
 
 ---
 
 ## Section 6 — Curation protocol setup
 
-**STATUS (2026-05-04):** Files DONE (commit `1d00467`). Quarterly-review schedule still pending: protocol reference not
-yet added to CLAUDE.md (Section 5.1.6), and the first quarterly review for 2026-06-01 not yet calendared.
-
-The `docs/protocols/curation-protocol.md` and `docs/curation-log.md` files are created in Section 5.6 and 5.7 above. Once
-committed:
-
-- Add the protocol reference to CLAUDE.md (Section 5.1.6 above).
-- Schedule the first quarterly review for the next quarter boundary (next: 2026-06-01 if quarterly counter starts at
-  January 1).
+**PARTIAL.** Files DONE. Remaining: add protocol reference to CLAUDE.md (under §5.1 Engineering Conventions) and
+calendar the first quarterly review (next: 2026-06-01).
 
 ---
 
 ## Section 7 — Repos to clone + notes to write
 
-**STATUS (2026-05-04):** Section 7.1 (clones) DONE manually by Dan with substantial scope expansion. Section 7.2/7.3
-(repo-note writing) IN PROGRESS as ten themed group batches; Group 1 (Apple Silicon — `autoresearch-mlx`) complete on
-`feature/repo-notes-g1-apple-silicon` (commit `bce023c`), Groups 2–10 queued. Section 7.4 (curation-log entry) DONE as a
-single batch entry on `main` covering all 67 clones; per-group PRs deliberately do NOT touch the curation log — see 7.4
-STATUS.
+**DONE** — 67 repos cloned to `repos/`, 81 repo-notes written across ten themed group PRs
+(`feature/repo-notes-g1-apple-silicon` through `feature/repo-notes-g10-finance`) all merged to `main`. Curation-log
+entry covers all 67 clones. The original 12-repo target was superseded by the expanded 2026-05-04 fan-out.
 
-### 7.1 — Clone commands
-
-**STATUS (2026-05-04):** DONE manually by Dan. Scope expanded substantially beyond the original 12-repo list below: 67
-community repos cloned, organized into ten cross-cutting themes (Apple Silicon inference; LLM Wiki engines; LLM Wiki
-agent-driven build patterns; agent persistent memory; KG/network tooling; MCP and code-context tools; agent harnesses
-and orchestration; scientific reasoning agents — primarily the FutureHouse stack; bioinformatics models; finance and
-quant agents). Full enumeration with theme breakdown is captured in the
-`2026-05-04 — added: 67 community repos to repos/` entry of `docs/curation-log.md`. The original 12-repo list below is
-retained as historical reference; the slug-verification note no longer applies (Dan resolved all slugs at clone time).
-
-Run from repo root (the `repos/` directory is gitignored, so cloning here doesn't pollute the Linus repo):
-
-```bash
-cd repos/
-git clone https://github.com/omega-memory/omega-memory.git
-git clone https://github.com/jgoldfed/keppi.git
-git clone https://github.com/rohitg00/agentmemory.git
-git clone https://github.com/bitsofchris/openaugi.git
-git clone https://github.com/tobi/qmd.git
-git clone https://github.com/the-knowledge.git           # verify exact slug; may be org/repo
-git clone https://github.com/multi-agent-wiki.git        # verify exact slug
-git clone https://github.com/HawHello/AgenticResearchWiki.git
-git clone https://github.com/jlowin/fastmcp.git
-git clone https://github.com/eyaltoledano/claude-task-master.git
-git clone https://github.com/smtg-ai/claude-squad.git    # verify exact slug
-# (one more slug pending Dan's specification — leave commented placeholder for now)
-cd ..
-```
-
-**Note:** Three of these slugs are placeholder; the Worker should verify the correct GitHub URLs before cloning and
-report back the canonical paths. If a slug fails to resolve, log the failure in the spec execution checkpoint summary.
-
-### 7.2 — Repo note shape
-
-**STATUS (2026-05-04):** Shape clarified during Group 1 execution. The actual existing notes (e.g.
-`docs/repo-notes/pmetal.md`, `docs/repo-notes/cline.md`) use **numbered sections** rather than the bullet list
-originally drafted here, and there is no separate "TL;DR" section — the opening paragraph of `Purpose and scope` carries
-the TL;DR. The canonical shape, in use as of Group 1, is:
-
-```
-# <name> (`<github-org>/<repo>`)
-
-## 1. Purpose and scope
-## 2. Architecture summary  (or content overview if not code)
-## 3. What's reusable in Linus
-## 4. What's inspiration only
-## 5. What's incompatible or out of scope
-## 6. Recommendation: **<Integrate / Study / Ignore>**
-## 7. Questions for Dan  (3–5 specific, non-generic; carry forward to open-questions.md)
-```
-
-Style rules (per `CLAUDE.md` docs convention): prose over bullets, ≤120 lines, concrete file/module/crate names where
-they exist, reference Linus phases by name where relevant, no emojis.
-
-The original spec bullet list is retained below as historical record.
-
-Each cloned repo gets a one-page note in `docs/repo-notes/<name>.md` following the existing shape established by the
-original twelve repo notes:
-
-- **TL;DR**
-- **Purpose and scope**
-- **Architecture summary** (or content overview if not code)
-- **What's reusable in Linus**
-- **What's inspiration only**
-- **What's incompatible or out of scope**
-- **Decision: integrate / study / ignore**
-- **Open questions for Dan** (carries forward to open-questions.md)
-
-### 7.3 — Worker prompt template for repo notes (Pattern 2)
-
-**STATUS (2026-05-04):** Refined during Group 1 execution. The original single-paragraph Worker prompt (retained below)
-was replaced with the group-batched Maestro/Worker pattern in current use: Maestro spawns one Haiku 4.5 Worker per repo
-within a group, fans out in parallel via the `Agent` tool with `subagent_type=general-purpose`, then reviews and commits
-the returned notes itself. Workers do NOT commit (avoids race conditions on the branch). Workers DO NOT touch
-`docs/curation-log.md` (see 7.4 STATUS).
-
-#### Group-batched Worker prompt (in use as of 2026-05-04)
-
-For each repo in a group, Maestro spawns a Worker with a brief covering:
-
-1. **Reading order** — style references first (`docs/repo-notes/pmetal.md` and one other thematically adjacent existing
-   note), then the target repo (README → `pyproject.toml`/`Cargo.toml`/`package.json` → 1–2 illustrative source files;
-   do not deep-read the whole tree), then the project context (`CLAUDE.md` skim).
-2. **Group context line** — one sentence naming the sibling repos in the same group and the differentiation question the
-   note must answer (e.g. "How does this differ from `link`, `llmwiki`, `wikiloom` in the LLM Wiki engine cluster?").
-3. **Output shape** — exactly the numbered sections from Section 7.2 above.
-4. **Style rules** — prose over bullets, ≤120 lines, concrete names, phase-tagged recommendations, no emojis.
-5. **STOP conditions** — repo not cloned, README missing, can't tell within ~10 minutes what the repo does. Report
-   rather than guess.
-6. **Commit policy** — Worker writes the file but does NOT commit; returns the absolute path plus a 2-sentence summary
-   of the recommendation. Maestro reviews, spot-checks 2–3 specific factual claims against the actual repo, then commits
-   the whole group as a single atomic commit per Section 8.1.
-
-#### Branch and commit conventions (in use)
-
-- Per-group branch: `feature/repo-notes-g<N>-<theme-slug>`, branched from `main` after the curation-log commit
-  (`1d00467`) so all groups share a conflict-free baseline.
-- Per-group commit message: `[planning-spec 7.G<N>] add repo notes for <theme>`.
-- One PR per group; PRs opened as a batch at the end of all ten groups, not per-group, so review can sequence cleanly.
-
-#### Original Pattern 2 prompt (historical reference)
-
-```
-Read planning-update-spec.md at docs/specs/planning-update-spec.md Section 7.
-Write a one-page repo-note for the cloned repo at repos/<NAME>/ following the
-shape in Section 7.2. Output file: docs/repo-notes/<NAME>.md. Use the existing
-notes (e.g., docs/repo-notes/pmetal.md) as style reference. Commit with message
-"[planning-spec 7.<N>] add <NAME> repo note". STOP if the repo isn't cloned yet
-or if any required source-of-truth file is missing — report and don't guess.
-```
-
-### 7.4 — Curation log entry on clone
-
-**STATUS (2026-05-04):** DONE on `main` in commit `1d00467`. The actual entry covers 67 repos (not 12) with a per-theme
-breakdown, dated 2026-05-04 (not 2026-05-03), and lives as the first entry in the **Entries** section of
-`docs/curation-log.md`.
-
-**Decision: per-group repo-note PRs do NOT touch `docs/curation-log.md`.** The curation-log entry covers the **clone
-event**, which already happened once on main. Per-repo rationale lives in each repo-note itself, per the curation
-protocol's "Add with rationale in the originating note" rule. This eliminates merge conflicts on the curation log when
-the ten group PRs land in any order.
-
-The original single-batch entry template is retained below as historical reference:
-
-```markdown
-## 2026-05-03 — added: 12 community repos to repos/
-
-**Action:** added **Rationale:** identified via LLM Wiki and skills syntheses as Phase 2-3 reference material. See
-planning-update-spec.md Section 7.1 for full list. **Source review:** planning session 2026-05-03.
-```
+_Section 7 detail (clone commands, repo-note shape, Worker prompt template, curation-log entry template) collapsed —
+all DONE; canonical artifacts live in `docs/curation-log.md`, `docs/repo-notes/`, and the merged group PRs._
 
 ---
 
-## Section 8 — Worker invocation guide (consolidated)
+## Section 8 — Worker invocation guide
 
-### 8.1 — Recommended execution order
+**Recommended execution order for remaining work** (DONE items omitted):
 
-1. **Section 5.5 — SAFETY.md** edits (Tier 0 #1 incident response is highest priority before any further env work).
+1. **§5.5 SAFETY.md** — Supply Chain Incident Response section + uv-via-conda Network safety expansion.
 2. **Tier 0 #0 deps cleanup** — remove langchain/langgraph/haystack-ai from `environment.yml`; add
-   `requirements-locked.txt` via `pip-compile --generate-hashes`. Cross-references CLAUDE.md edit 5.1.2.
-3. **Section 5.1 — CLAUDE.md** edits (small, batchable, single Worker session).
-4. **Section 5.2 — VISION.md** edits (small, single Worker session).
-5. **Section 5.3 — ARCHITECTURE.md** edits (medium, single Worker session).
-6. **Section 5.4 — ROADMAP.md** edits (medium-to-large, single Worker session).
-7. **Section 5.6 + 5.7** — curation protocol and log (two new files). **DONE 2026-05-04 (commit `1d00467` on `main`).**
-8. **Section 7.1 — clone repos** (terminal task; no Claude Code involvement beyond verification). **DONE manually by
-   Dan; expanded from 12 to 67 repos across ten themes — see Section 7.1 STATUS.**
-9. **Section 7.2/7.3 — write repo notes** — current pattern is **per-group parallel fan-out**: ten themed group batches,
-   one Maestro/Worker session per group, Workers fanned out in parallel via the `Agent` tool, Maestro reviews and
-   commits per-group. **IN PROGRESS:** Group 1 (Apple Silicon — `autoresearch-mlx`) DONE on
-   `feature/repo-notes-g1-apple-silicon` (commit `bce023c`); Groups 2–10 queued. PRs batched at the end of all ten
-   groups, not per-group. See Section 7.3 STATUS for the prompt template and branch convention in current use.
-10. **Section 3 — [KB-spec]** items delivered to KnowledgeBase repo via PRs.
+   `requirements-locked.txt` via `pip-compile --generate-hashes`.
+3. **§5.1 CLAUDE.md** — owner-background Hawthorn Woods update, uv-via-conda env note, five new Engineering
+   Conventions (page cache, public APIs, multi-language, curation cadence, planning write-back), MCP-shape arch
+   diagram, disposable-uv-env quirk note.
+4. **§5.2 VISION.md** — refined principled-independence sub-section, reproducibility/interpretability principle,
+   personal-LLM-Wiki framing, 10-bits/s Maestro/Worker anchoring.
+5. **§5.3 ARCHITECTURE.md** — MCP-shape tool registry, dual KB data model, refined Phase 2 scope, refreshed open
+   questions.
+6. **§5.4 ROADMAP.md** — Phase 1f community-repo notes, Phase 1b verdict refinement, Phase 1c BitNet 2B4T spike +
+   experimental-protocol.md, Phase 2 entrepreneurial-surface + output-synthesis + KB-substrate, Phase 4 Wikipedia +
+   Kolibri + PMTiles, Phase 5c claw-code-local adoption, Phase 6a/6d refresh, Phase 8 long-horizon notes.
+7. **§6 calendar** — first quarterly review (2026-06-01) + protocol reference in CLAUDE.md.
+8. **§10.1, §10.2.1, §10.2.2, §10.2.3** — memory-pillar phase additions and CLAUDE/ARCHITECTURE/ROADMAP file edits.
+9. **§11.1–§11.4, §11.6–§11.7** — sweep ADRs (S1, S3, S4, S6, S7, S8, S9, S10), sweep specs (phase1c-spike,
+   phase6d-streaming-target, phase3-spawner, biology-phase7-roadmap), SAFETY.md sweep additions, KB-spec sweep
+   additions, VISION.md sweep additions, tooling/process additions.
+10. **§3 [KB-spec]** items — delivered to KnowledgeBase repo via PRs.
 
-### 8.2 — Maestro session prompt (Pattern 1, full execution)
-
-For executing the entire spec in a single Maestro-orchestrated session:
-
-```
-This is a planning-spec execution session. Read
-docs/specs/planning-update-spec.md fully. Execute Sections 5 through 7 in the
-recommended execution order in Section 8.1. Use the Edit tool for in-file edits;
-use the Write tool for new files (5.6, 5.7); delegate repo-note writing
-(Section 7.2/7.3) to parallel Haiku Workers via the Agent tool with
-subagent_type=general-purpose if available, otherwise execute sequentially.
-
-After each section completes, post a checkpoint summary listing:
-- Files changed
-- Any task that surfaced ambiguity needing Dan's input (paste the question; do
-  not guess)
-- Open questions raised by the work itself (carry forward to a follow-up
-  iteration)
-
-Commit each section as a separate atomic commit on a feature branch
-"feature/planning-spec-2026-05-03". Open a PR titled "[planning-spec] core file
-refresh from 2026-05-03 session" when all sections are complete. Do NOT merge.
-
-If a Section 3 [KB-spec] item appears in scope, do NOT execute it in this Linus
-repo — flag it for delivery to KnowledgeBase.
-```
-
-### 8.3 — Maestro session prompt (Pattern 1, narrow scope)
-
-For executing one section at a time (lower risk, more iterative):
-
-```
-Read docs/specs/planning-update-spec.md. Execute ONLY Section <N>. Use the Edit
-tool. After completion, post a checkpoint summary and stop. Commit on a feature
-branch "feature/planning-spec-section-<N>". Do NOT proceed to other sections.
-```
-
-### 8.4 — Haiku Worker prompt (Pattern 2, single task)
-
-For executing a single self-contained task from the spec:
-
-```
-Read docs/specs/planning-update-spec.md, locate task <X.Y.Z> EXACTLY. Execute
-ONLY that task using the Edit tool. STOP if the task references content that
-doesn't exist or if the find/replace string is ambiguous. Commit with message
-"[planning-spec X.Y.Z] <description>". Do NOT touch any other file.
-```
+**Worker invocation patterns** (Maestro full-spec, Maestro narrow-scope, Haiku single-task) and prompt templates have
+been used and validated across multiple sessions; concrete prompts are reconstructable from the patterns themselves
+and from prior commit history. Re-document only if a future session shows the patterns drifting.
 
 ---
 
-## Section 9 — Open questions surfaced during this session (for next iteration)
+## Section 9 — Open questions surfaced during this session
 
-Items raised during the 2026-05-03 planning session that should propagate into the next iteration's `open-questions.md`
-rather than being resolved now:
-
-1. **Planet PMTiles disk footprint research.** What is the actual file size for global PMTiles coverage at the
-   resolution Linus needs? Decide between full planet vs. population-density-weighted vs. fallback regional priority
-   based on the answer.
-2. **Additional community repos to clone.** Dan flagged "one more slug" of content in this iteration; the next iteration
-   captures the specific repos.
-3. **DECISIONS.md → ADR graduation.** DECISIONS.md is now at 27 entries. The file's own threshold ("graduate to per-file
-   ADRs in `docs/adr/NNNN-title.md` when this file exceeds ~20") has been crossed. Action queued for next session.
-4. **Per-domain KB quality criteria.** Tier 1 #6 was reframed as "surface, not gate," but per-domain criteria (genomics,
-   computational biology, environmental science) for the YAML-policy framework remain unspecified. A future session
-   fills these in alongside the [KB-spec] KB-3.2 implementation.
-5. **fastmcp evaluation outcome.** Phase 2 spec needs the fastmcp evaluation result to commit MCP server-side
-   construction technology. Output of Phase 1f orchestration evaluation feeds this.
-6. **Cartography skill development plan.** Tier 3 #25 surfaced Dan's interest in cartography + geospatial-DB
-   integration. No phase-blocking decisions, but worth a small planning artifact in a future iteration.
-
----
-
-_Spec produced 2026-05-03 from a Maestro/Dan multi-question planning session. Walks through every Tier 0, Tier 1, Tier
-2, and Tier 3 item in [../questions/top-questions.md](../questions/top-questions.md) and converts the answers into
-actionable Worker tasks. Supersedes the 2026-05-01 draft. Extended the same day with Section 10 (Memory Pillar
-additions) from the follow-up planning session._
+Surfaced items propagated to [open-questions.md](../questions/open-questions.md): planet PMTiles disk footprint,
+DECISIONS.md → ADR graduation (now DONE), per-domain KB quality criteria for [KB-spec] KB-3.2, fastmcp evaluation
+outcome from Phase 1f, cartography + geospatial-DB skill plan. ADR graduation has since landed; the others remain
+open.
 
 ---
 
 ## Section 10 — Memory Pillar additions (2026-05-03 follow-up)
 
+> **STATUS (audit 2026-05-05):** §10.3 (the 16 ADRs DEC-0028 through DEC-0043) is **DONE.** §10.2.4
+> (`docs/protocols/maestro-worker-protocol.md`) is **DONE** (file exists; content match against §10.2.4 is one of the
+> remaining verification tasks). §10.1 phase-by-phase additions, §10.2.1 CLAUDE.md "Memory pillar discipline"
+> convention, §10.2.2 ARCHITECTURE.md memory-pillar section, §10.2.3 ROADMAP.md memory-pillar additions are
+> **NOT-STARTED.**
+
 This section extends the Phase-by-phase change list (Section 2) and File-by-file edit plan (Section 5) with the 17
 memory-pillar resolutions (M1–M17) and the side- quest addition (Mughal practitioner article). Sources of truth: the
-[Memory Pillar Resolution Log in top-questions.md](../questions/top-questions.md), the 16 per-file ADRs at
+Memory Pillar block in [answered-questions.md](../questions/answered-questions.md), the 16 per-file ADRs at
 [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md) through
 [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md), and the implementation contract in
 [`docs/specs/memory-architecture.md`](memory-architecture.md).
@@ -1372,84 +1017,28 @@ surfaces" entry is **superseded** by this section and the spec — replace with 
 
 ### 10.3 — DECISIONS.md / per-file ADR additions checklist
 
-The following ADRs landed per-file in [`docs/adr/`](../adr/) (the per-file convention adopted at the 2026-05-03
-follow-up session — DEC-0027 was the last entry in the legacy single-file `DECISIONS.md`). Verify presence as part of
-spec execution; do not duplicate:
-
-- [x] [DEC-0028](../adr/0028-memory-architecture-phase2-pillar.md) — Memory architecture lifted to Phase 2 first-class
-      pillar (M1 + M12)
-- [x] [DEC-0029](../adr/0029-episodic-memory-substrate.md) — Layer C substrate (M2)
-- [x] [DEC-0030](../adr/0030-scratchpad-first-class-artifact.md) — Scratchpad first-class; o1 anti-pattern forbidden
-      (M3)
-- [x] [DEC-0031](../adr/0031-router-primitives-cot-budget-memory-mode.md) — Router primitives `cot_budget` and
-      `memory_mode` (M4)
-- [x] [DEC-0032](../adr/0032-in-context-window-cap-policy.md) — In-context window cap policy (M5)
-- [x] [DEC-0033](../adr/0033-cot-gap-fingerprint-registry-property.md) — CoT-gap fingerprint as registry property (M6)
-- [x] [DEC-0034](../adr/0034-worker-size-vs-cot-length-comparison.md) — Worker-size vs. CoT-length comparison (M7)
-- [x] [DEC-0035](../adr/0035-arc-agi-as-memory-diagnostic.md) — ARC-AGI as memory diagnostic (M8)
-- [x] [DEC-0036](../adr/0036-kv-cache-continuity-architectural-constraint.md) — KV-cache continuity constraint (M9)
-- [x] [DEC-0037](../adr/0037-ttt-apple-silicon-viability-spike.md) — TTT viability spike (M10)
-- [x] [DEC-0038](../adr/0038-mingru-mlx-port-spike.md) — minGRU MLX port spike (M11)
-- [x] [DEC-0039](../adr/0039-episodic-schema-hybrid-leaf-summary.md) — Episodic schema hybrid leaf+summary (M13)
-- [x] [DEC-0040](../adr/0040-faithfulness-audit-deferred.md) — Faithfulness audit deferred (M14)
-- [x] [DEC-0041](../adr/0041-mingru-bitnet-phase8-research-direction.md) — minGRU + BitNet Phase 8 research direction
-      (M15)
-- [x] [DEC-0042](../adr/0042-coconut-phase6-substrate-experiment.md) — Coconut Phase 6 substrate experiment (M16)
-- [x] [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md) — Memory-mode-aware Phase 6a fine-tuning targets
-      (M17)
-
-[`docs/adr/README.md`](../adr/README.md) index updated. The legacy single-file `DECISIONS.md` at the repo root remains
-as the brief pointer + index it became after DEC-0027.
+**DONE** — DEC-0028 through DEC-0043 all landed at [`docs/adr/`](../adr/) covering M1–M17. Index at
+[`docs/adr/README.md`](../adr/README.md).
 
 ### 10.4 — Worker invocation guide for the memory-pillar additions
 
-Recommended execution order for Section 10:
-
-1. **§10.2.4 — `docs/protocols/maestro-worker-protocol.md` (new file)** — small, self-contained, single Haiku Worker
-   session per Pattern 2.
-2. **§10.2.1 — CLAUDE.md memory pillar discipline section** — small, single Worker session.
-3. **§10.2.2 — ARCHITECTURE.md memory pillar section** — medium, single Worker session referring to the
-   memory-architecture spec.
-4. **§10.2.3 — ROADMAP.md additions** — medium-to-large, single Worker session walking the ROADMAP block-by-block.
-5. **§10.2.5 — `~/.linus/` runtime directory documentation** — small, already covered by the memory-architecture spec;
-   ARCHITECTURE.md edit in step 3 references it.
-
-The implementation work itself (the seven Phase 2 v0 deliverables in §10.1) is **out of scope for the spec-execution
-session**; it lives in Phase 2a Worker sessions that happen after this spec lands.
+_Folded into Section 8._ Remaining memory-pillar work is captured there.
 
 ### 10.5 — Open questions surfaced during the memory-pillar session
 
-Items surfaced during the 2026-05-03 follow-up planning session that propagate into the next iteration's
-`open-questions.md`:
-
-1. **Per-domain CoT-gap variance.** The DEC-0033 fingerprint runs MultiArith- style problems. Does Dan's task
-   distribution (genomics, bioinformatics, scientific Python) produce a meaningfully different CoT-gap profile per
-   Worker? A small Phase 1c+ extension to the fingerprint with domain-specific probes would tell us; queued for next
-   iteration.
-2. **In-context cap empirical revision schedule.** DEC-0032 sets 16K as a floor that moves with confidence as
-   measurements accumulate. What is the trigger condition for moving the cap up — periodic review (quarterly?), a
-   measured fraction of Worker calls hitting the cap, or a Worker-class transition (when fine-tuned BitNet 3B lands)?
-   Queued for next iteration.
-3. **Episodic-store retention pruning policy.** DEC-0030 keeps everything in v0; "retain unless explicitly archived" is
-   the default. What is the actual long-tail behavior — when does the database start being unwieldy, and what does the
-   first pruning policy look like? Queued for next iteration; will surface naturally as Phase 2 ships and v0 accumulates
-   real data.
-4. **Hybrid summary function quality.** DEC-0039's deterministic structural summary is a v0 choice; a learned summarizer
-   is Phase 6+. What is the trigger condition for moving from deterministic to learned? Queued for next iteration.
-5. **Per-domain memory-mode defaults.** DEC-0031's v0 heuristic is session-continuity-based. Are there domain-specific
-   defaults worth encoding (e.g., genomics literature review → `project_stateful` by default; quick Q&A → `stateless`)?
-   Queued for the Phase 7 skills design conversation.
-
----
-
-_Section 10 produced 2026-05-03 from the same-day follow-up planning session covering the 17 M-series memory-pillar
-items. The Phase-by-phase change list in §10.1 and the file-by-file edit plan in §10.2 supplement Sections 2 and 5 of
-this spec; the Worker invocation guide in §10.4 supplements Section 8. The 16 ADRs in §10.3 and the implementation
-contract at [`docs/specs/memory-architecture.md`](memory-architecture.md) are the authoritative artifacts._
+Surfaced items propagated to [open-questions.md](../questions/open-questions.md): per-domain CoT-gap variance,
+in-context cap revision-schedule trigger, episodic-store retention pruning policy, hybrid summary function quality
+trigger (deterministic → learned), per-domain memory-mode defaults.
 
 ---
 
 ## Section 11 — Sweep additions (2026-05-04)
+
+> **STATUS (audit 2026-05-05):** §11.5 Layer E amendment to memory-architecture.md is **DONE** (Layer E section
+> present with status "open question"; prior-art section unverified). All other §11 work is **NOT-STARTED:** §11.1
+> sweep ADRs (no `0044+-*.md` files exist), §11.2 sweep specs (no `phase1c-spike.md`, `phase6d-streaming-target.md`,
+> `phase3-spawner.md`, `biology-phase7-roadmap.md`), §11.3 SAFETY.md sweep additions, §11.4 KB-spec sweep additions,
+> §11.6 VISION.md sweep additions, §11.7 tooling/process additions all owed.
 
 A second-wave addition pass covering the work surfaced by the post-fan-out integration of nine new thematic syntheses
 plus the 13 outstanding fan-out items. The new sweep questions live in
@@ -1541,21 +1130,9 @@ New `docs/specs/kb/` items implied by the sweep:
 
 ### 11.5 — Memory-architecture spec amendments
 
-The agentic-systems synthesis surfaces a new memory-pillar question (S13: fifth memory layer for "investigation
-memory"). The g4-memory cluster surfaces substrate evidence that strengthens DEC-0029 (openaugi as closest existing
-match) and parallel-write coordination prior art (agentmemory's lease/signal/checkpoint primitives).
-
-Amend [`docs/specs/memory-architecture.md`](memory-architecture.md) with:
-
-- A new "Layer E — Investigation memory" section under "The four memory layers," covering: what it holds
-  (task-scoped, multi-agent, single-investigation lifetime); read/write API; substrate choice (initial proposal:
-  shared in-memory store with Layer C overflow on session-end); the boundary against Layer B (within-session
-  scratchpad) and Layer C (cross-session episodic).
-- An "Implementation prior art" section under "What this spec leaves open" pointing at openaugi (DEC-0029 v0
-  closest match) and agentmemory (parallel-write coordination primitives) as references for the Phase 2
-  implementation.
-- A status note that Layer E is _open_ pending S13 resolution; the four-layer architecture stands until the
-  Investigation Memory question is settled at the next planning session.
+**PARTIAL.** Layer E (Investigation memory, S13) added with status "open question." Remaining: "Implementation prior
+art" section pointing at openaugi (DEC-0029 v0 closest match) and agentmemory (parallel-write coordination primitives)
+under "What this spec leaves open."
 
 ### 11.6 — VISION.md additions (Tier 3, batch)
 
@@ -1582,49 +1159,30 @@ The thematic syntheses surface several VISION-level positions Dan should conside
 - **Wh-per-task or energy ledger decision** for `benchmarks/dan_tasks/`: per-prompt measurement (benchmark column,
   per-model comparability) vs. `~/.linus/energy.jsonl` ledger (per-project honesty). _(S28.)_
 
-### 11.8 — Worker tasks for Section 11 execution
+### 11.8 — Worker task sequencing for Section 11
 
-The same Worker invocation pattern from Section 8 applies here. Work products in priority order:
+Smallest-reversible-first, KB-substrate decisions next, architectural ADRs (Phase 3 spawner is the biggest), Phase 7
+sub-roadmap and doc additions last:
 
-1. Draft ADR-S3 (fastmcp) and ADR-S2 (LAB-Bench canary blocklist) — small, reversible, no dependencies.
-2. Draft `docs/specs/kb/canary-blocklist.md` and the initial `canaries.yaml`.
-3. Draft ADR-S1 (paper-qa) and `docs/specs/kb/paper-qa-substrate-integration.md` — paired.
-4. Draft ADR-S6 (`model_prediction` edge class) and `docs/specs/kb/model-prediction-edges.md` — paired.
-5. Draft ADR-S4 (`external_api_tool` registry class).
-6. Draft `docs/specs/phase1c-spike.md` (or fold into existing `docs/experimental-protocol.md`).
-7. Draft SAFETY.md additions as a single PR (whole-genome tier-control + activation-hooks stub +
-   KB→hosted-Maestro policy + canary blocklist reference).
-8. Draft ADR-S8 (pmetal kernels vs PrismML fork) — gated on Phase 1b verdict context, may slip.
-9. Draft ADR-S9 + ADR-S10 + `docs/specs/phase3-spawner.md` — paired bundle for the Phase 3 spawner.
-10. Draft `docs/specs/biology-phase7-roadmap.md`.
-11. Draft `docs/specs/phase6d-streaming-target.md`.
-12. Amend `docs/specs/memory-architecture.md` (Layer E + implementation prior art).
-13. VISION.md / CLAUDE.md / SAFETY.md additions per §11.6 and §11.7 — collect as a single review PR rather than
-    drip-feed.
-
-The sequencing reflects: ship the smallest reversible items first, the KB-substrate decisions next (because they
-gate the largest downstream work), then the architectural ADRs (Phase 3 spawner is the biggest), then the Phase 7
-sub-roadmap and the doc additions.
+1. ADR-S3 (fastmcp) + ADR-S2 (LAB-Bench canary) — small, no deps.
+2. `docs/specs/kb/canary-blocklist.md` + `canaries.yaml`.
+3. ADR-S1 (paper-qa) + `docs/specs/kb/paper-qa-substrate-integration.md` — paired.
+4. ADR-S6 (`model_prediction` edge class) + `docs/specs/kb/model-prediction-edges.md` — paired.
+5. ADR-S4 (`external_api_tool` registry class).
+6. `docs/specs/phase1c-spike.md` (or fold into existing `docs/experimental-protocol.md`).
+7. SAFETY.md additions as a single PR (whole-genome tier-control + activation-hooks stub + KB→hosted-Maestro policy).
+8. ADR-S8 (pmetal kernels vs PrismML fork) — gated on Phase 1b verdict; may slip.
+9. ADR-S9 + ADR-S10 + `docs/specs/phase3-spawner.md` — paired bundle.
+10. `docs/specs/biology-phase7-roadmap.md`.
+11. `docs/specs/phase6d-streaming-target.md`.
+12. `docs/specs/memory-architecture.md` Layer E "implementation prior art" section.
+13. VISION.md / CLAUDE.md / SAFETY.md additions per §11.6 + §11.7 — single review PR.
 
 ### 11.9 — Open questions surfaced during Section 11
 
-- **Is `docs/experimental-protocol.md` the right home for the Phase 1c methodology, or is `phase1c-spike.md` a
-  separate doc?** Recommendation: fold into experimental-protocol.md (more durable; the methodology applies beyond
-  Phase 1c). Confirm before drafting.
-- **Should the KB-spec items in §11.4 land in the KnowledgeBase repo or the main Linus repo?** Per the [KB-spec]
-  split convention from §3, items that primarily impact KnowledgeBase land in `docs/specs/kb/` and the
-  KnowledgeBase repo gets a partner spec. The four items in §11.4 all primarily impact KnowledgeBase.
-- **Does the four-axis SAFETY.md addition still hold as a single PR, given the canary-blocklist item is more of a
-  KB-spec than a SAFETY policy?** Recommendation: ship the three SAFETY-policy items (whole-genome,
-  activation-hooks, KB→hosted-Maestro) as one PR; ship canary-blocklist separately as a KB-spec.
-- **Is the LucaOne-vs-specialist head-to-head (S18) tractable in a Worker session, or does it require a Maestro
-  session?** A scaled-down version (2 RNA tasks, 2 variant tasks, ~1 day per side) is Worker-tractable; the
-  full version with statistical rigor is Maestro-class. Decide which version Phase 7 actually wants before
-  writing the spec.
+Surfaced items propagated to [open-questions.md](../questions/open-questions.md): is `experimental-protocol.md` the
+right home for Phase 1c methodology vs. `phase1c-spike.md`; KB-spec items §11.4 land in main repo vs. KnowledgeBase
+repo; SAFETY single-PR scope (canary-blocklist split out as KB-spec); LucaOne-vs-specialist head-to-head Worker- or
+Maestro-class.
 
 ---
-
-_Section 11 produced 2026-05-04 from the post-fan-out integration pass that added nine new thematic syntheses and
-absorbed the 13 outstanding fan-out items. The 60 new sweep questions (S1–S60) live in
-[`docs/questions/top-questions.md`](../questions/top-questions.md) under "Sweep promotions (added 2026-05-04)";
-this Section 11 is their spec-level execution surface. New ADRs and specs land per the sequencing in §11.8._
