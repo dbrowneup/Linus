@@ -1,4 +1,4 @@
-# Paper-Notes Session Summary — 2026-05-03 through 2026-05-04
+# Paper-Notes Session Summary — 2026-05-03
 
 This document consolidates the per-batch checkpoint summaries from the 2026-05-03 / 2026-05-04
 Maestro session that fanned out paper-note generation across the 39 PDFs Dan added to
