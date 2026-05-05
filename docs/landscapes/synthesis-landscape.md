@@ -63,6 +63,38 @@ in `top-questions.md`; refer back as decisions land.
 
 ---
 
+## Cluster hubs and synthesis cross-edges (added 2026-05-05)
+
+The 2026-05-05 remapping moved the matrix from one-cluster-per-synthesis to many-to-many. Each thematic synthesis
+keeps a primary cluster anchor (the cluster whose Tier-1-equivalent action is most load-bearing), but secondary
+edges expose where the same cluster informs multiple syntheses. Four clusters become _hubs_ — clusters that anchor
+or substantively inform four or more thematic syntheses. The hubs are the leverage points: investing in the
+underlying repos (or in the patterns the cluster surfaces) compounds across multiple syntheses simultaneously.
+
+| Hub cluster | Thematic syntheses it touches | Why it's a hub |
+| --- | --- | --- |
+| **g4-memory** | memory _(primary)_, agentic-systems, llm-wiki, biological-foundation-models, security | The memory pillar is genuinely cross-cutting — investigation memory, claim-typed write-back, model_prediction provenance, and trust-tier tagging all share the same substrate. |
+| **g7-harnesses** | agentic-systems _(primary)_, skills-and-practices, infra-foundations, security, entrepreneurship | Harnesses are where every operational pattern actually runs; workgraph-style JSONL DAG + dispatch is the recommended Phase 2a session-store shape. |
+| **g8-sci-agents** | llms-in-science _(primary)_, agentic-systems, skills-and-practices, llm-wiki, function-annotation-discovery, entrepreneurship | paper-qa alone earns the breadth — it's the first paper-corpus tool to earn Integrate, the literature-intelligence engine for Phase 7, and the substrate-reframe ("adopt + extend") for Phase 2 KB. |
+| **g9-bio** | function-annotation-discovery _(primary)_, biological-foundation-models _(primary)_, generative-biology _(primary)_, skills-and-practices, llms-in-science, entrepreneurship | The biology pillar is overdetermined; bioSkills (~438 skills), Bacformer (Apple-Silicon-realistic broad-bio FM), and the integrate trio drive the Phase 7 sub-roadmap and the inaugural commercial surface. |
+
+Two clusters are anchors-only (anchor one or two syntheses but don't function as hubs): **g1-apple-silicon**
+(native-low-bit primary; infra-foundations, security secondary), **g10-finance** (entrepreneurship primary;
+skills-and-practices secondary). Both are doing focused work rather than cross-cutting work.
+
+The remaining clusters — **g2-wiki-engines**, **g3-wiki-patterns**, **g5-graph-tools**, **g6-mcp-tools** — are
+mid-degree: each touches three to five thematic syntheses, mostly as secondary edges that sharpen substrate or
+tooling decisions. g5-graph-tools in particular went from unmapped at the start of 2026-05-05 to anchor of
+infra-foundations plus secondary edges into memory, agentic-systems, biological-foundation-models, and security —
+Phase 3 KB tooling is concentrated here. g3-wiki-patterns touches memory, llms-in-science, and infra-foundations,
+making it a connective edge between substrate prior art and benchmark/KB-tooling workflows.
+
+The synthesis-side mirror image: **safety-alignment-privacy** and **humans-teams-performance** are intentionally
+repo-unmapped, and that's a property of the topic. Both feed VISION/SAFETY/benchmark-design rather than tool
+integration.
+
+---
+
 ## The unifying thesis (expanded)
 
 Across all 24 syntheses, from completely different starting points, the same underlying claim recurs: **the bottleneck
