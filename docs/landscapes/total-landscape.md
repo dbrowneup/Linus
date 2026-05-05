@@ -5,7 +5,7 @@
 The master integration map across the four kinds of input Linus has accumulated:
 
 - **78 paper notes** in [`docs/paper-notes/`](../paper-notes/) — flat lookup in
-  [`docs/papers/INDEX.md`](../papers/INDEX.md).
+  [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md).
 - **80 repo notes** in [`docs/repo-notes/`](../repo-notes/) — flat lookup in
   [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md).
 - **13 thematic syntheses** in [`docs/syntheses/`](../syntheses/) — security, llm-wiki, skills-and-practices, memory,
