@@ -140,8 +140,8 @@ that led to the 1963 nuclear test ban treaty.
 software infrastructure.
 
 Logo: a carbon atom. Pauling's early work was on carbon's tetravalent sp³ hybridization; carbon is the foundation of
-biochemistry (the project owner's field); and the hardware/silicon-wetware/carbon interface is a nice conceptual hook
-for what Linus does.
+biochemistry — the field of the project's owner, a PhD biochemist now working in genomics and metagenomics — and the
+silicon/carbon interface is a nice conceptual hook for what Linus does.
 
 See [VISION.md](VISION.md) for the extended rationale.
 

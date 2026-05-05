@@ -53,9 +53,11 @@ What Linus the project inherits from Pauling:
   open-ended practice.
 
 Pauling's favorite element is unknown, but it could have been oxygen, for its role in the biology he studied later. It
-could also have been carbon, as his early work was on carbon's tetravalent sp³ hybridization. Carbon is the logo. Carbon
-is the substrate of biochemistry, Dan's field. Carbon-based life meeting silicon-based intelligence is a nice conceptual
-hook and a reminder that the two have always been more entangled than the hardware/software split makes them look.
+could also have been carbon, as his early work was on carbon's tetravalent sp³ hybridization. Carbon is the logo.
+Carbon is the substrate of biochemistry — Dan's PhD field — and of the genomics and metagenomics work that occupies
+his current days as a Senior Scientist at LanzaTech. Carbon-based life meeting silicon-based intelligence is a nice
+conceptual hook and a reminder that the two have always been more entangled than the hardware/software split makes
+them look.
 
 ### Linus Torvalds (1969–)
 

@@ -9,14 +9,34 @@ atom.
 
 ## Owner Background
 
-- Dan Browne, 37
-- PhD Biochemistry (2018), specialization in genomics and computational biology
-- BS Environmental Science
-- 13 years of Python in scientific computing
-- Self-taught CS, comfortable with trial-and-error debugging
-- Learning: Rust, nodejs/npm, agentic systems, LLM inference/fine-tuning
-- Hardware: MacBook Pro 2021, Apple M1 Max, 32 GB unified memory, 10 CPU / 24 GPU / 16 ANE cores
-- GitHub: dbrowneup
+- Daniel R. Browne, 37 (GitHub: dbrowneup, email: dbrowne.up@gmail.com)
+- **Current role**: Senior Scientist at LanzaTech (Skokie, IL), since Apr 2026. Maintains enterprise LLM infrastructure
+  for company-wide AI tools and leads development/validation of bioinformatics software for metagenomics analyses.
+  Promoted from Computational Biologist (Jun 2023–Mar 2026) at the same company, where he led metagenomics SW dev,
+  analyzed genomic/metagenomic datasets for commercial process insights, and trained colleagues on bioinformatics
+  workflows.
+- **Prior industry**: PacBio (Chicago, 2019–2023) — Product Owner for Bioinformatics & Sequencing Platforms (Jul 2021–
+  Jan 2023), translating user needs into product requirements across R&D/Sales/Support; before that Field Applications
+  Scientist for Bioinformatics, supporting 35+ customer accounts on complex long-read pipelines and identifying edge
+  cases.
+- **Education**: PhD Biochemistry, Texas A&M (2018), with a Graduate Certificate in Entrepreneurship; BS Environmental
+  Science with Chemistry minor, University of Portland (2011). Doctoral thesis on systems analysis of metabolism and
+  physiology in the oil-producing green alga _Botryococcus braunii_ (Showa, race B).
+- **Domain specialty**: genomics and computational biology — long-read sequencing (PacBio HiFi), genome/transcriptome
+  assembly, comparative genomics, metagenomics, gene cloning/expression/editing, protein purification and enzyme
+  assays. _B. braunii_ genome assembly and downstream lipid/terpene metabolism analyses are the deepest part of his
+  publication record (11 publications, 15 presentations).
+- **Production stack he already operates in**: Python, Linux, Bash, Git, GitHub, GitHub Actions, SQL, WDL, Docker, AWS,
+  Azure; Agile/Jira; pipeline validation and automated testing.
+- **Entrepreneurship background**: founded Botryonyx LLC (2018–2019), an algae-based wastewater-treatment + carbon-
+  capture venture; raised $42K in seed funding, tested a prototype, competed at Rice Business Plan and was an SEC
+  Pitch semi-finalist for Texas A&M; 2nd place at the Aggie Pitch Competition ($12K). Scientific Advisor at CaribAlgae
+  in Curaçao (2018–2022). The speed-and-evidence instinct in this repo's Algorithm/blitzscaling framings is lived
+  experience, not borrowed mindset.
+- **13 years of Python in scientific computing**; self-taught CS, comfortable with trial-and-error debugging.
+- **Currently learning**: Rust, nodejs/npm, agentic systems, LLM inference/fine-tuning. Calibrate explanations
+  accordingly — deep biology/Python/Linux fluency, newer to systems-language idioms and modern JS tooling.
+- **Hardware**: MacBook Pro 2021, Apple M1 Max, 32 GB unified memory, 10 CPU / 24 GPU / 16 ANE cores.
 
 ## North Star
 
