@@ -604,7 +604,7 @@ The Garrison nucleus:
 
 - [`context/notes/garrison_memory_makes_computation_universal.md`](../../context/notes/garrison_memory_makes_computation_universal.md)
   — the synthesized blog + paper note that anchored this reading.
-- [`context/papers/2412.17794v1.pdf`](../../context/papers/2412.17794v1.pdf) — Garrison's proof paper.
+- [`context/papers/2412.17794v1.pdf`](../../context/papers/2412.17794v1.pdf) — Garrison's proof paper (formal arXiv version now in corpus as ([2412.17794v1](../paper-notes/2412.17794v1.md))).
 
 The eleven supporting paper notes (all in [`docs/paper-notes/`](../paper-notes/)):
 

@@ -227,6 +227,8 @@ citation-grounded outputs and explicit claim typing. Adopting paper-qa as the Ph
 integration target reframes the KB question from "build" to "adopt + extend," and it lands the citation discipline
 this synthesis argues for as code rather than convention.
 
+The Nature feature **Self-Driving Labs Power Up** ([d41586-026-00974-2](../paper-notes/d41586-026-00974-2.md)) documents the shift from human-directed experiments to AI-directed closed-loop discovery: LLM-guided hypothesis generation feeds robotic experimentation, results feed back to the LLM for the next hypothesis. This is the Schulz collaborative frame applied to laboratory automation, and it directly parallels Linus's maestro-worker architecture applied to computational discovery — plan.md discipline plus tool calls plus observed results, looping.
+
 The other g8 repos (research agents, scientific multi-step harnesses) supply the **prior art for what
 Maestro-class evaluation actually looks like in practice**. The Knuth case argues categorically for a Maestro-class
 tier in `benchmarks/dan_tasks/`; the g8 cluster argues empirically that the right shape is multi-step research

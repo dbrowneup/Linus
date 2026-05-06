@@ -204,6 +204,8 @@ Bacformer is an `[!analysis]` claim with specific provenance, distinct from an `
 database. When the model is updated, the content-hash mechanism flags the KG edges that need revalidation. Without this
 discipline, model-derived KG content becomes indistinguishable from curated content within months.
 
+**OptimusKG** ([2604.27269v1](../paper-notes/2604.27269v1.md)) provides a mature reference for biomedical knowledge-graph design at scale: a unified ontology across 18 sources, 190K+ nodes and 21.8M edges with explicit FAIR principles, evidence grounding, and property-rich metadata. While OptimusKG's full integration is deferred (it covers biomedical-only domains and requires 18+ external ontology harmonization), its medallion architecture (Landing → Bronze → Silver → Gold layers) and provenance-tracking schema are directly reusable patterns for Phase 3's KnowledgeBase integration of Group A model outputs.
+
 ---
 
 ## Implications for Linus skills (Phase 7)

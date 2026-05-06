@@ -232,6 +232,12 @@ sources and feed updates into the KnowledgeBase. Phase 4.
 
 ---
 
+## 4a. Cluster anchor: g11 agent frameworks (added 2026-05-05)
+
+The 2026-05-05 landscape remapping made **[g11 agent frameworks](../syntheses/repo-clusters/g11-agent-frameworks.md)** the primary cluster anchor for this synthesis. g11 covers pydantic-ai, dspy, superpowers, Agent-Skills-for-Context-Engineering, gptme, huginn, lmnr, and promptfoo—the agent framework, skills definition, and evaluation infrastructure that operationalize the practices and skills listed above. Adopting g11 as the anchoring cluster reframes the skills-and-practices question from "what should Linus do" to "here is what the community has already built; which patterns apply to Linus's Maestro/Worker model."
+
+---
+
 ## 5. Entrepreneurial Opportunities
 
 > **Extracted 2026-05-05.** The seven entrepreneurial opportunities originally listed here have been promoted to a
