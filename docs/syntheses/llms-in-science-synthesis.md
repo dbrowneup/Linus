@@ -31,7 +31,7 @@ framed as collaborator, tool, or hazard.
 Knuth's _Claude's Cycles_ is a narrative. Knuth had a hand-construction for one case of an open
 Hamiltonian-decomposition problem on a 3-regular Cayley digraph; Stappers had numeric solutions through m = 16 but no
 general construction. Stappers handed the problem to Claude Opus 4.6 with one process rule ("after EVERY exploreXX.py
-run, IMMEDIATELY update plan.md"); ~1 hour and 31 explorations later Claude produced a working construction for all odd
+run, IMMEDIATELY update plan.md"); ~1 hour and 31 explorations later ([claude-cycles.md](../paper-notes/claude-cycles.md)) Claude produced a working construction for all odd
 m as a tiny C program. Knuth wrote a hand proof; a Lean formalization followed within days; the even case was cracked
 shortly after with GPT-5.4 Pro and Claude 4.6 Sonnet. For a mathematician of Knuth's stature to take an LLM-produced
 construction seriously enough to write it up is a non-trivial signal — especially because the report is honest about
@@ -219,7 +219,7 @@ distinction in the benchmark suite itself.
 
 ## Repo-cluster anchor: g8-sci-agents (added 2026-05-05)
 
-The 2026-05-05 landscape remapping made **g8-sci-agents** the primary cluster anchor for this synthesis. g8 is the
+The 2026-05-05 landscape remapping made **[g8-sci-agents](../syntheses/repo-clusters/g8-sci-agents.md)** the primary cluster anchor for this synthesis. g8 is the
 scientific-agent prior art cluster — most importantly **paper-qa**, the first paper-corpus tool to earn an Integrate
 verdict, with `PaperSearch`, `GatherEvidence`, `GenerateAnswer`, and `Reset` as the canonical tool surface. paper-qa
 is the operational instantiation of the Schulz frame: an open-source research-assistant-like collaborator with
@@ -240,7 +240,7 @@ the architecture. The Marelli citation discipline is the constraint that keeps t
 paper-qa's claim-typing + LAB-Bench canary blocklist + content-hashing make the Schulz collaboration auditable.
 
 The g3-wiki-patterns secondary edge supports the epistemic-standards thread: build patterns for agent-driven wikis
-(obsidian-llm-wiki-local, llm-research-wiki LINT) operationalize the claim categories Marelli argues for.
+([obsidian-llm-wiki-local](../repo-notes/obsidian-llm-wiki-local.md), [llm-research-wiki](../repo-notes/llm-research-wiki.md) LINT) operationalize the claim categories Marelli argues for.
 g2-wiki-engines supports the reproducibility-floor thread: open-source wiki substrates are what the Schulz frame
 requires for science to remain reproducible. g9-bioinformatics supplies the Dan-relevant domain instantiation
 (Bacformer, BioReason, DeepSeMS as scientific agents in metagenomics-adjacent territory).

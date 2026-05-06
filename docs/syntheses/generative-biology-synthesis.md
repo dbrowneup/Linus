@@ -38,7 +38,7 @@ Qwen3-style Transformer with a 6,000-token cross-modal BPE vocabulary, prompted 
 
 [**DISCO**](../paper-notes/2604.05181v1.md) (Rector-Brooks et al., arXiv 2026, Caltech/Mila/Arnold lab) — joint
 masked-discrete + continuous diffusion for sequence-and-structure co-design conditioned on arbitrary biomolecular
-context; produced de novo carbene-transfer enzymes that exceed evolved P450 variants in TTN.
+context; produced de novo carbene-transfer enzymes that exceed evolved P450 variants in TTN ([2604.05181v1](../paper-notes/2604.05181v1.md)).
 
 [**DeepSeMS**](../paper-notes/2025.03.02.641084v1.md) (Xu et al., bioRxiv 2025) — ~100M Pfam-domain → SMILES Transformer
 encoder-decoder; mined 27,139 ocean MAGs to produce 65,868 unique novel candidate metabolites including 8,783 antibiotic
@@ -98,7 +98,7 @@ validation does not.
 eleven densely-overlapping ORFs and a viability surface that decades of rational engineering have struggled to navigate.
 The substrate is Evo 1 (7B/131K) and Evo 2 (7B/8K) fine-tuned on ~15K Microviridae genomes; the recipe is a six-stage
 pipeline (host → template family → SFT → conserved-prefix prompt → tiered inference-time scoring → wet-lab); the
-validation is the strongest in the corpus because **16 of 302 designs produced viable phages**, several outcompeting
+validation is the strongest in the corpus because **16 of 302 designs produced viable phages ([King et al., 2025](../paper-notes/2025.09.12.675911v1.md))**, several outcompeting
 ΦX174 itself, and a cocktail broke through LPS-mediated resistance that ΦX174 alone never could. This is also the paper
 that crosses the line into dual-use territory.
 
@@ -182,7 +182,7 @@ backing it but only on one published benchmark.** The Linus tool wrappers should
 propagates into the KnowledgeBase.
 
 The DISCO + error-prone PCR pattern is worth singling out: DISCO-designed dCT-H11 produced ~35 improved variants under
-one round of random mutagenesis with substitutions scattered across the protein, confirming the designs occupy fitness
+one round of random mutagenesis ([2604.05181v1](../paper-notes/2604.05181v1.md)) with substitutions scattered across the protein, confirming the designs occupy fitness
 regions accessible to evolution. This is the strongest validation pattern in the corpus — not just "it worked once" but
 "it occupies a navigable fitness landscape."
 
@@ -192,7 +192,7 @@ A pattern repeated across four of six papers: control over the generative artefa
 on the target task but from inference-time conditioning. **GenNA's four-field prompt** is a free-form English channel;
 **Trias's species tag** is a categorical channel that shapes 640 codon-usage regimes from one set of weights; **the
 generative-phage recipe** uses a conserved 4–9 nt prefix prompt plus three tiers of inference-time scoring; **DISCO**
-uses Feynman-Kac correctors to tilt sampling toward joint sequence+structure rewards and toward on-target ligand binding
+uses Feynman-Kac correctors ([2604.05181v1](../paper-notes/2604.05181v1.md)) to tilt sampling toward joint sequence+structure rewards and toward on-target ligand binding
 while penalising off-target decoys.
 
 This is the same thread the [memory synthesis](memory-synthesis.md) followed in the text-LLM space: the right answer to
