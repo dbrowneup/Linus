@@ -81,7 +81,8 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
 
 - Install `lm-eval` in the `linus` conda env
 - Configure Ollama backend
-- Run MBPP, HumanEval, MMLU (5-shot), GPQA (main) against `qwen2.5-coder:7b` and `mistral:7b-instruct`
+- Run MBPP, HumanEval, MMLU (5-shot), GPQA (main) against best available Qwen3 model for hardware (e.g.,
+  `qwen3:8b` or `qwen3:14b` via Ollama) and one FP16 reference
 - Results to `benchmarks/results/public_baseline_YYYY-MM-DD.json`
 
 **1d — Private "Dan task" suite** at `benchmarks/dan_tasks/`.
@@ -93,14 +94,15 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
   - "Given these 50 paper titles, cluster them into 5 topics and name each"
   - "Given this bioinformatics pipeline error traceback, diagnose and propose a fix"
 - Each task: input, expected output schema, rubric (what counts as success)
-- Run against hosted Claude (reference), Ollama+Qwen2.5-Coder, Ollama+Mistral, and pmetal+something if adopted in 1b
+- Run against hosted Claude (reference), Ollama+Qwen3 (best available for hardware), and pmetal+something if adopted
+  in 1b
 - Results to `benchmarks/results/dan_tasks_baseline_YYYY-MM-DD.json`
 - This suite becomes the primary evaluation measure for every future phase
 
 **1e — First Maestro/Worker loop recorded.**
 
 - Claude (Maestro, via Claude Code) writes a concrete spec in `experiments/first-loop.md`
-- Worker (Qwen2.5-Coder via Ollama, driven by Cline or a minimal orchestration script) executes the spec
+- Worker (Qwen3 via Ollama, driven by Cline or a minimal orchestration script) executes the spec
 - Smoke test gate before any full run
 - Atomic commit with clean message
 - Full protocol documented in `docs/maestro-worker-protocol.md`
@@ -301,7 +303,9 @@ local source — with no network required.
 **6a — Continued pretraining LoRA (1 week):**
 
 - LoRA adapter trained on ~1M tokens of genomics/biochem papers from KnowledgeBase
-- Base: Qwen2.5-7B or 14B (pick based on eval)
+- Base: Qwen3-7B or Qwen3-14B (pick based on Phase 1c Pareto result and memory headroom)
+- BitDistill spike: evaluate ~10B token continued pretraining on M1 Max (hours vs. days). Gate: MLX BitNet
+  training-path functional? If yes, BitDistill-style compressed adapter as 6a parallel experiment.
 - Pipeline via pmetal or mlx-lm-ft (per Phase 1b verdict)
 - Validation: held-out perplexity on KB papers + Dan task suite
 - First "Linus model" adapter, saved to `experiments/adapters/linus-pretrain-v1/`
@@ -323,10 +327,12 @@ local source — with no network required.
 
 **6d — Flash-streaming evaluation (1 week):**
 
-- Use mlx-flash to run a larger fine-tuned model that exceeds RAM (e.g., LoRA'd 32B Qwen variant)
-- Inference-only path (the "b" option from planning discussion)
-- Benchmark on Dan task suite: does larger model + LoRA + streaming outperform smaller model + LoRA at native speed?
-- Apply autoresearch methodology: set a target tok/s, iterate until hit
+- mlx-flash applies to fine-tuned models that genuinely exceed 32 GB RAM — Linus-branded 30B+ or opportunistic
+  ternary 30B+ from PrismML. Bonsai 8B (1.75 GB weight footprint) does NOT need streaming; the original framing
+  ("dense fine-tuned 8B exceeds RAM") is obsolete post-Bonsai. (Updated 2026-05-06 per S20.)
+- Target: LoRA'd Qwen3-32B or equivalent, streamed via mlx-flash from SSD.
+- Benchmark on Dan task suite: does the larger streamed model outperform the smaller native-speed model?
+- Apply autoresearch methodology: set a target tok/s, iterate until hit.
 
 **Explicit open-research non-goal for Phase 6:** streaming-based training (gradients and optimizer states on SSD).
 Deferred — this is unsolved research territory.
@@ -346,13 +352,25 @@ margin.
 
 **Goal:** Linus becomes the specific assistant Dan wants, not a generic one.
 
-**7a — Domain skills at `src/linus/skills/`:**
+**7a — Inaugural skills bundle and biology FM pairs (2026-05-06 update):**
 
+Biology skills bundle (~573 skills total):
+- **bioSkills** (~438 SKILL.md files, 63 bioinformatics categories, Bio-Task Bench benchmarked) — primary anchor
+- **scientific-agent-skills** (~135 broad-science skills + 100+ databases) — complement
+- **Pre-launch measurement gate:** A/B test on 5 tasks — with vs. without skills loaded. If in-context skill priming
+  doesn't measurably lift judgment-heavy tasks, launch with skills as opt-in (not default-on).
+
+Generalist × specialist FM pairing sequence (Phase 7-tractable first):
+1. **Trias + GenNA** — protein threading + RNA generation
+2. **REBEAN + DeepSeMS** — microbiome embedding + BGC-to-SMILES
+3. **Bacformer + DeepSeMS** — broad bacterial FM + synthesis route design
+Phase 8 (Apple-Silicon plumbing or NC-license risk not yet resolved): mCSM-metal + DISCO; AlphaGenome + GenNA.
+
+Custom domain skills (emerge from usage patterns):
 - `genomics-pipeline`: helpers for common bioinformatics tasks
 - `paper-to-script`: generate reproducibility scripts from paper methods
 - `plot-style-consistency`: enforce Dan's matplotlib/seaborn preferences
 - `cluster-label-propose`: suggest labels for HDBSCAN clusters
-- Additional skills emerge from observed patterns in Dan's usage
 
 All skills follow the Anthropic `SKILL.md` convention so they work in Claude Code, Claude.ai, and Linus.
 
@@ -376,13 +394,32 @@ All skills follow the Anthropic `SKILL.md` convention so they work in Claude Cod
 
 **Target duration:** future
 
-**Goal:** Linus expands beyond a single MacBook.
+**Goal:** Linus expands beyond a single MacBook — and potentially graduates to Maestro-capable offline operation.
+
+**8a — Hardware expansion:**
 
 - Native Linus app (SwiftUI or Tauri) — much thinner than openclaw, fully branded
 - iPhone/iPad companion nodes (via openclaw protocol or direct WebSocket to Linus)
 - Mac Studio or Mac Mini deployment — the MacBook becomes a client of the Linus server
 - Vision Pro experimentation if/when acquired
 - Multi-device coordination: Dan's phone, laptop, and desk machine all talking to the same Linus orchestration layer
+
+**8b — Linus as Maestro (north star):**
+
+The long-term goal is for Linus to be fully Maestro-capable: able to plan complex tasks, decompose them, direct local
+Workers, and produce research-quality outputs entirely offline — without hosted Claude in the loop. This requires
+passing the Maestro-class evaluation suite at a level competitive with hosted Claude on Dan's domain tasks. When
+that bar is cleared: Dan reviews outputs; Linus orchestrates; local Workers execute. The Maestro/Worker discipline
+doesn't disappear — it gains a new option where Linus _is_ the Maestro.
+
+The measurement gate: Maestro-class eval suite in `benchmarks/dan_tasks/maestro/` (added per S23, Phase 1 plan)
+serves as the readiness indicator. When Linus consistently scores within 10 percentage points of hosted Claude on
+Maestro-class tasks, Phase 8b transition planning begins. Timeline: entirely driven by model quality; not plannable
+in advance.
+
+Note: "stateful Docker on macOS" (Postgres+pgvector etc.) is not built here. The "no stateful Docker on macOS" rule
+(DEC-0027 practice stance) applies throughout Phase 8. If additional services are needed, they run native or on a
+separate server node.
 
 ---
 

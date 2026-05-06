@@ -104,8 +104,9 @@ A small orchestra:
   performance, makes taste-level calls.
 - **Section leaders** = the harnesses (Claude Code, Cline, future terminal agents). Senior players who coordinate within
   sections.
-- **Musicians** = local Worker models (Qwen2.5-Coder, Mistral-7B, future fine-tuned Linus). Execute the written parts at
-  high throughput, low cost.
+- **Musicians** = local Worker models (Qwen3 current generation, future fine-tuned Linus). Execute the written parts at
+  high throughput, low cost. Model selection tracks the best available model for 32 GB M1 Max hardware; Qwen3 is the
+  current standard as of 2026-05-06.
 - **Score** = CLAUDE.md, VISION.md (this file), ARCHITECTURE.md, ROADMAP.md, and the session-level specs and notes.
 - **Rehearsal** = smoke tests, dry runs, benchmarks. Never skip rehearsal.
 - **Performance** = production runs, real research loops, actual work.
@@ -153,7 +154,10 @@ values-level decision, but the technical substrate is closer to ready than the p
 
 - **Not a startup.** No users to serve, no investors to impress, no deadline pressure. Build what's interesting and
   useful to Dan.
-- **Not a replacement for hosted Claude.** Hosted Claude is the Maestro. Linus is the orchestra it conducts.
+- **Not a replacement for hosted Claude in the near term.** Today, hosted Claude is the Maestro. As Linus's model
+  quality grows toward the Maestro threshold — defined as passing the Maestro-class eval suite at a level competitive
+  with hosted Claude on Dan's domain tasks — the architecture is designed to allow Linus to take on Maestro roles
+  fully offline. That transition is a Phase 8+ north star, not a current assumption. See "The long view."
 - **Not a single harness.** Linus is the backend. Harnesses are front-ends. Keep them separable.
 - **Not a content generator.** Linus is a working assistant. Generating text is a means, not the end.
 - **Not AGI or anything adjacent.** Linus is a tool. Useful, personalized, private. Tools don't need to be conscious to
@@ -161,11 +165,21 @@ values-level decision, but the technical substrate is closer to ready than the p
 
 ## The long view
 
-In the near term, Linus is a chat-and-tools assistant with a knowledge base and a few fine- tuned adapters. In the
+In the near term, Linus is a chat-and-tools assistant with a knowledge base and a few fine-tuned adapters. In the
 medium term, it orchestrates multiple local models with specialized skills, accepts voice input, and runs experiments
 autonomously overnight. In the long term, it's an accrued corpus of Dan-specific intelligence: tools tailored to his
 workflows, models fine-tuned on his data, benchmarks calibrated to his tasks, all running on hardware he owns,
 configurable and extensible by him alone.
+
+**The Maestro transition (Phase 8+ north star).** Today Dan + hosted Claude serve as Maestro; local Linus models serve
+as Workers. The long-term goal is for Linus to be fully Maestro-capable: able to plan, decompose, direct Workers, and
+produce research-quality outputs entirely offline, without hosted Claude in the loop. This requires Linus to pass the
+Maestro-class evaluation suite — tasks categorically different from Worker tasks (multi-step synthesis, judgment under
+genuine uncertainty, cross-domain reasoning). It does not require matching frontier models on general benchmarks; it
+requires matching or approaching Dan's hosted-Claude performance on Dan's specific domain. The Maestro-class eval tier
+(S23) is the measurement instrument. Once Linus clears that bar reliably, the Maestro/Worker discipline does not
+disappear — it gets a new option: Linus as Maestro, local Workers under its direction, Dan reviewing outputs rather
+than driving every session. That is the complete offline vision.
 
 None of this requires that Linus ever match hosted frontier models on general benchmarks. It requires that Linus be
 excellent at Dan's work, reliably available, under Dan's control, and a pleasure to use. Those are the success

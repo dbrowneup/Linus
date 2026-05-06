@@ -78,7 +78,7 @@ Ship rough, learn, iterate.
 
 - **Maestro** = Dan + hosted Claude (this chat, Claude Code, Claude.ai). Architecture, planning, spec writing, hard
   debugging, taste-level decisions.
-- **Worker** = local models (Qwen2.5-Coder, Mistral-7B, future fine-tuned Linus). Bulk implementation, test generation,
+- **Worker** = local models (Qwen3 — best available for 32 GB M1 Max hardware; future fine-tuned Linus). Bulk implementation, test generation,
   refactors, pipeline execution.
 - Maestro attention is the scarce resource. Push any well-specified task to Workers.
 
@@ -294,6 +294,13 @@ Caveat: workgraph's tree-kill is Linux `/proc`-only; macOS port needs a `psutil`
 When interacting with hosted Claude (via Claude Code or this chat): arrive with context gathered, questions sharpened,
 and the task well-specified. Don't use Maestro tokens to read files Claude can't cache; pull excerpts and paste. Don't
 use Maestro tokens for well-specified implementation; hand the spec to a Worker.
+
+### Typed structured prediction for biology skills (resolved 2026-05-06, S25)
+
+For any biology skill or domain skill producing a predictive output, use typed structured prediction wrapping free-text
+rationale — the BioReason-Pro shape. The structured result is machine-queryable; the `rationale` field preserves
+explanation for human review. Example: `{gene: "BRCA1", predicted_function: "DNA repair", confidence: 0.87, evidence:
+["pmid:12345"], rationale: "..."}`. This generalizes beyond biology to any task where auditability matters.
 
 ### Writing style for docs
 

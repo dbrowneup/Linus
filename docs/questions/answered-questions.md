@@ -15,6 +15,7 @@ Sister documents:
 
 ## Table of contents
 
+- [Sweep Tier 2 — S11–S31 (resolved 2026-05-06)](#sweep-tier-2--s11s31-resolved-2026-05-06)
 - [Sweep Tier 1 — S1–S10 (resolved 2026-05-06)](#sweep-tier-1--s1s10-resolved-2026-05-06)
 - [Memory Pillar (resolved 2026-05-03)](#memory-pillar-resolved-2026-05-03)
   - [Tier 1 — block Phase 2 architecture decisions](#memory-pillar--tier-1)
@@ -27,6 +28,152 @@ Sister documents:
 - [Tier 3 — Documentation, conventions, longer-horizon scope (resolved 2026-05-03)](#tier-3--documentation-conventions-longer-horizon-scope-resolved-2026-05-03)
 - [Source-archive items propagated and resolved (from open-questions.md)](#source-archive-items-propagated-and-resolved-from-open-questionsmd)
 - [Resolution sessions log](#resolution-sessions-log)
+
+---
+
+<a id="sweep-tier-2--s11s31-resolved-2026-05-06"></a>
+
+## Sweep Tier 2 — S11–S31 (resolved 2026-05-06)
+
+Twenty-one Tier 2 sweep questions resolved in the 2026-05-06 top-questions walk (Maestro/Dan). ADRs DEC-0052–0054;
+VISION.md, ROADMAP.md, CLAUDE.md, memory-architecture.md updated. Notable new item: "Linus as Maestro" captured as a
+Phase 8b north star in VISION.md and ROADMAP.md, triggered by Dan's articulation 2026-05-06.
+
+#### S11. LAB-Bench MCQ + BixBench as Phase 1 Worker-selection baseline
+
+**Resolution:** Adopt both, with caveats. LAB-Bench MCQ-with-refusal is the Worker quality ceiling reference;
+BixBench is the agent-harness benchmark. Supplement with Dan-authored capsule tasks (weight Dan-authored tasks more
+heavily in Phase 1 decision-making; LAB-Bench is contextual calibration, not primary signal). Alongside existing
+benchmarks already discussed.
+
+#### S12. FutureHouse evaluation philosophy ADR
+
+**Resolution:** Partial adoption. Keep: MCQ-with-refusal structure (insufficient-info option is good), open-answer
+grading, 80/20 public/private split principle. Reject: LLM-judge dependency on hosted Claude (not local-first). Use
+Qwen3 (best available for hardware) as the local judge for open-answer grading in Phase 1; revisit in Phase 5 when
+local judge is better calibrated. Model floor updated: Qwen3 replaces Qwen2.5 throughout all benchmarks, evals, and
+Worker references. (VISION.md, ROADMAP.md, CLAUDE.md updated 2026-05-06.)
+
+#### S13. Fifth memory layer — investigation memory
+
+**Resolution:** Added as Layer D (between cross-session episodic Layer C and semantic knowledge, now Layer E). All
+layers renamed A–E. Investigation memory: task-scoped, multi-agent, single-investigation-lifetime; created at
+investigation-spawn, archived to Layer C on close; SQLite substrate Phase 3. API:
+`create/write/read/close(investigation_id, ...)`. `memory_mode` router unchanged at Phase 2; `investigation_stateful`
+mode deferred to Phase 3. → [DEC-0052](../adr/0052-investigation-memory-layer-d.md). memory-architecture.md updated.
+
+#### S14. Hosted-model fallback as critic-tier-and-budget question
+
+**Resolution:** Role property convention. `critic_eligible: bool` (DEC-0050) is the gate. The budget policy is
+expressed as "Maestro-tier agent, not specifically hosted Claude" — because Linus graduates to Maestro-capable in
+Phase 8b (VISION.md updated). Critic-eligible Roles can call the current Maestro (hosted Claude now, Linus-Maestro
+eventually). Convention written into Phase 2a orchestration spec.
+
+#### S15. Validation-gate primitive — spawner vs. sandbox
+
+**Resolution:** Spawner, not sandbox. Per-stage validation hooks in the orchestration layer (Sketch2Simulation
+pattern: execute → detect → fix, with fixer-agent as a separate spawned Worker). Sandbox = enforcement surface
+(can't do X at all); spawner validation = quality surface (did X, is the output good enough?). Written as a spawner
+design principle in Phase 2a orchestration spec.
+
+#### S16. KB → hosted-Maestro flow policy
+
+**Resolution:** hosted-ok / hosted-forbidden binary; no middle category. `hosted-ok` = published papers, public
+reference data, public ontologies. `hosted-forbidden` = Dan's personal notes, draft writing, financial data,
+LanzaTech proprietary data, anything from `context/` not already public. Conservative default: new records tagged
+`hosted-forbidden` at ingest; must be explicitly upgraded to `hosted-ok`. No override at query time. Enforced at
+ingest (tag) and query time (strip). → [DEC-0053](../adr/0053-kb-hosted-maestro-flow-policy.md).
+
+#### S17. Activation hooks API stub Phase 1 + Phase 2 feasibility spike
+
+**Resolution:** Stub class (`ActivationHooks` with `register_hook / get_activation / clear_hooks / list_registered`)
+in `src/linus/`, Phase 1, all no-ops. Phase 2 spike: verify mlx-lm exposes residual stream activations; decision
+rule defines next step (implement in Phase 2, upstream patch, or defer to Phase 6). → [DEC-0054](../adr/0054-activation-hooks-api-stub.md).
+
+#### S18. Generalist (LucaOne) vs. specialist FMs as Phase 7 default
+
+**Resolution:** Hybrid with empirical gate. LucaOne as KG anchor; specialists (RiNALMo, ESM3) as task Workers. Gate:
+before committing registry architecture, run LucaOne head-to-head vs. RiNALMo on one Dan-relevant RNA task (splice-site
+prediction or secondary structure from metagenomics work). If LucaOne matches or beats: KG anchor confirmed.
+
+#### S19. Evo 2 vs. AlphaGenome for variant prediction
+
+**Resolution:** Both, but test operational availability first. AlphaGenome spike first (cleaner architecture, better
+local-deployment story). Evo 2 spike after (StripedHyena 2 quantization risk). If either spike fails local
+deployment, it moves to "hosted API only" (Tier C, DEC-0047).
+
+#### S20. Phase 6d framing rewrite
+
+**Resolution:** Rewritten in ROADMAP.md. mlx-flash applies to fine-tuned models genuinely exceeding 32 GB RAM
+(Linus-branded 30B+, or ternary 30B+ from PrismML). Bonsai 8B (1.75 GB) does NOT need streaming. Target: LoRA'd
+Qwen3-32B streamed from SSD.
+
+#### S21. BitDistill spike timing
+
+**Resolution:** Phase 6a, as a parallel experiment alongside the primary pretraining LoRA. Gate: MLX BitNet
+training-path functional? If yes, BitDistill-style compressed adapter as a 6a parallel. Added to ROADMAP.md Phase
+6a.
+
+#### S22. `docs/EPISTEMIC-STANDARDS.md`
+
+**Resolution:** Deferred to Phase 2a, not now. Needs KB schema (DEC-0048 model_prediction edges, DEC-0023 claim types)
+to already exist before the standards document is operational. Phase 2a deliverable.
+
+#### S23. Maestro-class evaluation tier
+
+**Resolution:** Add a 5-task inaugural Maestro-class suite in `benchmarks/dan_tasks/maestro/`: Hamiltonian-path
+decomposition, "find contradiction across three papers," "synthesize a research question from gene expression
+datasets," "debug a WDL pipeline from error logs," "explain a metagenomics cluster anomaly." These are tasks where
+7B models reliably fail; hosted Claude is the baseline reference. The Maestro-class eval is also the readiness
+indicator for Phase 8b (Linus-as-Maestro threshold: within 10 pp of hosted Claude on this suite). Dan to write
+these tasks; Claude Code writes the harness.
+
+#### S24. ProtHGT vs. Horizyn-1 vs. BioReason-Pro: which first?
+
+**Resolution:** BioReason-Pro first. Its four-tier evaluation (automated Fmax, LLM-judge, human pairwise, structural
+grounding) is the template for `benchmarks/dan_tasks/biology/`. Starting here builds the benchmark and the skill
+simultaneously. Establishes the typed-structured-prediction-with-rationale shape (S25) from day one.
+
+#### S25. Default mode for function prediction: typed structured prediction + free-text rationale
+
+**Resolution:** Adopted as CLAUDE.md Engineering Convention (2026-05-06). For any biology or domain skill producing a
+predictive output: typed structured result + `rationale` free-text field. Machine-queryable + human-readable. The
+BioReason-Pro shape is the reference. Generalizes beyond biology.
+
+#### S26. hyalo + keppi as Phase 3 KB tooling layer
+
+**Resolution:** Accepted. hyalo (Integrate, Phase 3) for lint + transactional link rewrites; keppi (Study → Integrate,
+Phase 3) for bounded-BFS-with-decay context_pack retrieval. Added to ROADMAP.md Phase 3.
+
+#### S27. Maestro codebase navigation: ontomics vs. codesight vs. both
+
+**Resolution:** Both, with role differentiation. ontomics: semantic code search (find callers, Pydantic models, etc.).
+codesight: structural repo export for LLM context (repo-as-tree, selectable depth). Complementary; both written into
+Phase 2a orchestration spec as two named tool slots.
+
+#### S28. Wh-per-task as benchmark column vs. separate ledger
+
+**Resolution:** Benchmark column first. Wh/prompt is already a measurement in the Phase 1c spike spec. Add as a column
+in `benchmarks/results/` JSONL. Separate `~/.linus/energy.jsonl` ledger deferred to Phase 5.
+
+#### S29. AlphaGenome non-commercial license implications
+
+**Resolution:** Closed. With E1 (open-source-by-default) and E11 cross-reference, NC license is not blocking for
+current plans. Revisit only if commercial use becomes real.
+
+#### S30. bioSkills + scientific-agent-skills as Phase 7 inaugural bundle
+
+**Resolution:** Accepted with measurement gate. Pre-launch: A/B test on 5 tasks (skills loaded vs. not). If no
+measurable lift on judgment-heavy tasks, launch with skills as opt-in (not default-on). Both bioSkills (~438 skills)
+and scientific-agent-skills (~135 skills + 100+ databases) adopted as the Phase 7 inaugural bundle (~573 total).
+Added to ROADMAP.md Phase 7.
+
+#### S31. Generalist × specialist FM combinations sequencing
+
+**Resolution:** Accepted synthesis order. Phase 7 first three: Trias+GenNA, REBEAN+DeepSeMS, Bacformer+DeepSeMS.
+Phase 8: mCSM-metal+DISCO, AlphaGenome+GenNA. Added to ROADMAP.md Phase 7.
+
+[↑ Back to top](#table-of-contents)
 
 ---
 
@@ -845,6 +992,14 @@ unresolved. No migration from Part 4 has occurred.
 The metadata about when and how questions were resolved. Promotes the `Resolution Log` headers that previously sat at
 the top of `top-questions.md` into one place at the bottom of this archive, so the reader's first impression is the
 resolved Q&A pairs (most relevant) rather than session bookkeeping.
+
+### 2026-05-06 — Sweep Tier 2 S11–S31 planning session (Maestro/Dan)
+
+Twenty-one Tier 2 items (S11–S31) resolved in the same session. ADRs DEC-0052–0054 authored. VISION.md updated with
+Linus-as-Maestro north star (Phase 8b) and model floor update (Qwen3 replaces Qwen2.5 throughout). ROADMAP.md Phase
+6a, 6d, 7a, 8 updated. CLAUDE.md convention added (typed structured prediction for domain skills). memory-architecture.md
+updated: five layers (A–E); Layer D is investigation memory; Layer E is semantic knowledge. New Q-Maestro question
+added to top-questions.md as a tracked Tier 2 item.
 
 ### 2026-05-06 — Sweep Tier 1 S1–S10 planning session (Maestro/Dan)
 

@@ -72,6 +72,9 @@ at-a-glance index. The canonical format spec, authoring procedure, and full ADR 
 | [DEC-0049](docs/adr/0049-pmetal-vs-prismml-fork-deferred-phase1b.md) | pmetal vs. MLX-native PrismML fork: deferred to Phase 1b verdict (S8)                                                     | proposed — gate at Phase 1b                                   |
 | [DEC-0050](docs/adr/0050-role-first-class-type-agent-spawner.md)   | Role as a first-class type in the Phase 3 agent spawner (S9)                                                                  | accepted                                                      |
 | [DEC-0051](docs/adr/0051-agent-report-typed-inter-agent-message.md) | AgentReport: typed inter-agent message format for Phase 3+ (S10)                                                             | accepted                                                      |
+| [DEC-0052](docs/adr/0052-investigation-memory-layer-d.md)          | Investigation memory as Layer D; semantic knowledge renamed Layer E; five-layer pillar (S13)                                  | accepted                                                      |
+| [DEC-0053](docs/adr/0053-kb-hosted-maestro-flow-policy.md)         | KB → hosted-Maestro flow policy: hosted-ok / hosted-forbidden binary; conservative default (S16)                             | accepted                                                      |
+| [DEC-0054](docs/adr/0054-activation-hooks-api-stub.md)             | Activation hooks: API stub Phase 1, feasibility spike Phase 2, Phase 6 steering ADR if spike passes (S17)                    | accepted                                                      |
 
 _New decisions: author the ADR in `docs/adr/` first (see [`docs/adr/README.md`](docs/adr/README.md) for the procedure),
 then add a row above._

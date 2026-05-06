@@ -33,12 +33,13 @@ Memory architecture in Linus is the orchestration-layer machinery that satisfies
 whatever Worker model is dispatched. Single-pass transformers satisfy neither (TC0 ceiling per Merrill & Sabharwal); the
 orchestration layer's job is to externalise what the model cannot internalise.
 
-## The four memory layers
+## The five memory layers
 
-Memory in Linus decomposes into four layers, named for what they hold and how durable that holding is. The same
-`linus.memory.*` API shape serves all four; substrate choice is hidden behind the API so Workers cannot tell which layer
+Memory in Linus decomposes into five layers (A–E), named for what they hold and how durable that holding is. The same
+`linus.memory.*` API shape serves all five; substrate choice is hidden behind the API so Workers cannot tell which layer
 answered. Layers compose in retrieval — a single dispatch's prefix may pull from any combination, mediated by the
-`memory_mode` router primitive (DEC-0031).
+`memory_mode` router primitive (DEC-0031). Layer D (investigation memory) was added 2026-05-06 per DEC-0052, shifting
+the former Layer D (semantic knowledge) to Layer E.
 
 ### Layer A — Intra-step latent state
 
@@ -132,14 +133,54 @@ linus.memory.episodic.prune_archived(...)        — admin
 Substrate variation (SQLite-only v0; future hybrid) is hidden behind this API; Workers cannot tell which mechanism
 answered.
 
-### Layer D — Semantic / knowledge memory
+### Layer D — Investigation memory
+
+**What it holds.** Shared context for an active multi-agent investigation: intermediate outputs, partial results,
+strategy notes, and inter-agent messages scoped to one task instantiation. Created when a multi-agent investigation
+spawns; archived to Layer C (episodic store) when the investigation closes. This layer did not exist in the original
+four-layer pillar; it was added 2026-05-06 (DEC-0052) to address the gap identified by Kosmos's world model,
+Sketch2Simulation's IR, and HKUST QuantAgent's context buffer — all of which are task-scoped, multi-agent, and
+single-investigation-lifetime.
+
+**Distinction from adjacent layers.** Layer B (scratchpad) is per-agent, per-session; Layer C (episodic) is archived
+history accessible across sessions; Layer E (semantic knowledge) is durable shared fact. Layer D is live, shared,
+and transient — its lifetime is exactly one investigation, after which it collapses into a single Layer C record.
+
+**Substrate (Phase 3).** SQLite table in `~/.linus/investigations.db`, partitioned by `investigation_id`. Record shape:
+
+```
+(investigation_id, agent_id, role_id, entry_type, timestamp,
+ content_hash, content, tags)
+```
+
+GC policy: investigations with no writes for 30 days are automatically archived to Layer C and their active records
+deleted. The archive entry carries `investigation_id`, a summary, and a list of all leaf content-hashes.
+
+**Read/write API.**
+
+```
+linus.memory.investigation.create(investigation_id, task_id, participating_roles)
+linus.memory.investigation.write(investigation_id, agent_id, entry_type, content)
+    → content_hash
+linus.memory.investigation.read(investigation_id, query?, limit?)
+    → list of entries, temporally ordered
+linus.memory.investigation.close(investigation_id)
+    → archives to Layer C; returns archive_record_id
+```
+
+**Phase 2 status.** API shape defined; substrate implementation is Phase 3. The `memory_mode` router primitive
+(DEC-0031) does not include a Layer D mode in Phase 2; an `investigation_stateful` mode is deferred to Phase 3
+design.
+
+### Layer E — Semantic / knowledge memory
 
 **What it holds.** Durable shared factual knowledge — Dan's papers, notes, corpora, ontologies. Already substantially
 served by KnowledgeBase ([modules/KnowledgeBase/](../../modules/KnowledgeBase/)). The Garrison framing argues
-KnowledgeBase is part of the memory pillar, not a separate "RAG feature."
+KnowledgeBase is part of the memory pillar, not a separate "RAG feature." Renamed from Layer D to Layer E 2026-05-06
+(DEC-0052) to accommodate the new investigation-memory layer.
 
 **Substrate (Phase 2).** The dual KB substrate per DEC-0015: RDF (rdflib + optional Oxigraph) and property graph
-(networkx). The [KB-spec items](../specs/kb/) handle the KB-side details; this spec specifies only the Layer D contract
+(networkx). The [KB-spec items](../specs/kb/) handle the KB-side details; this spec specifies only the Layer E contract
 from the memory-pillar perspective.
 
 **Read/write API.** The existing KB tool families per DEC-0015:
@@ -149,7 +190,7 @@ linus.knowledge.sparql.*    — RDF / SPARQL queries
 linus.knowledge.graph.*     — property-graph traversal
 ```
 
-Memory-pillar uniformity requires that the dispatch-layer prefix-loading machinery treats Layer D retrievals the same
+Memory-pillar uniformity requires that the dispatch-layer prefix-loading machinery treats Layer E retrievals the same
 shape as Layer B/C retrievals — a Worker should not be able to tell whether a fact came from its own scratchpad, a prior
 session, or KnowledgeBase. The `memory_mode` router primitive (DEC-0031) governs which combination is loaded as prefix;
 the KB API supplies the records.
@@ -158,22 +199,22 @@ the KB API supplies the records.
 
 ### Sub-requirement-to-mechanism mapping
 
-| Sub-requirement | Layer A                        | Layer B                              | Layer C                                               | Layer D                                   |
-| --------------- | ------------------------------ | ------------------------------------ | ----------------------------------------------------- | ----------------------------------------- |
-| Addressability  | (transparent)                  | `(session_id, turn_id, segment)`     | `(session_id, turn_id, segment)` rowid + content_hash | KB entity URI / graph node id             |
-| Disambiguation  | (transparent)                  | content_hash                         | content_hash + tags                                   | KB schema + identity per DEC-0015         |
-| Temporal order  | KV-cache continuity (DEC-0036) | monotonic timestamp + parent-pointer | monotonic timestamp + parent-pointer                  | KB ingest timestamp + version             |
-| Integrity       | (transparent)                  | SHA chain + audit log                | SHA chain + git history                               | KB content hashing per LLM Wiki synthesis |
+| Sub-requirement | Layer A                        | Layer B                              | Layer C                                               | Layer D                                       | Layer E                                   |
+| --------------- | ------------------------------ | ------------------------------------ | ----------------------------------------------------- | --------------------------------------------- | ----------------------------------------- |
+| Addressability  | (transparent)                  | `(session_id, turn_id, segment)`     | `(session_id, turn_id, segment)` rowid + content_hash | `(investigation_id, agent_id)` + content_hash | KB entity URI / graph node id             |
+| Disambiguation  | (transparent)                  | content_hash                         | content_hash + tags                                   | content_hash + entry_type + role_id           | KB schema + identity per DEC-0015         |
+| Temporal order  | KV-cache continuity (DEC-0036) | monotonic timestamp + parent-pointer | monotonic timestamp + parent-pointer                  | monotonic timestamp within investigation      | KB ingest timestamp + version             |
+| Integrity       | (transparent)                  | SHA chain + audit log                | SHA chain + git history                               | SHA chain; archived to Layer C on close       | KB content hashing per LLM Wiki synthesis |
 
 ### The router-side contract: `memory_mode` and prefix loading
 
 DEC-0031 specifies three `memory_mode` values; this section is the implementation contract for what each loads as Worker
 prefix.
 
-`stateless`: Layer D only. KB context retrieved fresh; no scratchpad, no episodic prefix. Per-layer cap allocation per
+`stateless`: Layer E only. KB context retrieved fresh; no scratchpad, no episodic prefix. Per-layer cap allocation per
 DEC-0032: task spec ≤ 8K, KB context ≤ 6K, system + format ≤ 2K.
 
-`session_stateful`: Layers B + D. Current session's scratchpad and answer history loaded as prefix (most recent first,
+`session_stateful`: Layers B + E. Current session's scratchpad and answer history loaded as prefix (most recent first,
 CRISPR-style temporal weighting). Default for multi-turn coding work. Per-layer cap allocation: task spec ≤ 4K, KB
 context ≤ 4K, session prefix ≤ 6K, system + format ≤ 2K.
 
