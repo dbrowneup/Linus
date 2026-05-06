@@ -7,17 +7,19 @@ synthesis pass; autoresearch-mlx repo note added as the new Group 1 entry.
 
 ## What this document is
 
-Group 1 spans eight repos that collectively constitute Linus's Apple Silicon inference and training substrate. Seven of
+Group 1 spans nine repos that collectively constitute Linus's Apple Silicon inference and training substrate. Seven of
 them — pmetal, mlx-flash, flash-moe, BitNet, Bonsai-demo, ANE, and autoresearch — already shaped the total landscape
 through the Phase 1 recon pass. autoresearch-mlx is the marginal addition in this fan-out: a clean MLX port of
 Karpathy's autoresearch loop that converts the upstream methodology from "inspiration only, requires NVIDIA GPU" to
-"runnable on M1 Max today." The synthesis treats autoresearch-mlx as the completing piece of a picture that was already
-mostly drawn.
+"runnable on M1 Max today." QiMeng-cpu-v1 is a late addition providing CPU-inference contrast: while the other eight
+repos optimize for Apple Silicon native execution, QiMeng-cpu-v1 documents how to scale behavioral synthesis at
+hardware-agnostic efficiency, a methodological contrast worth holding in view. The synthesis treats autoresearch-mlx and
+QiMeng-cpu-v1 as completing pieces of a picture that was already mostly drawn.
 
 This document is not a re-review of each repo. The per-file notes cover that ground. What this document does is name
-what the eight repos are collectively pointing at, identify the engineering patterns worth lifting, map how the cluster
+what the nine repos are collectively pointing at, identify the engineering patterns worth lifting, map how the cluster
 connects to the rest of the Linus corpus, and extract the phase-tagged implications that follow from treating these
-eight repos as a unit rather than as eight independent decisions.
+nine repos as a unit rather than as nine independent decisions.
 
 The total-landscape Crossings most relevant here are Crossing 1 (the BitNet → Apple Silicon → ANE bridge), Crossing 2
 (the streaming axis: dense versus sparse versus composite), and Crossing 5 (memory as load-bearing pillar — which has an
@@ -28,20 +30,25 @@ audit of how well the G1 cluster supports those resolutions.
 
 ## The unifying thesis
 
-These eight repos are eight different bets on the same underlying question: what does it take to run frontier-class AI
+These nine repos are nine different bets on the same underlying question: what does it take to run frontier-class AI
 on a single MacBook Pro M1 Max under the 32 GB unified-memory constraint, with no CUDA, no cloud, and no framework
 abstraction that sacrifices metal-level control when it matters? The repos disagree on almost everything except the
 premise. pmetal bets on a maintained Rust platform. flash-moe bets on bespoke Objective-C with no framework at all.
 mlx-flash bets on framework integration with a smart scheduler on top. BitNet and Bonsai-demo bet on weight formats that
 make the memory ceiling move. ANE bets on a hardware block Apple does not officially expose. autoresearch and
 autoresearch-mlx bet on methodology — the claim that the right search process matters more than any particular
-architectural choice.
+architectural choice. QiMeng-cpu-v1 bets on a hardware-agnostic automated synthesis methodology, learning CPU design
+from behavioral I/O examples without hand-written specifications.
 
-The thesis that emerges from holding all eight together is this: Apple Silicon is not a constrained-device deployment
+The thesis that emerges from holding all nine together is this: Apple Silicon is not a constrained-device deployment
 target but a research-grade inference and training platform, and the constraint is not hardware capability but software
-sophistication. Every repo in the cluster is evidence for the same proposition. The M1 Max has 24 GPU cores, 16 ANE
-cores, 400 GB/s memory bandwidth, and fast NVMe with unified addressing. What it lacks is a mature software ecosystem
-that uses those components well together. The G1 repos are, collectively, the partial ecosystem that exists.
+sophistication. Eight of the nine repos in the cluster are evidence for this proposition on Apple Silicon specifically.
+QiMeng-cpu-v1 provides the methodological complement: it shows how behavioral synthesis scales to industrial complexity
+on any hardware given the right learning algorithm, a principle that applies to Linus's own fine-tuning and automation
+layers regardless of the inference backend. The M1 Max has 24 GPU cores, 16 ANE cores, 400 GB/s memory bandwidth, and
+fast NVMe with unified addressing. What it lacks is a mature software ecosystem that uses those components well together.
+The G1 repos are, collectively, the partial ecosystem that exists, plus the blueprint for how that ecosystem can extend
+itself through learned synthesis.
 
 For Linus this means the inference and training layer is not a purchasing decision or a one-time configuration step. It
 is an ongoing engineering domain where decisions compound, where the right methodology is as important as the right
@@ -91,6 +98,32 @@ cover in-RAM 1-bit inference. mlx-flash covers >RAM dense streaming at native pr
 Ternary-Bonsai checkpoint large enough to exceed RAM does not yet exist on Apple Silicon. This is the Phase 6d stretch
 target (per the Crossing 2 resolution), but it is not available today and should not be planned around for any Phase 1
 or Phase 2 deliverable.
+
+**QiMeng-cpu-v1 is the methodological anchor for learned synthesis beyond the inference layer.** The project demonstrates
+that behavioral synthesis (learning system design from input-output test cases, no hand-written specs) scales to
+industrial complexity: 18,260 single-output Boolean functions learned from I/O examples, assembled into a RISC-V CPU
+design that boots Linux and runs SPEC benchmarks. The BSD (Binary Speculative Diagram) learner uses a graph-based
+approximation with Boolean Distance as the structural similarity metric, hierarchically partitioned into 10 clusters of
+1,826 tasks each. The pipeline from I/O specification to Verilog to tape-out is an existence proof that Linus Phase 6+
+can adopt analogous patterns: gather (task_input, task_output) pairs from Dan's usage logs, measure distance between
+learned behaviors and target behaviors, partition fine-tuning or skill synthesis into parallelizable sub-problems, and
+iterate until the learned system passes the behavioral test suite.
+
+Where the other eight repos in the cluster optimize for Apple Silicon native execution — each accepting the M1 Max's
+hardware constraints as a given and engineering around them — QiMeng-cpu-v1 abstracts one layer higher: it asks what
+guarantees a synthesis algorithm needs about the target hardware, and the answer is surprisingly little. The BSD learner
+runs on CPU, the Boolean functions it learns are hardware-agnostic, and the Verilog it outputs is independent of the
+underlying process. For Linus, this principle translates directly: a fine-tuning loop or skill-synthesis substrate built
+on behavioral I/O examples, measured by structural distance between predicted and actual outputs, remains valid whether
+the underlying model runs on Metal, ANE, or mlx-flash. The hardware choice becomes a parameter, not a constraint.
+
+QiMeng-cpu-v1 is a Monitor not because it is out of scope, but because its relevance is Phase 6+ and downstream. The
+I/O-driven learning paradigm, the Boolean Distance metric, and the hierarchical task partitioning are not patterns to
+adopt immediately; they are patterns to revisit once Linus has concrete (task, output) logs from Dan's actual usage and
+a clear definition of what "behavioral similarity" means for Linus skills. The self-designing CPU's feedback loop (design
+→ test → refinement) sketches an intriguing Phase 7 direction: could Linus learn continuously from Dan's corrections,
+refining its own skills without human re-engineering? QiMeng-cpu-v1 says it is possible; the Linus-specific instantiation
+is future work.
 
 ---
 
@@ -191,11 +224,17 @@ new engineering: replace the pretraining loop with a LoRA fine-tune harness agai
 `val_bpb` with a Dan-task-suite proxy or held-out PPL on Dan's corpus, inherit `program.md`, the branch convention, and
 the keep-or-revert discipline unchanged. The autonomy tier for "NEVER STOP" (autoresearch-mlx's `program.md` posture of
 running unsupervised overnight on its own agent branch) needs a corresponding SAFETY.md graduation before Phase 6d can
-run fully unattended — that graduation step should be planned in Phase 6's setup rather than discovered mid-run.
+run fully unattended — that graduation step should be planned in Phase 6's setup rather than discovered mid-run. QiMeng-cpu-v1's
+I/O-driven behavioral synthesis and Boolean Distance metric are worth prototyping as alternatives to held-out-PPL scoring
+if Linus decides to optimize for skill replication rather than language modeling perplexity — a decision that should be
+explicit in Phase 6 planning.
 
 **Phase 8 (beyond MacBook):** The minGRU × BitNet × mlx-flash research direction (recurrent + 1-bit + streamed) is the
-long-horizon G1 target. No Phase 6 or Phase 7 work is gated on it, but it is the direction the cluster collectively
-points at when its components are combined rather than considered individually.
+long-horizon G1 target for inference. QiMeng-cpu-v1 points to a parallel Phase 8 target for Linus's own self-improvement:
+learned synthesis of skills and fine-tuning loops from behavioral I/O examples, treating (task, output, feedback) tuples as
+the specification and a distance metric as the optimization criterion. No Phase 6 or Phase 7 work is gated on either
+direction, but together they describe the direction the cluster collectively points at when its components are combined
+rather than considered individually.
 
 ---
 
