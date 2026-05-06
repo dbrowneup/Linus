@@ -66,8 +66,10 @@ projections inside attention and FFN with 1-bit / 1.58-bit weights — identifyi
 Section 3 of the Transformer paper. The memory pillar — the [Garrison-driven synthesis](memory-synthesis.md) plus eleven
 supporting notes — argues against _this exact model class_ in single-pass mode; the TC0 ceiling is a statement about a
 fixed-depth Transformer, and the chain-of-thought escape lifts it by adding intermediate decoded tokens the same
-self-attention can later reference. The larger-than-RAM streaming work in [`repos/mlx-flash/`](../../repos/mlx-flash/)
-and [`repos/flash-moe/`](../../repos/flash-moe/) sits on top of the identical-stacked-block layer structure introduced
+self-attention can later reference. The larger-than-RAM streaming work in
+[`repos/mlx-flash/`](../../repos/mlx-flash/) ([repo-note](../repo-notes/mlx-flash.md)) and
+[`repos/flash-moe/`](../../repos/flash-moe/) ([repo-note](../repo-notes/flash-moe.md)) sits on top of the
+identical-stacked-block layer structure introduced
 here; the "stream a layer at a time" trick only works because Vaswani et al. designed each layer as an independent unit.
 [Llama 3](../paper-notes/2407.21783v3.md) is the modern industrialized instantiation: same skeleton, knobs turned up.
 
@@ -209,8 +211,9 @@ capability-introspection step from WHAM.
 ### Efficiency as a through-line
 
 The [BitNet thread](../paper-notes/2310.11453v1.md) and the larger-than-RAM streaming line
-([LLM in a Flash](../paper-notes/2312.11514v3.md), [Flash-MoE](../paper-notes/flash_moe.md), the
-[mlx-flash repo](../../repos/mlx-flash/)) argue from the supply side that efficiency is the operational constraint.
+([LLM in a Flash](../paper-notes/2312.11514v3.md), [Flash-MoE](../paper-notes/flash_moe.md),
+[mlx-flash](../repo-notes/mlx-flash.md), [flash-moe](../repo-notes/flash-moe.md)) argue from the supply side that
+efficiency is the operational constraint.
 Google supplies the demand-side measurement framework that lets those claims be evaluated honestly. The shared lesson,
 explicit in both the Google note and the speed-and-tok/s note: _define the measurement boundary first, measure
 end-to-end task cost second, don't optimize a proxy_. Tok/s as a quality metric and active-GPU-Wh as an efficiency

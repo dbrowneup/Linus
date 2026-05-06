@@ -52,7 +52,7 @@ a secondary axis of **operational reach** on M1 Max.
 
 At the _generalist_ extreme sits **LucaOne**, the only model spanning DNA, RNA, and protein in a single shared embedding
 space. The unified 39-token vocabulary plus a token-type embedding is the operationalisation of the central-dogma claim,
-and the few-shot DNA-protein matching result (LucaOne 0.84 vs DNABert2+ESM2 0.73) is the cleanest evidence in the corpus
+and the few-shot DNA-protein matching result (LucaOne 0.84 vs DNABert2+ESM2 0.73 ([s42256-025-01044-4](../paper-notes/s42256-025-01044-4.md))) is the cleanest evidence in the corpus
 that joint training learns what neither half can learn alone. A step inward sits **Evo 2**, generalist _within_ DNA: 9.3
 T base pairs across all three domains of life, zero-shot variant scoring, generative as well as discriminative, 1
 M-token context.
@@ -69,7 +69,7 @@ homology baselines exactly where homology breaks down.
 
 The empirical evidence is mixed in a clarifying way. LucaOne's discussion explicitly concedes that small specialised
 models occasionally outperform large pretrained ones. RiNALMo beats SpliceBERT (pretrained exclusively on pre-mRNA) on
-splicing despite seeing no mRNA at all. AlphaGenome beats Evo 2 on the regulatory variant subdomain where Evo 2's own
+splicing despite seeing no mRNA at all ([s41467-025-60872-5](../paper-notes/s41467-025-60872-5.md)). AlphaGenome beats Evo 2 on the regulatory variant subdomain where Evo 2's own
 paper acknowledges trailing ChromBPNet. Bacformer beats fine-tuned Evo on bacterial gene essentiality. **Neither pure
 strategy survives contact with the evidence.** A LucaOne-only registry would underperform on regulatory variants,
 scarce-data protein engineering, bacterial genome analysis, and metagenomic annotation. A pure specialist registry would
@@ -120,7 +120,7 @@ models out of the box. The exceptions (Evo 2's hyena operators, ProteinReasoner'
 in Phase 7 over Evo 2, where local-inference plumbing is not yet mature.
 
 A second pattern worth naming: RiNALMo's **diversity-clustered batching** (cluster 36 M sequences at 70% identity into
-17 M clusters, sample one per cluster per minibatch) is "data curation as architecture." A few lines of data-loader code
+17 M clusters, sample one per cluster per minibatch ([s41467-025-60872-5](../paper-notes/s41467-025-60872-5.md))) is "data curation as architecture." A few lines of data-loader code
 that produced the inter-family generalisation gain. This is a candidate Linus engineering convention to adopt the moment
 any Linus-trained model has a sequence corpus large enough to benefit.
 
@@ -160,8 +160,8 @@ only paper that pretrains on **synthetic data from biophysical simulation** — 
 run through Rosetta to extract 55 biophysical attributes, with the trained encoder predicting those attributes from
 sequence. The motivating argument is mechanistic: protein engineering wants to know what happens at non-natural
 mutations, and natural sequences are silent on that regime by definition. The evidence is the GFP design experiment
-(fine-tune on 64 wet-lab variants, synthesise 20, get 16 functional) and the "29 simulated points ≈ 1 experimental
-point" trade-off heuristic. The pattern generalises beyond proteins — **simulation-pretrained, observation-fine-tuned**
+(fine-tune on 64 wet-lab variants, synthesise 20, get 16 functional ([s41592-025-02776-2](../paper-notes/s41592-025-02776-2.md))) and the "29 simulated points ≈ 1 experimental
+point" trade-off heuristic ([s41592-025-02776-2](../paper-notes/s41592-025-02776-2.md)). The pattern generalises beyond proteins — **simulation-pretrained, observation-fine-tuned**
 applies to any Linus domain with scarce real data plus a slower-but-correct simulator (enzyme kinetics, RNA folding,
 docking, spectroscopy). Worth lifting to a named architectural pattern in `docs/syntheses/` once a second clean instance
 lands.

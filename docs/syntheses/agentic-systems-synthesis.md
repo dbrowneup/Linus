@@ -2,7 +2,7 @@
 
 ## What this document is
 
-A rewrite of the prior Group D synthesis, expanded from seven to thirteen paper-notes. This rewrite absorbs four new
+A rewrite of the prior Group D synthesis, expanded from seven to ten paper-notes. This rewrite absorbs three new
 papers — the two same-named-but-different _QuantAgent_ papers ([HKUST/IDEA, 2024](../paper-notes/2402.03755v1.md) and
 [Stony Brook et al., 2025](../paper-notes/2509.09995v3.md)) and [WikiAutoGen](../paper-notes/2503.19065v1.md)
 (KAUST, 2025) — and surfaces them as fresh evidence on threads that were present-but-quiet in the prior synthesis
@@ -13,7 +13,7 @@ the landscape and questions documents.
 The headline claim sharpens with the expansion: the agentic-systems literature has converged on a small set of
 architectural primitives — role specialization, structured shared state, multi-level validation, per-tool documentation,
 hybrid local/hosted-model routing, ReAct + reflection as the default loop, and a critic tier distinct from a writer tier
-— and Linus's Phase 2/3 design is implicitly committing to most of them. The thirteen-paper version also promotes two
+— and Linus's Phase 2/3 design is implicitly committing to most of them. The ten-paper version also promotes two
 threads the seven-paper version under-weighted: structured inter-agent communication as a load-bearing primitive in its
 own right, and the question of whether agentic-system theory (regret bounds, MDP formalism) deserves more weight in
 Linus's design alongside the formal results that already anchor the memory pillar. The sober line under transferability
@@ -409,7 +409,7 @@ the input to that ADR.
 
 ## Inputs
 
-The thirteen paper-notes synthesised here, all in [`docs/paper-notes/`](../paper-notes/):
+The ten paper-notes synthesised here, all in [`docs/paper-notes/`](../paper-notes/):
 
 - [2511.02824v2](../paper-notes/2511.02824v2.md) — Mitchener et al., _Kosmos: An AI Scientist for Autonomous Discovery_
   (Edison Scientific / FutureHouse, 2025).

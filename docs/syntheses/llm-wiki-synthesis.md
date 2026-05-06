@@ -1,7 +1,8 @@
 # LLM Wiki Synthesis: Karpathy, Rohit v2, and Community Insights
 
 _Synthesized from: Karpathy LLM Wiki Gist, Rohit LLM Wiki v2 Gist, Karpathy LLM Wiki Repos list, Autoresearching Apple's
-LLM in a Flash, COMMUNITY_INSIGHTS.md, KB_DESIGN_PATTERNS.md._ _Date: 2026-05-01_
+LLM in a Flash, [COMMUNITY_INSIGHTS.md](../../context/notes/COMMUNITY_INSIGHTS.md),
+[KB_DESIGN_PATTERNS.md](../../context/notes/KB_DESIGN_PATTERNS.md)._ _Date: 2026-05-01_
 
 ---
 
@@ -10,8 +11,8 @@ LLM in a Flash, COMMUNITY_INSIGHTS.md, KB_DESIGN_PATTERNS.md._ _Date: 2026-05-01
 In April 2026, Andrej Karpathy published a gist describing what he called an "LLM Wiki" — a pattern for using language
 models to build and maintain persistent, interlinked personal knowledge bases rather than re-deriving answers from raw
 documents on every query. The gist attracted roughly 485 substantive comments from practitioners who had built real
-systems on their own hardware, and Rohit Garg (author of the `agentmemory` project) published a follow-on gist extending
-the pattern with lessons from production use.
+systems on their own hardware, and Rohit Garg (author of the [`agentmemory`](../repo-notes/agentmemory.md) project)
+published a follow-on gist extending the pattern with lessons from production use.
 
 The community response is high-signal but not uniformly reliable. The most credible contributors cited specific metrics,
 described failure modes, or had clearly shipped real systems (measured context savings, weeks of production use across
@@ -41,8 +42,8 @@ setup document — it is the core product. It encodes entity types, relation typ
 thresholds, and operational conventions. Without a schema the LLM is a generic chatbot. With one it is a disciplined
 knowledge worker.
 
-**Memory lifecycle: confidence decay and supersession.** Rohit's v2 adds the observation that knowledge has a lifecycle
-which the original gist ignores. Every claim should carry a confidence score (source count, recency, contradiction
+**Memory lifecycle: confidence decay and supersession.** [Rohit's v2](../repo-notes/agentmemory.md) adds the observation
+that knowledge has a lifecycle which the original gist ignores. Every claim should carry a confidence score (source count, recency, contradiction
 status). Claims that haven't been accessed or reinforced in months should deprioritize via Ebbinghaus-style exponential
 decay. When new information contradicts an existing claim, the old claim should be marked stale and linked to the new
 one — preserved but superseded — rather than silently overwritten. For a scientific paper corpus, methods sections go
@@ -113,80 +114,83 @@ KnowledgeBase graph should track "anticipated" nodes (mentioned but not yet extr
 
 ### Inference and Local-First Priority
 
-**kytmanov/obsidian-llm-wiki-local** — 100% local Ollama, concept extraction, rejection feedback loop, actively
-iterating (concept aliases, multi-language support as of v0.5). Directly relevant because it proves the fully local
-pattern works without cloud APIs. Relevant to Phase 2 (Linus MVP) when building the KnowledgeBase interaction layer.
+**[obsidian-llm-wiki-local](../repo-notes/obsidian-llm-wiki-local.md)** (kytmanov/obsidian-llm-wiki-local) — 100% local
+Ollama, concept extraction, rejection feedback loop, actively iterating (concept aliases, multi-language support as of
+v0.5). Directly relevant because it proves the fully local pattern works without cloud APIs. Relevant to Phase 2 (Linus
+MVP) when building the KnowledgeBase interaction layer.
 
-**NiharShrotri/llm-wiki** — Python CLI, Ollama plus Qwen3, QMD hybrid search, 3-way query scope, write-back,
-contradiction detection. One of the most complete local-first implementations in the thread. Relevant to Phase 2-3 as a
-reference for what a complete ingest/query/lint loop looks like in Python.
+**[NiharShrotri/llm-wiki](../repo-notes/llmwiki.md)** — Python CLI, Ollama plus Qwen3, QMD hybrid search, 3-way query
+scope, write-back, contradiction detection. One of the most complete local-first implementations in the thread. Relevant
+to Phase 2-3 as a reference for what a complete ingest/query/lint loop looks like in Python.
 
-**7xuanlu/origin** — Tauri (Rust) desktop app, background daemon, Qwen3 on Metal, explicit quality gate at ingest. The
-quality gate insight (filtering at the door beats retrieval improvements) came from this builder. Relevant to Phase 2;
-the Metal backend and Rust architecture are directly applicable to Linus's hardware targets.
+**[7xuanlu/origin](../repo-notes/origin.md)** — Tauri (Rust) desktop app, background daemon, Qwen3 on Metal, explicit
+quality gate at ingest. The quality gate insight (filtering at the door beats retrieval improvements) came from this
+builder. Relevant to Phase 2; the Metal backend and Rust architecture are directly applicable to Linus's hardware
+targets.
 
-**nashsu/llm_wiki** — Cross-platform Tauri (Rust), Ollama plus multi-provider, 3-column layout with graph view. Relevant
-to Phase 5 (interface) and for understanding what a native desktop shell looks like on the same Rust/Tauri stack Linus
-might eventually use.
+**[nashsu/llm_wiki](../repo-notes/llmwiki-cli.md)** — Cross-platform Tauri (Rust), Ollama plus multi-provider, 3-column
+layout with graph view. Relevant to Phase 5 (interface) and for understanding what a native desktop shell looks like on
+the same Rust/Tauri stack Linus might eventually use.
 
 ### Knowledge Graph and Retrieval
 
-**jgoldfed/keppi** — Weighted directed graph built from wikilinks, tags, and frontmatter. Blast-radius analysis (what
-does updating this node affect?), Louvain community detection, gap detection, 20+ MCP tools. Tested on 1,471 notes and
-267K edges. The blast-radius and gap-detection concepts are directly applicable to the paper library in KnowledgeBase.
-Relevant to Phase 3 (KB/Parallel Agents).
+**[jgoldfed/keppi](../repo-notes/keppi.md)** — Weighted directed graph built from wikilinks, tags, and frontmatter.
+Blast-radius analysis (what does updating this node affect?), Louvain community detection, gap detection, 20+ MCP tools.
+Tested on 1,471 notes and 267K edges. The blast-radius and gap-detection concepts are directly applicable to the paper
+library in KnowledgeBase. Relevant to Phase 3 (KB/Parallel Agents).
 
-**omega-memory/omega-memory** — Local semantic search: FTS5 plus vector embeddings plus cross-encoder reranking, all
-on-device. 95.4% on LongMemEval at 50ms retrieval. Solves the index.md scaling problem without requiring a heavy vector
-database. Directly relevant to Phase 3 when the KnowledgeBase grows past 200 nodes and the index-file approach breaks
-down.
+**[omega-memory/omega-memory](../repo-notes/omega-memory.md)** — Local semantic search: FTS5 plus vector embeddings
+plus cross-encoder reranking, all on-device. 95.4% on LongMemEval at 50ms retrieval. Solves the index.md scaling
+problem without requiring a heavy vector database. Directly relevant to Phase 3 when the KnowledgeBase grows past 200
+nodes and the index-file approach breaks down.
 
-**vectorlessflow/vectorless** — Knowledge graph traversal for document retrieval with no vector database. Builds a
-knowledge link graph for contextual retrieval. Relevant to Phase 3 as an alternative retrieval architecture for cases
-where vector DB overhead is undesirable.
+**[vectorlessflow/vectorless](../repo-notes/vectorless.md)** — Knowledge graph traversal for document retrieval with no
+vector database. Builds a knowledge link graph for contextual retrieval. Relevant to Phase 3 as an alternative retrieval
+architecture for cases where vector DB overhead is undesirable.
 
-**QipengGuo/llm-wikidata** — Combines LLMs and ChromaDB to recall existing entities before inserting new ones,
-preventing duplicate or hallucinated graph nodes. The entity deduplication approach (checking for existing nodes before
-creating new ones) is a concrete solution to the concept-drift problem the community identified as the hardest part of
-graph construction. Phase 3.
+**[QipengGuo/llm-wikidata](../repo-notes/llm-wikidata.md)** — Combines LLMs and ChromaDB to recall existing entities
+before inserting new ones, preventing duplicate or hallucinated graph nodes. The entity deduplication approach (checking
+for existing nodes before creating new ones) is a concrete solution to the concept-drift problem the community identified
+as the hardest part of graph construction. Phase 3.
 
-**Tencent/WeKnora** — Auto-built wiki plus typed knowledge graph (Neo4j), wiki-grounded retrieval, Chrome extension for
-ingestion. Apache 2.0. The typed graph architecture and wiki-grounded retrieval pattern are worth studying, even if
-Neo4j itself is heavier than what Linus needs. Phase 3.
+**[Tencent/WeKnora](../repo-notes/WeKnora.md)** — Auto-built wiki plus typed knowledge graph (Neo4j), wiki-grounded
+retrieval, Chrome extension for ingestion. Apache 2.0. The typed graph architecture and wiki-grounded retrieval pattern
+are worth studying, even if Neo4j itself is heavier than what Linus needs. Phase 3.
 
 ### Provenance and Citation Integrity
 
-**badwally/TheKnowledge** — Write-validator pattern: rejects any wiki page write that doesn't include a resolved
-`[[sources/]]` link to an already-ingested file. Span anchors to exact timestamps and pages. Bidirectional backlinks
-maintained automatically. This is the most rigorous citation enforcement implementation in the thread. Relevant to Phase
-2-3 for KnowledgeBase metadata curation.
+**[badwally/TheKnowledge](../repo-notes/TheKnowledge.md)** — Write-validator pattern: rejects any wiki page write that
+doesn't include a resolved `[[sources/]]` link to an already-ingested file. Span anchors to exact timestamps and pages.
+Bidirectional backlinks maintained automatically. This is the most rigorous citation enforcement implementation in the
+thread. Relevant to Phase 2-3 for KnowledgeBase metadata curation.
 
-**gayawellness/anamnesis** — Purpose-built provenance layer tracking how knowledge was compiled, why decisions were
-made, and what superseded what. "The wiki is the codebase; Anamnesis is the git log." Running 13 agents in production.
-The multi-agent provenance architecture is directly applicable to Linus's parallel agent work in Phase 3.
+**[gayawellness/anamnesis](../repo-notes/anamnesis.md)** — Purpose-built provenance layer tracking how knowledge was
+compiled, why decisions were made, and what superseded what. "The wiki is the codebase; Anamnesis is the git log."
+Running 13 agents in production. The multi-agent provenance architecture is directly applicable to Linus's parallel
+agent work in Phase 3.
 
-**ap0phasi/agentic-wiki-builder** — Git branch per ingestion. Every source is processed on its own branch, enabling
-contamination tracing: if a bad source corrupts wiki claims, the branch history lets you identify exactly what it
-touched and revert selectively. Phase 3 (parallel agents).
+**[ap0phasi/agentic-wiki-builder](../repo-notes/agentic-wiki-builder.md)** — Git branch per ingestion. Every source is
+processed on its own branch, enabling contamination tracing: if a bad source corrupts wiki claims, the branch history
+lets you identify exactly what it touched and revert selectively. Phase 3 (parallel agents).
 
-**do-y-lee/wikiloom** — Chunk-level SHA-256 hashing with source traceability. Storing
+**[do-y-lee/wikiloom](../repo-notes/wikiloom.md)** — Chunk-level SHA-256 hashing with source traceability. Storing
 `sha256(source_hash + chunk_index)` in page frontmatter gives a direct line from any wiki claim to the exact passage in
 the raw source. Human-edit protection. Phase 2-3.
 
 ### Agent Memory and MCP
 
-**rohitg00/agentmemory** — BM25 plus vector plus knowledge graph, RRF fusion, 95.2% on LongMemEval-S, 43 MCP tools.
-Knowledge graph extraction optional. This is the production implementation behind the Rohit v2 gist. Relevant as a
-reference architecture for Linus's memory layer. Phase 2-3.
+**[rohitg00/agentmemory](../repo-notes/agentmemory.md)** — BM25 plus vector plus knowledge graph, RRF fusion, 95.2% on
+LongMemEval-S, 43 MCP tools. Knowledge graph extraction optional. This is the production implementation behind the Rohit
+v2 gist. Relevant as a reference architecture for Linus's memory layer. Phase 2-3.
 
-**bitsofchris/openaugi** — "Links are the whole thing" — treats tags and links as first-class graph nodes. One SQLite
-file, MCP server, write-back from chat conversations. Minimal dependency footprint. Relevant to Phase 2 as the simplest
-possible graph-backed memory architecture that still has MCP integration.
+**[bitsofchris/openaugi](../repo-notes/openaugi.md)** — "Links are the whole thing" — treats tags and links as
+first-class graph nodes. One SQLite file, MCP server, write-back from chat conversations. Minimal dependency footprint.
+Relevant to Phase 2 as the simplest possible graph-backed memory architecture that still has MCP integration.
 
-**axoviq-ai/synthadoc** — Multi-provider including Ollama, contradiction detection, confidence thresholds, HITL review
-queue, audit trail, 6 file format ingesters (PDF, DOCX, PPTX, images, URLs, spreadsheets). The most complete
-batteries-included implementation that remains local-first. Relevant to Phase 2-3; the contradiction detection and HITL
-queue are immediately applicable to KnowledgeBase.
+**[axoviq-ai/synthadoc](../repo-notes/synthadoc.md)** — Multi-provider including Ollama, contradiction detection,
+confidence thresholds, HITL review queue, audit trail, 6 file format ingesters (PDF, DOCX, PPTX, images, URLs,
+spreadsheets). The most complete batteries-included implementation that remains local-first. Relevant to Phase 2-3; the
+contradiction detection and HITL queue are immediately applicable to KnowledgeBase.
 
 **redmizt/multi-agent-wiki-toolkit** — Flat files plus bash plus Python plus git. No database, no external services.
 Deterministic and reproducible. 18 architectural extensions for multi-agent production use. Relevant to Phase 3 parallel
@@ -194,27 +198,27 @@ agent work; the no-external-services constraint matches Linus's minimal dependen
 
 ### Lightweight CLI and Tooling
 
-**tobi/qmd** — Local hybrid search engine: BM25 plus vector plus LLM reranking. Both CLI and MCP server. All on-device.
-Explicitly recommended by Karpathy as the search solution for wikis that outgrow index.md. Phase 3 when search is
-needed.
+**[tobi/qmd](../repo-notes/qmd.md)** — Local hybrid search engine: BM25 plus vector plus LLM reranking. Both CLI and MCP
+server. All on-device. Explicitly recommended by Karpathy as the search solution for wikis that outgrow index.md. Phase
+3 when search is needed.
 
 **ilya-epifanov/llmwiki-tooling** — CLI for linting, checking and fixing links, enforcing frontmatter fields. Designed
 to be driven by AI agents. Saves tokens versus freeform linting. Phase 2-3 for KnowledgeBase lint automation.
 
-**HawHello/AgenticResearchWiki** — Wiki holds data paths, training configs, and eval records. Agent enters from
-Overview.md and writes records back. Compounds project memory (not just knowledge). Directly relevant to Linus's
-experiment tracking needs. Phase 1-2.
+**[HawHello/AgenticResearchWiki](../repo-notes/AgenticResearchWiki.md)** — Wiki holds data paths, training configs, and
+eval records. Agent enters from Overview.md and writes records back. Compounds project memory (not just knowledge).
+Directly relevant to Linus's experiment tracking needs. Phase 1-2.
 
 ### Specialized
 
-**MetamusicX/llm-research-wiki** — Academic research template with domain-specific page types: concepts, authors,
-debates, syntheses. First ingest produced 38 interlinked pages from one source. A useful template for how a scientific
-paper corpus should organize its entity types. Phase 2-3 for KnowledgeBase.
+**[MetamusicX/llm-research-wiki](../repo-notes/llm-research-wiki.md)** — Academic research template with domain-specific
+page types: concepts, authors, debates, syntheses. First ingest produced 38 interlinked pages from one source. A useful
+template for how a scientific paper corpus should organize its entity types. Phase 2-3 for KnowledgeBase.
 
-**EtienneChollet/ontomics** — Tree-sitter AST plus TF-IDF plus code embeddings to generate a semantic index of a
-codebase's domain vocabulary (concepts, conventions, abbreviations, behavioral clusters). Exposed as MCP tools.
-Deterministic, no hallucination. Relevant to Phase 2 when Linus wants to give Worker agents semantic access to the Linus
-codebase itself.
+**[EtienneChollet/ontomics](../repo-notes/ontomics.md)** — Tree-sitter AST plus TF-IDF plus code embeddings to generate
+a semantic index of a codebase's domain vocabulary (concepts, conventions, abbreviations, behavioral clusters). Exposed
+as MCP tools. Deterministic, no hallucination. Relevant to Phase 2 when Linus wants to give Worker agents semantic
+access to the Linus codebase itself.
 
 ---
 
@@ -293,8 +297,8 @@ file outgrows the context window.
 
 ## 5. KB Design Patterns
 
-KB_DESIGN_PATTERNS.md translates the community learnings into twelve concrete, actionable patterns with CLAUDE.md rules
-and directory structures. The document is immediately applicable and should be treated as a design specification for the
+[KB_DESIGN_PATTERNS.md](../../context/notes/KB_DESIGN_PATTERNS.md) translates the community learnings into twelve
+concrete, actionable patterns with CLAUDE.md rules and directory structures. The document is immediately applicable and should be treated as a design specification for the
 next KnowledgeBase sprint.
 
 The patterns that map most directly onto Linus's current KnowledgeBase architecture are:
@@ -340,14 +344,15 @@ and each mitigation should appear in the KnowledgeBase CLAUDE.md schema.
 
 The "Autoresearching Apple's LLM in a Flash" thread is a first-person account by Dan Woods of running Qwen 3.5 397B on
 an M3 Max MacBook Pro — a 209 GB MoE model producing 5.7 tokens per second sustained, using 5.5 GB resident memory, with
-no Python in the hot path. The paper and code are in `repos/flash-moe`, which Linus already has cloned.
+no Python in the hot path. The paper and code are in [`repos/flash-moe`](../repo-notes/flash-moe.md), which Linus
+already has cloned.
 
 Several things in the thread connect directly to Linus's current landscape:
 
-The methodology is exactly the autoresearch pattern Karpathy described and that `repos/autoresearch` and
-`repos/autoresearch-mlx` implement. Dan Woods gave Claude Opus a metric to optimize (tokens per second), a goal ("never
-stop until you hit this number"), reference materials (the LLM in a Flash paper, Maderix's ANE reverse-engineering work
-— also in `repos/ANE`), and let it run for 24 hours and 90 experiments. 42% of experiments were discarded. The flash-moe
+The methodology is exactly the autoresearch pattern Karpathy described and that [`repos/autoresearch`](../repo-notes/autoresearch.md)
+and [`repos/autoresearch-mlx`](../repo-notes/autoresearch-mlx.md) implement. Dan Woods gave Claude Opus a metric to optimize (tokens per second), a goal ("never
+stop until you hit this number"), reference materials (the LLM in a Flash paper, Maderix's ANE reverse-engineering work — also in
+[`repos/ANE`](../repo-notes/ANE.md)), and let it run for 24 hours and 90 experiments. 42% of experiments were discarded. The flash-moe
 pattern emerged from that search. This is not inspiration; this is the exact methodology Linus is planning to use for
 its own performance optimization work, and it has a concrete, documented success case.
 
@@ -368,9 +373,10 @@ degradation). That means expert weight blocks are small enough to stream from SS
 selection for flash-mode inference should prioritize MoE architectures where total parameter count vastly exceeds active
 parameter count.
 
-The thread also demonstrates that the ANE work in `repos/ANE` (Maderix's reverse-engineering) was a direct input to the
-flash-moe optimization — the ANE architecture knowledge informed where the Metal cache was hurting rather than helping.
-Linus has both `repos/ANE` and `repos/flash-moe`; these should be read as companion materials.
+The thread also demonstrates that the ANE work in [`repos/ANE`](../repo-notes/ANE.md) (Maderix's reverse-engineering)
+was a direct input to the flash-moe optimization — the ANE architecture knowledge informed where the Metal cache was
+hurting rather than helping. Linus has both `repos/ANE` and `repos/flash-moe`; these should be read as companion
+materials.
 
 ---
 
@@ -469,6 +475,7 @@ reference implementations for Linus's current phase).
 ---
 
 _This document should be updated when the KnowledgeBase schema is next revised or when Phase 3 parallel agent work
-begins. Key references: KB_DESIGN_PATTERNS.md for implementation patterns, repos/flash-moe for the autoresearch
-methodology applied to Apple Silicon inference, repos/autoresearch and repos/autoresearch-mlx for the research loop
-framework._
+begins. Key references: [KB_DESIGN_PATTERNS.md](../../context/notes/KB_DESIGN_PATTERNS.md) for implementation patterns,
+[repos/flash-moe](../repo-notes/flash-moe.md) for the autoresearch methodology applied to Apple Silicon inference,
+[repos/autoresearch](../repo-notes/autoresearch.md) and [repos/autoresearch-mlx](../repo-notes/autoresearch-mlx.md) for
+the research loop framework._
