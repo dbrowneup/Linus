@@ -24,12 +24,13 @@ One markdown file per decision, numbered `NNNN-<slug>.md` and matching the `DEC-
 choice (project name, orchestration backend as the product, KnowledgeBase as a submodule, OpenAI-compatible protocol,
 pmetal evaluation, branching model, MCP as the extensibility substrate, and so on). Currently 44 entries.
 
-### `repo-notes/` — Per-repo study notes
+### `landscapes/` — Integrated maps
 
-One page per cloned reference repo under `repos/`. Each note summarizes what the repo is, what is liftable into Linus,
-what to ignore, and any quirks worth remembering. Used as raw material for the syntheses. Currently ~80 notes covering
-Apple-Silicon inference work, agentic harnesses, MCP servers, memory systems, scientific agents, biology models, and
-related ecosystems.
+Higher-altitude documents that integrate the per-item notes and the per-theme syntheses into a single picture.
+
+- [total-landscape.md](landscapes/total-landscape.md) — master integration map crossing syntheses against architecture, roadmap, and open questions.
+- [synthesis-landscape.md](landscapes/synthesis-landscape.md) — cross-synthesis structural map showing overlaps, tensions, and hub clusters across the 24 synthesis docs.
+- [paper-landscape.md](landscapes/paper-landscape.md) and [repo-landscape.md](landscapes/repo-landscape.md) — deprecated stubs retained for link integrity, now pointing to index docs and synthesis-first landscapes.
 
 ### `paper-notes/` — Per-paper study notes
 
@@ -37,6 +38,39 @@ One page per paper under `context/papers/`. Same shape as repo-notes: what it ar
 what to skip. File names mirror the source identifiers (arXiv ids, bioRxiv DOIs, ScienceDirect PIIs). Currently ~80
 notes spanning LLM foundations, agents, biological foundation models, evaluation, alignment, and the
 humans/teams/performance literature.
+
+### `protocols/` — Operating protocols
+
+- [maestro-worker-protocol.md](protocols/maestro-worker-protocol.md) — the full version of the Maestro (Dan + hosted Claude) ↔ Worker (local models)
+  delegation contract summarized in the repo-root [CLAUDE.md](../CLAUDE.md).
+
+### `questions/` — Question logs
+
+- [top-questions.md](questions/top-questions.md) — the prioritized working set of unresolved questions, tiered by how much each answer changes the next concrete action.
+- [open-questions.md](questions/open-questions.md) — the full unresolved backlog, organized as a verbose per-source archive.
+- [answered-questions.md](questions/answered-questions.md) — the archive of resolved planning questions, with linked ADR/spec pointers and session-log context.
+
+### `repo-notes/` — Per-repo study notes
+
+One page per cloned reference repo under `repos/`. Each note summarizes what the repo is, what is liftable into Linus,
+what to ignore, and any quirks worth remembering. Used as raw material for the syntheses. Currently ~80 notes covering
+Apple-Silicon inference work, agentic harnesses, MCP servers, memory systems, scientific agents, biology models, and
+related ecosystems.
+
+### `session-summaries` – Key session recaps
+
+- [fan-out-session-summary-2026-05-04.md](session-summaries/fan-out-session-summary-2026-05-04.md) — Recaps the Section 7 G1-G10 repo-note fan-out run, including shared pre-fan-out infrastructure commits, per-group outcomes, and the highest-impact implementation patterns surfaced for Linus.
+- [landscape-rollup-session-summary-2026-05-05.md](session-summaries/landscape-rollup-session-summary-2026-05-05.md) — Recaps the post-fan-out landscape reorganization session that swept open questions, built flat index docs, rewrote the two canonical landscape files, deprecated legacy landscape docs, and appended the resulting execution plan in planning-update-spec Section 11.
+- [memory-pillar-session-summary-2026-05-03.md](session-summaries/memory-pillar-session-summary-2026-05-03.md) — Recaps the follow-up planning session that translated the Garrison memory thesis into Linus architecture via an 11-paper fan-out, a dedicated memory synthesis, 17 resolved memory-pillar questions, and ratifying ADR/spec outputs.
+- [paper-notes-session-summary-2026-05-03.md](session-summaries/paper-notes-session-summary-2026-05-03.md) — Recaps the multi-wave paper-note fan-out across the expanded corpus, including pre-triage decisions, per-batch execution checkpoints, and same-session group syntheses with wave-level roll-up deferred.
+- [planning-update-session-summary-2026-05-05.md](session-summaries/planning-update-session-summary-2026-05-05.md) — Recaps the context-ingestion session that produced five new paper notes, three new thematic syntheses, a preliminary planning-update draft, and a late-stage path-recovery fix that reapplied landscape updates to main-repo docs.
+- [top-questions-resolution-session-summary-2026-05-03.md](session-summaries/top-questions-resolution-session-summary-2026-05-03.md) — Recaps the end-to-end top-questions resolution session where Tier 0-3 items were converted into committed decisions, roadmap/spec deltas, and a concrete Worker-executable planning artifact.
+
+### `specs/` — Implementable specs and session artifacts
+
+Working specs handed off to the next implementation step (e.g. [planning-update-spec.md](specs/planning-update-spec.md), [memory-architecture.md](specs/memory-architecture.md)) and
+session summaries from large fan-out events (e.g. [fan-out-session-summary-2026-05-04.md](session-summaries/fan-out-session-summary-2026-05-04.md)). Living documents — updated
+when execution surfaces gaps.
 
 ### `syntheses/` — Cross-cutting roll-ups by theme
 
@@ -47,27 +81,3 @@ skills/practices, humans-and-teams). The nested [`repo-clusters/`](syntheses/rep
 group syntheses produced during the 2026-05-04 fan-out — each `gN-<slug>.md` covers one cluster of related repos
 (Apple-Silicon, wiki engines, wiki patterns, memory, graph tools, MCP tools, harnesses, scientific agents, biology,
 finance).
-
-### `landscapes/` — Integrated maps
-
-Higher-altitude documents that integrate the per-item notes and the per-theme syntheses into a single picture.
-
-- `total-landscape.md` — master integration map across all four input streams (repos, papers, decisions, questions).
-- `repo-landscape.md`, `paper-landscape.md`, `synthesis-landscape.md` — single-stream views feeding into the total.
-
-### `questions/` — Open-question log
-
-- `open-questions.md` — the full backlog of unresolved questions.
-- `top-questions.md` — the prioritized subset, tiered by how much each answer changes the next concrete action, with a
-  resolution log appended as questions are closed.
-
-### `specs/` — Implementable specs and session artifacts
-
-Working specs handed off to the next implementation step (e.g. `planning-update-spec.md`, `memory-architecture.md`) and
-session summaries from large fan-out events (e.g. `fan-out-session-summary-2026-05-04.md`). Living documents — updated
-when execution surfaces gaps.
-
-### `protocols/` — Operating protocols
-
-- `maestro-worker-protocol.md` — the full version of the Maestro (Dan + hosted Claude) ↔ Worker (local models)
-  delegation contract summarized in the repo-root [CLAUDE.md](../CLAUDE.md).
