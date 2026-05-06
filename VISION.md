@@ -8,6 +8,12 @@ notes, corpora, and eventually fine-tuned models trained on his own data. Linus 
 offline and privately — all models, knowledge, conversations, and corpora live on Dan's hardware and never need to leave
 it. The network is optional, not load-bearing.
 
+Conceptually, Linus is a **personal LLM Wiki at scale**: a continuously refined, citation-rich knowledge substrate that
+compounds across every Maestro/Worker interaction, every paper read, every synthesis written. Citations and traceability
+are first-class — every synthesized claim links back to its source Worker output, KB entity, or paper-note. The
+substrate absorbs Dan's accumulated digital knowledge over time and becomes the medium through which Dan interacts with
+his own information.
+
 Linus is not an attempt to replace hosted frontier models. It is an attempt to own the infrastructure between intent and
 output — the layer where domain knowledge, tools, skills, sandbox policy, and multi-agent coordination live. Frontier
 labs will keep advancing the quality of the raw models. Linus makes whatever raw model Dan uses actually good at Dan's
@@ -51,8 +57,9 @@ What Linus the project inherits from Pauling:
 - **Principled independence.** Local-first AI with privacy and data sovereignty isn't a feature — it's a stance. Linus
   can operate entirely without network access: no telemetry, no API keys required for daily operation, no cloud
   dependency in the critical path. Every source of knowledge it draws on — papers, notes, Wikipedia, structured
-  courseware, maps, fine-tuned model weights — is stored locally, versioned, and under Dan's physical control.
-  "Knowledge That Never Goes Offline" isn't a tagline borrowed from an inspiration project; it is a hard design
+  courseware, maps, fine-tuned model weights — is stored locally, versioned, and under Dan's physical control. The
+  network boundary is the trust boundary. "Knowledge That Never Goes Offline" isn't a tagline borrowed from an
+  inspiration project; it is a hard design
   constraint that every phase must respect.
 - **Long horizons.** Two Nobels, decades apart, in different fields. Linus the project has no v1 deadline. It is an
   open-ended practice.
@@ -125,6 +132,12 @@ A small orchestra:
 - **Rehearsal** = smoke tests, dry runs, benchmarks. Never skip rehearsal.
 - **Performance** = production runs, real research loops, actual work.
 
+The Maestro/Worker split has a quantitative anchor in the cognitive-throughput literature: Workers handle the
+high-bandwidth parallel substrate (sensorimotor processing runs at ~10⁹ bits/s of input); Dan + Maestro handle the
+narrow conscious synthesis channel (~10 bits/s of behavioral output, per Zheng and Meister 2024). Multi-Worker fan-out
+generates throughput gain only when synthesized into review-ready outputs before reaching the conscious channel — hence
+the Phase 2 chat UI defaults to balanced bullets + prose with citation drill-down, not raw Worker concatenation.
+
 Maestro attention is the scarcest resource. Push any well-specified task to a Worker. Use Maestro tokens for
 architecture, direction, and plateau-point insight — the places where taste and judgment matter most.
 
@@ -133,6 +146,14 @@ architecture, direction, and plateau-point insight — the places where taste an
 When stuck, measure. When disagreeing, measure. When the model gives a confident answer and you're not sure if it's
 right, measure. Benchmarks exist because confidence without data is cheap. Dan task suite, MMLU, GPQA, HumanEval, MBPP,
 and the private Q&A rubric are all ways of converting argument into evidence.
+
+### Reproducibility and interpretability over stochastic complexity
+
+When two methods perform comparably, prefer the one whose outputs Dan can audit, reproduce, and explain. The Horiike
+PCA-projection work is the canonical example: an orthogonal, principled visualization of high-dimensional binary data
+outperforms more elaborate stochastic projections precisely because it is reproducible and interpretable. This principle
+applies across Linus — in benchmark methodology, in retrieval heuristics, in fine-tuning evaluation, and in the
+visualization of agent state and KB structure.
 
 ## What Linus is becoming concrete (post 2026-05-04 fan-out)
 
@@ -158,8 +179,8 @@ The stack (each a separate Integrate verdict from the fan-out):
   leak the eval. New Phase 2 obligation.
 - **KnowledgeBase** (existing submodule) — the paper-corpus substrate over which the rest operates.
 
-Together, this is what `docs/entrepreneurial-surface.md` (a planning-spec deliverable not yet written) would describe as
-the first opportunity-shaped deliverable. The skills synthesis already named "scientific literature intelligence for
+Together, this is what `docs/knowledge-mining-surface.md` (a Phase 2 planning-spec deliverable) would describe as the
+first opportunity-shaped deliverable. The skills synthesis already named "scientific literature intelligence for
 biotech teams" as the Phase 1+ entrepreneurial surface; the 2026-05-04 fan-out converts that framing from intent into a
 concrete component list. Whether to actively pursue clients now versus after Linus is operational remains an open
 values-level decision, but the technical substrate is closer to ready than the planning-spec assumed.
