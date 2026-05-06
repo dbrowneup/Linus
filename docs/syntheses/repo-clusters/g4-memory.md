@@ -1,7 +1,7 @@
 # Group 4 Synthesis — Agent Persistent Memory
 
 **Date:** 2026-05-04 **Repos surveyed:** agentmemory, anamnesis, omega-memory, engram, remember, prompt-vault, openaugi,
-memex **Verdicts:** 7 × Study, 1 × Ignore (prompt-vault)
+memex, k-dense-byok (late addition) **Verdicts:** 8 × Study, 1 × Ignore (prompt-vault)
 
 ---
 
@@ -137,6 +137,21 @@ Obsidian vault — these are adjacent to memory concerns, not constitutive of th
 `self-documenting-ai-agent/` is worth saving as a draft for a future Linus skill. Beyond that, prompt-vault should not
 appear in the Layer C infrastructure discussion.
 
+**k-dense-byok contributes orchestration patterns for multi-model dispatch and skill routing at scale.** K-Dense is a
+production-grade local-first research assistant (Kady) that runs on macOS/Linux with a maestro/expert dispatch
+architecture: a Claude Opus "maestro" model orchestrates a Gemini CLI "expert" subprocess for tool-heavy tasks, manages
+170+ scientific skills across genomics, drug discovery, and materials science, and surfaces 326 workflow templates to
+researchers. The orchestrator/expert split directly mirrors Linus's Maestro/Worker discipline and is worth studying for
+Phase 2's orchestration backend design. The skill routing logic — JSON-encoded skill summaries, model-driven selection,
+pass-through to the expert via tool calling — is directly portable to Linus's Phase 2 tool registry and Phase 3's
+multi-agent skill dispatch. K-Dense's multi-tab architecture with shared file-system sandboxes is an elegant pattern for
+session isolation; whether Dan adopts it for Linus depends on Phase 2's session-store design and whether parallel Workers
+need to coordinate file I/O. The cost tracking — especially the backfill logic from OpenRouter's generation API — solves
+the production problem of post-streaming cost attribution and is reusable patterns for any multi-model infrastructure.
+K-Dense runs against external APIs (OpenRouter, Exa, Modal) and is thus outside Linus's sovereignty mandate, but the
+routing, selection, and expert-dispatch patterns are orthogonal to the storage substrate and transfer directly to local
+infrastructure.
+
 ---
 
 ## Patterns and modules worth lifting
@@ -202,41 +217,52 @@ contract is the right shape for validating the LLM's classification response bef
 ## Cross-references
 
 The memory-synthesis document argued for Layer C promotion to a Phase 2 first-class deliverable and specified the
-substrate (SQLite + content hashes + git). This document provides the empirical grounding: eight practitioners
+substrate (SQLite + content hashes + git). This document provides the empirical grounding: nine practitioners
 independently converged on the same architectural need, and the one who implemented it closest to DEC-0029's spec is
 `openaugi`. The memory-synthesis's Phase 3 parallel-write question has a named answer in agentmemory's
 lease/signal/checkpoint primitives.
 
 The LLM Wiki synthesis (G2/G3 clusters) surfaced many of the same repos from a different angle — agentmemory and
 openaugi appear in that synthesis as retrieval and memory reference implementations. This group extends that reading by
-examining the full episodic substrate, not just the retrieval shape. The G6 paper-qa cluster (if surveyed) would connect
-to Layer D (KnowledgeBase), which this group treats as already specified by DEC-0015 and the KnowledgeBase submodule.
+examining the full episodic substrate, not just the retrieval shape. K-dense-byok appears here as well, contributing
+maestro/expert dispatch and skill routing patterns that bridge memory infrastructure to the orchestration layer discussed
+in the G7 harnesses synthesis. The G6 paper-qa cluster (if surveyed) would connect to Layer D (KnowledgeBase), which this
+group treats as already specified by DEC-0015 and the KnowledgeBase submodule.
 
 The security synthesis's trust-tier separation pattern connects directly to anamnesis's authority-weighted hierarchy and
 to memex's cross-vendor enforcer. Both are answers to the same question: when Workers write to the memory store, how do
 we prevent agent-generated noise from polluting user-stated facts? The security synthesis named this as an
-orchestration- layer concern; the G4 repos show two concrete mechanism designs.
+orchestration-layer concern; the G4 repos show two concrete mechanism designs. K-dense-byok's multi-tab sandboxing
+architecture adds a third dimension: session isolation and inter-tab visibility as a memory-access control pattern.
 
 ---
 
 ## Phase-tagged implications
 
-**Phase 2a (episodic store v0 substrate):** Lift the openaugi two-table schema as the starting migration. Implement the
-agentmemory hook taxonomy as the lifecycle write contract. Adopt sqlite-vec + FTS5 inside the same file; delete the
-Qdrant requirement from v0 scope. Add `supersedes_id` and `depends_on_id` columns now — zero-cost at definition time,
-expensive to add later. Write the `linus.memory.persona.read()` Layer D primitive using a Persona.md pattern from
-remember.
+**Phase 2a (episodic store v0 substrate and orchestration routing):** Lift the openaugi two-table schema as the
+starting migration. Implement the agentmemory hook taxonomy as the lifecycle write contract. Adopt sqlite-vec + FTS5
+inside the same file; delete the Qdrant requirement from v0 scope. Add `supersedes_id` and `depends_on_id` columns now —
+zero-cost at definition time, expensive to add later. Write the `linus.memory.persona.read()` Layer D primitive using a
+Persona.md pattern from remember. Concurrently, lift k-dense-byok's skill-routing patterns (skill summary JSON encoding,
+model-driven selection logic, pass-through to Workers) into the Phase 2a tool-registry design. K-dense's 170-skill
+scale is overkill; a minimal 10–20-skill set (bioinformatics, document analysis, knowledge-base tools) is Phase 2a scope,
+with expansion deferred to Phase 3.
 
-**Phase 2b (backfill and retrieval):** Use `remember/scripts/extract.js` as the reference for a Python
-`linus.memory.episodic.backfill_from_history()` tool that walks `~/.claude/projects/*.jsonl` transcripts and populates
-the episodic store retroactively. Add temporal and relational channels to the retrieval path (anamnesis 4D pattern over
-SQLite). Write `docs/specs/memory-constitution.md` using the memex constitution as the model.
+**Phase 2b (backfill, retrieval, and session isolation):** Use `remember/scripts/extract.js` as the reference for a
+Python `linus.memory.episodic.backfill_from_history()` tool that walks `~/.claude/projects/*.jsonl` transcripts and
+populates the episodic store retroactively. Add temporal and relational channels to the retrieval path (anamnesis 4D
+pattern over SQLite). Write `docs/specs/memory-constitution.md` using the memex constitution as the model. Evaluate
+k-dense-byok's multi-tab sandboxing architecture for applicability to Linus's session-store design; decide whether file
+I/O isolation across parallel Workers requires explicit session-sandbox enforcement or implicit isolation via separate
+episodic-store queries.
 
-**Phase 3 (parallel-Worker write coordination):** Promote the agentmemory lease/signal/checkpoint vocabulary to a named
-DEC alongside DEC-0029. Add `linus.memory.episodic.audit()` using engram's lint taxonomy. Implement the cross-vendor
-enforcer pattern: a separate low-authority Worker audits the episodic records written by the primary Worker and drops a
-dated report. Tag the enforcer audit result with `trust_level=system` rather than `inferred`; it should not override
-user-stated facts but should surface contradictions for Maestro review.
+**Phase 3 (parallel-Worker write coordination and dispatch):** Promote the agentmemory lease/signal/checkpoint
+vocabulary to a named DEC alongside DEC-0029. Add `linus.memory.episodic.audit()` using engram's lint taxonomy.
+Implement the cross-vendor enforcer pattern: a separate low-authority Worker audits the episodic records written by the
+primary Worker and drops a dated report. Tag the enforcer audit result with `trust_level=system` rather than `inferred`;
+it should not override user-stated facts but should surface contradictions for Maestro review. Implement k-dense-byok's
+expert-dispatch configurability: allow Workers to toggle between local models (Ollama, pmetal) and future hosted-Claude
+routing, with cost tracking backfill from each source.
 
 ---
 
