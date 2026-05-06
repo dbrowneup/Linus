@@ -706,32 +706,35 @@ Phase 6d and DEC-0010/0014.
 
 ### F.2 — `docs/specs/phase3-spawner.md`
 
+**Scope:** Design intent stub only. The full implementation spec is a Maestro task to be written closer to Phase 3.
+This stub captures the key architectural decisions so they are findable and don't have to be re-derived.
+
 **Context:** The Phase 3 agent spawner handles parallel Worker fan-out with typed inter-agent communication. Read
 DEC-0050 (Role type), DEC-0051 (AgentReport), DEC-0052 (investigation memory), and the relevant answered-questions
 entries for S9, S10, S13, S14, S15, S56.
 
-**Contents to include:**
+**Contents to include (keep each section brief — 3–5 sentences max):**
 
 - **Goal and scope:** Phase 3 spawner enables `linus.agent.spawn(spec, roles)` — fans a parent task into N Workers
-  with typed communication and shared state.
+  with typed communication and shared state. Note that full task-decomposition primitives (PRD→tasks, parallel
+  terminal patterns) are adopted as skills in the skill registry, not re-implemented (DEC-0020).
 - **Role type** (DEC-0050): dataclass with `role_id`, `capability_set`, `memory_access_tier`, `critic_eligible`.
-  Serializable as JSON/YAML. `capability_set` provides the sandbox enforcement surface. Example role definitions.
-- **AgentReport** (DEC-0051): typed inter-agent message format — `task_id`, `role_id`, `status`
+  Serializable as JSON/YAML. Example role definitions (researcher, critic, writer).
+- **AgentReport** (DEC-0051): typed message format — `task_id`, `role_id`, `status`
   (`complete` / `partial` / `blocked` / `error`), `result`, `rationale` (only free-text field), `evidence`,
-  `timestamp`. `status: "partial"` explicitly named for useful-but-incomplete Workers.
-- **Validation-gate primitive** (S15 resolution): per-stage validation hooks in the orchestration layer; spawner
-  validation is a quality surface (did X, is the output good enough?), distinct from sandbox enforcement (can't do X
-  at all). Sketch2Simulation pattern: execute → detect → fix, with fixer-agent as a separate spawned Worker.
-- **Critic-tier policy** (S14 resolution): `critic_eligible: true` roles can call the current Maestro-tier agent
-  (hosted Claude now; Linus-Maestro eventually at Phase 8b). Budget convention: critic calls are expensive; use only at
-  plateau points.
-- **Investigation memory integration** (DEC-0052): spawner creates a Layer D investigation store at fan-out time
-  (`create(investigation_id, task_id, participating_roles)`); closes and archives to Layer C on completion.
-- **Applicable theory** (S56): HKUST QuantAgent formal result — KB-coverage growth is the dominant lever on
-  suboptimality. Design implication: expanding the retrieval layer's coverage of the problem domain reduces spawner
-  suboptimality more than refining Worker model quality at constant KB coverage.
-- **Dynamic tool activation** (E3): design the tool registry with per-session activation in mind; Phase 3 evaluates
-  whether dynamic activation is necessary at the actual tool-budget scale of that phase.
+  `timestamp`. `status: "partial"` is explicitly valid for useful-but-incomplete Workers.
+- **Validation-gate primitive** (S15): spawner validation is a quality surface (did X, is the output good enough?),
+  distinct from sandbox enforcement (can't do X at all). Fixer-agent pattern: execute → detect → fix as a separate
+  spawned Worker.
+- **Critic-tier policy** (S14): `critic_eligible: true` roles call the current Maestro-tier agent (hosted Claude now;
+  Linus-Maestro at Phase 8b). Critic calls are expensive — use only at plateau points.
+- **Investigation memory** (DEC-0052): spawner creates a Layer D store at fan-out; closes and archives to Layer C on
+  completion.
+- **Key open question for Phase 3 planning:** dynamic tool activation (E3) — evaluate whether per-session activation
+  is necessary at the actual tool-budget scale.
+- **Applicable theory note** (S56): KB-coverage growth is the dominant lever on spawner suboptimality (HKUST
+  QuantAgent formal result). Expanding retrieval coverage beats refining model quality at constant KB coverage.
+- **Status:** Design intent only. Full implementation spec to be written by Maestro at Phase 3 planning time.
 
 ### F.3 — `docs/specs/biology-phase7-roadmap.md`
 
