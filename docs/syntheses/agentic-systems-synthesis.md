@@ -305,7 +305,8 @@ fan-out.
 ## Implications for Linus evaluation
 
 The [Practical Guide](../paper-notes/2506.13023v1.md) is essentially the design document for `benchmarks/dan_tasks/`.
-(BixBench now lives in Group C; reference it there for bioinformatics-agent evaluation. Practical Guide is the central
+(BixBench and LAB-Bench moved to [`infra-foundations-synthesis.md`](infra-foundations-synthesis.md) as benchmark
+anchors as of 2026-05-05; their agent-loop aspect is referenced from there. Practical Guide remains the central
 evaluation anchor for Group D.)
 
 The 5 D's apply item-by-item: **Defined Scope** (tag the Linus capability targeted), **Demonstrative** (Dan would

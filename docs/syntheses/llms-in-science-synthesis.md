@@ -217,6 +217,34 @@ distinction in the benchmark suite itself.
 
 ---
 
+## Repo-cluster anchor: g8-sci-agents (added 2026-05-05)
+
+The 2026-05-05 landscape remapping made **g8-sci-agents** the primary cluster anchor for this synthesis. g8 is the
+scientific-agent prior art cluster — most importantly **paper-qa**, the first paper-corpus tool to earn an Integrate
+verdict, with `PaperSearch`, `GatherEvidence`, `GenerateAnswer`, and `Reset` as the canonical tool surface. paper-qa
+is the operational instantiation of the Schulz frame: an open-source research-assistant-like collaborator with
+citation-grounded outputs and explicit claim typing. Adopting paper-qa as the Phase 2 KB substrate default
+integration target reframes the KB question from "build" to "adopt + extend," and it lands the citation discipline
+this synthesis argues for as code rather than convention.
+
+The other g8 repos (research agents, scientific multi-step harnesses) supply the **prior art for what
+Maestro-class evaluation actually looks like in practice**. The Knuth case argues categorically for a Maestro-class
+tier in `benchmarks/dan_tasks/`; the g8 cluster argues empirically that the right shape is multi-step research
+loops with citation-grounded intermediate outputs, not single-prompt evaluations. The two arguments converge on the
+same Maestro-class eval recommendation from different directions.
+
+A non-trivial implication: **the Schulz frame is the implicit position of the integrate-trio** (paper-qa + bioSkills
++ scientific-agent-skills). When Linus adopts those repos, it endorses Schulz operationally. The synthesis claim
+that "Linus is a position-taking artifact" tightens — the position is now also embedded in the toolchain, not just
+the architecture. The Marelli citation discipline is the constraint that keeps the Schulz adoption honest:
+paper-qa's claim-typing + LAB-Bench canary blocklist + content-hashing make the Schulz collaboration auditable.
+
+The g3-wiki-patterns secondary edge supports the epistemic-standards thread: build patterns for agent-driven wikis
+(obsidian-llm-wiki-local, llm-research-wiki LINT) operationalize the claim categories Marelli argues for.
+g2-wiki-engines supports the reproducibility-floor thread: open-source wiki substrates are what the Schulz frame
+requires for science to remain reproducible. g9-bioinformatics supplies the Dan-relevant domain instantiation
+(Bacformer, BioReason, DeepSeMS as scientific agents in metagenomics-adjacent territory).
+
 ## Where this synthesis fits
 
 The [memory synthesis](memory-synthesis.md) gives the architectural foundation for _how_ LLMs can usefully participate

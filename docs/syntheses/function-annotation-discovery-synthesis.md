@@ -1,5 +1,13 @@
 # Function Annotation, Reasoning & Discovery Synthesis
 
+> **Cross-cutting note (added 2026-05-05).** As of the 2026-05-05 landscape remapping, **LAB-Bench and BixBench are
+> primarily anchored from [`infra-foundations-synthesis.md`](infra-foundations-synthesis.md)** as Phase 1 Worker-
+> selection benchmarks. The deeper methodological treatment (coverage/accuracy/precision triple, MCQ→open-answer
+> collapse, FutureHouse evaluation philosophy) remains in this document because it is load-bearing for the
+> function-annotation skill argument; cross-reference both files when planning benchmark adoption. The Tier-1-equivalent
+> action ("LAB-Bench MCQ + BixBench as Phase 1 baseline") now lives on the infra-foundations row of the synthesis
+> matrix.
+
 ## What this document is
 
 A synthesis of eight Group C papers — three method papers (Horizyn-1, ProtHGT, DIAMOND DeepClust), two

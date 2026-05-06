@@ -234,76 +234,17 @@ sources and feed updates into the KnowledgeBase. Phase 4.
 
 ## 5. Entrepreneurial Opportunities
 
-Dan's position is unusual: PhD biochemistry with genomics depth, 13 years of Python in scientific computing, a failed
-biotech startup (operational experience, not just theory), and a working local AI infrastructure project. This
-combination is not common, and most of the generic AI side-hustle content misses it entirely. The opportunities below
-are filtered for this specific intersection.
+> **Extracted 2026-05-05.** The seven entrepreneurial opportunities originally listed here have been promoted to a
+> first-class [`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md), where they sit alongside the
+> g10-finance transferable-context-management patterns and the Phase 7 biology pillar's commercial surface. This
+> section is retained as a pointer; new entrepreneurship content should land in the new synthesis.
 
-**Opportunity 1: Scientific literature intelligence service for biotech teams. (Phase 1-ready)** The "$312/Day" thread's
-competitor feature mapping and market objection mining skills, applied to scientific literature rather than SaaS
-products. Biotech and pharma teams routinely need to track competitive landscapes across dozens of journals, preprint
-servers, and patent databases. Dan can do this manually now with Claude and his paper corpus; the productized version
-routes a client's competitive intelligence questions through a structured pipeline backed by Linus's KnowledgeBase.
-Initial revenue model: flat monthly retainer per client, $1,000–$3,000/month range. This requires Phase 1's recon
-infrastructure but not the full orchestration layer. Three to five clients in year one is a realistic target, producing
-$3,000–$15,000/month recurring revenue before any automation. Differentiation: Dan actually understands the science, so
-he can evaluate output quality in a way that a generalist prompt-seller cannot. This is a moat.
-
-**Opportunity 2: Automated genomics pipeline auditing and SOP generation. (Phase 1-2)** Bioinformatics pipelines
-accumulate technical debt at the same rate software pipelines do, but the people maintaining them are scientists, not
-software engineers. Nobody wants to document them; everyone needs the documentation. Dan's "$312/Day" SOP-writing skill,
-applied to bioinformatics code and workflows, is a natural fit. Feed a Python/Snakemake/Nextflow pipeline to a Worker;
-get structured documentation, decision trees, and new-hire-friendly SOPs in return. Sold as a one-time engagement
-($2,000–$8,000 per pipeline), with optional ongoing retainer for pipeline updates. This can be prototyped in Phase 1
-using existing Claude Code capabilities and does not require the full Linus backend. The environmental science
-background extends this to environmental monitoring pipelines (EPA data processing, remote sensing workflows), widening
-the addressable market.
-
-**Opportunity 3: Domain-specific decision frameworks for funding and grant applications. (Phase 1)** The "$312/Day"
-thread identifies decision frameworks as underrated and high-value: people are stuck, not stupid, and clarity sells.
-Grant applications and funding decisions in science are notoriously unclear processes. Dan's experience founding a
-biotech startup (and presumably navigating SBIR/STTR applications, investor pitches, and grant submissions) gives him
-firsthand knowledge of the decision criteria that aren't written down anywhere. A Claude-backed framework that helps
-scientists decide whether to pursue a grant vs. industry collaboration vs. equity financing — with risk matrices and
-priority scoring — is a concrete, sellable product. Initial format: a structured Notion template or PDF workbook
-($150–$500 one-time), with an optional consulting layer for customization. Validation is fast: post a free version in
-r/biotech or r/labrats and measure download rate.
-
-**Opportunity 4: Environmental data intelligence for compliance and monitoring teams. (Phase 2-3)** Dan's BS
-Environmental Science intersects with a large, compliance-driven market: environmental consulting firms, municipal water
-utilities, and industrial facilities that must monitor and report on regulatory compliance. These organizations generate
-enormous volumes of sensor data, lab reports, and regulatory filings, and they struggle to extract actionable
-intelligence from them. A Linus-backed pipeline that ingests monitoring data and produces plain-English compliance
-summaries, flags anomalies, and drafts regulatory correspondence is differentiated by Dan's domain knowledge. Revenue
-model: productized service or SaaS, $500–$2,000/month per facility. Requires Phase 2's orchestration layer and Phase 3's
-structured data ingestion. Medium-term opportunity (12–24 months).
-
-**Opportunity 5: AI-accelerated scientific manuscript preparation. (Phase 2)** Scientific writing is a known bottleneck
-in academic and industry research. The "$312/Day" cold email personalization and landing page rewrite skills have a
-direct analog: personalized manuscript structure, methods section standardization, and journal-specific formatting. Dan
-can offer a service that takes a set of results (figures, tables, notes) and produces a submission-ready draft tailored
-to a specific journal's style and scope. The differentiation over generic writing services is scientific credibility —
-Dan can read the results and catch errors that a non-scientist would miss. Pricing: $500–$2,500 per manuscript, with
-faster turnaround as Linus's Worker pipeline matures. This scales with Phase 2's automation; early versions can be
-semi-manual.
-
-**Opportunity 6: Notion template systems for scientific project management. (Phase 1, low-effort)** The "$312/Day"
-thread's Notion template play is specifically relevant for scientists. Research project management in academia is
-notoriously poor: lab notebooks are paper or fragmented Google Docs, experiment tracking is ad hoc, and literature
-review is done in a browser bookmarks folder. A set of Notion templates designed specifically for wet lab or
-computational biology teams — experiment logging, protocol management, paper reading queues with synthesis notes — has a
-natural market and minimal competition compared to generic productivity templates. Build time with Claude: hours.
-Validation: post to Twitter/X biotech community, BioResnet, or r/bioinformatics. Revenue: Gumroad or Etsy, $15–$79 per
-template, with the potential for lab-level licenses. This is the lowest-barrier entry in this list and can be done in
-Phase 1 with no Linus infrastructure at all.
-
-**Opportunity 7: Local AI infrastructure consulting for research institutions. (Phase 2-3, longer horizon)** University
-research groups and small biotech companies are increasingly interested in running AI locally for data privacy reasons
-(patient data, proprietary sequences, pre-publication results). Dan's hands-on experience building Linus — specifically
-the Apple Silicon / no-CUDA / Ollama stack — is ahead of most research IT departments. A consulting practice that helps
-research groups set up compliant, locally-hosted AI infrastructure (model selection, hardware sizing, workflow
-integration) is a Phase 2+ opportunity once Linus is demonstrably functional. Revenue: project-based consulting,
-$5,000–$20,000 per engagement. This requires Phase 2's MVP to be working reliably enough to demo.
+The seven opportunities (Scientific literature intelligence service for biotech teams; Automated genomics pipeline
+auditing and SOP generation; Domain-specific decision frameworks for funding and grant applications; Environmental
+data intelligence for compliance and monitoring teams; AI-accelerated scientific manuscript preparation; Notion
+template systems for scientific project management; Local AI infrastructure consulting for research institutions)
+remain Dan-profile-relevant; their full treatment lives in the entrepreneurship synthesis. The Tier-1-equivalent
+action and Tier 1/2/3 questions for the commercial surface are now owned by that synthesis.
 
 ---
 
@@ -339,13 +280,9 @@ Cline against Ollama, and measure whether the output quality justifies the local
 
 ## 7. Open Questions for Dan
 
-**Question 1: What is Linus's first monetizable capability, and when?** The entrepreneurial opportunities above span a
-range from "buildable today with Claude Code" (Opportunity 6, Notion templates) to "requires Phase 3+" (Opportunity 5 at
-scale). The question worth sitting with: should Dan start generating revenue from AI-assisted services now, using hosted
-Claude + his domain expertise, while Linus builds in the background? Or does the current investment focus remain
-entirely on infrastructure? Starting even one client engagement at the "$312/Day" skill level (e.g., scientific
-literature intelligence) would generate real feedback about what clients actually pay for — which is more valuable than
-speculative roadmap planning.
+**Question 1: What is Linus's first monetizable capability, and when?** _(Moved to
+[`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md) on 2026-05-05; retained here as a cross-reference for
+the build-vs-monetize tension that touches Maestro/Worker discipline.)_
 
 **Question 2: Does Linus need a custom orchestration layer, or will Task Master AI + Cline cover Phase 2?** The "Task
 Master AI" pattern (PRD → structured tasks → sequential Claude execution) and Claude-squad (parallel terminal agents)
@@ -361,12 +298,12 @@ smaller loops. What is Linus's smallest-possible closed loop — a Worker receiv
 verifiable result — that Dan could run this week? Getting that loop working, even trivially, is more valuable than any
 further planning.
 
-**Question 4: What is the right fine-tuning target in Phase 6, and does it change the entrepreneurial calculus?** Phase
-6 is described as LoRA on domain corpus. But which domain? A model fine-tuned on genomics literature behaves differently
-from one fine-tuned on Dan's personal writing style, which behaves differently from one fine-tuned on scientific Python.
-The fine-tuning target matters enormously for which entrepreneurial opportunities become viable at Phase 6. A
-genomics-specialized model opens the scientific intelligence opportunities much wider; a coding-specialized model
-accelerates Linus's own development. This decision should probably be made by Phase 3, not deferred to Phase 6.
+**Question 4: What is the right fine-tuning target in Phase 6?** Phase 6 is described as LoRA on domain corpus. But
+which domain? A model fine-tuned on genomics literature behaves differently from one fine-tuned on Dan's personal
+writing style, which behaves differently from one fine-tuned on scientific Python. A genomics-specialized model
+accelerates the scientific intelligence path; a coding-specialized model accelerates Linus's own development. This
+decision should probably be made by Phase 3, not deferred to Phase 6. _(Entrepreneurial-calculus implications now live
+in [`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md).)_
 
 **Question 5: Is the "Stop Staring at the Files" architectural clarity claim actually load-bearing for Dan's specific
 situation?** The thread argues that task decomposition and architectural clarity are the scarce inputs as agents
