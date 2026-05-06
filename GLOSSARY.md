@@ -10,8 +10,8 @@ rationale. Also the name of the eventual fine-tuned model (e.g., "Linus-Qwen-7B-
 **Maestro.** Dan + hosted Claude (via this chat, Claude Code, Claude.ai). Responsible for architecture, planning, spec
 writing, hard debugging, taste-level decisions.
 
-**Worker.** A local model (currently Qwen2.5-Coder-7B or Mistral-7B via Ollama). Executes well-specified tasks handed
-down from the Maestro. Workers are fungible and scalable; Maestros are not.
+**Worker.** A local model (currently Qwen3 — best available for 32 GB M1 Max hardware, served via Ollama). Executes
+well-specified tasks handed down from the Maestro. Workers are fungible and scalable; Maestros are not.
 
 **Orchestra / orchestration layer.** The Linus backend itself. Composer + Conductor + Section leaders + Musicians +
 Score. See VISION.md for the full extended metaphor.
@@ -49,8 +49,8 @@ chat), LM Studio, openclaw, a future native Linus app. Interchangeable.
 ## Inference and training
 
 **Ollama.** Local model server with Metal acceleration on Apple Silicon. Dan's current primary worker-model server.
-Installed via Homebrew (NOT conda — the conda build is CPU-only). Runs on port 11434. Serves `mistral:7b-instruct` and
-`qwen2.5-coder:7b`.
+Installed via Homebrew (NOT conda — the conda build is CPU-only). Runs on port 11434. Serves Qwen3 and other models;
+specific model selection tracks the best available model for 32 GB M1 Max hardware.
 
 **pmetal.** Rust-based Apple Silicon ML platform (Epistates). Covers LoRA/QLoRA/DoRA training, preference optimization
 (DPO/SimPO/ORPO/KTO), knowledge distillation (including TAID), native ANE pipeline, custom Metal kernels, 13-format GGUF
@@ -120,6 +120,26 @@ search. Distinct from the `autoresearch-mlx` repo (which is the MLX port of Karp
 **Flash-moe pattern.** The agentic development pattern demonstrated by Dan Woods' flash-moe project: give Opus a metric
 and a "never stop until you hit this number" goal; let it iterate; collaborate at plateau points. 24 hours, ~90
 experiments, 42% discarded, winning insight un-deducible from first principles. Used in Linus for Phase 5+ research.
+
+**shared_context.** Linus's preferred term for what some papers call a "world model" at the orchestration layer: the
+structured representation of task state passed between Maestro and Workers. Disambiguates from external usage: PAN/WHAM
+use "world model" to mean a predictive simulation of the environment (`task_state`); Kosmos uses it to mean a grounded
+perceptual representation (`belief_state`). Linus uses `shared_context` on its orchestration surface to avoid the
+ambiguity.
+
+## Domain and biology archetypes
+
+These named patterns have appeared in at least one surveyed repo or paper and are canonical enough to reference by name
+in synthesis notes and ADRs. New names are added after the second independent observation of the same pattern.
+
+**Dual-encoder cross-modal retrieval.** An architecture pairing two specialized encoders (e.g., text + protein sequence)
+trained with a shared embedding space so that queries in one modality retrieve results in the other. Primary Linus
+example: Horizyn-1 (chemical/genomic cross-modal search).
+
+**Generative wet-lab loop.** The biology design archetype: generate candidate sequences or molecules → score with a
+discriminative model → filter by predicted fitness → validate in a wet-lab assay → iterate. Primary examples: Evo 2
+(whole-genome generation), phage engineering pipelines. Contrast with pure in-silico prediction pipelines that skip
+experimental feedback.
 
 ## Data and storage
 

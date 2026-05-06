@@ -15,6 +15,7 @@ Sister documents:
 
 ## Table of contents
 
+- [Sweep Tier 3 + Entrepreneurship (resolved 2026-05-06)](#sweep-tier-3--entrepreneurship-resolved-2026-05-06)
 - [Sweep Tier 2 — S11–S31 (resolved 2026-05-06)](#sweep-tier-2--s11s31-resolved-2026-05-06)
 - [Sweep Tier 1 — S1–S10 (resolved 2026-05-06)](#sweep-tier-1--s1s10-resolved-2026-05-06)
 - [Memory Pillar (resolved 2026-05-03)](#memory-pillar-resolved-2026-05-03)
@@ -28,6 +29,193 @@ Sister documents:
 - [Tier 3 — Documentation, conventions, longer-horizon scope (resolved 2026-05-03)](#tier-3--documentation-conventions-longer-horizon-scope-resolved-2026-05-03)
 - [Source-archive items propagated and resolved (from open-questions.md)](#source-archive-items-propagated-and-resolved-from-open-questionsmd)
 - [Resolution sessions log](#resolution-sessions-log)
+
+---
+
+<a id="sweep-tier-3--entrepreneurship-resolved-2026-05-06"></a>
+
+## Sweep Tier 3 + Entrepreneurship (resolved 2026-05-06)
+
+S32–S60 and E1–E12 resolved in the 2026-05-06 top-questions walk (Maestro/Dan). No new ADRs — most resolutions are
+doc additions, naming conventions, clean defers, or corrections to existing policies. Key changes: Docker constraint
+clarified (inference-only, not stateful services); Schulz/Marelli/Botvinick-Gershman Philosophy section added to
+maestro-worker-protocol.md; open-source release posture codified in VISION.md; domain archetypes and world-model
+terminology disambiguation added to GLOSSARY.md; SKILL.md committed as Phase 7 standard in ROADMAP.md.
+
+#### S32. PLM + heterogeneous KG + graph transformer archetype name
+
+**Resolution:** Defer naming. Criterion already set: name after second out-of-corpus replication. ProtHGT is the
+lead example; wait for independent replication.
+
+#### S33. Dual-encoder cross-modal retrieval archetype
+
+**Resolution:** Named now. "Dual-encoder cross-modal retrieval" — two specialized encoders trained to a shared embedding
+space so queries in one modality retrieve results in the other. Added to GLOSSARY.md, Horizyn-1 as primary example.
+
+#### S34. Generative wet-lab loop archetype
+
+**Resolution:** Named now as "generative wet-lab loop" — generate → score → filter → wet-lab validate → iterate. Added
+to GLOSSARY.md, Evo 2 + phage engineering pipelines as primary examples.
+
+#### S35. "World model" terminology disambiguation
+
+**Resolution:** Linus orchestration surface uses `shared_context`. External papers use `task_state` (PAN/WHAM) and
+`belief_state` (Kosmos) for their own contexts. `shared_context` is the canonical Linus term for the structured
+task-state passed between Maestro and Workers. Added to GLOSSARY.md.
+
+#### S36. VISION.md cite Binz et al. four-perspectives explicitly
+
+**Resolution:** Done. VISION.md "Cross-domain fluency as a multiplier" bullet updated with Binz et al. four-perspectives
+citation and Linus positioning (Schulz on Workers, Marelli on audit, Botvinick/Gershman on Maestro budget).
+
+#### S37. `docs/maestro-worker-protocol.md` Philosophy section
+
+**Resolution:** Done. Philosophy section added naming the Schulz / Marelli / Botvinick-Gershman blend and their
+Linus operationalizations.
+
+#### S38. `goal_orientation` field in Worker spec template
+
+**Resolution:** Defer to Phase 3 spawner spec. Optional annotation, not a hard requirement at Phase 2.
+
+#### S39. Multidisciplinary time-allocation as VISION/CLAUDE/ROADMAP entry
+
+**Resolution:** Done. Paragraph added to VISION.md "The long view" section: deliberate multidisciplinary allocation
+across biology, CS, and infrastructure is a design practice, not an accident.
+
+#### S40. Modern Transformer reference paper
+
+**Resolution:** Already done. infra-foundations-synthesis.md Transformer stack section covers RoPE, RMSNorm, SwiGLU,
+GQA, pre-norm conventions — added in this session.
+
+#### S41. prompt-vault placement
+
+**Resolution:** Already handled. G4 synthesis assigns prompt-vault an Ignore verdict and explicitly notes it is a
+prompt cookbook, not memory infrastructure. No new group needed.
+
+#### S42. Ollama vs. non-Ollama Worker mix for synthesis passes
+
+**Resolution:** Do not codify now. Worker backend selection (Ollama vs. pmetal vs. mlx-lm) must be data-driven;
+Phase 1c/1b results will inform this. Codify only after comparison data exists.
+
+#### S43. Sub-agent hook bypass process note
+
+**Resolution:** Done. "Sub-agent hook bypass flow" Engineering Convention added to CLAUDE.md: Worker writes → Maestro
+formats → Maestro commits when hooks can't propagate.
+
+#### S44. Internal-error result-message recovery protocol
+
+**Resolution:** Done. "Internal-error recovery protocol" Engineering Convention added to CLAUDE.md: check filesystem
+state before re-issuing tasks; Workers may have partially written output.
+
+#### S45–S46. DeepSeMS modernization; FKC steering as generic pattern
+
+**Resolution:** Defer. S45 to Phase 6 planning; S46 on second instance. Both tracked in open-questions.
+
+#### S47. Activation-steering generality + BitNet compatibility
+
+**Resolution:** Already covered. DEC-0054 (activation hooks) and DEC-0013 (BitNet spike) address both axes.
+
+#### S48–S51. Concept-vector dataset source; sycophancy detection; METL; Evo 2 + phages mini-synthesis
+
+**Resolution:** All deferred. S48/S49 to Phase 5–6; S50 to second METL instance; S51 to Wave 3 prep.
+
+#### S52. ProteinReasoner checkpoint watch; benchmarks/low_bit dedicated suite
+
+**Resolution:** Split. (a) ProteinReasoner: Dan monitors BioMap GitHub / `airkingbd` HF org passively. (b)
+benchmarks/low_bit: fold into dan\_tasks for now; revisit after Phase 1c data exists.
+
+#### S53. Local vs. hosted energy comparison
+
+**Resolution:** Defer to Phase 5. Not actionable before energy ledger ships.
+
+#### S54. WHAM consistency/diversity/persistency triple
+
+**Resolution:** Derive from Linus-specific workflow introspection first (Phase 3+), not lifted wholesale. WHAM's context
+is different from Linus's.
+
+#### S55. Adversarial debate as Worker primitive
+
+**Resolution:** Empirical question — add to future dan\_tasks. Do not architect for debate now. Cross-references E4.
+
+#### S56. Agentic-system theory as first-class architectural input
+
+**Resolution:** Note the KB-coverage-growth-as-dominant-lever intuition as a design principle when the Phase 3 spawner
+spec is written. Full "applicable theory" section deferred to Phase 3 planning.
+
+#### S57. `docs/maestro-protocol.md`
+
+**Resolution:** Schedule for Phase 2a. Operational doc describing Maestro's characterized behaviors that Linus
+depends on. Values paper's argument that Maestro is not a black box makes this load-bearing for Phase 8b.
+
+#### S58. SAFETY.md four additions — single PR or staged?
+
+**Resolution:** Single PR with explicit per-section Dan review. Schedule for next doc-update batch.
+
+#### S59. Session-rhythm metric
+
+**Resolution:** Compute retrospectively first on existing commit history before instrumenting prospectively. Add a
+quick script to `experiments/`. Cheap prototype before deciding if it's worth a prospective gate.
+
+#### S60. "No stateful Docker on macOS" rule
+
+**Resolution:** Clarified and corrected. The real constraint is inference-only: Docker ML inference is forbidden (no
+Metal/ANE passthrough). Docker is fine for stateful services that don't need GPU/ANE — databases (PostgreSQL, Neo4j),
+vector stores (Qdrant), knowledge servers (Kiwix, wiki), web services. CLAUDE.md Hardware Constraints updated to
+reflect this precisely. The earlier "stateless services only" framing was overly restrictive.
+
+#### E1. Open-source release posture as default architectural commitment
+
+**Resolution:** Done. "Release posture" principle added to VISION.md under Principles: open-source-by-default, citing
+Pauling/Torvalds rationale; commercial derivative remains an open future decision; architectural consequences noted
+(license-compatible deps, contributor-friendly boundaries, public benchmarks).
+
+#### E2. Rename `docs/entrepreneurial-surface.md` → `docs/knowledge-mining-surface.md`
+
+**Resolution:** Accepted. The doc doesn't exist yet; committed to the knowledge-mining-surface.md name from the start.
+Phase 2 deliverable per E12.
+
+#### E3. Dynamic tool activation as Phase 2/3 orchestration primitive
+
+**Resolution:** Accept pattern, defer decision. Phase 2a: design registry with activation in mind. Phase 3: evaluate
+whether dynamic activation is needed at the actual tool-budget scale of that phase.
+
+#### E4. Adversarial debate as Worker primitive (TradingAgents)
+
+**Resolution:** Cross-references S55. Same answer: defer to empirical testing in dan\_tasks.
+
+#### E5. Two-tier compaction for long sessions
+
+**Resolution:** Accepted. Lift the dexter/microcompact + full-compact pattern with attribution into the Phase 2
+context-manager spec as a design constraint.
+
+#### E6. SKILL.md as Phase 7 skills bundle format
+
+**Resolution:** Done. ROADMAP.md Phase 7a updated: YAML-frontmatter markdown with single `skill` tool is the committed
+Linus Phase 7 standard. Evaluate alternatives only if a concrete deficiency is demonstrated on real Linus tasks.
+
+#### E7–E9. Entrepreneurship defers (knowledge gunpowder testability; Botryonyx/CaribAlgae; pricing anchors)
+
+**Resolution:** All deferred. E7 to Phase 5; E8 acknowledged (CLAUDE.md background framing unchanged); E9 until actual
+opportunity exploration.
+
+#### E10. Open-source-by-default architectural implications
+
+**Resolution:** Bundled with E1 (VISION.md Release posture paragraph). License-compatible deps, contributor-friendly
+boundaries, public benchmarks named as architectural consequences.
+
+#### E11. AlphaGenome non-commercial license
+
+**Resolution:** Cross-references S29. NC license is not blocking given current plans and E1 posture. Revisit only if
+commercial use becomes real.
+
+#### E12. `docs/knowledge-mining-surface.md` first-draft scope
+
+**Resolution:** Phase 2 deliverable. Scope: Dan profile + local-files-as-gunpowder reframe + whiteboard pipeline
+(workspace → tools → private-Claude-equivalent → fine-tuning → eventual entrepreneurial application) + seven
+opportunities as long-tail (not action items) + g10-finance transferable patterns + "deferred until Linus is
+demonstrably useful" stance.
+
+[↑ Back to top](#table-of-contents)
 
 ---
 
@@ -992,6 +1180,15 @@ unresolved. No migration from Part 4 has occurred.
 The metadata about when and how questions were resolved. Promotes the `Resolution Log` headers that previously sat at
 the top of `top-questions.md` into one place at the bottom of this archive, so the reader's first impression is the
 resolved Q&A pairs (most relevant) rather than session bookkeeping.
+
+### 2026-05-06 — Sweep Tier 3 + Entrepreneurship S32–S60, E1–E12 planning session (Maestro/Dan)
+
+Full question backlog cleared in the same session. No new ADRs. Key writes: VISION.md Release posture principle (E1/E10,
+open-source-by-default); VISION.md Binz et al. citation (S36); VISION.md multidisciplinary time-allocation note (S39);
+maestro-worker-protocol.md Philosophy section (S37, Schulz/Marelli/Botvinick-Gershman); GLOSSARY.md domain archetypes
+(S33, S34) and shared_context disambiguation (S35); CLAUDE.md Docker constraint clarified to inference-only (S60);
+CLAUDE.md sub-agent hook bypass + internal-error recovery conventions (S43, S44); ROADMAP.md Phase 7 SKILL.md format
+committed (E6). Most Tier 3 spikes cleanly deferred to Phase 5–6.
 
 ### 2026-05-06 — Sweep Tier 2 S11–S31 planning session (Maestro/Dan)
 

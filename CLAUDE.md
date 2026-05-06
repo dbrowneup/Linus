@@ -95,8 +95,9 @@ working.
 - **ANE is accessible** via pmetal and Core ML; underutilized by most frameworks.
 - **32 GB unified memory** is a hard constraint for fine-tuning. LoRA/QLoRA on 7–14B models is tractable. Full
   fine-tuning of 8B+ is at the edge. Streaming-based training (optimizer state on SSD) is open research; deferred.
-- **Docker runs in a VM on macOS** and does NOT pass through Metal/ANE. Use Docker for stateless services only (Qdrant,
-  Kiwix, CyberChef). Inference stays native.
+- **Docker inference is forbidden** — the macOS VM does not pass through Metal or ANE. ML inference and training must
+  run natively. Docker is fine for any service that does not need GPU/ANE: databases (PostgreSQL, Neo4j), vector stores
+  (Qdrant), knowledge servers (Kiwix, wiki), web services, etc.
 
 ## Environment
 
@@ -301,6 +302,19 @@ For any biology skill or domain skill producing a predictive output, use typed s
 rationale — the BioReason-Pro shape. The structured result is machine-queryable; the `rationale` field preserves
 explanation for human review. Example: `{gene: "BRCA1", predicted_function: "DNA repair", confidence: 0.87, evidence:
 ["pmid:12345"], rationale: "..."}`. This generalizes beyond biology to any task where auditability matters.
+
+### Sub-agent hook bypass flow
+
+When a Worker writes a file, the `PostToolUse` hook triggers on the Worker's Edit/Write calls. If the Worker is running
+in a context where hooks can't execute (e.g., sub-agent invocation without hook propagation), the canonical flow is:
+Worker writes → Maestro formats (runs prettier/ruff manually if needed) → Maestro commits. Never skip formatting
+silently; the commit should always reflect hook-clean output.
+
+### Internal-error recovery protocol
+
+When a Worker task produces a missing or empty result and the session log shows an internal error, check the filesystem
+state before re-issuing the task. Workers may have partially written output even if the session terminated abnormally.
+Check the target files and branch state first; re-running a completed task wastes tokens and may overwrite good work.
 
 ### Writing style for docs
 

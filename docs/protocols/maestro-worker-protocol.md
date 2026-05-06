@@ -6,6 +6,30 @@ Claude Code) to Workers (local models like Qwen2.5-Coder via Ollama, or future a
 The protocol ensures safe, auditable, traceable work and keeps Dan in the review loop while enabling parallel task
 execution.
 
+## Philosophy
+
+The Maestro/Worker split is not just a token-economics convenience — it reflects a principled position on human-AI
+collaboration drawn from three bodies of work:
+
+**Schulz (open-source collaborators).** LLMs function best as research-assistant-like collaborators operating under
+existing scientific norms. Workers are fungible, open-source, locally hosted — Schulz operationalized. The norm is that
+the human collaborator reviews and takes responsibility for the output.
+
+**Marelli (attribution and accountability).** Every output must be traceable to its producing model, its inputs, and the
+decision that authorized it. The audit log, content-hashing, and claim-typing in the KB are Marelli requirements wearing
+engineering clothing. The spec format itself — task ID, inputs, outputs, success criteria — is a Marelli attribution
+artifact.
+
+**Botvinick & Gershman (humans retain roadmap agency).** There is a _subjective limit_ — a class of decisions (which
+problems to pursue, what constitutes success, how to weigh trade-offs) — that should stay with the human regardless of
+Worker capability. Maestro budget discipline is this principle operationalized: use Workers for well-specified execution,
+reserve Maestro attention for architecture, direction, and judgment calls that shape the trajectory. This is not a
+token-economics rule; it is a normative claim about where AI amplification is appropriate.
+
+These three positions are not in tension for Linus. Together they define a coherent stance: open-source Workers under
+Schulz norms, audited under Marelli discipline, directed by a human Maestro following Botvinick/Gershman's roadmap
+principle.
+
 ## Summary
 
 1. **Spec** (Maestro): write a concise spec in `experiments/` or `docs/specs/`

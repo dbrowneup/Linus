@@ -42,7 +42,12 @@ What Linus the project inherits from Pauling:
 
 - **Basement-lab hacker energy.** Cobble together what you have. Explosions are fine if they're informative.
 - **Cross-domain fluency as a multiplier.** The biggest wins come from bringing frameworks from one field to problems in
-  another.
+  another. Binz et al. (2025 PNAS Perspective, "How should the advancement of large language models affect the practice
+  of science?") provide the four-perspectives framework that this project positions itself within: Schulz (open-source
+  collaborators), Marelli (accountability and attribution), Botvinick & Gershman (humans retain roadmap agency), and
+  Bender (capability skepticism). Linus operationalizes a hybrid: Schulz on open-source Workers, Marelli on audit logs
+  and claim provenance, Botvinick/Gershman on Maestro budget discipline. See the llms-in-science synthesis for the full
+  mapping.
 - **Principled independence.** Local-first AI with privacy and data sovereignty isn't a feature — it's a stance. Linus
   can operate entirely without network access: no telemetry, no API keys required for daily operation, no cloud
   dependency in the critical path. Every source of knowledge it draws on — papers, notes, Wikipedia, structured
@@ -72,6 +77,15 @@ Two Linuses, both Oregonians, both stubborn about open access to things that mat
 and a large commitment.
 
 ## Principles
+
+### Release posture
+
+Linus is open-source by default. If Linus succeeds and Dan wants to share it, the default assumption is that it ships
+under an open license, following Pauling's "for science, for society" rationale and Torvalds' open-source-as-default
+engineering culture. A commercial derivative remains an open future decision — the open-source default does not foreclose
+it, but it does foreclose silent proprietary assumptions. Architectural consequences that follow from this: prefer
+license-compatible dependencies, design for contributor-friendly module boundaries, use public benchmarks rather than
+private moats. These are easier to honor as defaults than as retrofits.
 
 ### The Algorithm (Elon Musk, via Jon McNeill's _The Algorithm_)
 
@@ -184,6 +198,11 @@ than driving every session. That is the complete offline vision.
 None of this requires that Linus ever match hosted frontier models on general benchmarks. It requires that Linus be
 excellent at Dan's work, reliably available, under Dan's control, and a pleasure to use. Those are the success
 conditions.
+
+A deliberate multidisciplinary time allocation — distributing research and tool-building effort across biology,
+computer science, and infrastructure rather than deep-specializing in any one — is part of the design. The cross-domain
+fluency that Pauling exemplified is not an accident of genius; it is a practice. Linus should keep pace across domains
+because Dan's actual work spans them.
 
 The carbon atom logo — sp³ orbitals suggested, to be refined — is a reminder of the substrate: four bonds, tetrahedral,
 the element of life. Every organic molecule Dan has ever studied is built around it. It seems appropriate.

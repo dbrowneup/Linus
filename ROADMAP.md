@@ -372,7 +372,10 @@ Custom domain skills (emerge from usage patterns):
 - `plot-style-consistency`: enforce Dan's matplotlib/seaborn preferences
 - `cluster-label-propose`: suggest labels for HDBSCAN clusters
 
-All skills follow the Anthropic `SKILL.md` convention so they work in Claude Code, Claude.ai, and Linus.
+All skills follow the Anthropic `SKILL.md` convention so they work in Claude Code, Claude.ai, and Linus. This is the
+committed Linus Phase 7 skills-bundle format: YAML-frontmatter markdown files with a single `skill` tool, consistent
+with the converging ecosystem standard (dexter, OpenBB, bioSkills, scientific-agent-skills, autoresearch all use the
+same format). Evaluate alternatives only if a concrete deficiency in this format is demonstrated on real Linus tasks.
 
 **7b — Autonomy graduation:**
 
