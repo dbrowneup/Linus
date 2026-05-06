@@ -4,16 +4,16 @@
 
 The master integration map across the four kinds of input Linus has accumulated:
 
-- **78 paper notes** in [`docs/paper-notes/`](../paper-notes/) — flat lookup in
+- **100 paper notes** in [`docs/paper-notes/`](../paper-notes/) — flat lookup in
   [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md).
-- **80 repo notes** in [`docs/repo-notes/`](../repo-notes/) — flat lookup in
+- **99 repo notes** in [`docs/repo-notes/`](../repo-notes/) — flat lookup in
   [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md).
 - **14 thematic syntheses** in [`docs/syntheses/`](../syntheses/) — security, llm-wiki, skills-and-practices, memory,
   humans-teams-performance, generative-biology, infra-foundations, native-low-bit-apple-silicon, llms-in-science,
   function-annotation-discovery, agentic-systems, safety-alignment-privacy, biological-foundation-models,
   entrepreneurship (added 2026-05-05).
-- **10 repo-cluster syntheses** in [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/) — `g1`–`g10`,
-  written 2026-05-04 over the post-fan-out repo notes.
+- **11 repo-cluster syntheses** in [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/) — `g1`–`g11`;
+  `g11` (agent frameworks, skills, and evaluation) added 2026-05-05.
 
 This document does not enumerate the underlying notes (the indexes do that) and does not retell the syntheses
 (those documents do that themselves). It crosses _the syntheses_ — pointing out where independent threads converge,
@@ -40,22 +40,25 @@ Read this once before working through Tier 1; refer back as decisions land.
 
 ## How the syntheses align
 
-The 24 syntheses (14 thematic + 10 repo-cluster) cover overlapping but distinguishable territory. The matrix below
+The 25 syntheses (14 thematic + 11 repo-cluster) cover overlapping but distinguishable territory. The matrix below
 crosses each thematic synthesis against the architectural layers it informs and the closest cluster synthesis it
 shares territory with. Cells with `—` are deliberate: not every theme touches every layer.
 
 The 2026-05-05 remapping closed all unmapped repo-cluster anchors (g5, g8, g10) and added a 14th synthesis
 (entrepreneurship) anchored on g10-finance. BixBench and LAB-Bench moved from agentic-systems to infra-foundations
-as benchmark anchors, with a one-line cross-link kept in agentic-systems for their agent-loop aspect. The matrix
-now allows many-to-many mapping: each thematic synthesis has a primary cluster anchor plus secondary clusters that
-sharpen specific claims. The cross-edges expose load-bearing hubs (g4, g7, g8, g9) that touch multiple syntheses.
+as benchmark anchors, with a one-line cross-link kept in agentic-systems for their agent-loop aspect. A new g11
+cluster (agent frameworks, skills, and evaluation) was added 2026-05-05 as the primary anchor for
+skills-and-practices, covering pydantic-ai, dspy, superpowers, Agent-Skills-for-Context-Engineering, gptme,
+huginn, lmnr, and promptfoo. The matrix now allows many-to-many mapping: each thematic synthesis has a primary
+cluster anchor plus secondary clusters that sharpen specific claims. The cross-edges expose load-bearing hubs (g4,
+g7, g8, g9) that touch multiple syntheses.
 
 | Thematic synthesis | Architectural layers it informs | Primary cluster anchor | Secondary clusters | Tier-1-equivalent action |
 | --- | --- | --- | --- | --- |
 | **memory** | Orchestration (router, session store, audit log); KB | g4-memory | g2-wiki-engines, g3-wiki-patterns, g5-graph-tools | Phase 2 first-class memory pillar; v0 episodic store; `cot_budget` + `memory_mode` router primitives. **Resolved in M1–M17 (DEC-0028…0043).** |
 | **security** | Orchestration (sandbox, endpoint, deps); KB ingest | g6-mcp-tools (indirectly, via fastmcp) | g7-harnesses, g5-graph-tools, g1-apple-silicon, g4-memory, g2-wiki-engines | pip-audit + hash lock file + remove pre-emptive deps + incident protocol. **Resolved in 2026-05-03 Tier 0.** Security touches every core component Linus is building. |
 | **llm-wiki** | KB substrate; orchestration (write-back, hot cache) | g2-wiki-engines, g3-wiki-patterns | g8-sci-agents (paper-qa adopt+extend), g4-memory (substrate shape) | Compile-not-retrieve; schema-as-product; claim typing + content hashing + write-back as Phase 2 KB deliverables. |
-| **skills-and-practices** | Maestro/Worker discipline | g7-harnesses (Task Master AI, claude-squad) | g9-bioinformatics (bioSkills), g8-sci-agents (scientific-agent-skills, paper-qa), g10-finance (transferable patterns) | Hot-cache convention; Worker-spec uncertainty protocol. (Entrepreneurship content extracted to its own synthesis 2026-05-05; g10 also cross-linked from there.) |
+| **skills-and-practices** | Maestro/Worker discipline | g11-agent-frameworks (pydantic-ai, dspy, superpowers, gptme, huginn, lmnr, promptfoo) | g7-harnesses (Task Master AI, claude-squad), g9-bioinformatics (bioSkills), g8-sci-agents (scientific-agent-skills, paper-qa), g10-finance (transferable patterns) | Hot-cache convention; Worker-spec uncertainty protocol; promptfoo baseline + pydantic-ai smoke test as Phase 2a open. (Entrepreneurship content extracted to its own synthesis 2026-05-05; g10 also cross-linked from there.) |
 | **agentic-systems** | Phase 3 spawner; multi-agent protocol | g7-harnesses (workgraph as runtime) | g6-mcp-tools (fastmcp), g4-memory (investigation memory + agentmemory primitives), g5-graph-tools (KB tool primitives), g8-sci-agents (multi-role evidence base) | Role + typed `AgentReport` + investigation-memory layer ADR before spawner ships. (BixBench/LAB-Bench moved to infra-foundations 2026-05-05; cross-link retained for agent-loop aspect.) |
 | **infra-foundations** | Foundational reference; benchmarks (energy ledger, agent harnesses); KB tooling | g5-graph-tools | g7-harnesses (workgraph + autoresearch-mlx as methodology substrate), g1-apple-silicon (autoresearch-mlx, Wh-per-task), g2-wiki-engines (foundational substrate prior art), g3-wiki-patterns (build-pattern prior art for benchmark + KB-tooling workflows) | Wh-per-task as benchmark or ledger column; "world model" terminology hygiene before Phase 3; LAB-Bench MCQ + BixBench as Phase 1 baseline (moved here 2026-05-05); hyalo + keppi as Phase 3 KB tooling layer. |
 | **native-low-bit-apple-silicon** | Inference + training (Phase 1b/1c/6) | g1-apple-silicon | g6-mcp-tools (pmetal-mcp as inference-layer MCP surface) | Phase 1c unified four-way Worker-selection methodology (Bonsai 8B + ternary + 2B4T + FP16). |
@@ -319,7 +322,7 @@ docs/
 │
 ├── syntheses/
 │   ├── *-synthesis.md        (14 thematic syntheses; entrepreneurship added 2026-05-05)
-│   └── repo-clusters/*.md    (10 cluster syntheses, g1–g10; all anchored to a thematic synthesis as of 2026-05-05)
+│   └── repo-clusters/*.md    (11 cluster syntheses, g1–g11; all anchored to a thematic synthesis as of 2026-05-05)
 │
 ├── landscapes/
 │   ├── synthesis-landscape.md  (cross-synthesis structure: where 23 agree/disagree/overlap)

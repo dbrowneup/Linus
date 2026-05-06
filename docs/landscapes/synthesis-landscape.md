@@ -2,8 +2,8 @@
 
 ## What this document is
 
-The cross-synthesis structural map. Linus has accumulated 24 synthesis documents — 14 thematic syntheses in
-[`docs/syntheses/`](../syntheses/) and 10 repo-cluster syntheses in
+The cross-synthesis structural map. Linus has accumulated 25 synthesis documents — 14 thematic syntheses in
+[`docs/syntheses/`](../syntheses/) and 11 repo-cluster syntheses in
 [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/). Each one is itself a cross-cut: a thematic synthesis
 crosses paper-notes against an architectural or operational concern; a cluster synthesis crosses repo-notes within a
 fan-out group. This document goes one level higher — it crosses the syntheses against each other.
@@ -11,21 +11,23 @@ fan-out group. This document goes one level higher — it crosses the syntheses 
 The 2026-05-05 remapping closed all unmapped repo-cluster anchors and added a 14th thematic synthesis
 (entrepreneurship). BixBench and LAB-Bench moved from agentic-systems to infra-foundations as benchmark anchors;
 g5-graph-tools now anchors infra-foundations; g8-sci-agents now anchors llms-in-science; g10-finance anchors the new
-entrepreneurship synthesis.
+entrepreneurship synthesis. A new g11 cluster (agent frameworks, skills, and evaluation — pydantic-ai, dspy,
+superpowers, Agent-Skills-for-Context-Engineering, gptme, huginn, lmnr, promptfoo) was added 2026-05-05 and becomes
+the primary cluster anchor for the skills-and-practices synthesis.
 
 This is intentionally a complement to [`total-landscape.md`](total-landscape.md). The total landscape is the master
 integration map (architecture × roadmap × open questions in one place); this file is the structural map across the
 syntheses themselves (where they agree, tension, overlap, and what meta-shape emerges). The total landscape works
-top-down (Phase 2 needs X, X is informed by syntheses A, B, C); this file works bottom-up (here are 23 syntheses,
+top-down (Phase 2 needs X, X is informed by syntheses A, B, C); this file works bottom-up (here are 25 syntheses,
 this is what falls out when you stack them).
 
 The previous version of this document covered four syntheses (security, llm-wiki, skills-and-practices, memory).
 That ratio has expanded ~6× since the post-fan-out integration pass. Read this once before working through Tier 1
-in `top-questions.md`; refer back as decisions land.
+in `top-questions.md`; refer back as decisions land. (Updated 2026-05-05 to reflect g11 + 5 thematic additions.)
 
 ---
 
-## The 24 syntheses
+## The 25 syntheses
 
 ### Thematic syntheses (14)
 
@@ -33,7 +35,7 @@ in `top-questions.md`; refer back as decisions land.
 | --- | --- |
 | [`security`](../syntheses/security-synthesis.md) | Supply chain + dependency surface + endpoint security + prompt-injection threat model. Triggered by litellm. |
 | [`llm-wiki`](../syntheses/llm-wiki-synthesis.md) | LLM Wiki pattern: compile-not-retrieve, schema-as-product, claim typing, content hashing, write-back, hot cache. |
-| [`skills-and-practices`](../syntheses/skills-and-practices-synthesis.md) | Practitioner collaboration patterns + Claude skills filtered for Dan's profile. (Entrepreneurship content extracted to its own synthesis 2026-05-05.) |
+| [`skills-and-practices`](../syntheses/skills-and-practices-synthesis.md) | Practitioner collaboration patterns + Claude skills filtered for Dan's profile. Primary cluster anchor remapped to g11 (agent frameworks) 2026-05-05. (Entrepreneurship content extracted to its own synthesis 2026-05-05.) |
 | [`memory`](../syntheses/memory-synthesis.md) | Garrison thread + Mughal practitioner article: memory as Phase 2 first-class pillar, four-layer architecture. |
 | [`humans-teams-performance`](../syntheses/humans-teams-performance-synthesis.md) | Güllich on multidisciplinary expertise + Harvey on team rhythm; Maestro/Worker analogy at three timescales. |
 | [`infra-foundations`](../syntheses/infra-foundations-synthesis.md) | Foundational references (attention paper, flow matching, PAN, Google AI energy, WHAM) + benchmarks (LAB-Bench, BixBench moved here 2026-05-05) + KG/network tooling (g5 anchor) — methodology + watch-the-field. |
@@ -46,41 +48,46 @@ in `top-questions.md`; refer back as decisions land.
 | [`agentic-systems`](../syntheses/agentic-systems-synthesis.md) | Multi-agent role specialization + typed messages + validation gates + critic tier; first formal theory result (regret bound). (BixBench/LAB-Bench's agent-loop aspect cross-linked to infra-foundations as of 2026-05-05.) |
 | [`entrepreneurship`](../syntheses/entrepreneurship-synthesis.md) _(added 2026-05-05)_ | Commercial surface for Linus + biotech-team literature-intelligence productization + transferable Maestro/Worker context-management patterns from quant-agent prior art (g10 anchor). |
 
-### Repo-cluster syntheses (10)
+### Repo-cluster syntheses (11)
 
 | Synthesis | One-line characterization |
 | --- | --- |
-| [`g1-apple-silicon`](../syntheses/repo-clusters/g1-apple-silicon.md) | autoresearch-mlx as the runnable methodology substrate; trust the OS page cache. |
+| [`g1-apple-silicon`](../syntheses/repo-clusters/g1-apple-silicon.md) | 9 repos; autoresearch-mlx as the runnable methodology substrate; trust the OS page cache. QiMeng-cpu-v1 added as behavioral-synthesis methodology reference (Monitor). |
 | [`g2-wiki-engines`](../syntheses/repo-clusters/g2-wiki-engines.md) | 11 LLM Wiki implementations; high pattern convergence, no drop-in winner; wikiloom + llmbase + wikidesk + OmegaWiki most liftable. |
 | [`g3-wiki-patterns`](../syntheses/repo-clusters/g3-wiki-patterns.md) | 7 agent-driven wiki build patterns; obsidian-llm-wiki-local 3-tier JSON fallback for Ollama; llm-research-wiki LINT workflow. |
-| [`g4-memory`](../syntheses/repo-clusters/g4-memory.md) | 8 agent-memory systems; openaugi as closest match to DEC-0029 v0; agentmemory primitives for parallel-write coordination. |
-| [`g5-graph-tools`](../syntheses/repo-clusters/g5-graph-tools.md) | 5 KG/network-analysis tools; hyalo (Integrate) + keppi (clean reference) close most of Phase 3 KB tooling gap. |
-| [`g6-mcp-tools`](../syntheses/repo-clusters/g6-mcp-tools.md) | 6 MCP servers + framework; fastmcp as default; ontomics + codesight for Maestro codebase navigation. |
-| [`g7-harnesses`](../syntheses/repo-clusters/g7-harnesses.md) | 9 agent harnesses; workgraph JSONL DAG + dispatch as recommended Phase 2a session-store shape. |
-| [`g8-sci-agents`](../syntheses/repo-clusters/g8-sci-agents.md) | 11 scientific reasoning agents; paper-qa as first paper-corpus Integrate; LAB-Bench canary blocklist obligation. |
+| [`g4-memory`](../syntheses/repo-clusters/g4-memory.md) | 9 agent-memory systems; openaugi as closest match to DEC-0029 v0; agentmemory primitives for parallel-write coordination. k-dense-byok added as Study. |
+| [`g5-graph-tools`](../syntheses/repo-clusters/g5-graph-tools.md) | 7 KG/network-analysis + ETL tools; hyalo (Integrate) + keppi close Phase 3 KB tooling gap; OptimusKG + dlt added as Study. |
+| [`g6-mcp-tools`](../syntheses/repo-clusters/g6-mcp-tools.md) | 11 repos; fastmcp as default; expanded to document-context platform (markdownify-mcp, codebase-memory-mcp, vanna, ExtractThinker, rendergit added). |
+| [`g7-harnesses`](../syntheses/repo-clusters/g7-harnesses.md) | 10 agent harnesses; workgraph JSONL DAG + dispatch as recommended Phase 2a session-store shape. semanticworkbench added as HTTP-registered protocol reference. |
+| [`g8-sci-agents`](../syntheses/repo-clusters/g8-sci-agents.md) | 12 scientific reasoning agents; paper-qa as first paper-corpus Integrate; LAB-Bench canary blocklist obligation. Sketch2Simulation error-recovery loop added. |
 | [`g9-bio`](../syntheses/repo-clusters/g9-bio.md) | 4 bioinformatics models; bioSkills as Phase 7 inaugural skills bundle (~438 bio skills). |
 | [`g10-finance`](../syntheses/repo-clusters/g10-finance.md) | 5 finance/quant agents; transferable Maestro/Worker context-management patterns. Anchors the entrepreneurship thematic synthesis (2026-05-05). |
+| [`g11-agent-frameworks`](../syntheses/repo-clusters/g11-agent-frameworks.md) _(added 2026-05-05)_ | 8 agent framework, skills, and evaluation repos; pydantic-ai (Integrate) + promptfoo (Integrate) as immediate actionables; dspy, superpowers, gptme, huginn, Agent-Skills, lmnr as Study. Primary anchor for skills-and-practices synthesis. |
 
 ---
 
-## Cluster hubs and synthesis cross-edges (added 2026-05-05)
+## Cluster hubs and synthesis cross-edges (updated 2026-05-05)
 
-The 2026-05-05 remapping moved the matrix from one-cluster-per-synthesis to many-to-many. Each thematic synthesis
-keeps a primary cluster anchor (the cluster whose Tier-1-equivalent action is most load-bearing), but secondary
-edges expose where the same cluster informs multiple syntheses. Four clusters become _hubs_ — clusters that anchor
-or substantively inform four or more thematic syntheses. The hubs are the leverage points: investing in the
-underlying repos (or in the patterns the cluster surfaces) compounds across multiple syntheses simultaneously.
+The 2026-05-05 remapping moved the matrix from one-cluster-per-synthesis to many-to-many and added g11 as the
+11th cluster (primary anchor for skills-and-practices). Each thematic synthesis keeps a primary cluster anchor
+(the cluster whose Tier-1-equivalent action is most load-bearing), but secondary edges expose where the same cluster
+informs multiple syntheses. Four clusters become _hubs_ — clusters that anchor or substantively inform four or more
+thematic syntheses. The hubs are the leverage points: investing in the underlying repos (or in the patterns the
+cluster surfaces) compounds across multiple syntheses simultaneously.
 
 | Hub cluster | Thematic syntheses it touches | Why it's a hub |
 | --- | --- | --- |
 | **g4-memory** | memory _(primary)_, agentic-systems, llm-wiki, biological-foundation-models, security | The memory pillar is genuinely cross-cutting — investigation memory, claim-typed write-back, model_prediction provenance, and trust-tier tagging all share the same substrate. |
-| **g7-harnesses** | agentic-systems _(primary)_, skills-and-practices, infra-foundations, security, entrepreneurship | Harnesses are where every operational pattern actually runs; workgraph-style JSONL DAG + dispatch is the recommended Phase 2a session-store shape. |
+| **g7-harnesses** | agentic-systems _(primary)_, infra-foundations, security, entrepreneurship | Harnesses are where every operational pattern actually runs; workgraph-style JSONL DAG + dispatch is the recommended Phase 2a session-store shape. (skills-and-practices primary anchor moved to g11 2026-05-05; g7 remains a secondary edge.) |
 | **g8-sci-agents** | llms-in-science _(primary)_, agentic-systems, skills-and-practices, llm-wiki, function-annotation-discovery, entrepreneurship | paper-qa alone earns the breadth — it's the first paper-corpus tool to earn Integrate, the literature-intelligence engine for Phase 7, and the substrate-reframe ("adopt + extend") for Phase 2 KB. |
 | **g9-bio** | function-annotation-discovery _(primary)_, biological-foundation-models _(primary)_, generative-biology _(primary)_, skills-and-practices, llms-in-science, entrepreneurship | The biology pillar is overdetermined; bioSkills (~438 skills), Bacformer (Apple-Silicon-realistic broad-bio FM), and the integrate trio drive the Phase 7 sub-roadmap and the inaugural commercial surface. |
 
 Two clusters are anchors-only (anchor one or two syntheses but don't function as hubs): **g1-apple-silicon**
 (native-low-bit primary; infra-foundations, security secondary), **g10-finance** (entrepreneurship primary;
-skills-and-practices secondary). Both are doing focused work rather than cross-cutting work.
+skills-and-practices secondary). Both are doing focused work rather than cross-cutting work. **g11-agent-frameworks**
+(added 2026-05-05) is currently an anchor for skills-and-practices primary plus secondary edges into
+agentic-systems and infra-foundations — anchors-only status at launch but the pydantic-ai + promptfoo + dspy
+pattern library could expand its reach as Phase 2a hardens.
 
 The remaining clusters — **g2-wiki-engines**, **g3-wiki-patterns**, **g5-graph-tools**, **g6-mcp-tools** — are
 mid-degree: each touches three to five thematic syntheses, mostly as secondary edges that sharpen substrate or
@@ -97,7 +104,7 @@ integration.
 
 ## The unifying thesis (expanded)
 
-Across all 24 syntheses, from completely different starting points, the same underlying claim recurs: **the bottleneck
+Across all 25 syntheses, from completely different starting points, the same underlying claim recurs: **the bottleneck
 has shifted from capability to structure.** The earlier four-synthesis version of this document already named four
 angles on this; the expanded set adds four more.
 
@@ -236,13 +243,17 @@ The entrepreneurship synthesis is intentionally cross-cutting: it reads Phase 7 
 Bacformer + LAB-Bench + KnowledgeBase) as the inaugural commercial surface, and reads g10's harnesses as the
 context-management pattern library.
 
-### Orchestration has three syntheses + one cluster
+### Orchestration has three syntheses + two clusters (updated 2026-05-05)
 
 - **agentic-systems** for multi-agent typing (Role, AgentReport, validation gates, critic tier, regret bound).
 - **skills-and-practices** for build-vs-adopt orchestration primitives (Task Master AI, claude-squad, fastmcp).
 - **security** for dep philosophy (delete langchain/langgraph; orchestration logic is the work, not extra).
 - **g7-harnesses** cluster surfaces workgraph as the most directly liftable orchestration runtime (JSONL DAG +
   dispatch as recommended Phase 2a session-store shape).
+- **g11-agent-frameworks** cluster (added 2026-05-05) adds the behavioral layer: pydantic-ai as the Worker base
+  abstraction, superpowers + gptme as behavioral-discipline patterns, promptfoo as the evaluation harness, dspy as
+  the Phase 6 fine-tuning primitive. g11 answers _how Workers are built and validated_, where g7 answers _how
+  Workers are orchestrated at runtime_.
 
 These converge on a single architectural implication: **build the custom orchestration layer (DEC-0002 stands), but
 adopt patterns/primitives from off-the-shelf tools rather than re-implement them.** Phase 1f deliverable is the
