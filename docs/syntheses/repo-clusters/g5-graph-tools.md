@@ -2,10 +2,13 @@
 
 ## What this document is
 
-A cross-cutting synthesis of the five repos in Group 5: **hyalo** (Integrate), **keppi** (Study), **py3plex** (Study),
-**infranodus** (Study), and **infranodus-skills** (Study). These repos arrived in the same fan-out because they all
-touch graph-structured knowledge management, network analysis, or the tooling layer that sits between a markdown vault
-and an LLM agent. The repo notes live in `docs/repo-notes/{hyalo,keppi,py3plex,infranodus,infranodus-skills}.md`.
+A cross-cutting synthesis of the seven repos in Group 5: **hyalo** (Integrate), **keppi** (Study), **py3plex**
+(Study), **infranodus** (Study), **infranodus-skills** (Study), **OptimusKG** (Study), and **dlt** (Study/Integrate).
+These repos arrived in the same fan-out because they all touch graph-structured knowledge management, network analysis,
+knowledge-graph construction, ETL infrastructure, or the tooling layer that sits between a markdown vault and an LLM
+agent. The initial five repos address graph analysis and vault interaction; OptimusKG and dlt expand the group to include
+production knowledge-graph pipelines and data-ingestion tooling, both critical for Phase 3–4 KnowledgeBase scaling. The
+repo notes live in `docs/repo-notes/{hyalo,keppi,py3plex,infranodus,infranodus-skills,OptimusKG,dlt}.md`.
 
 One repo that appeared in an early draft of this group — prism — was removed before synthesis began: it was cloned in
 error while searching for a differently-named project (claude-prism, now in Group 8). Its verdict was Ignore and it has
@@ -99,6 +102,34 @@ cognitive primitives for Maestro review loops: the four-state variability vocabu
 diagnosing stuck or biased reasoning. The repo's GitHub Action that auto-builds `.zip`/`.skill` bundles on tag push is
 also a useful template for how Linus should package its Phase 7 domain skills for distribution.
 
+**OptimusKG demonstrates the production medallion architecture that KnowledgeBase v1 should emulate.** OptimusKG
+integrates 65 biomedical data sources into a unified knowledge graph (190k nodes, 21.8M edges) following a medallion
+pattern: landing layer (raw data), bronze layer (extraction and standardization per-source into Parquet), silver layer
+(entity consolidation and relationship edges), and gold layer (final export via BioCypher). The catalog-first design
+pattern — all datasets defined in YAML with schema, checksum, and origin metadata — provides the governance and
+reproducibility layer that Linus will need as KnowledgeBase scales beyond paper corpus alone. The hook system (pre-
+execution, validation, error recovery) and custom runners (FixedParallelRunner, DryRunner) for parallelism and
+validation are directly applicable patterns. Most critically: OptimusKG's Polars-based transformation layer (not Pandas)
+and validation story (checksums, schema validation, human-in-the-loop QA via PaperQA3) show what data integrity and
+reproducibility look like at production scale. Linus does not need to match OptimusKG's 65-source integration; the Phase
+3 scope is closer to 10–15 sources. But the architectural pattern — landing → bronze → silver → gold, with catalog-driven
+governance — is the blueprint for KnowledgeBase v1's design.
+
+**dlt is the authoritative ETL backbone for KnowledgeBase corpus feeding and ingestion.** dlt is a production-grade
+Python library that abstracts the "extract, normalize, load" cycle: extract from REST APIs, SQL databases, cloud
+storage, or 5000+ verified sources; infer and normalize schemas from messy, nested data; and load into any destination
+(DuckDB, Snowflake, etc.). What makes dlt strategic for Linus is not the verified sources (Dan's data sources are
+domain-specific), but three core capabilities: schema contracts (Pydantic models that enforce required fields and types,
+catching corruptions early), incremental loading with checkpoint-based state tracking (enabling monthly corpus updates
+without re-processing everything), and a pure-Python library model that runs anywhere without lock-in. These three
+features directly address the "corpus health monitoring" and "reliable incremental ingestion" problems that KnowledgeBase
+v1 will face. The contract system parallels the validation layer Linus will build; the state-tracking pattern enables
+periodic corpus refresh (new papers, updated genome annotations) without waste. dlt is also tuned for Linus's stack:
+typed with mypy and ruff, uses `uv` for fast dependency resolution, and includes a rich CLI for schema inspection. The
+Phase 2a entry point is straightforward: a simple spike that prototypes a pipeline loading 10 papers from a local
+directory into DuckDB, validates schema contracts, and measures init cost and runtime on M1 Max. If that spike proves
+promising, dlt becomes the Phase 2b authoritative ETL layer for all KnowledgeBase ingestion.
+
 ---
 
 ## Patterns and modules worth lifting
@@ -182,22 +213,34 @@ from.
 
 ## Phase-tagged implications
 
-**Phase 2 — Linus MVP (immediate):** Install hyalo via Homebrew, point `.hyalo.toml` at `context/notes/` with a Linus
-schema (`paper`, `thread`, `decision`, `experiment`, `iteration`), run `hyalo init --claude` to install the vault-scoped
-rule and skills into `.claude/`. This is an afternoon of setup and it immediately improves every Maestro session that
-touches KnowledgeBase notes. Read py3plex's DSL v2 design (`dsl/builder.py`, `dsl/ast.py`) before finalizing Linus's
-graph-query surface in `docs/specs/kb-architecture.md` — the DSL is a stronger prior for what a typed, chainable,
-uncertainty-aware query interface looks like than anything Linus would design from scratch. Port the
-`@require`/`@ensure` contract pattern into `src/linus/` for sandbox boundary code (DEC-0026/27 implementation).
+**Phase 2a — Linus MVP (immediate + early spike):** Install hyalo via Homebrew, point `.hyalo.toml` at
+`context/notes/` with a Linus schema (`paper`, `thread`, `decision`, `experiment`, `iteration`), run `hyalo init
+--claude` to install the vault-scoped rule and skills into `.claude/`. This is an afternoon of setup and it
+immediately improves every Maestro session that touches KnowledgeBase notes. Read py3plex's DSL v2 design
+(`dsl/builder.py`, `dsl/ast.py`) before finalizing Linus's graph-query surface in `docs/specs/kb-architecture.md` —
+the DSL is a stronger prior for what a typed, chainable, uncertainty-aware query interface looks like than anything
+Linus would design from scratch. Port the `@require`/`@ensure` contract pattern into `src/linus/` for sandbox
+boundary code (DEC-0026/27 implementation). Conduct a Phase 2a spike with dlt: prototype a simple pipeline that
+loads 10 papers from a local directory into a DuckDB table, verify that schema contracts catch format mismatches,
+and measure init cost and runtime on M1 Max. The goal is to validate whether dlt is the right ETL backbone for
+KnowledgeBase ingestion before committing to Phase 2b integration.
+
+**Phase 2b — Knowledge Base ingestion backbone:** If the dlt spike succeeds, integrate dlt as the authoritative ETL
+layer for KnowledgeBase corpus feeding. Use dlt's schema contracts to validate paper metadata and content quality,
+and checkpoint-based state tracking to enable monthly corpus updates without re-processing. Start with a simple
+source (local papers directory) before expanding to API-driven sources (GitHub READMEs, structured databases).
 
 **Phase 3 — Knowledge & Parallel Agents (primary target):** Port keppi's `blast_radius` and `context_pack` as
 Linus-native functions over the KnowledgeBase graph, replacing keppi's Zettelkasten edge weights with paper-corpus
 weights (`cites`, `co_author`, `shared_topic`, `shared_doi`). Wire the resulting `context_pack(topic, token_budget)`
 into the Worker invocation protocol as a standard pre-task KB query. At that point the hyalo + keppi combination covers
 both the authoring side (DEC-0026/27 graph population via vault editing) and the retrieval side (deterministic graph
-traversal for context scoping) without custom infrastructure beyond the weight adapter. Evaluate whether the infranodus
-cognitive-variability metric (biased/focused/diversified/dispersed) is worth implementing in Python against the
-KnowledgeBase graph as a quality-of-coverage signal.
+traversal for context scoping) without custom infrastructure beyond the weight adapter. Adopt OptimusKG's medallion
+architecture (landing → bronze → silver → gold) and catalog-first governance pattern as the canonical design for
+KnowledgeBase v1. Phase 3 scope is 10–15 initial sources (papers, notes, genomics databases, tool documentation),
+not 65, but the medallion pattern scales cleanly and provides the reproducibility and validation hooks Linus will
+need as the KB grows. Evaluate whether the infranodus cognitive-variability metric (biased/focused/diversified/dispersed)
+is worth implementing in Python against the KnowledgeBase graph as a quality-of-coverage signal.
 
 **Phase 4+ — Uncertainty quantification on KB retrieval:** If the property graph has grown to include multiple node
 types in earnest (paper / author / concept / claim / source) and retrieval ranking needs principled confidence
