@@ -2241,6 +2241,14 @@ archive. Promotion candidates (Tier 1 / Tier 2 / Tier 3) live in
 
 ## Infrastructure Foundations Synthesis (docs/syntheses/infra-foundations-synthesis.md)
 
+> **Remapping note (2026-05-05).** This synthesis now anchors on **g5-graph-tools** (primary cluster) and gained
+> **LAB-Bench + BixBench** as benchmark anchors, moved here from function-annotation-discovery. The Tier-1-equivalent
+> action "LAB-Bench MCQ + BixBench as Phase 1 baseline for Worker selection" lives on this row of the synthesis matrix
+> as of 2026-05-05; the deeper biology-domain treatment of those benchmarks remains in
+> [function-annotation-discovery-synthesis.md](../syntheses/function-annotation-discovery-synthesis.md). hyalo + keppi
+> from g5 close most of Phase 3's KB-tooling gap. Secondary edges: g7-harnesses, g1-apple-silicon, g2-wiki-engines,
+> g3-wiki-patterns.
+
 1. **"World model as orchestration primitive" — useful design concept or term too overloaded?** PAN, WHAM, Kosmos,
    memory pillar all use the phrase to mean different things. Phase 3 design might be cleaner picking
    `task_state`/`shared_context`/`belief_state` for orchestration-layer surface, reserving "world model" for citation.
@@ -2283,6 +2291,12 @@ archive. Promotion candidates (Tier 1 / Tier 2 / Tier 3) live in
 
 ## LLMs in Science Synthesis (docs/syntheses/llms-in-science-synthesis.md)
 
+> **Remapping note (2026-05-05).** This synthesis now anchors on **g8-sci-agents** (primary cluster) — paper-qa
+> as the first paper-corpus tool to earn Integrate operationalizes the Schulz frame, and the integrate-trio
+> (paper-qa + bioSkills + scientific-agent-skills) is the implicit-position-of-Linus claim made concrete.
+> Secondary edges: g9-bioinformatics (Bacformer, BioReason, DeepSeMS as scientific agents in Dan-relevant
+> domain), g2-wiki-engines (reproducibility floor), g3-wiki-patterns (epistemic-standards operationalization).
+
 1. **VISION.md cite Binz et al. and stake out Linus's positions explicitly?** One-paragraph addition naming four
    perspectives and Linus's hybrid converts implicit bets into reviewable design philosophy. Sub-question: whether
    to acknowledge tension points (the "Linus joins the Maestro team" line is in slight tension with strict
@@ -2301,6 +2315,14 @@ archive. Promotion candidates (Tier 1 / Tier 2 / Tier 3) live in
    (Hamiltonian-decomposition or Cayley-graph cycle puzzle) would formalize the role distinction.
 
 ## Function Annotation, Reasoning & Discovery Synthesis (docs/syntheses/function-annotation-discovery-synthesis.md)
+
+> **Remapping note (2026-05-05).** LAB-Bench and BixBench moved to **infra-foundations** as their primary anchor.
+> The deeper methodological treatment (coverage/accuracy/precision triple, MCQ→open-answer collapse, FutureHouse
+> evaluation philosophy, capsule authoring as `dan_tasks/` pattern) remains in this synthesis because it is
+> load-bearing for the function-annotation skill argument; the Phase 1 baseline-adoption decision lives on the
+> infra-foundations row. Cross-reference both syntheses when planning benchmark adoption. Question #2 (LAB-Bench
+> MCQ + BixBench as Phase 1 baseline) is now primarily owned by the infra-foundations row of the synthesis matrix
+> via S11/S12; question #3 (FutureHouse evaluation philosophy ADR) similarly cross-cuts.
 
 1. **ProtHGT vs Horizyn-1 vs BioReason-Pro for first protein-function skill — picking criteria?** Pick on benchmark
    against Dan-authored protein-function eval; deeper question is which axis matters (latency, narrative quality,
@@ -2402,6 +2424,78 @@ archive. Promotion candidates (Tier 1 / Tier 2 / Tier 3) live in
 8. **AlphaGenome non-commercial license — does it constrain Linus's long-term posture?** If Linus is offered as a
    service, API path is closed and only legal path is released weights run locally. Hybrid release means workable
    iff local-deployability spike lands cleanly.
+
+## Entrepreneurship Synthesis (docs/syntheses/entrepreneurship-synthesis.md) _(added 2026-05-05)_
+
+> **Posture.** All twelve items below are explicitly **deferred-but-tracked**: Linus needs to demonstrate it is a
+> useful intelligent tool before any commercial-surface decision becomes load-bearing. The items are recorded so
+> the thread is findable later, not so they are answered now. Primary cluster anchor: g10-finance. Secondary
+> edges: g9-bioinformatics, g8-sci-agents, g7-harnesses. The synthesis itself houses the full reasoning; this
+> archive section preserves the question shapes for future-Dan retrieval. All twelve are promoted to top-questions
+> as E1–E12.
+
+### Tier 1 — release-posture and framing decisions worth making early
+
+1. **E1. Open-source release posture as default architectural commitment.** Codify "open-source-by-default if
+   Linus succeeds" in VISION.md, citing the Pauling/Torvalds "for science, for society" rationale. Carve-out: if
+   Linus succeeds enough that Dan wants to commercialize a derivative, that decision remains open. Architectural
+   constraints follow (license-compatible deps, contributor-friendly module boundaries, no proprietary internal
+   APIs).
+2. **E2. Reframe Phase 2 deliverable from `docs/entrepreneurial-surface.md` to `docs/knowledge-mining-surface.md`.**
+   The 2026-05-03 Tier 2 #14 resolution committed to a doc by the original name; the 2026-05-05 reframe argues the
+   real entrepreneurial gunpowder is the knowledge in Dan's files, with Linus as the mining tool — productization
+   is downstream. Rename to reflect the priority order.
+
+### Tier 2 — transferable g10-finance patterns (not commercial-specific)
+
+3. **E3. Dynamic-tool-activation as Phase 2/3 orchestration primitive.** OpenBB's `openbb-mcp` per-session
+   activation pattern keeps tool-budget cost bounded for small local Workers. Adopt as Phase 2 default
+   tool-registry behavior, or defer to Phase 3? Open: timing.
+4. **E4. Adversarial-debate as a Worker primitive — empirical question.** TradingAgents' two-tier LLM split +
+   decision-log vs Stony Brook QuantAgent's no-debate majority-with-confirmation. Cross-references S55 (sweep
+   item) and Question 6 in the agentic-systems section above.
+5. **E5. Two-tier compaction for long sessions.** dexter's `microcompact` + full-compact pattern: lift verbatim
+   with attribution into the Phase 2 context-manager spec, or design from scratch? Recommendation: lift; tested
+   prior art.
+6. **E6. SKILL.md as Phase 7 skills bundle format.** dexter, OpenBB, bioSkills, scientific-agent-skills, and
+   autoresearch all use YAML-frontmatter markdown skills with a single `skill` tool. Commit as Linus standard?
+   Cross-references S30.
+
+### Tier 3 — longer-horizon framing, deferred until Linus is demonstrably useful
+
+7. **E7. The "knowledge in Dan's files is the entrepreneurial gunpowder" claim — when does it become testable?**
+   The whiteboard pipeline places business ideas at the end of the chain, downstream of Linus working,
+   fine-tunable, and benchmarkable. Recommendation: Phase 5 at earliest.
+8. **E8. Botryonyx and CaribAlgae as background, not direct opportunity hooks.** Algae as a domain is hard to
+   scale quickly or profitably; Dan still loves the science but doesn't see a viable new-business path right now.
+   Background informs taste and pattern-recognition; not a target.
+9. **E9. Pricing-anchor honesty.** Dollar ranges in the seven opportunities (extracted from skills-and-practices
+   Section 5) are anchors borrowed from adjacent SaaS/consulting markets, not Dan-validated. Revisit only when
+   an opportunity is actually being explored.
+10. **E10. Open-source-by-default release-posture implications for the architecture.** If E1 codifies, the
+    architecture inherits constraints. Short audit pass when E1 lands (likely Phase 2) to surface anything that
+    silently assumed proprietary deployment.
+11. **E11. AlphaGenome NC license — relevant only conditionally.** S29 already tracks this on the biology pillar.
+    With the 2026-05-05 reframe, AlphaGenome's NC license is _not_ blocking; revisit if and when commercial use
+    becomes a real question. Cross-reference S29; do not duplicate.
+12. **E12. `docs/knowledge-mining-surface.md` first-draft scope (renamed per E2).** Captures: Dan profile,
+    local-files-as-gunpowder reframe, whiteboard pipeline, the seven opportunities as long-tail possibilities,
+    g10-finance transferable patterns, "deferred until Linus is demonstrably useful" stance. Phase 2 (framed as
+    tracking) or Phase 3?
+
+### The seven entrepreneurial opportunities (extracted from skills-and-practices Section 5 on 2026-05-05)
+
+The original skills-and-practices Section 5 listed seven Dan-profile-relevant opportunities. They are now archived
+in the entrepreneurship synthesis itself; preserved here as a one-line index for findability. **All are
+deferred-but-tracked per E7.** No action items.
+
+1. Scientific literature intelligence service for biotech teams (Phase 1-ready capability, but deferred).
+2. Automated genomics pipeline auditing and SOP generation (Phase 1–2 capability).
+3. Domain-specific decision frameworks for funding and grant applications (Phase 1 capability).
+4. Environmental data intelligence for compliance and monitoring teams (Phase 2–3 capability).
+5. AI-accelerated scientific manuscript preparation (Phase 2 capability).
+6. Notion template systems for scientific project management (Phase 1, low-effort capability).
+7. Local AI infrastructure consulting for research institutions (Phase 2–3, longer horizon).
 
 ---
 
