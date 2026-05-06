@@ -4,25 +4,45 @@ _Added 2026-05-05 as the 14th thematic synthesis._
 
 ## What this document is
 
-A first-class thematic synthesis of the entrepreneurial surface for Linus. The content has three sources: (1) the
-seven Dan-profile-relevant opportunities originally housed in the `skills-and-practices` synthesis, now extracted
-here; (2) the [g10-finance cluster synthesis](repo-clusters/g10-finance.md), surveyed during the 2026-05-04 fan-out,
-which surfaced transferable Maestro/Worker context-management patterns from quant-agent prior art; (3) the Phase 7
-biology pillar's literature-intelligence stack (paper-qa + bioSkills + Bacformer + LAB-Bench + KnowledgeBase), which
-the [function-annotation-discovery](function-annotation-discovery-synthesis.md),
+A first-class thematic synthesis of the entrepreneurial surface for Linus, written in a deliberately exploratory
+register. **It is much too early to commit to productization.** The headline posture: Linus is being built for its
+own sake and for Dan's own use; the entrepreneurial surface is a thread worth tracking because the project's
+namesakes (Linus Pauling, Linus Torvalds — both open-source-and-public-good adjacent) imply a release posture that
+is "open source if it works at all" rather than "build to sell." If Linus turns out to genuinely push the frontier
+forward in some way, the possibilities downstream are enormous; if it doesn't, the work was its own reward. This
+synthesis records the thread so future-Dan can find it, not so present-Dan has to act on it.
+
+The content has three sources: (1) the seven Dan-profile-relevant opportunities originally housed in the
+`skills-and-practices` synthesis, extracted here for completeness; (2) the
+[g10-finance cluster synthesis](repo-clusters/g10-finance.md), surveyed during the 2026-05-04 fan-out, which
+surfaced transferable Maestro/Worker context-management patterns from quant-agent prior art; (3) the Phase 7
+biology pillar's literature-intelligence stack (paper-qa + bioSkills + Bacformer + LAB-Bench + KnowledgeBase),
+which the [function-annotation-discovery](function-annotation-discovery-synthesis.md),
 [biological-foundation-models](biological-foundation-models-synthesis.md), and
-[generative-biology](generative-biology-synthesis.md) syntheses converge on as a coherent commercial offering for
-biotech teams.
+[generative-biology](generative-biology-synthesis.md) syntheses converge on as a coherent biotech-team offering.
 
-The headline claim: **Linus's commercial surface only crystallizes when the underlying schemas, citation discipline,
-and Maestro/Worker context-management patterns are right.** The g10-finance quant-agent prior art is the most
-honest evidence in the corpus: the same context-budget and dispatch primitives Linus needs internally are also what
-makes a domain-specific decision-support offering credible to a paying buyer. Productization is downstream of
-structure, not upstream of it. This is not "build first, sell later" — it is "the structure work _is_ the moat."
+The reframe (added 2026-05-05 on Dan's review): **Dan's local files — papers, articles, threads, websites — are
+the real entrepreneurial gunpowder, and Linus is the tool that mines fuel from them.** Linus itself may or may
+not have direct business value; the more interesting commercial-surface question is what Dan-the-scientist can do
+once Linus makes the knowledge in his corpus tractable and queryable on his own machine. The whiteboard sketch
+captures this cleanly: local files → workspace ← GitHub repos (data systems / inference tools / agentic tools) →
+Claude (Maestro) used to understand tool capabilities and to build custom tools → "akin to Claude but private and
+free" → enables more complex code development, integrates with knowledge and files, writes documents (DOCX, XLSX,
+PPTX) → scales with future Apple Silicon (M4, M5, M6?) → can fine-tune and benchmark Dan's own models → _then_
+apply to business ideas and revenue generation. The arrow ordering is load-bearing: business ideas come at the end
+of the pipeline, not the start.
 
-This synthesis intentionally does not cover: a full business plan, go-to-market strategy, pricing experiments, legal
-or tax setup, or hiring decisions. Those become real once a first-client engagement validates demand. The synthesis
-covers the architectural and prioritization decisions that make commercial readiness possible.
+The release posture this implies is **open-source-by-default if Linus succeeds**. "For science, for society" is a
+defensible interpretation of the Pauling/Torvalds naming, and the open-source path also keeps the project free of
+the structural pressures that would warp the architecture toward what's monetizable rather than what's right. Real
+entrepreneurial value, if it materializes, lives in what _Dan_ does with Linus + his files, not in what Linus is
+sold for.
+
+This synthesis intentionally does not cover: a business plan, GTM strategy, pricing experiments, legal/tax setup,
+or hiring. Those become real if-and-only-if a first concrete engagement validates demand and Dan decides to
+pursue it. The synthesis covers the prioritization context — what the long-tail commercial surface looks like
+under Dan's profile, what transferable patterns the g10-finance cluster actually contributes, and which questions
+become live once productization is on the table.
 
 ---
 
@@ -50,12 +70,56 @@ shape of a thematic synthesis.
 
 A third observation supports the extraction: **Dan's profile is itself defining**. PhD biochemistry with genomics
 depth, 13 years of Python in scientific computing, prior founder experience (Botryonyx LLC, 2018–2019; raised $42K
-seed, prototyped, competed at Rice and SEC Pitch), Scientific Advisor experience (CaribAlgae, 2018–2022), current
-Senior Scientist role at LanzaTech maintaining enterprise LLM infrastructure for a biotech production environment.
-That intersection — domain expertise, software fluency, founder operational experience, and active enterprise-LLM
-deployment context — is rare. Most generic AI-side-hustle content misses it; treating entrepreneurship as a
-first-class synthesis lets Linus's recommendations be filtered for this specific intersection rather than diluted
-toward generic advice.
+seed, prototyped, competed at Rice and SEC Pitch). The algae path Dan loves is structurally hard to scale quickly
+or profitably, so the realistic entrepreneurial gunpowder comes from a different combination: deep
+biology/biochem fluency + Linus + Dan's curated knowledge base. Most generic AI-side-hustle content misses this
+intersection entirely; treating entrepreneurship as a first-class synthesis lets recommendations be filtered for
+this specific shape rather than diluted toward generic advice — _while keeping the priority order honest_:
+Linus first, knowledge mining second, business ideas at the end of the pipeline if the upstream work succeeds.
+
+---
+
+## The whiteboard pipeline (added 2026-05-05)
+
+Dan's whiteboard sketch organizes the project's flow this way:
+
+```
+Local Files                  GitHub Repos                    Paper Agents
+  Papers                       Data Systems                    FigureFinder · ReferenceFinder
+  Articles      ──→  Workspace ←──  Inference Tools            TableFinder  · TitleFinder
+  Threads                      Agentic Tools                   EquationFinder · AbstractFinder
+  Websites                                                            │
+       │                                                              ↓
+       ↓                                                       Apply to business ideas
+  Use Claude (Maestro) to                                      and revenue generation
+  understand tool capabilities,                                       ↑
+  usage, and architecture                                      Can I fine-tune and
+       │                                                       benchmark my own models?
+       ↓                                                              ↑
+  Use Claude to build       ──→  Akin to Claude but private   ──→  Scale performance and
+  custom tools for myself        and free; enables more            capabilities with new
+                                 complex code development;         hardware in the future
+                                 integrates with knowledge          (Apple Silicon → M4, M5, M6?)
+                                 and files; tools for writing
+                                 documents (DOCX, XLSX, PPTX)
+```
+
+**Goal: build a powerful coding and computational work assistant application that runs locally without usage
+limits and includes personal knowledge base.**
+
+Two arrows in this picture matter for the entrepreneurship synthesis specifically. First, "Apply to business
+ideas and revenue generation" sits at the _bottom right_, downstream of "fine-tune and benchmark my own models,"
+which is itself downstream of "scale with new hardware." Productization is the last step, not the first. Second,
+the Paper Agents column (FigureFinder, TableFinder, EquationFinder, ReferenceFinder, TitleFinder, AbstractFinder)
+sits parallel to the main pipeline — these are tractable Worker-shaped capabilities that can be built and proven
+on Dan's own corpus before any commercial question is asked. They are concrete examples of the
+"local-files-as-gunpowder" claim: Dan's papers contain figures, tables, equations, references, titles, and
+abstracts that nobody else has indexed in this combination, and a working agent over them is the kind of
+capability that — _if_ Linus eventually ships — would be useful well beyond Dan personally.
+
+The Paper Agents are also a natural validation set for Phase 1c/Phase 2: small, specific, demonstrable
+capabilities that prove Linus can do _something_ useful end-to-end, before any larger architectural commitment
+is fairly defended.
 
 ---
 
@@ -158,11 +222,12 @@ Filtered for Dan's specific intersection: PhD biochemistry, genomics depth, 13 y
 operational experience, current biotech production environment. Phase markers indicate when each opportunity is
 realistically buildable given Linus's roadmap.
 
-**Opportunity 1 — Scientific literature intelligence service for biotech teams. (Phase 1-ready.)** The
-literature-intelligence stack above, productized. Initial revenue model: flat monthly retainer per client,
-$1,000–$3,000/month range. Three to five clients in year one is a realistic target, producing $3,000–$15,000/month
-recurring revenue before any automation. Differentiation: domain knowledge + local-first auditability + citation
-grounding. **This is the Phase 2 lead candidate — most directly enabled by the existing biology pillar.**
+**Opportunity 1 — Scientific literature intelligence service for biotech teams. (Phase 1-ready, but deferred.)**
+The literature-intelligence stack above, productized. Anchor pricing if pursued: monthly retainer per client,
+$1,000–$3,000/month range; three to five clients in year one would be $3,000–$15,000/month recurring revenue
+before any automation. Differentiation: domain knowledge + local-first auditability + citation grounding. **Most
+directly enabled by the existing biology pillar — but premature to pursue.** Linus is not yet a useful intelligent
+tool; commercial readiness is downstream of Linus working at all. Track this opportunity; do not pursue.
 
 **Opportunity 2 — Automated genomics pipeline auditing and SOP generation. (Phase 1–2.)** Bioinformatics pipelines
 accumulate technical debt at the same rate software pipelines do, but their maintainers are scientists, not
@@ -227,91 +292,95 @@ Plays well with Dan's current LanzaTech enterprise-LLM-infrastructure role as cr
 ## Open questions for Dan
 
 These map to Tier 1/2/3 candidates for [`top-questions.md`](../questions/top-questions.md) when the next planning
-session opens.
+session opens. **All entrepreneurship questions are explicitly deferred** — Linus needs to demonstrate it is a
+useful intelligent tool before any commercial-surface decision becomes load-bearing. The questions are recorded
+so the thread is findable later, not so they are answered now.
 
-### Tier 1 — block Phase 2 commercial-surface architecture
+### Tier 1 — release-posture and framing decisions worth making early
 
-**E1. First commercial-surface engagement timing: now (Phase 1 hosted-Claude-only) vs. defer to Phase 2 (Linus
-MVP working) vs. defer to Phase 3 (KB hardened)?** The trade-off is real-feedback velocity vs. infrastructure
-maturity. The g10-finance dexter pattern argues for early — Mughal's data shows ~25–45 percentage points of session
-quality come from disciplined context management, not from infrastructure depth. Recommendation: start a
-first-client engagement (likely Opportunity 1, scientific literature intelligence) at the Phase 1 hosted-Claude
-level, treating the engagement as a feedback loop on what clients actually pay for. Defer dropping it onto Linus
-infrastructure until Phase 2 MVP is demonstrably reliable. Open: which client, what scope, what discount in
-exchange for early-access feedback?
+**E1. Open-source release posture as a default architectural commitment.** Dan's instinct is that Linus, if
+successful, should be released open source — "for science, for society," consistent with the
+Pauling/Torvalds naming. This commitment, made early, prevents architectural drift toward proprietary surfaces
+later. Open: codify the open-source-by-default posture in VISION.md and add a one-paragraph rationale, with a
+deliberate carve-out that "if Linus succeeds enough that Dan wants to commercialize a derivative, that decision
+remains open" — i.e., open-source is the baseline, not a bind. Recommendation: codify; the architectural
+decisions that follow (license-compatible deps, no proprietary internal APIs, contributor-friendly module
+boundaries) are easier to honor as defaults than as retrofits.
 
-**E2. `docs/entrepreneurial-surface.md` ownership and structure.** The 2026-05-03 Tier 2 #14 resolution committed
-to a Phase 2 deliverable; the document now belongs in the entrepreneurship synthesis's orbit, not
-skills-and-practices. Open: does this document live as `docs/entrepreneurial-surface.md` or as a Phase 7
-sub-roadmap (`docs/biology-commercial-surface.md`)? Recommendation: top-level `docs/entrepreneurial-surface.md`
-with phase-specific sub-sections; biology is the first worked example, not the only one.
+**E2. Reframe `docs/entrepreneurial-surface.md` as `docs/knowledge-mining-surface.md` (or similar).** The
+2026-05-03 Tier 2 #14 resolution committed to a Phase 2 deliverable named `docs/entrepreneurial-surface.md`. The
+2026-05-05 reframe argues the real entrepreneurial gunpowder is the knowledge in Dan's files, with Linus as the
+mining tool — productization is downstream. Open: rename the deliverable to reflect this reframe (e.g.,
+`docs/knowledge-mining-surface.md`), or keep the original name and let the contents reflect the priority order?
+Recommendation: rename. The new name is more honest about what the document is _for_ and removes the implicit
+push toward early productization.
 
-**E3. License posture for the literature-intelligence offering.** paper-qa is permissively licensed; bioSkills
-is permissively licensed; KnowledgeBase is Dan's; Bacformer's license needs verification. AlphaGenome's
-non-commercial license (flagged in [biological-foundation-models](biological-foundation-models-synthesis.md), S29)
-forces a hard choice if AlphaGenome is in the Phase 7 stack: either the commercial offering uses local Evo 2
-(plumbing risk) or AlphaGenome stays as Maestro/research-only. Open: ADR before any commercial pilot ships.
+### Tier 2 — transferable g10-finance patterns worth tracking (not commercial-specific)
 
-### Tier 2 — shape Phase 3–7 commercial-surface architecture
+These are useful regardless of whether Linus ever ships a commercial offering — they sharpen the internal
+architecture too. Surfaced here because g10-finance is the entrepreneurship synthesis's primary cluster anchor; the
+patterns transfer.
 
-**E4. Dynamic-tool-activation as Phase 2/3 orchestration primitive.** OpenBB's `openbb-mcp` per-session tool
+**E3. Dynamic-tool-activation as Phase 2/3 orchestration primitive.** OpenBB's `openbb-mcp` per-session tool
 activation pattern keeps tool-budget cost bounded for small local Workers. Open: adopt as Phase 2 default tool
 registry behavior, or defer to Phase 3 once the actual tool surface is large enough to need it? The
 [g6-mcp-tools](repo-clusters/g6-mcp-tools.md) cluster's fastmcp-based registry should adopt it; the open question
 is timing.
 
-**E5. Adversarial-debate as commercial-output discipline.** TradingAgents' two-tier LLM split + decision-log
-pattern, applied to literature claims (one Worker finds supporting evidence, another finds contradicting
-evidence, Maestro arbiter writes the answer with both logs), produces defensible outputs that single-pass RAG
-cannot match. Open: is this the right default for the literature-intelligence offering, or only an opt-in
-high-precision mode? Cost (2–3× tokens) vs. defensibility tradeoff.
+**E4. Adversarial-debate as a Worker primitive — empirical question.** TradingAgents' two-tier LLM split +
+decision-log pattern (one Worker finds supporting evidence, another finds contradicting evidence, Maestro arbiter
+writes the answer with both logs), versus Stony Brook QuantAgent's no-debate majority-with-confirmation pattern.
+This is a `benchmarks/dan_tasks/` empirical question regardless of any commercial use; the cost (2–3× tokens) vs.
+defensibility tradeoff matters internally too. (Already on the sweep as S55.)
 
-**E6. Two-tier compaction for long client engagements.** dexter's microcompact + full-compact pattern fits
-client engagements where a session may run for hours and quantitative claims must be preserved. Open: lift
-verbatim into the Phase 2 context-manager spec, or design from scratch? Recommendation: lift verbatim with
-attribution; it is tested prior art.
+**E5. Two-tier compaction for long sessions.** dexter's microcompact + full-compact pattern fits any session that
+runs for hours and where quantitative claims must be preserved across compactions. Open: lift verbatim into the
+Phase 2 context-manager spec, or design from scratch? Recommendation: lift verbatim with attribution; it is
+tested prior art. This is internal-Linus architecture, not commercial-specific.
 
-**E7. SKILL.md as the Phase 7 skills bundle format.** dexter, OpenBB, bioSkills, scientific-agent-skills, and
+**E6. SKILL.md as the Phase 7 skills bundle format.** dexter, OpenBB, bioSkills, scientific-agent-skills, and
 autoresearch all use YAML-frontmatter markdown skills with a single `skill` tool. Open: commit to this format as
 the Linus standard for Phase 7, or evaluate alternatives? Recommendation: commit; the format is converging toward
-a de facto standard.
+a de facto standard. (Cross-references S30 on inaugural skills bundle.)
 
-**E8. OpenBB integration scope for a financial-data Phase 7 skill.** OpenBB's free-tier data floor (yfinance, SEC
-EDGAR, FRED, federal_reserve, ECB, OECD, IMF, BLS) is broad enough for a real Phase 7 financial-data skill. Open:
-is financial-data adjacent capability worth building, or is the biology pillar enough to anchor commercial
-surface? Dan's profile suggests biology pillar first, financial as Phase 7 stretch if commercial demand surfaces.
+### Tier 3 — longer-horizon framing, deferred until Linus is demonstrably useful
 
-### Tier 3 — documentation, conventions, longer-horizon scope
+**E7. The "knowledge in Dan's files is the entrepreneurial gunpowder" claim — when does it become testable?**
+The whiteboard reframe places business ideas at the end of the pipeline, downstream of Linus working,
+fine-tunable, and benchmarkable. Open: at what milestone does it become honest to ask "what specifically can Dan
+do with Linus + his corpus that nobody else can?" Recommendation: Phase 5 at earliest (chat surface + KB + memory
+all working end-to-end on real Dan tasks). Until then, the question is premature.
 
-**E9. Pricing model anchors for the seven opportunities.** The dollar ranges above are anchors, not commitments.
-Open: do they need a more rigorous unit-economics pass, or is "anchor + first-client adjustment" enough?
-Recommendation: anchor + adjust; rigor is premature without engagement data.
+**E8. Botryonyx and CaribAlgae as background, not as direct opportunity hooks.** Algae as a domain is hard to
+scale quickly or profitably; Dan still loves the science but doesn't see a viable new-business path right now.
+Open: keep Botryonyx referenced in CLAUDE.md owner-background as the source of the speed-and-evidence instinct
+(stays as is); soften any synthesis text that read as "build another algae company" — not the recommendation. The
+algae background informs taste and pattern-recognition; it is not a target.
 
-**E10. Validation channels for low-barrier opportunities (3, 6).** r/biotech, r/labrats, BioResnet, Twitter/X
-biotech community, LinkedIn (Dan's PacBio + LanzaTech network). Open: which channel(s) to test first, and what
-validation metric (download count, signup count, paid-conversion count)? Cheap to run; defer until first
-opportunity is selected.
+**E9. Pricing-anchor honesty.** The dollar ranges in the seven opportunities above are anchors borrowed from
+adjacent SaaS/consulting markets, not Dan-validated numbers. Open: revisit only when an opportunity is actually
+being explored; until then, the anchors are placeholders.
 
-**E11. Prior-experience leverage from Botryonyx.** $42K seed raised, prototype tested, Rice Business Plan / SEC
-Pitch semi-finalist for Texas A&M, 2nd place at Aggie Pitch ($12K). Open: is this lived experience worth surfacing
-explicitly in VISION.md as part of the entrepreneurial mindset claim, or kept as background context? The speed-
-and-evidence instinct in Algorithm/blitzscaling framings comes from this experience; CLAUDE.md already references
-it. Recommendation: one-line VISION.md addition citing it.
+**E10. Open-source-by-default release-posture implications for the architecture.** If Linus is open-source by
+default (E1), the architecture inherits constraints: license-compatible deps only, contributor-friendly module
+boundaries, no proprietary internal APIs that would need stripping for release, public benchmarks rather than
+private moats. Open: which of these are already true in the existing architecture, and which would need explicit
+ADRs to lock in? Recommendation: a short audit pass when E1 codifies — likely Phase 2 — to surface anything that
+silently assumed proprietary deployment.
 
-**E12. CaribAlgae Scientific Advisor experience as relationship-building precedent.** Dan was Scientific Advisor
-to CaribAlgae in Curaçao 2018–2022. Open: is this a relevant data point for the consulting opportunity (7), or
-genuinely unrelated? Recommendation: relevant; "advisor + scientific credibility" is the consulting offer shape.
+**E11. AlphaGenome non-commercial license — relevant only conditionally.** S29 already tracks this as an open
+question on the biology pillar's commercial readiness. From the entrepreneurship-synthesis perspective: with the
+2026-05-05 reframe (productization deferred, open-source-by-default), AlphaGenome's NC license is _not_ blocking;
+it is a constraint to revisit if and when commercial use becomes a real question. Cross-reference S29; do not
+duplicate.
 
-**E13. LanzaTech enterprise-LLM-infrastructure context as marketable case study.** Dan currently maintains
-enterprise LLM infrastructure for company-wide AI tools at LanzaTech. Open: is this anonymizable into a case
-study for the consulting opportunity, or off-limits as confidential employer context? Recommendation: discuss with
-LanzaTech before any case-study language ships.
-
-**E14. `docs/entrepreneurial-surface.md` first-draft scope.** Eight to ten pages. Cover: Dan profile, the seven
-opportunities (lifted from this synthesis), the literature-intelligence stack, the g10-finance transferable
-patterns, validation roadmap (which opportunity first, what success criterion, when to commit). Open: write in
-Phase 2 or defer to Phase 3? Recommendation: Phase 2 deliverable; the document shapes Phase 2 architecture
-decisions (E2, E3, E4) rather than waiting on them.
+**E12. `docs/knowledge-mining-surface.md` first-draft scope (renamed from `entrepreneurial-surface.md` per E2).**
+The document captures: Dan profile, the local-files-as-gunpowder reframe, the whiteboard pipeline (workspace →
+custom tools → private-Claude-equivalent → fine-tuning → eventual entrepreneurial application), the seven
+opportunities as long-tail possibilities (not action items), the g10-finance transferable patterns, and an
+explicit "deferred until Linus is demonstrably useful" stance. Open: write in Phase 2 or defer to Phase 3? With
+the deferred posture, Phase 3 is honest; Phase 2 is fine if the document is explicitly framed as "tracking, not
+acting."
 
 ---
 
@@ -332,14 +401,16 @@ The entrepreneurship synthesis sits at the intersection of three other syntheses
   [g7-harnesses](repo-clusters/g7-harnesses.md) (claude-squad and harness primitives for multi-user/multi-agent
   story).
 
-VISION.md and ROADMAP.md will gain entrepreneurship-flavored entries when the first commercial-surface engagement
-opens. CLAUDE.md already references the Botryonyx + blitzscaling instinct in the owner background; that stays as
-is.
+VISION.md should gain a one-paragraph open-source-by-default release-posture statement (per E1), naming the
+Pauling/Torvalds "for science, for society" rationale. ROADMAP.md does not need entrepreneurship-flavored entries
+yet — productization is deferred. CLAUDE.md already references the Botryonyx + blitzscaling instinct in the owner
+background; that stays as is, with the understanding that algae-as-a-target is closed and the instinct generalizes.
 
 ---
 
-_This synthesis is the input to `docs/entrepreneurial-surface.md` (Phase 2 deliverable), the E1–E14 candidate
-top-questions for the next planning round, and a one-paragraph VISION.md addition explicitly naming the
-commercial surface as a first-class objective rather than a side concern. Revisit when the first commercial-surface
-engagement opens, when AlphaGenome's commercial-license posture clarifies, when OpenBB's AGPLv3 forces a Phase 8
-ADR, or when the biology pillar's Phase 7 ships skills to a non-Dan user._
+_This synthesis is the input to: a one-paragraph VISION.md release-posture addition (E1); the renamed
+`docs/knowledge-mining-surface.md` deliverable (E2 + E12) at whichever phase is honest given Linus's actual state;
+the E1–E12 candidate top-questions for the next planning round, all explicitly deferred-but-tracked. Revisit if
+Linus reaches the milestone where the corpus is genuinely queryable end-to-end (Phase 5 at earliest), if the
+open-source-by-default posture is challenged by a specific opportunity, or if the algae landscape shifts in a way
+that opens a path Dan finds credible._
