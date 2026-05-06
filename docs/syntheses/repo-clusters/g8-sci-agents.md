@@ -2,8 +2,8 @@
 
 **Date:** 2026-05-04  
 **Repos:** paper-qa, aviary, ldp, robin, ether0, BixBench, LAB-Bench, finch, scientific-agent-skills,
-ibmdotcom-tutorials, claude-prism (11 total)  
-**Verdicts:** Integrate × 3 (paper-qa, LAB-Bench, scientific-agent-skills), Study × 7, Ignore × 1 (ibmdotcom-tutorials)
+ibmdotcom-tutorials, claude-prism, Sketch2Simulation (12 total)  
+**Verdicts:** Integrate × 3 (paper-qa, LAB-Bench, scientific-agent-skills), Study × 8, Ignore × 1 (ibmdotcom-tutorials)
 
 ---
 
@@ -175,6 +175,18 @@ sandbox-exec. The `Dockerfile.pinned` and `kernel_requirements.txt` bioinformati
 Bioconductor; Python + anndata + scanpy + biopython + pydeseq2; CLI tools BLAST, MAFFT, FastQC, IQ-TREE) are a useful
 menu for the eventual Linus bio-Worker environment, whatever the sandbox decision.
 
+**Sketch2Simulation's error-recovery orchestration pattern.** Sketch2Simulation (`OptiMaL-PSE-Lab/Sketch2Simulation`) is
+a nine-stage multi-agent pipeline that converts hand-drawn process flow diagrams into executable simulation scripts, with
+a dedicated "fixer agent" that detects execution failures and reroutes to targeted correction. The vision-to-code pathway
+(image → textual description → intermediate structured representation → normalized specifications → executable code) is
+directly applicable to Linus Phase 3+ domain pipelines. More immediately, the error-recovery loop (execute → detect
+failure → route to specialized fixer → retry) is a generalizable pattern for any code-generation or
+simulation-orchestration task. The domain (chemical process simulation via HYSYS) does not transfer to bioinformatics,
+but the orchestration primitives do: a task graph with progressive refinement, typed intermediate representations at each
+stage, a dedicated error-detection agent, and conditional re-routing. Phase 3 parallel agents can adopt this pattern when
+Linus grows multi-stage reasoning pipelines; Phase 6 fine-tuning (RLVR on code tasks) will find the error-feedback
+formalism useful.
+
 **aviary's `Tool.from_function` as the Linus tool registry standard.** This converts a Python function with a typed
 signature and Google-style docstring into an OpenAI-schema tool with no schema duplication. It is strictly cleaner than
 the Cline `xs`/`generic` prompt-variant approach. Whether or not Linus takes on `fhaviary` as a dependency, the pattern
@@ -267,7 +279,9 @@ dependency.
 for candidate selection. Adopt the `Prompts.validate_all_prompts` convention when the prompt registry forms. Implement
 `MemoryAgent`/`MemoryOpt` as the first retrieval-augmented agent shape if the ldp abstraction is in use; otherwise port
 the pattern into Linus's own agent module. Run the full BixBench agentic evaluation once against Linus's endpoint as a
-regression baseline.
+regression baseline. Study Sketch2Simulation's multi-stage agent orchestration with progressive refinement and error
+recovery as a reference pattern when Linus builds its own vision-to-code or domain-specific pipeline agents. The error-
+detection and fixer-agent model generalizes beyond chemistry to bioinformatics code-generation tasks.
 
 **Phase 6 — RLVR and Fine-Tuning.** ether0's eleven-verifier taxonomy is the most detailed published template for domain
 RLVR the entire collection provides. The bio-verifier candidates to define before the Phase 6 sprint: BLAST identity for

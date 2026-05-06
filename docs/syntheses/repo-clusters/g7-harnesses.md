@@ -1,9 +1,9 @@
 # Group 7 Synthesis — Agent Harnesses, Orchestration, Model Routing
 
 **Date:** 2026-05-04 **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne) **Trigger:** G7 fan-out
-synthesis pass; nine new repo notes (claude-squad, claude-task-master, codebuff, workgraph, openrouter-skills,
+synthesis pass; ten new repo notes (claude-squad, claude-task-master, codebuff, workgraph, openrouter-skills,
 python-sdk, origin, gravityfile, semanticworkbench) added alongside four existing harness notes (cline, claw-code,
-claw-code-local, openclaw).
+claw-code-local, openclaw). Amended 2026-05-05: semanticworkbench expanded with full Key findings subsection.
 
 ---
 
@@ -281,11 +281,18 @@ editor (writes code), reviewer (scores output against `## Validation`), and cont
 scratchpad accumulation). Workgraph's heartbeat-plus-PID supervisor and the `kqueue`-based macOS tree-kill equivalent
 should land in this phase.
 
+**Phase 2a protocol design.** Before committing the orchestration API shape, read `semanticworkbench`'s
+`libraries/python/semantic-workbench-api-model` and `workbench-service/semantic_workbench_service/controller/` as a
+reference for assistant-as-HTTP-service registration and event dispatch. The question of whether Linus's Workers are
+in-process calls or HTTP-registered services should be settled explicitly as an ADR: the semanticworkbench protocol
+design demonstrates that the framework-agnostic HTTP-registered pattern is viable for orchestration, and the tradeoffs
+(loose coupling, external integration, debuggability) merit explicit discussion before Phase 2a hardens the decision.
+
 **Phase 5 interface.** The semanticworkbench protocol design — Workers as HTTP-registered external services with a typed
 event bus — is the right reference when Phase 5 connects openclaw, Cline, and claw-code-local to Linus's orchestration
-layer. The question of whether Workers are in-process calls or HTTP-registered services is the most consequential
-architectural decision Phase 5 inherits from Phase 2a, and it should be made explicitly as an ADR in Phase 2a rather
-than by drift.
+layer. If Phase 2a commits to HTTP registration, the Phase 5 surface is a thin rendering layer over already-standardized
+events. If Phase 2a commits to in-process, the Phase 5 interface needs a different abstraction for external-service
+registration.
 
 ---
 
