@@ -370,6 +370,64 @@ When a Worker task produces a missing or empty result and the session log shows 
 state before re-issuing the task. Workers may have partially written output even if the session terminated abnormally.
 Check the target files and branch state first; re-running a completed task wastes tokens and may overwrite good work.
 
+### State verification across context boundaries
+
+When state was established in a prior context — a different session, a context-window compaction summary, or even
+Maestro's own claims from earlier in the same session — verify the state before building further work on it. The
+canonical failure mode (PR #12, 2026-05-06): a compaction summary stated "committed and pushed on branch X." The
+post-compaction continuation acted on this without verification; the commit was actually on branch Y. An empty PR was
+opened and merged before anyone checked, and the actual content nearly went into the reflog-only state.
+
+The rule has two specific applications worth calling out:
+
+- **Branch state verification before "ready to merge" claims.** Before any end-of-session report that a PR is ready or
+  that a branch contains a commit, run `git log <branch>..main --stat` and `git log main..<branch> --stat`. If those
+  two commands don't show the expected diff, the claim is false.
+- **Compaction-summary humility.** Treat any synthesized session summary as a hypothesis about prior state, not a
+  ground truth. Verify any "X was committed / pushed / merged / written" claim against the actual artefact before
+  proceeding.
+
+### Cherry-pick to preserve, never reset to delete
+
+Before any `git reset --hard` past a commit, run `git branch --contains <sha>` to confirm the commit exists elsewhere.
+If it does not, the reset will leave the commit reachable only via reflog (recoverable for ~90 days, durable for
+zero). The safe pattern is cherry-pick first to a known-good branch, then reset; never the reverse. Canonical failure
+mode: the Task A redo (2026-05-06), where a "cleanup" reset destroyed the only copy of the cherry-pickable commit. The
+reflog rescue worked but the discipline rule is cheaper.
+
+### PR summary discipline
+
+PR descriptions are the durable record of what a change does and why. They should follow a uniform template so a
+reviewer can scan a batch of related PRs without recalibrating per-author style. The template:
+
+```markdown
+## Summary
+<1–2 sentence executive summary: what the PR changes and why>
+
+## Changes
+- **<spec-item-id>** — <terse 1-line description>. <DEC refs where relevant>
+- ...
+- **Bonus fix** — <description> (only when applicable)
+
+## Spec
+See [`docs/specs/<spec-name>.md`](docs/specs/<spec-name>.md) — Task <X>.
+
+[## Background — only when reviewer needs context, e.g. a redo or a non-obvious dependency]
+```
+
+Apply this for every Worker-delivered or Maestro-delivered PR that descends from a planning-update spec or any
+multi-task spec doc. Per-PR ad-hoc structures (Test plan checklists, prose blocks, bold-per-file headers) are
+specifically out of scope; pick this template even if it feels less expressive for a particular task. Consistency
+across the batch beats expressivity within one PR.
+
+### Agent fan-out: probe permissions first
+
+When fanning out N parallel agents that need bash access for `git` / `gh` / `pytest` / similar operations, probe with
+a single canary agent before the full fan-out. Run a one-step task that exercises the same tool surface (e.g., "create
+a branch, write a file, commit, push, open a PR") and confirm the agent completes. If the canary is blocked at a step,
+the full fan-out will be blocked too — and Maestro will end up doing the work serially anyway, having paid the
+fan-out tax for no parallelism gain. The canary costs a minute; debugging six stuck agents costs much more.
+
 ### Writing style for docs
 
 Prose over bullet-heavy dumps for anything a human will read. Markdown files in this repo communicate reasoning, not
@@ -496,6 +554,22 @@ produce noisy reformatting diffs. Prettier also normalizes heading style, list m
 **Disposable uv envs for experimental packages.** Untrusted or experimental Python packages always go in a fresh
 `uv venv`, never `pip install` into the linus conda env (DEC-0024). The linus env is the production substrate,
 hash-pinned and audited. Create with `uv venv .venv && source .venv/bin/activate`; discard after the experiment.
+
+**GitHub PR `baseRefOid` caching artefact.** When a PR is opened from a branch that's based on a local main ahead of
+origin/main, GitHub captures `baseRefOid` at the older origin/main commit. Even after origin/main advances, GitHub does
+not auto-refresh `baseRefOid`, so the PR's diff display shows the stale-base diff (extra commits, extra files, all
+appearing as "changes in this PR"). The merge itself is correct — only the head branch's unique commits land — but the
+review UI is misleading. Workarounds: (a) push local main to origin/main before opening task PRs so the captured
+`baseRefOid` is current; (b) verify true diffs with `git diff origin/main..origin/<branch>` not via `gh pr diff`; (c)
+manually update the base in GitHub UI after origin/main advances. The cleanest fix is (a) — keep origin/main current
+before fanning out task branches.
+
+**Empty PRs from branches even with main may auto-fast-forward on merge.** A PR opened from a branch that has zero
+unique commits beyond its base (i.e., `git log base..head` is empty) will still merge if Dan clicks "merge." The merge
+behaves as a fast-forward of `origin/<base>` to wherever the head pointed at PR creation, which can advance
+`origin/main` by N commits even though the PR itself has no diff content. Side effect: a PR can serve as an ancillary
+push vehicle for prior local-main commits. This is not a bug but it can confuse reviewers. PR #12 (2026-05-06) was the
+canonical instance — see the planning-update-execution session summary for the full incident.
 
 ---
 
