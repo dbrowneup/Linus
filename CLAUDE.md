@@ -5,7 +5,7 @@
 Build a private, local, modular AI assistant named **Linus** that runs on Apple Silicon, provides Claude-equivalent
 capabilities for Dan's scientific and software work, and stays fully under Dan's control. Named after Linus Pauling
 (scientist, humanitarian, Oregonian) and Linus Torvalds (engineer, open-source advocate, Oregonian). Logo: a carbon
-atom.
+atom. Linus is a force that harnesses human knowledge for good in the world.
 
 ## Owner Background
 

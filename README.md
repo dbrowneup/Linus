@@ -4,6 +4,8 @@ A personal AI orchestration backend for Apple Silicon.
 
 Named after Linus Pauling and Linus Torvalds. Runs locally. Respects your data. Gets better at your work over time.
 
+Linus is a force that harnesses human knowledge for good in the world.
+
 ## What this is
 
 Linus is an OpenAI-compatible AI backend that runs on a MacBook Pro, exposes domain-specific tools backed by a personal
