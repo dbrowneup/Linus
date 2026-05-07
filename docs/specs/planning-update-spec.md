@@ -16,7 +16,7 @@
 > | G    | 4 KB-spec items | #11 | 2026-05-07            |
 >
 > Pre-release tags: `v0.1.0` (before merges), `v0.2.0` (after merges). Session recap:
-> [`docs/session-summaries/planning-update-execution-session-summary-2026-05-07.md`](../session-summaries/planning-update-execution-session-summary-2026-05-07.md).
+> [`docs/session-summaries/2026-05-07-planning-update-execution-session-summary.md`](../session-summaries/2026-05-07-planning-update-execution-session-summary.md).
 
 Actionable Worker tasks synthesizing all Maestro/Dan planning sessions from 2026-05-03 through 2026-05-06. Covers Tier
 0/1/2/3 + Memory Pillar M1–M17 + Sweep S1–S60 + Entrepreneurship E1–E12 resolutions. The question archive lives at

@@ -80,7 +80,7 @@ discipline rules below.
 
 The seven lessons from the 2026-05-06 → 2026-05-07 planning-update execution session are codified in CLAUDE.md as
 Engineering Conventions and reproduced here as the Maestro behavioral spec. The session summary is at
-[`docs/session-summaries/planning-update-execution-session-summary-2026-05-07.md`](../session-summaries/planning-update-execution-session-summary-2026-05-07.md).
+[`docs/session-summaries/2026-05-07-planning-update-execution-session-summary.md`](../session-summaries/2026-05-07-planning-update-execution-session-summary.md).
 
 ### L1 — State verification across context boundaries
 
@@ -234,7 +234,7 @@ Per the Marelli operationalization, every Maestro-directed action leaves a trail
 
 - **Per session**: a session summary in [`docs/session-summaries/`](../session-summaries/) recapping what was done,
   what's outstanding, and what was learned. The
-  [planning-update-execution session summary](../session-summaries/planning-update-execution-session-summary-2026-05-07.md)
+  [planning-update-execution session summary](../session-summaries/2026-05-07-planning-update-execution-session-summary.md)
   is the current canonical example of the format.
 - **Per decision**: an ADR in [`docs/adr/`](../adr/) with stable `DEC-NNNN` id. Indexed in
   [DECISIONS.md](../../DECISIONS.md).

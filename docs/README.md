@@ -59,17 +59,17 @@ related ecosystems.
 
 ### `session-summaries` – Key session recaps
 
-- [fan-out-session-summary-2026-05-04.md](session-summaries/fan-out-session-summary-2026-05-04.md) — Recaps the Section 7 G1-G10 repo-note fan-out run, including shared pre-fan-out infrastructure commits, per-group outcomes, and the highest-impact implementation patterns surfaced for Linus.
-- [landscape-rollup-session-summary-2026-05-05.md](session-summaries/landscape-rollup-session-summary-2026-05-05.md) — Recaps the post-fan-out landscape reorganization session that swept open questions, built flat index docs, rewrote the two canonical landscape files, deprecated legacy landscape docs, and appended the resulting execution plan in planning-update-spec Section 11.
-- [memory-pillar-session-summary-2026-05-03.md](session-summaries/memory-pillar-session-summary-2026-05-03.md) — Recaps the follow-up planning session that translated the Garrison memory thesis into Linus architecture via an 11-paper fan-out, a dedicated memory synthesis, 17 resolved memory-pillar questions, and ratifying ADR/spec outputs.
-- [paper-notes-session-summary-2026-05-03.md](session-summaries/paper-notes-session-summary-2026-05-03.md) — Recaps the multi-wave paper-note fan-out across the expanded corpus, including pre-triage decisions, per-batch execution checkpoints, and same-session group syntheses with wave-level roll-up deferred.
-- [planning-update-session-summary-2026-05-05.md](session-summaries/planning-update-session-summary-2026-05-05.md) — Recaps the context-ingestion session that produced five new paper notes, three new thematic syntheses, a preliminary planning-update draft, and a late-stage path-recovery fix that reapplied landscape updates to main-repo docs.
-- [top-questions-resolution-session-summary-2026-05-03.md](session-summaries/top-questions-resolution-session-summary-2026-05-03.md) — Recaps the end-to-end top-questions resolution session where Tier 0-3 items were converted into committed decisions, roadmap/spec deltas, and a concrete Worker-executable planning artifact.
+- [2026-05-03-memory-pillar-session-summary.md](session-summaries/2026-05-03-memory-pillar-session-summary.md) — Recaps the follow-up planning session that translated the Garrison memory thesis into Linus architecture via an 11-paper fan-out, a dedicated memory synthesis, 17 resolved memory-pillar questions, and ratifying ADR/spec outputs.
+- [2026-05-03-paper-notes-session-summary.md](session-summaries/2026-05-03-paper-notes-session-summary.md) — Recaps the multi-wave paper-note fan-out across the expanded corpus, including pre-triage decisions, per-batch execution checkpoints, and same-session group syntheses with wave-level roll-up deferred.
+- [2026-05-03-top-questions-resolution-session-summary.md](session-summaries/2026-05-03-top-questions-resolution-session-summary.md) — Recaps the end-to-end top-questions resolution session where Tier 0-3 items were converted into committed decisions, roadmap/spec deltas, and a concrete Worker-executable planning artifact.
+- [2026-05-04-fan-out-session-summary.md](session-summaries/2026-05-04-fan-out-session-summary.md) — Recaps the Section 7 G1-G10 repo-note fan-out run, including shared pre-fan-out infrastructure commits, per-group outcomes, and the highest-impact implementation patterns surfaced for Linus.
+- [2026-05-05-landscape-rollup-session-summary.md](session-summaries/2026-05-05-landscape-rollup-session-summary.md) — Recaps the post-fan-out landscape reorganization session that swept open questions, built flat index docs, rewrote the two canonical landscape files, deprecated legacy landscape docs, and appended the resulting execution plan in planning-update-spec Section 11.
+- [2026-05-05-planning-update-session-summary.md](session-summaries/2026-05-05-planning-update-session-summary.md) — Recaps the context-ingestion session that produced five new paper notes, three new thematic syntheses, a preliminary planning-update draft, and a late-stage path-recovery fix that reapplied landscape updates to main-repo docs.
 
 ### `specs/` — Implementable specs and session artifacts
 
 Working specs handed off to the next implementation step (e.g. [planning-update-spec.md](specs/planning-update-spec.md), [memory-architecture.md](specs/memory-architecture.md)) and
-session summaries from large fan-out events (e.g. [fan-out-session-summary-2026-05-04.md](session-summaries/fan-out-session-summary-2026-05-04.md)). Living documents — updated
+session summaries from large fan-out events (e.g. [2026-05-04-fan-out-session-summary.md](session-summaries/2026-05-04-fan-out-session-summary.md)). Living documents — updated
 when execution surfaces gaps.
 
 ### `syntheses/` — Cross-cutting roll-ups by theme

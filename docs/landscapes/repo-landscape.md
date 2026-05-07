@@ -17,7 +17,7 @@
   phase-by-phase entry; key tensions): [`docs/landscapes/total-landscape.md`](total-landscape.md) and
   [`docs/landscapes/synthesis-landscape.md`](synthesis-landscape.md).
 - **Verdicts and decisions:** the per-cluster syntheses carry the Integrate/Study/Ignore call for each repo within
-  that cluster; the [`fan-out-session-summary-2026-05-04.md`](../specs/fan-out-session-summary-2026-05-04.md) is
+  that cluster; the [`2026-05-04-fan-out-session-summary.md`](../session-summaries/2026-05-04-fan-out-session-summary.md) is
   the read-out for the run that produced them.
 
 ## Why it was retired

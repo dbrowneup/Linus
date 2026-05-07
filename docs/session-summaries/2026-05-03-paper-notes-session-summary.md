@@ -543,7 +543,7 @@ before the wave-level synthesis pass can proceed cleanly:
     in Wave 1 by Group G, expanded in Wave 2/3 with WHAM addition.
 
 12. **`docs/syntheses/repo-clusters/` parallel** — note that the fan-out work documented
-    in `docs/specs/fan-out-session-summary-2026-05-04.md` produced 10 repo-cluster groups
+    in `docs/session-summaries/2026-05-04-fan-out-session-summary.md` produced 10 repo-cluster groups
     on a parallel track. The 9 paper-note groups + 10 repo-cluster groups will both feed
     the eventual landscape-doc rewrite.
 

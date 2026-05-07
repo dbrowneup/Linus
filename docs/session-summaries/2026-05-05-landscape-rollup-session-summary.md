@@ -2,10 +2,10 @@
 
 This document recaps the 2026-05-05 Maestro session that rolled up the post-fan-out
 material — 13 thematic syntheses, 10 cluster syntheses (g1–g10), the
-[fan-out session summary](../specs/fan-out-session-summary-2026-05-04.md), and the second
+[fan-out session summary](2026-05-04-fan-out-session-summary.md), and the second
 batch of paper-notes work — into a coherent set of landscape and planning documents. It
-follows the [paper-notes session summary](paper-notes-session-summary-2026-05-03.md) and
-the [fan-out session summary](../specs/fan-out-session-summary-2026-05-04.md), closing the
+follows the [paper-notes session summary](2026-05-03-paper-notes-session-summary.md) and
+the [fan-out session summary](2026-05-04-fan-out-session-summary.md), closing the
 "landscape-doc weave" item that both of those deferred.
 
 It is intentionally a recap, not a synthesis: the work done was structural reorganization
@@ -357,7 +357,7 @@ All six are complete. Steps that follow naturally:
 ---
 
 _This document closes the landscape-doc weave that the
-[paper-notes session](paper-notes-session-summary-2026-05-03.md) and the
-[fan-out session](../specs/fan-out-session-summary-2026-05-04.md) both deferred. The
+[paper-notes session](2026-05-03-paper-notes-session-summary.md) and the
+[fan-out session](2026-05-04-fan-out-session-summary.md) both deferred. The
 deferred wave-level paper-note syntheses (Wave 1 / Wave 2 / Wave 3) remain open from the
 2026-05-03 paper-notes session — they were not part of this rollup's scope._

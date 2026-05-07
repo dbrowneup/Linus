@@ -340,7 +340,7 @@ Specs and ADRs live alongside:
 - [`docs/specs/memory-architecture.md`](../specs/memory-architecture.md) — Phase 2 memory pillar contract.
 - [`docs/specs/planning-update-spec.md`](../specs/planning-update-spec.md) — execution log for the planning arc that
   resolved S1–S60 + E1–E12 (status: complete, all seven Worker tasks merged 2026-05-07).
-- [`docs/session-summaries/fan-out-session-summary-2026-05-04.md`](../session-summaries/fan-out-session-summary-2026-05-04.md)
+- [`docs/session-summaries/2026-05-04-fan-out-session-summary.md`](../session-summaries/2026-05-04-fan-out-session-summary.md)
   — read-out from the Section 7 fan-out.
 - `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0054 as of 2026-05-06).
 

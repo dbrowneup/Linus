@@ -123,7 +123,7 @@ Before the PR is opened:
 - `grep -rn "S\d\+\|M\d\+\|E\d\+" docs/syntheses/` to confirm every numeric question marker has been either replaced
   with a resolution stub or left intact (no orphans).
 - `git log main..HEAD --stat` shows only synthesis files plus this spec file plus
-  `docs/session-summaries/synthesis-cleanup-session-summary-2026-05-07.md` if added.
+  `docs/session-summaries/2026-05-07-synthesis-cleanup-session-summary.md` if added.
 - `git log HEAD..main --stat` is empty.
 - L1/L2 discipline (CLAUDE.md state-verification + cherry-pick-to-preserve) applied.
 
