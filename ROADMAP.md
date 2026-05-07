@@ -85,6 +85,20 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
   `qwen3:8b` or `qwen3:14b` via Ollama) and one FP16 reference
 - Results to `benchmarks/results/public_baseline_YYYY-MM-DD.json`
 
+**Phase 1c memory-pillar spikes (run alongside the four-config inference comparison):**
+
+- **CoT-gap fingerprint** (DEC-0033): 50-item MultiArith-style smoke test per model in the registry. Measures the gap
+  between model's best chain-of-thought performance and its zero-chain-of-thought performance. Output to
+  `benchmarks/results/cot_gap_<YYYY-MM-DD>.json` and mirrored into `~/.linus/registry/models.json`.
+- **Worker-size vs. CoT-length comparison** (DEC-0034): four-configuration sweep on a sequential-task subset of
+  `dan_tasks/`. Answers: does a smaller model with longer CoT outperform a larger model with shorter CoT? Output to
+  `benchmarks/results/cot_length_vs_size_<YYYY-MM-DD>.json`. Sequenced after the CoT-gap fingerprint so
+  configurations are calibrated per Worker.
+- **TTT Apple-Silicon viability spike** (DEC-0037): 10 ARC validation tasks, Llama-3.2-1B base, mlx-lm LoRA pipeline,
+  leave-one-out synthetic data with geometric augmentations. Decision rule: under 5 minutes wall-clock per task. If it
+  passes, TTT graduates to Phase 6 candidate substrate. Output to `experiments/ttt-mlx-arc-spike/results.md` +
+  `benchmarks/results/ttt_viability_<YYYY-MM-DD>.json`.
+
 **1d — Private "Dan task" suite** at `benchmarks/dan_tasks/`.
 
 - 5–10 tasks pulled from real work. Examples:
@@ -106,6 +120,17 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
 - Smoke test gate before any full run
 - Atomic commit with clean message
 - Full protocol documented in `docs/maestro-worker-protocol.md`
+
+**1f — Additional repo synthesis notes + minGRU MLX port spike.**
+
+Repo notes for the second-wave repos surfaced during Phase 1 planning (omega-memory, keppi, agentmemory, openaugi,
+fastmcp, Task Master AI, claude-squad, etc.). Same format as 1a.
+
+**minGRU MLX port spike** (DEC-0038): port the few-line minGRU/minLSTM PyTorch reference to MLX using MLX's scan
+primitives + Heinsen 2023 log-space scan; run Shakespeare benchmark (~1M chars) on M1 Max; compare against vanilla MLX
+LSTM baseline. Decision rule: within 2× of paper's T4 numbers AND matched perplexity. If it passes, minGRU graduates
+to Phase 6 candidate substrate. Output to `experiments/mingru-mlx-shakespeare/results.md` +
+`benchmarks/results/mingru_mlx_<YYYY-MM-DD>.json`.
 
 **Gate to Phase 2:** we know (a) which inference engine to use for the serving layer, (b) our baseline numbers on public
 and private benchmarks, (c) the Maestro/Worker pattern works end-to-end on a real task.
@@ -155,6 +180,54 @@ under 5 minutes.
 - Linus routes to local model, model calls `linus.knowledge.search_papers`, returns grounded answer with citations
 - Compare to hosted Claude on the same query (Dan task suite)
 - Record the delta
+
+**2e — Output synthesis + citation drill-down (DEC-0023).**
+
+Maestro-side synthesis layer that compresses Worker outputs into balanced bullets + prose with citations as first-class
+artifacts. Drill-down affordance from synthesized summary to underlying Worker outputs and source citations. Opt-in
+`/verbose` for unsynthesized full-Worker output. Multi-Worker fan-out outputs always synthesized before reaching Dan,
+with citation links preserved.
+
+**2f — KB integration v1 with dual substrate + quality scorecard (DEC-0015, DEC-0019).**
+
+Linus exposes both `linus.knowledge.sparql.*` (RDF) and `linus.knowledge.graph.*` (property graph) as separate tool
+families. Per-paper quality scorecard surfaced in retrieval context (no hard gating). RaKUn 2.0 keyphrases rendered
+alongside existing TF-IDF/BERTopic outputs for empirical comparison; winning pipeline adopted in Phase 3.
+
+**2g — Knowledge-mining surface document.**
+
+`docs/knowledge-mining-surface.md` — knowledge and opportunity-surface planning artifact. Scope: Dan profile, the
+local-files-as-gunpowder framing (knowledge in Dan's files is the primary asset; Linus is the mining tool), the
+whiteboard pipeline (workspace → custom tools → private-Claude-equivalent → fine-tuning → eventual entrepreneurial
+application), seven opportunities as long-tail possibilities (not action items), g10-finance transferable patterns, and
+an explicit "deferred until Linus is demonstrably useful" stance.
+
+**2h — Memory pillar v0 implementation (DEC-0028–DEC-0043).**
+
+Seven deliverables:
+
+1. SQLite schema at `~/.linus/episodic.db` with the DEC-0029 record shape. Migration script. Hash-computation helpers.
+2. Audit log writer at `~/.linus/audit.jsonl` (append-only) with the DEC-0030/0031/0032 contract.
+3. `linus.memory.episodic.*` tool family (reads, writes, admin) per the memory-architecture spec API surface.
+4. `linus.memory.scratchpad.*` thin facade over the episodic substrate.
+5. Dispatch-layer prefix loader implementing the per-`memory_mode` cap allocation from DEC-0032; summarization or
+   retrieval on overflow; dispatch metadata reporting.
+6. Router primitive plumbing — `cot_budget` and `memory_mode` as first-class dispatch struct fields; explicit caller
+   annotation in v0; both recorded in the audit log.
+7. Worker registry — `scratchpad_durability` capability tag (DEC-0030) and per-Worker `cot_budget` overrides populated
+   by the DEC-0033 CoT-gap fingerprint measurement.
+
+**2i — ARC-AGI memory diagnostic (DEC-0035).**
+
+50–100 public-eval ARC-AGI-1 tasks, run twice (stateless vs. session_stateful) against a small Linus Worker. Output to
+`benchmarks/arc_agi_diagnostic/`. Lives separately from `dan_tasks/` — this is a memory-architecture probe, not a
+general capability benchmark.
+
+**2j — Worker protocol non-conformance constraints.**
+
+Phase 2 Worker protocol spec at `docs/protocols/maestro-worker-protocol.md` (already exists) formalizes the DEC-0030
+forbidden patterns and DEC-0036 KV-cache continuity requirement. A Worker integration that violates these is
+non-conformant; Phase 2 will not ship with a non-conformant Worker as default.
 
 **Explicit non-goals for Phase 2:**
 
@@ -212,6 +285,19 @@ gap on domain-specific tasks.
 - Only build if a concrete use case demands it. The Algorithm check: delete before adding.
 - Candidate implementation: embedding-based retrieval over past session turns, indexed by topic
 
+**Phase 3 memory additions:**
+
+- **Parallel-write coordination of episodic-store writes** (extends DEC-0022 from KB writes): the same coordinator
+  pattern applies one layer up — episodic-store writes from parallel Workers route through a coordinator to prevent
+  contention.
+- **Faithfulness audit trigger condition** (DEC-0040): no Phase 3 deliverable scoped today; trigger is a measurable
+  failure mode (Worker reasoning trace claims X but answer reflects Y, or downstream Worker inherits trace error). When
+  the trigger fires, an audit-component spec goes into the Phase 3 backlog with concrete failure cases as design input.
+- **Investigation memory (Layer D)** implementation (DEC-0052): SQLite substrate at `~/.linus/investigations.db`, API
+  `create / write / read / close`, lifecycle tied to investigation span, GC at 30-day inactivity.
+- **Per-task auto-classification** for `cot_budget` and `memory_mode` (DEC-0031): a small task classifier replaces
+  explicit caller annotation. Phase 2 ships with annotation; Phase 3 may ship the classifier.
+
 **Gate to Phase 4:** Linus answers domain questions measurably better than raw local model, and can execute
 multi-subtask jobs in parallel with observable speedup.
 
@@ -228,11 +314,16 @@ network access, with every data source under Dan's physical control.
 **Core:**
 
 - Kiwix running natively on macOS
-- ZIMs installed: English Wikipedia (full or curated selection), Simple English Wikipedia; topical ZIMs (medical,
-  genomics/biochem if available) evaluated at install time
+- ZIMs installed: Full English Wikipedia (~100 GB) as the Phase 4 foundation corpus for the personal LLM Wiki vision;
+  Simple English Wikipedia as a smaller option; topical ZIMs (medical, genomics/biochem if available) evaluated at
+  install time
 - Kolibri running natively on macOS for structured Khan Academy courseware; Kolibri serves curriculum-depth content
-  (worked explanations, exercises, learning trees) where Kiwix serves reference lookups — both belong, as distinct tools
-- ProtoMaps PMTiles with OSM data for offline geographic queries
+  (worked explanations, exercises, learning trees) where Kiwix serves reference lookups — both belong, as distinct
+  tools. Kolibri also serves as a **parallel benchmark surface** at `benchmarks/kolibri_tasks/` — testing Worker
+  reasoning on canonical educational problems (not just a content server).
+- ProtoMaps PMTiles with planet-wide OSM coverage as the goal; fallback prioritization if disk requires it
+  (US → EU → Middle East → Asia → Eurasia → Africa, or population-density-weighted). Research planet-PMTiles disk
+  footprint before committing.
 - Dataset version tracking: `~/.linus/data_packages.json` registry
 - Update check tool: `linus.data.check_updates` polls upstream, reports available updates, user approves downloads
 - `linus.kiwix.search(zim, query)` tool wrapping Kiwix's HTTP API
@@ -243,8 +334,9 @@ network access, with every data source under Dan's physical control.
 **Optional Docker:**
 
 - Qdrant in Docker (if KnowledgeBase's native search hits scalability limits)
-- Any other stateless services nomad-inspired: CyberChef, ArchiveBox, etc.
-- Rule from earlier discussion: Docker for stateless services only; inference stays native
+- PostgreSQL, Neo4j, or other stateful services in Docker are acceptable — Docker inference is what is forbidden (no
+  Metal/ANE passthrough); stateful services with no ML compute needs run fine in Docker
+- Any other nomad-inspired services: CyberChef, ArchiveBox, Kiwix-serve-via-Docker, etc.
 
 **Obsidian vault integration (stretch):**
 
@@ -334,6 +426,17 @@ local source — with no network required.
 - Benchmark on Dan task suite: does the larger streamed model outperform the smaller native-speed model?
 - Apply autoresearch methodology: set a target tok/s, iterate until hit.
 
+**6e — TTT-as-episodic-consolidation spike (conditional on DEC-0037 graduation).**
+
+Akyürek-style per-project LoRA consolidation experiment using the v0 SQLite store as input. Output: measured
+cost-per-consolidation on M1 Max + retrieval-quality delta vs. SQLite-only baseline. Decides whether Layer C gains a
+parametric upgrade path.
+
+**6f — Coconut substrate experiment (conditional on DEC-0042 graduation).**
+
+Phase 1 prerequisite spike checks MLX-portability of Meta's reference implementation vs. iCoT alternative. If tractable
++ comparable cost to LoRA, Coconut joins minGRU and TTT on the Phase 6 substrate menu.
+
 **Explicit open-research non-goal for Phase 6:** streaming-based training (gradients and optimizer states on SSD).
 Deferred — this is unsolved research territory.
 
@@ -420,9 +523,14 @@ serves as the readiness indicator. When Linus consistently scores within 10 perc
 Maestro-class tasks, Phase 8b transition planning begins. Timeline: entirely driven by model quality; not plannable
 in advance.
 
-Note: "stateful Docker on macOS" (Postgres+pgvector etc.) is not built here. The "no stateful Docker on macOS" rule
-(DEC-0027 practice stance) applies throughout Phase 8. If additional services are needed, they run native or on a
-separate server node.
+**Memory long-horizon directions:**
+
+- **minGRU + BitNet cross-product** (DEC-0041): long-horizon research direction — promotion to planned deliverable
+  requires both the minGRU MLX spike (DEC-0038) and the TTT Apple-Silicon viability spike (DEC-0037) to graduate.
+- **Hybrid Layer C graduation pattern** (DEC-0029): text → parametric LoRA after sufficient repeated access. Gated on
+  Phase 6e TTT spike result.
+- **Layer A active management** via Coconut-style or minGRU-style substrate (DEC-0042, DEC-0038): Phase 6+ pending
+  spike outcomes; Phase 8 if spikes don't graduate.
 
 ---
 
