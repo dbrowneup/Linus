@@ -90,7 +90,7 @@ short kebab-case description.
 - Reviewed by: Dan (creator is a Worker, not a human)
 - Lifetime: short to medium (1–14 days)
 - Created by: Worker, not human
-- Commits authored by: Worker (e.g., `Co-Authored-By: Ollama-Qwen2.5-Coder`)
+- Commits authored by: Worker (e.g., `Co-Authored-By: Ollama-Qwen3`)
 
 **Worker workflow:**
 
@@ -348,7 +348,7 @@ git switch main && git pull origin main
    - SPECTER2 embeddings updated in-place to ~/.linus/kb_embeddings.db
    - Tested on 10-paper subset; all embeddings verified
 
-   Co-Authored-By: Ollama-Qwen2.5-Coder"
+   Co-Authored-By: Ollama-Qwen3"
 
    git push -u origin agent/kb-sync/v1
    gh pr create --title "Spec: KB sync tool" --body "Implements background KB sync."
@@ -448,6 +448,6 @@ See SAFETY.md for the complete autonomy tier and tool use policy. Branch-specifi
 
 - [CLAUDE.md](CLAUDE.md) — session protocol, tool use policy
 - [SAFETY.md](SAFETY.md) — autonomy tiers, branch-level safety, audit log
-- [docs/maestro-worker-protocol.md](docs/maestro-worker-protocol.md) — end-to-end workflow for spec → implementation →
-  review
+- [docs/protocols/maestro-worker-protocol.md](docs/protocols/maestro-worker-protocol.md) — end-to-end workflow for spec
+  → implementation → review
 - [ROADMAP.md](ROADMAP.md#phase-3--knowledge-integration-and-parallel-agents) — Phase 3 branching model migration

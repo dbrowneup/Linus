@@ -292,30 +292,19 @@ In execution order:
 Items 1–7 are Phase 2 prerequisites for the orchestration backend per DEC-0028. Items 8–9 are Phase 1c benchmark
 deliverables that feed Phase 2 calibration.
 
-## Layer E (open question, added 2026-05-04) — Investigation memory
+## Investigation memory resolution log (resolved 2026-05-06 via DEC-0052)
 
-A fifth named layer was surfaced by the [agentic-systems synthesis](../syntheses/agentic-systems-synthesis.md)
-during the post-fan-out integration pass. Three corpus papers (Kosmos's world model, Sketch2Simulation's IR, the
-HKUST QuantAgent's context buffer) all occupy a layer the four-layer architecture above does not name: a
-**task-scoped, multi-agent, single-investigation lifetime** memory shared across the Workers participating in one
-investigation but not persisted as cross-session episodic state.
+The fifth named layer surfaced by the [agentic-systems synthesis](../syntheses/agentic-systems-synthesis.md) during
+the post-fan-out integration pass — task-scoped, multi-agent, single-investigation memory shared across Workers
+participating in one investigation but not persisted as cross-session episodic state — was resolved on 2026-05-06 by
+[DEC-0052](../adr/0052-investigation-memory-layer-d.md). The resolution adopted option 1 ("Add a new named layer"):
+investigation memory became **Layer D** with its own SQLite substrate at `~/.linus/investigations.db` and its own
+`linus.memory.investigation.*` API; the former Layer D (semantic knowledge) was renamed Layer E to accommodate.
 
-This spec does **not** yet commit to Layer E. The open question lives at
-[`top-questions.md` S13](../questions/top-questions.md) and resolves at the next planning session. Three resolutions
-are plausible:
-
-1. **Add Layer E.** New named layer with its own substrate (initial proposal: shared in-memory store with overflow
-   to Layer C on session-end), its own `linus.memory.investigation.*` API, and its own retention policy
-   (investigation-scoped, not session-scoped).
-2. **Extend Layer C.** Treat investigation memory as a Layer C scope with a new `investigation_id` tag alongside
-   `session_id` and `project_tag`. No new API; the same `linus.memory.episodic.*` reads with a richer query
-   surface.
-3. **Extend Layer B.** Treat it as a multi-Worker scratchpad — share Layer B writes within an investigation
-   regardless of which Worker emitted them. Conceptually closer to "investigation = group of sessions" than
-   "investigation = a memory layer."
-
-The choice is forced by the Phase 3 multi-agent spawner design (a single investigation is the natural unit a
-spawner manages). Resolution should land before `docs/specs/phase3-spawner.md` ships.
+The Phase 3 multi-agent spawner design (`docs/specs/phase3-spawner.md`) is the implementation site; this spec's
+"five memory layers" section above carries the canonical contract. The two alternatives that were not chosen
+(extending Layer C with an `investigation_id` scope; extending Layer B as a multi-Worker scratchpad) are recorded in
+DEC-0052 along with the rationale for the chosen option.
 
 ## Implementation prior art (added 2026-05-04)
 
@@ -354,9 +343,9 @@ history rather than start with an empty store, this is the worked-example patter
 - **The 16K in-context cap moves up over time** — DEC-0032 makes the cap a floor we move with confidence, not a
   permanent ceiling. The episodic store, overflow contract, and explicit-bypass mechanism stay regardless.
 
-## Memory budget accounting (forward pointer)
+## Memory budget accounting
 
-ARCHITECTURE.md gains a "Memory Budget Accounting" section per DEC-0028 naming memory budget as a first-class
+ARCHITECTURE.md carries a "Memory Budget Accounting" section per DEC-0028 naming memory budget as a first-class
 architectural quantity tracked per session and per task. Reference upper bound: o3 at ~$1.15M for 91.5% on ARC-AGI-1
 (the cost of brute-forcing memory reliability through compute). Reference lower bound: human with pen, paper,
 sandwiches. Linus's design target sits in the middle: tens of dollars of electricity per day on a single M1 Max, with

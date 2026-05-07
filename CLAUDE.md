@@ -157,13 +157,20 @@ Linus/
 │   ├── notes/
 │   └── pics/
 ├── benchmarks/            # Evaluation harnesses, Dan task suite, results
-│   ├── dan_tasks/         # Private benchmark suite
+│   ├── dan_tasks/         # Private benchmark suite (Dan-authored)
 │   └── results/           # Dated JSON result files
 ├── experiments/           # Throwaway scripts, ablations, quick tests
 └── docs/                  # Long-form writing, synthesis notes
     ├── adr/               # Per-file ADRs (NNNN-<slug>.md matching DEC-NNNN ids)
-    ├── repo-notes/        # One-pager per cloned repo
-    └── maestro-worker-protocol.md
+    ├── landscapes/        # total-landscape, synthesis-landscape (paper/repo are deprecated stubs)
+    ├── paper-notes/       # ~100 per-paper write-ups + INDEX.md
+    ├── papers/            # Paper-corpus index (paper-notes/INDEX.md mirror; pointer doc)
+    ├── protocols/         # maestro-worker-protocol, curation-protocol
+    ├── questions/         # top-questions, open-questions, answered-questions
+    ├── repo-notes/        # ~99 per-repo write-ups + INDEX.md
+    ├── session-summaries/ # Maestro session recaps (one per substantive session)
+    ├── specs/             # Implementation specs (memory-architecture, phase*-spike, kb/, etc.)
+    └── syntheses/         # 14 thematic + 11 cluster (g1–g11) synthesis docs
 ```
 
 ## Phased Plan

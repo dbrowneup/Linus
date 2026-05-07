@@ -155,11 +155,12 @@ outperforms more elaborate stochastic projections precisely because it is reprod
 applies across Linus — in benchmark methodology, in retrieval heuristics, in fine-tuning evaluation, and in the
 visualization of agent state and KB structure.
 
-## What Linus is becoming concrete (post 2026-05-04 fan-out)
+## What Linus is becoming concrete (post 2026-05-04 fan-out, expanded 2026-05-05)
 
-The Section 7 fan-out (10 group PRs covering 65 new repo notes plus 10 cross-cutting syntheses) sharpened the picture of
-what Linus's first paying-client-shaped deliverable looks like. The G9 synthesis names it explicitly: a **biotech
-literature intelligence stack** built from components that are largely Phase-1-ready rather than Phase-7-deferred.
+The Section 7 fan-out and its 2026-05-05 follow-up grew the cloned-repo collection from 12 to ~99, produced 25
+syntheses (14 thematic + 11 cluster, g1–g11), and sharpened the picture of what Linus's first paying-client-shaped
+deliverable looks like. The G9 synthesis names it explicitly: a **biotech literature intelligence stack** built from
+components that are largely Phase-1-ready rather than Phase-7-deferred.
 
 The stack (each a separate Integrate verdict from the fan-out):
 

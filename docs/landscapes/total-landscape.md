@@ -256,14 +256,14 @@ llm-research-wiki's typed page schema, obsidian-llm-wiki-local's 3-tier JSON fal
 
 ### Layer D — Memory pillar
 
-Per `docs/specs/memory-architecture.md`. Four layers (intra-step latent / within-session scratchpad / cross-session
-episodic / semantic-knowledge), with KnowledgeBase as Layer D and the new SQLite+content-hashes+git substrate as
-Layers B and C.
+Per `docs/specs/memory-architecture.md`. **Five layers (A–E)** as of DEC-0052: intra-step latent (A), within-session
+scratchpad (B), cross-session episodic (C, SQLite + content hashes + git), investigation memory (D, task-scoped
+multi-agent SQLite), and semantic knowledge (E, KnowledgeBase). The five-layer architecture is committed in
+DEC-0028–DEC-0043 plus DEC-0052; implementation is Phase 2 (B/C/E active) and Phase 3 (D).
 
-**Updated 2026-05-04:**
+**Substrate prior art (added 2026-05-04):**
 - **openaugi** is the closest existing match to the DEC-0029 v0 substrate; design ideas may be portable.
 - **agentmemory** lease/signal/checkpoint primitives are concrete prior art for parallel-Worker write coordination.
-- **Investigation memory** as a fifth named layer — open question S13, may amend `memory-architecture.md`.
 
 ### Layer E (new, 2026-05-04) — Skills and entrepreneurial surface
 
@@ -338,10 +338,11 @@ docs/
 Specs and ADRs live alongside:
 
 - [`docs/specs/memory-architecture.md`](../specs/memory-architecture.md) — Phase 2 memory pillar contract.
-- [`docs/specs/planning-update-spec.md`](../specs/planning-update-spec.md) — execution detail for resolved items.
-- [`docs/specs/fan-out-session-summary-2026-05-04.md`](../specs/fan-out-session-summary-2026-05-04.md) — read-out
-  from the Section 7 fan-out.
-- `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0043 as of 2026-05-04).
+- [`docs/specs/planning-update-spec.md`](../specs/planning-update-spec.md) — execution log for the planning arc that
+  resolved S1–S60 + E1–E12 (status: complete, all seven Worker tasks merged 2026-05-07).
+- [`docs/session-summaries/fan-out-session-summary-2026-05-04.md`](../session-summaries/fan-out-session-summary-2026-05-04.md)
+  — read-out from the Section 7 fan-out.
+- `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0054 as of 2026-05-06).
 
 The intended workflow is: walk `top-questions.md` Tier 1 in conversation, with `total-landscape.md` open as the map,
 `synthesis-landscape.md` open for cross-synthesis context, and the relevant per-synthesis or per-note file open for

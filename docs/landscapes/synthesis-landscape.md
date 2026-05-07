@@ -36,7 +36,7 @@ in `top-questions.md`; refer back as decisions land. (Updated 2026-05-05 to refl
 | [`security`](../syntheses/security-synthesis.md) | Supply chain + dependency surface + endpoint security + prompt-injection threat model. Triggered by litellm. |
 | [`llm-wiki`](../syntheses/llm-wiki-synthesis.md) | LLM Wiki pattern: compile-not-retrieve, schema-as-product, claim typing, content hashing, write-back, hot cache. |
 | [`skills-and-practices`](../syntheses/skills-and-practices-synthesis.md) | Practitioner collaboration patterns + Claude skills filtered for Dan's profile. Primary cluster anchor remapped to g11 (agent frameworks) 2026-05-05. (Entrepreneurship content extracted to its own synthesis 2026-05-05.) |
-| [`memory`](../syntheses/memory-synthesis.md) | Garrison thread + Mughal practitioner article: memory as Phase 2 first-class pillar, four-layer architecture. |
+| [`memory`](../syntheses/memory-synthesis.md) | Garrison thread + Mughal practitioner article: memory as Phase 2 first-class pillar, five-layer architecture (A–E) per DEC-0028–DEC-0043 + DEC-0052. |
 | [`humans-teams-performance`](../syntheses/humans-teams-performance-synthesis.md) | Güllich on multidisciplinary expertise + Harvey on team rhythm; Maestro/Worker analogy at three timescales. |
 | [`infra-foundations`](../syntheses/infra-foundations-synthesis.md) | Foundational references (attention paper, flow matching, PAN, Google AI energy, WHAM) + benchmarks (LAB-Bench, BixBench moved here 2026-05-05) + KG/network tooling (g5 anchor) — methodology + watch-the-field. |
 | [`native-low-bit-apple-silicon`](../syntheses/native-low-bit-apple-silicon-synthesis.md) | BitNet + Bonsai + bitnet.cpp + flash-streaming on Apple Silicon — research → engineering → productization arc. |
@@ -153,7 +153,7 @@ Many of the syntheses cover orthogonal territory; some have substantial overlap 
 
 - **llm-wiki** supplies the operational discipline (claim typing, content hashing, write-back, quality gate as
   surface).
-- **memory** supplies the architectural framing (KB as Layer D of the four-layer pillar; uniform read API across
+- **memory** supplies the architectural framing (KB as Layer E of the five-layer pillar per DEC-0052; uniform read API across
   layers).
 - **biological-foundation-models** supplies a near-term obligation (`model_prediction` edge class with provenance
   before Group A skills start writing back).
@@ -311,20 +311,26 @@ The Phase 2 KB schema must encode, before the first Worker writes back:
 - **Scratchpad as first-class durable artifact** — DEC-0030 forbids the o1 anti-pattern.
 - **`cot_budget` and `memory_mode`** as router primitives — DEC-0031.
 - **In-context cap policy** (16K Phase 2 floor; episodic-store overflow) — DEC-0032.
-- **Role + typed AgentReport** before the multi-agent spawner ships (S9, S10 — pending).
-- **Investigation memory** as a fifth named layer in the memory architecture (S13 — pending).
+- **Role + typed AgentReport** before the multi-agent spawner ships — resolved via DEC-0050 (Role) and DEC-0051
+  (AgentReport); Phase 3 implementation per `docs/specs/phase3-spawner.md` design-intent stub.
+- **Investigation memory** as a fifth named layer in the memory architecture — resolved 2026-05-06 via DEC-0052;
+  Layer D in the five-layer pillar (A–E).
 
 ### Safety posture (consolidated from security + safety-alignment-privacy)
 
 - **Dependency surface minimization** — delete langchain/langgraph (resolved Tier 0, 2026-05-03).
 - **Hash-pinned lock files + monthly pip-audit** — production env hardening (resolved Tier 0).
 - **Trust-tier tagging on every context-window item** — Phase 2 architectural commitment.
-- **Incident response protocol** — drafted for SAFETY.md (resolved Tier 0, 2026-05-03).
-- **Activation-hooks API stub Phase 1, feasibility spike Phase 2** — supports steering, monitoring, future
-  tooling (S17 — pending).
-- **KB → hosted-Maestro flow policy** with potential `hosted-forbidden` category (S16 — pending).
-- **SAFETY.md tier-control for generative whole-genome design** — Phase 1 deliverable (S5 — pending).
-- **Four SAFETY.md additions as single PR with per-section Dan review** (S58 — pending).
+- **Incident response protocol** — drafted in SAFETY.md (Supply Chain Incident Response section); resolved Tier 0,
+  2026-05-03.
+- **Activation-hooks API stub Phase 1, feasibility spike Phase 2** — resolved via DEC-0054 (API stub Phase 1,
+  feasibility spike Phase 2 against mlx-lm; Phase 6 steering ADR if spike passes).
+- **KB → hosted-Maestro flow policy** — resolved via DEC-0053; `hosted-ok` / `hosted-forbidden` binary tag at ingest
+  time, conservative default `hosted-forbidden`. Enforcement in SAFETY.md.
+- **SAFETY.md tier-control for generative whole-genome design** — resolved via DEC-0047; three-tier biosecurity
+  policy (residue / gene / whole-genome) with sign-off + out-of-band review at the top tier. Codified in SAFETY.md.
+- **Four SAFETY.md additions as a single PR with per-section Dan review** — completed 2026-05-07 as PR #16 (Task E
+  in `docs/specs/planning-update-spec.md`).
 
 ### Phase 7 skills + entrepreneurial surface (consolidated from biology trio + entrepreneurship + g8/g9/g10)
 
@@ -341,18 +347,25 @@ The Phase 2 KB schema must encode, before the first Worker writes back:
 
 ## What's missing
 
-Five gaps where no current synthesis owns the territory:
+The 2026-05-04 / 2026-05-05 / 2026-05-06 sweeps closed most of the gaps the prior version of this section listed.
+The two remaining open writing items are tracked as Phase 2a deliverables:
 
-- **A `docs/maestro-protocol.md`** for hosted-Maestro behavioral dependencies (Values paper argues Maestro is not
-  a black box; safety-alignment-privacy synthesis recommends a separate doc — S57).
-- **A `docs/EPISTEMIC-STANDARDS.md`** defining claim categories Linus distinguishes (Marelli operationalized;
-  generalizes the LLM-wiki KB categories — S22).
-- **A modern-Transformer-reference paper** bridging 2017 → 2025 (RoPE, RMSNorm, SwiGLU, GQA, pre-norm conventions
-  spread across many papers without a clean survey companion — S38).
-- **A Phase 3 spawner ADR draft** (Role + typed AgentReport + investigation memory + validation-gate primitive +
-  hosted-fallback critic-tier policy + applicable theory section).
-- **A Phase 7 biology sub-roadmap** (the biology pillar is overdetermined enough to deserve its own
-  sub-roadmap.md beyond skill-by-skill commitment).
+- **`docs/maestro-protocol.md`** for hosted-Maestro behavioral dependencies (Values paper argues Maestro is not a
+  black box; safety-alignment-privacy synthesis recommends a separate doc — S57). Phase 2a deliverable per
+  `docs/specs/planning-update-spec.md`.
+- **`docs/EPISTEMIC-STANDARDS.md`** defining claim categories Linus distinguishes (Marelli operationalized;
+  generalizes the LLM-wiki KB categories — S22). Phase 2a deliverable; needs KB schema (DEC-0048) and claim types
+  (DEC-0023) live before the standards doc is operational.
+
+Closed during the resolution arc:
+
+- **Modern-Transformer-reference paper** (S38): closed 2026-05-06 as Tier 3 documentation deferral; absorbed into
+  the infra-foundations synthesis's Transformer reference section rather than authored as a separate paper.
+- **Phase 3 spawner ADR + spec** (S9, S10, S13): closed 2026-05-06 / 2026-05-07. Role + AgentReport + investigation
+  memory all have ADRs (DEC-0050, DEC-0051, DEC-0052). Design-intent stub exists at
+  `docs/specs/phase3-spawner.md`; full implementation spec is a Phase 3 Maestro task per Dan's direction.
+- **Phase 7 biology sub-roadmap**: closed 2026-05-07 as `docs/specs/biology-phase7-roadmap.md` (Task F.3 in the
+  planning-update spec).
 
 ---
 

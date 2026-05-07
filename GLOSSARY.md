@@ -105,7 +105,7 @@ KnowledgeBase for the knowledge graph.
 user query. Linus can spawn multiple agents in parallel.
 
 **Maestro/Worker loop.** The core Linus development pattern. Maestro writes a spec, Worker implements against the spec,
-Maestro reviews. See `docs/maestro-worker-protocol.md`.
+Maestro reviews. See `docs/protocols/maestro-worker-protocol.md`.
 
 **Parallel agent spawn.** `linus.agent.spawn(spec, subtasks)` tool (Phase 3+). Fans out a single parent task into N
 worker agents operating in parallel with shared results store.

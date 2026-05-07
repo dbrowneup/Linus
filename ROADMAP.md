@@ -28,18 +28,19 @@ satisfied.
 
 ## Phase 1 — Recon and Baselines
 
-**Target duration:** 2 weeks (in progress; ~halfway through as of 2026-05-01)
+**Target duration:** 2 weeks (in progress)
 
-**Status snapshot (2026-05-01):**
+**Status snapshot (2026-05-07):**
 
-- **1a — Repo synthesis notes:** largely complete. Twelve original repo notes written. Likely scope expansion to add a
-  small set of new repos surfaced in the LLM wiki and skills syntheses (omega-memory, keppi, agentmemory, openaugi,
-  fastmcp, Task Master AI, claude-squad, etc.) — to be folded in either as 1a addenda or as a new 1f bucket (decided in
-  this planning refresh).
+- **1a — Repo synthesis notes:** complete. ~99 repo notes written across 12 original + the second-wave additions
+  (omega-memory, keppi, agentmemory, openaugi, fastmcp, Task Master AI, claude-squad, and the g11 cluster). Folded
+  primarily into Phase 1a; second-wave items now also covered by Phase 1f (this section).
 - **1b — pmetal deep evaluation:** in progress. Built from source successfully; smoke tests pass; initial impressions
-  strongly positive. LoRA trial, serve trial, and comparative benchmark vs. Ollama still to run before the ADR is
-  written.
-- **1c, 1d, 1e:** not yet started.
+  strongly positive. LoRA trial, serve trial, and comparative benchmark vs. Ollama still to run before the verdict
+  ADR (next free DEC-NNNN, slug `inference-backend`) is written.
+- **1c, 1d, 1e, 1f:** not yet started; specs and decision rules are committed (memory-pillar spikes per DEC-0033/
+  DEC-0034/ DEC-0037; minGRU MLX port spike per DEC-0038; Phase 1c Pareto methodology in
+  `docs/specs/phase1c-spike.md`).
 
 **Goal:** know what each repo is, know how our worker models perform on real tasks, and have the first Maestro/Worker
 loop on record.
@@ -119,7 +120,7 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
 - Worker (Qwen3 via Ollama, driven by Cline or a minimal orchestration script) executes the spec
 - Smoke test gate before any full run
 - Atomic commit with clean message
-- Full protocol documented in `docs/maestro-worker-protocol.md`
+- Full protocol documented in `docs/protocols/maestro-worker-protocol.md`
 
 **1f — Additional repo synthesis notes + minGRU MLX port spike.**
 
@@ -280,10 +281,12 @@ of Phase 3:
 **3c — Dan task suite re-run:** Linus-with-RAG vs. Linus-without-RAG vs. hosted Claude. Goal: measurable closing of the
 gap on domain-specific tasks.
 
-**3d — Memory (first pass, only if needed):**
+**3d — Memory deepening:**
 
-- Only build if a concrete use case demands it. The Algorithm check: delete before adding.
-- Candidate implementation: embedding-based retrieval over past session turns, indexed by topic
+The Phase 2 memory pillar v0 (Layers B + C + E per DEC-0028 onwards) ships as part of Phase 2h. Phase 3 deepens it
+along the dimensions below. The earlier "build memory only if a concrete use case demands it" framing was replaced
+on 2026-05-03 by the memory pillar resolution: memory is now a load-bearing architectural pillar, not a deferred
+feature.
 
 **Phase 3 memory additions:**
 
