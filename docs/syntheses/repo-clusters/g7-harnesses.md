@@ -303,10 +303,10 @@ After reading both notes, the verdict is that they are not competitors — they 
 capture "adopt both patterns, neither product," or should it declare one pattern as primary and treat the other as
 supplementary?
 
-**Session store format.** ARCHITECTURE.md calls for a session store and audit log without specifying a format. The
-workgraph JSONL shape is the right weight for a personal system; SQLite is the right weight if Phase 2 query patterns
-demand it. Which wins — human-readable append-only JSONL, SQLite with Alembic migrations, or JSONL now with a SQLite
-migration gate at Phase 3 when query complexity arrives?
+_Partially resolved (CLAUDE.md "Workgraph JSONL as the Phase 2a session-store shape" Engineering Convention): the
+recommended Phase 2a shape is workgraph-style JSONL DAG + dispatch. ARCHITECTURE.md notes the audit log is
+append-only JSONL at `~/.linus/audit.jsonl` (Phase 2). The session-store substrate (JSONL vs SQLite vs JSONL→SQLite
+migration gate at Phase 3) remains an implementation choice but JSONL-first is the default per the convention._
 
 **Open Responses versus Chat Completions.** The serving protocol choice locks in client compatibility. Ollama serves the
 legacy Chat Completions shape; the Open Responses spec adds stateful response threading and the SSE event catalog. Cline
@@ -318,9 +318,8 @@ a short spike against the open-responses spec document before committing?
 gets evaluated against the resulting requirements? The order matters because if origin is the candidate, the spec should
 be written in a way that makes the evaluation legible.
 
-**MCP as explicit Phase 3 ADR.** Three repos (origin, cline, semanticworkbench) and the existing pmetal-mcp note all
-converge on MCP as the tool substrate. DEC-0005 deferred this evaluation. G7 supplies enough data to close it. Should
-the Phase 1f ADR include a sub-decision on MCP, or does it get its own ADR at Phase 3 kickoff?
+_Resolved (DEC-0018, DEC-0045): MCP adoption is committed for Phase 2 onwards (not Phase 3 kickoff). fastmcp is the
+default framework. DEC-0005's MCP portion is superseded by DEC-0018 per the index in DECISIONS.md._
 
 ---
 

@@ -117,7 +117,7 @@ KnowledgeBase's existing section graph, gives Maestro and Workers a navigable do
 vector retrieval rather than replacing it. The cost of building `kb_ls` / `kb_cd` / `kb_cat` / `kb_grep` / `kb_concepts`
 over existing KnowledgeBase metadata is small; the payoff is a retrieval mode appropriate for precise, multi-hop
 navigation on small document sets where the latency of 5–10 navigation calls is acceptable. A smoke test in
-`experiments/vectorless-smoke/` (3–5 papers, Ollama/qwen2.5-coder:14b, same Dan-task questions as the qmd baseline)
+`experiments/vectorless-smoke/` (3–5 papers, Ollama/qwen3:14b, same Dan-task questions as the qmd baseline)
 produces the data that determines whether this pattern earns a Phase 3 tool slot.
 
 **WeKnora (Study) — the conscious anti-pattern.** WeKnora is Tencent's enterprise RAG platform: Go monolith, Python gRPC
@@ -338,13 +338,11 @@ Phase 1f benchmark suite include an ontomics run against the KnowledgeBase submo
 should CodeRankEmbed's clustering of bioinformatics function bodies (lots of array math, similar shapes, different
 intents) get an explicit ablation before ontomics is registered as a default Worker tool?
 
-**Which comes first: MCP ADR or Phase 3 design?** The total-landscape observation is that MCP adoption is now
-overdetermined, but the ADR formalizing the commitment has not been written. Should this happen at the start of Phase 2a
-planning — before any tool code is written — so that the commit is explicit and the policy decisions are made once
-rather than implied by implementation choices?
+_Resolved (DEC-0018, DEC-0045): MCP commitment formalized at Phase 2 onwards — not deferred to Phase 3. fastmcp is
+the default framework. Linus's tool registry is MCP-shape from Phase 2a per ARCHITECTURE.md C.1._
 
 **Vectorless bake-off model selection.** The vectorless smoke test needs an LLM in the loop. Against a hosted model
-(Claude Haiku, gpt-4o-mini) the quality ceiling is honest but expensive; against Ollama/qwen2.5-coder:14b the ceiling is
+(Claude Haiku, gpt-4o-mini) the quality ceiling is honest but expensive; against Ollama/qwen3:14b the ceiling is
 the realistic Linus-on-MacBook constraint. The two answers could diverge significantly. Which framing is more useful for
 the Phase 3 decision: "does this pattern work in principle?" (hosted) or "does this pattern work on my hardware?"
 (local)?

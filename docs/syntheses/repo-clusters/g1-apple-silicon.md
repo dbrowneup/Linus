@@ -240,10 +240,8 @@ rather than considered individually.
 
 ## Open questions for Dan
 
-**Should the "trust the OS page cache" finding be promoted to a named Linus engineering convention in CLAUDE.md?** It
-currently appears in the flash-moe note as a finding and in this synthesis as a recommendation. Elevating it to
-CLAUDE.md's Known Library Quirks would make it visible to every future Worker operating on inference-adjacent code. The
-cost is one paragraph in a file that already carries this kind of operational wisdom.
+_Resolved (DEC-0027, [answered-questions.md](../../questions/answered-questions.md)): "Trust the OS page cache" is now both a named
+Engineering Convention and a Known Library Quirk in CLAUDE.md._
 
 **Does the ANE prefill + GPU decode configuration belong in Phase 1b's explicit benchmark matrix?** The ANE repo
 confirms it is real on M4 and pmetal ships the implementation. Dan's M1 Max is the hardware the benchmark must run on.
@@ -263,11 +261,9 @@ minute/experiment cycle on this chip before Phase 6d planning needs those number
 infrastructure that isn't Phase 1's critical path. The case for doing it now is that it takes less time to run the
 experiment than to estimate it.
 
-**Is pmetal-mcp a serious Phase 2a tool registry candidate, or is it study material?** The 45-tool MCP server that ships
-with pmetal is a complete tool registry if Linus adds KnowledgeBase integration on top. The alternative is Linus
-building its own registry from scratch and studying pmetal-mcp as a reference. The Algorithm says delete before
-building; the case for using pmetal-mcp as the foundation is strong if the Phase 1b verdict is favorable. This decision
-should appear explicitly in Phase 2a planning documents rather than default to one answer or the other.
+_Resolved (DEC-0018, DEC-0045, ARCHITECTURE.md C.1): Linus's tool registry is MCP-shape from Phase 2 onwards, built
+on fastmcp. pmetal-mcp is the first **external** MCP server consumed via client adapter — not the registry foundation
+itself. The decision is captured in ARCHITECTURE.md's Tool registry section._
 
 ---
 
