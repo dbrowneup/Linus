@@ -230,6 +230,9 @@ KB write-back path; see "What's reusable" above.
    the Claude values Linus relies on (epistemic honesty for synthesis, transparency for tool-use) and the values Linus
    actively counters in its prompts (over-hedging, sycophantic mirroring, default warmth in technical contexts)? Making
    the dependency explicit would let us notice when a Maestro version change shifts the relied-on behaviors.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): `docs/maestro-protocol.md` scheduled
+   for Phase 2a as operational doc of Maestro's characterized behaviors Linus depends on (S57)._
 2. **Worker-values audit pipeline?** The paper's bottom-up extraction is implementable in small. Worth scoping a Phase
    6/7 deliverable that runs an analogous extraction over Linus's audit log to characterize Worker value expression —
    with the explicit goal of detecting Worker behavior drift after fine-tunes or quantization changes?
@@ -248,3 +251,6 @@ KB write-back path; see "What's reusable" above.
 6. **Mirroring vs. sycophancy detection.** The paper flags the open question of whether the 20% support-mirroring rate
    is appropriate or sycophantic. For Linus's own prompts to the Maestro, is there value in periodically running a "did
    you mirror or did you disagree" check on Maestro outputs to detect drift toward sycophancy?
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Sycophancy detection deferred to
+   Phase 5–6; add to future dan\_tasks (S49)._

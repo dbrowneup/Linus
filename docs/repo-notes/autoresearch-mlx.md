@@ -76,5 +76,7 @@ actually runs.
   graduation step in Phase 7?
 - **`program.md` → SKILL.md.** Promote it to the Anthropic `SKILL.md` convention as the template for Linus's first real
   skill, or keep `program.md` flavor for now?
+  _Resolved (E6, see [answered-questions.md](../questions/answered-questions.md)): YAML-frontmatter markdown with single
+  `skill` tool committed as the Phase 7 SKILL.md standard; evaluate alternatives only on demonstrated deficiency._
 - **Muon variant.** The README hints the working (non-public) port used Muon to reach `1.294526` on M4 Max. Worth
   porting Muon into our fork as the first agent-driven experiment, or stay AdamW-only?

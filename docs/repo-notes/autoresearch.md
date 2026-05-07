@@ -63,10 +63,18 @@ Phase 7c, adopt the same loop for inference experimentation with tok/s-target.
 - **First real use of autoresearch methodology.** Phase 6d or Phase 1b's pmetal evaluation? The pmetal LoRA trial is a
   natural first loop: Maestro (me, or you + me) writes the `program.md`, Worker iterates overnight, we wake up to a
   benchmark table. Low risk, exercises the whole Maestro/Worker protocol on real work.
+  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Phase 1b pmetal LoRA trial is the first
+  autoresearch loop._
 - **Metric for Linus's loops.** Karpathy uses val_bpb for its architecture-fairness. Linus's analogue is Dan task suite
   score, which is higher-variance and slower-per-evaluation. Are we willing to lengthen the per-experiment budget (30
   min+) to get the higher-signal metric, or keep short loops on proxy metrics?
+  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): 30+ min per experiment on Dan task suite
+  as default; proxy-metric loops only for very early smoke tests._
 - **`program.md` as SKILL.md.** autoresearch's `program.md` is essentially a lightweight skill. Promoting it to the
   Anthropic `SKILL.md` convention makes it portable between Claude Code and Linus. Worth doing in Phase 7, or premature?
+  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Promote `program.md` to `SKILL.md`
+  convention in Phase 7._
 - **Read the Karpathy tweets linked in the README.** Short. Likely contain framing worth surfacing in VISION.md if you
   want Linus to inherit some of the "research org as code" posture explicitly.
+  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Deferred to T3.18 batch; read
+  opportunistically, no immediate VISION.md change required._

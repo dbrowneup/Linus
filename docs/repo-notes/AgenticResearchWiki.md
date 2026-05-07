@@ -77,15 +77,17 @@ as a target pattern) and during Phase 3 when KnowledgeBase project workspaces ge
 - **Page templates for `docs/`.** Want to lift the `Overview.md` template + `{{...}}` placeholder convention into
   Linus's `docs/` page-template kit, or keep `docs/` informal and reserve this only for per-project workspaces under
   `context/`?
+
 - **Install the two Skills.** `import-notes` and `project-doc-update` are user-level installable today
   (`cp -r skills/* ~/.claude/skills/`). Worth doing as a Phase 1 quality-of-life experiment on `context/notes/`, or
   defer until Memory Architecture lands?
+
 - **Differentiator check vs. siblings.** I distinguished AgenticResearchWiki from `llm-research-wiki` (research-of-LLMs
   vs. research-via-LLMs) and `agentic-wiki-builder` (agent-maintained vs. agent-constructed) on README evidence alone.
   Once the other two notes land, want me to revisit and tighten the contrast?
-- **Write-back loop and Memory Architecture.** The auto-write-back of task records into module Overviews is the closest
-  published analogue to the journal -> index -> synthesis split the Memory Architecture spec is reaching for. Should the
-  spec cite this repo as a worked example, or is the parallel coincidental?
+
+- _Resolved (DEC-0028, DEC-0039, see [answered-questions.md](../questions/answered-questions.md)): Memory Architecture spec (layers A–E, hybrid episodic schema) is the canonical Linus write-back pattern; AgenticResearchWiki is a useful worked example reference._
+
 - **Per-experiment wikis.** Tencent's framing is one wiki per project. Linus has many concurrent experiments under
   `experiments/`. Does each experiment get a mini-wiki, or does this convention only kick in for multi-month efforts
   (Phase 6 fine-tuning, Phase 4 data-sovereignty datasets)?

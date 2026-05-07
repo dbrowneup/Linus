@@ -61,3 +61,6 @@ fields). If accuracy is acceptable, integrate into KB ingestion pipeline (Phase 
   Cost/quality tradeoff.
 - **Validation layer.** Should failed extractions (missing required fields, confidence low) be quarantined,
   re-attempted with a smarter model, or logged for manual review?
+
+  _Partially resolved (DEC-0019, see [answered-questions.md](../questions/answered-questions.md)): KB ingest quality
+  gate is a quality surface, not a hard gate; failed items are logged, not silently dropped; re-attempt policy TBD._

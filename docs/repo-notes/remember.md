@@ -87,6 +87,8 @@ export's organisational schema.
   "evidence line" with no provenance. DEC-0030 mandates trust levels on scratchpad segments. Should Linus's Layer D
   persona inherit the same trust-level tagging, or is Persona-class data (style preferences, naming conventions) always
   trust=high by definition?
+  _Partially resolved (DEC-0030, see [answered-questions.md](../questions/answered-questions.md)): DEC-0030 mandates
+  trust-level tagging on scratchpad segments; persona-class data trust policy TBD in Phase 2a memory spec._
 - **Markdown vault as Layer C export.** SQLite is the source of truth for episodic memory (DEC-0029), but a read-only
   markdown-vault projection would let Dan browse memory in Obsidian and let openclaw see memory without speaking SQL.
   Worth a small export-tool spike in Phase 2b, or premature?

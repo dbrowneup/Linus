@@ -96,3 +96,6 @@ one.
 - **Git-as-substrate scope.** Is the Linus orchestration log itself a candidate for the same "auto-commit with
   classifying prefix" pattern, separate from the KB? It's a clean audit trail, but it does mean every Linus session that
   touches state writes commits.
+  _Partially resolved (DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): cross-session
+  episodic store uses SQLite + git for persistence; auto-commit classifying prefix pattern not adopted for the
+  orchestration log specifically — audit log is JSONL append-only per DEC-0039._

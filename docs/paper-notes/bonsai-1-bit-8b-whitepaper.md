@@ -198,6 +198,9 @@ kernel work would eventually need to be ported or integrated.
    b1.58 2B4T, Bonsai 1-bit 1.7B / 4B / 8B, the upcoming Bonsai-ternary variant, all benchmarked on M1 Max with the
    `dan_tasks` suite and the task-completion-time methodology? That's the natural scope given what just landed; worth
    confirming before the spike spec is written.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Phase 1c spike includes four
+   configurations — Bonsai 8B 1-bit, PrismML ternary 8B, BitNet 2B4T, FP16 baseline (S7)._
 2. **`Bonsai-demo` integration path.** Does the demo wrap PrismML's MLX fork, llama.cpp Metal, or both? The answer
    determines whether Linus needs to vendor and track a forked MLX install, or can run Bonsai through stock llama.cpp +
    Metal kernels. The maintenance cost differs significantly.
@@ -214,6 +217,9 @@ kernel work would eventually need to be ported or integrated.
 6. **MLX fork strategy.** Long-term, does Linus pin to PrismML's MLX fork, contribute upstream support for scale-only
    quant formats (which would let MLX match GGUF's 1.125 bits/weight), or wait for pmetal to subsume both? The fork is a
    real maintenance liability and the question deserves an ADR before the inference layer hardens.
+
+   _Resolved (DEC-0049, see [answered-questions.md](../questions/answered-questions.md)): pmetal vs. PrismML fork
+   decision deferred to Phase 1b verdict on pmetal throughput (DEC-0049)._
 
 ---
 

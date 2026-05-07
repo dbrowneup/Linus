@@ -96,11 +96,20 @@ chat-history ingest from his own DMs/Discords (unlikely on the current roadmap).
 - **Dual semantic + graph memory.** Beever runs Weaviate + Neo4j with a smart router that picks per question. The
   current Linus plan is Qdrant-only. Is a graph store (Neo4j, Memgraph, or even a SQLite-on-disk triple table) on the
   roadmap for relational queries over the paper corpus?
+
+  _Partially resolved (DEC-0015, see [answered-questions.md](../questions/answered-questions.md)): Dual approach
+  adopted (RDF via rdflib/SPARQL + property graph); both are Phase 3 KB substrates; Weaviate/Neo4j not adopted._
 - **Google ADK as an orchestration framework.** Beever's pipeline is expressed as ADK `SequentialAgent` /
   `ParallelAgent` rather than ad-hoc Python. Is ADK on the table for Linus's orchestration layer, or do we want to own
   the agent-graph abstraction ourselves to keep the dependency surface small?
+
+  _Resolved (DEC-0002, DEC-0020, see [answered-questions.md](../questions/answered-questions.md)): Linus owns its
+  orchestration layer; ADK not adopted; scope is sandbox + KB + MCP registry + audit._
 - **MCP tool surface.** Beever ships 16 tools through `fastmcp`. Is the Phase 2/3 plan for Linus's MCP surface similarly
   scoped (discovery, retrieval, graph traversal, long-running ops), or narrower for v1?
+
+  _Partially resolved (DEC-0045, DEC-0046, see [answered-questions.md](../questions/answered-questions.md)): fastmcp
+  adopted as MCP framework; deployment field in registry schema; v1 tool count and scope TBD at Phase 2a._
 - **Adapter abstraction for non-paper sources.** Beever's `BaseAdapter` + `NormalizedMessage` cleanly separates "where
   the bytes come from" from "what the pipeline does with them." Even ignoring chat, Dan has papers, threads, notes, and
   pics. Is there value in defining a similar `BaseSource` abstraction in KnowledgeBase before more source types

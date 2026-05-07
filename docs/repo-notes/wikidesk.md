@@ -85,5 +85,6 @@ Phase 3 fan-out needs a precedent for queued, bounded-concurrency research subta
 - **Sandboxing the worker on macOS.** wikidesk explicitly punts to Docker/bubblewrap. If Linus ever runs an autonomous
   research-agent loop on the M1 Max, what's the macOS-native sandbox plan (Seatbelt profiles? app-sandbox? confined
   launchd jobs?), and is that a Phase 7 concern or do we want a sketch in SAFETY.md sooner?
-- **MCP as the KB surface.** wikidesk speaks both MCP and REST for the same operations. Is "Linus exposes its tools over
-  MCP" a settled direction (consistent with the Cline/openclaw/pmetal-mcp ecosystem), or still open?
+- **MCP as the KB surface.**
+  _Resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as
+  Linus extensibility substrate; fastmcp as the default in-house framework._

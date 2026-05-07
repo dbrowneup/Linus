@@ -59,16 +59,10 @@ for producing a Linus-branded model.
 
 ## 7. Questions for Dan
 
-- **How aggressively do we want to chase 1.58-bit on Apple Silicon as a first-class path?** Bitnet.cpp's ~7 tok/s at
-  100B on M2 Ultra implies a ~40–50B ternary model could be feasible on the M1 Max. Is that compelling enough to put an
-  "MLX/Metal ternary runtime" experiment earlier in the roadmap (Phase 2–3 experimental branch) rather than waiting for
-  Phase 6+?
-- **BitNet Distillation as a fine-tuning path.** Would you accept a 1.58-bit distilled Qwen2.5 variant as the Phase 6
-  deliverable if it beats a FP16-LoRA'd counterpart on Dan task suite, given it sacrifices some smoothness in exchange
-  for much larger effective capacity?
-- **Ternary base models vs. converted models.** Native ternary training (BitNet b1.58 2B4T) vs. post-hoc distillation
-  (BitDistill) vs. post-hoc quantization (run FP16 Qwen at 2-bit via bitnet.cpp-style kernels) — three different
-  philosophies. Any strong prior?
-- **Hardware bet.** The BitNet papers repeatedly call for "new hardware designed for 1-bit LLMs." The ANE is closer to
-  that than Metal is. Is investing in ANE kernel development (via pmetal or directly) worth Linus dev time in Phase 2–3,
-  or does it stay a Phase 7+ project?
+- _Resolved (DEC-0013, see [answered-questions.md](../questions/answered-questions.md)): BitNet 2B4T spike adopted as first concrete Phase 1c experiment; 1-bit via Ollama pull + benchmark sweep is the Phase 1c path, not an earlier roadmap item._
+
+- _Resolved (DEC-0014, see [answered-questions.md](../questions/answered-questions.md)): BitDistill as parallel Phase 6a experiment alongside FP16-LoRA; accepted if it beats FP16-LoRA on Dan task suite; S21._
+
+- _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Lane decision deferred to Phase 6a/6b boundary pending Phase 1c BitNet data; T1.3._
+
+- _Resolved (DEC-0027, see [answered-questions.md](../questions/answered-questions.md)): ANE kernel investment deferred to Phase 2 conditional benchmark; Linus stays on public APIs; T2.9._

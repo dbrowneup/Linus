@@ -93,7 +93,9 @@ dependency. Keep the clone for Phase 3 design discussions and as a reference for
   Is this the right first agent to build, or do you want a simpler ReAct-over-KnowledgeBase as the v1?
 - **Pair ldp with aviary, or unify behind a single Linus-native abstraction?** Both are FutureHouse, both are Apache,
   but they are two packages with two install footprints. Phase 2 could vendor the parts we need into `src/linus/agents/`
-  and skip the dependency. Acceptable, or worth the dep?
+  and skip the dependency. Acceptable, or worth the dep? _Partially resolved (DEC-0044, see
+  [answered-questions.md](../questions/answered-questions.md)): paper-qa adopted as Phase 2c engine without requiring
+  ldp or aviary; revisit ldp/aviary only if Phase 6 fine-tunes a domain-specific tool-selection policy._
 - **SCG: yes or no for Phase 6.** The SCG buys gradient flow through the agent for end-to-end training. It also buys ~1k
   lines of compute-graph machinery to maintain. Do you anticipate Phase 6 doing gradient-based agent training (in which
   case SCG earns its keep), or is Phase 6 scoped to LoRA-on-trajectories (in which case SCG is pure overhead)?

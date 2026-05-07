@@ -65,4 +65,4 @@ ingest into self-hosted Laminar, and measure span-to-alert latency and dashboard
 - **Operational burden of self-hosted Laminar.** For Dan's personal workflows, is a full Laminar stack (Postgres +
   ClickHouse + RabbitMQ) justified, or is lightweight JSON-based request/response logging sufficient for Phase 2-4?
 - **Signal detection for fine-tuned model quality.** Once Linus has fine-tuned models (Phase 6), should it auto-detect
-  quality drift with Laminar's clustering, or rely on manual evaluation against the Dan task suite?
+  quality drift with Laminar's clustering, or rely on manual evaluation against the Dan task suite? _Partially resolved (DEC-0040, see [answered-questions.md](../questions/answered-questions.md)): Faithfulness audit of stored reasoning traces deferred to Phase 3 with a trigger condition; quality evaluation in Phase 6 relies on the Dan task suite first; automated drift detection is a Phase 3+ question._

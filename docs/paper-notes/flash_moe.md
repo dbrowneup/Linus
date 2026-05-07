@@ -154,3 +154,7 @@ proof of what disciplined Maestro-Worker collaboration can produce.
    Or is that too meta?
 3. Combining BitNet experts with Flash-MoE streaming would push the memory/quality frontier further. Realistic Phase 8
    direction, or premature?
+
+   _Partially resolved (DEC-0041, see [answered-questions.md](../questions/answered-questions.md)): minGRU + BitNet
+   cross-product adopted as Phase 8 long-horizon research direction; BitNet + Flash-MoE combination is an adjacent
+   speculation, not yet explicitly scoped (DEC-0041)._

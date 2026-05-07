@@ -91,5 +91,12 @@ against the existing KnowledgeBase store (or fork `DiscourseDiversity`), and tre
 - **Relationship to `infranodus-skills`.** That sibling repo assumes a hosted MCP server. If Linus re-implements the
   engine locally, do we also stand up an MCP server façade so the same skill prompts work unchanged against local data,
   or is that scope creep before Phase 3?
+
+  _Partially resolved (DEC-0018, DEC-0045): MCP adopted as extensibility substrate and fastmcp as the in-house MCP
+  framework default — a local infranodus façade would follow the same pattern when Phase 3 arrives._
+
 - **Neo4j.** DEC-0026/27 currently does not pick Neo4j. Does anything in InfraNodus's Cypher make a strong enough case
   to revisit that, or is the substrate decision settled and Cypher is just a reading exercise?
+
+  _Resolved (DEC-0015, see [answered-questions.md](../questions/answered-questions.md)): Dual approach (RDF + property
+  graph) is the settled substrate; Neo4j not adopted._

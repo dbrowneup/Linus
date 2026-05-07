@@ -55,6 +55,9 @@ well-maintained (by dlt-hub, with 1000s of production users), and fits Linus's "
 
 - **DuckDB as Linus's transactional store.** dlt works with many destinations; is DuckDB the plan for Phase 2a's
   metadata + corpus indexing, or is a different store (SQLite, Postgres) preferred?
+
+  _Partially resolved (DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): SQLite is the
+  chosen substrate for episodic and session stores; DuckDB not adopted; corpus analytics store TBD at Phase 2b._
 - **Schema contracts rigor.** Should Linus enforce contracts strictly (fail on mismatch) or log warnings? Depends on
   corpus quality assumptions.
 - **Incremental loading strategy.** For KnowledgeBase updates, should Linus re-ingest everything monthly or use dlt's

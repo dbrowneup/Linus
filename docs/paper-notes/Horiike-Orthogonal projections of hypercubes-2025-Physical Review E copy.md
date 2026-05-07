@@ -131,11 +131,7 @@ PCA is used in any Linus pipeline.
 1. **Why is this paper in your `context/papers/` folder?** Is it for the geometry methodology (visualization tool), the
    biology applications (Ising-as-Boltzmann ↔ gene regulation), or because of the surface-level "hypercube" word overlap
    with JPmHC? Knowing your motivation would refocus the note.
-2. **BitNet weight visualization**: would you find it useful if I drafted a small experiment spec —
-   `experiments/bitnet-weight-hypercube.md` — that takes a small BitNet checkpoint, extracts the sign-pattern of one
-   layer's weights, treats each input row as a hypercube vertex, and applies the PCA projection from this paper? It's
-   curiosity-driven, not Phase 6 critical, but might give surprising structural insight into what 1-bit LLMs encode.
-3. **Methodological methodology**: the paper's framing of "we want reproducible AND interpretable visualizations of
-   high-dim binary data" maps onto a question we'll have downstream when Linus produces visualizations of agent state,
-   KB structure, etc. Worth elevating as a Linus design principle (reproducibility + interpretability over fancy
-   stochastic methods)?
+2. _Resolved (T3.18 batch, see [answered-questions.md](../questions/answered-questions.md)): BitNet weight visualization
+   via the Horiike PCA-projection method resolved in the T3.18 batch of smaller open items._
+3. _Resolved (T3.16, see [answered-questions.md](../questions/answered-questions.md)): Reproducibility + interpretability
+   over fancy stochastic methods adopted as a Linus practice/stance (DEC-0027)._

@@ -176,6 +176,9 @@ Section 3.
    The Llama 3 paper covers it implicitly, but a focused reference (e.g., a recent survey or a clean blog post like
    Karpathy's nanoGPT writeups) might be a better daily-driver companion to this one. If yes, it's a small Worker task
    to find and download.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): infra-foundations-synthesis.md
+   Transformer stack section added covering RoPE, RMSNorm, SwiGLU, GQA, pre-norm conventions (S40)._
 2. **Attention-as-implementation-target paper.** Linus will eventually need to run attention efficiently on Metal/ANE.
    Should the corpus include FlashAttention-1/2/3 (Tri Dao) as the canonical "how attention is actually implemented on
    accelerators" reference? The original FlashAttention paper is short and load-bearing for any throughput conversation.

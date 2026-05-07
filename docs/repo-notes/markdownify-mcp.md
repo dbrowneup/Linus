@@ -57,4 +57,7 @@ workflows), test one transcript. This establishes the MCP-as-tool-substrate patt
   wait until KnowledgeBase v2 workflow is mature?
 - **Bing search tool.** Keep it in Linus MCP config or delete it from the tool registry to minimize API surface?
 - **Markdown validation post-conversion.** Should the KB ingestion tier validate Markdown structure and warn on
-  malformed output, or assume markitdown output is always clean?
+  malformed output, or assume markitdown output is always clean? _Partially resolved (DEC-0019, see
+  [answered-questions.md](../questions/answered-questions.md)): KB ingest quality gate is a quality surface not a hard
+  gate; validation warnings are consistent with that posture; specific Markdown structural checks remain to be
+  specified._

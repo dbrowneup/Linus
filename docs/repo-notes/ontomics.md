@@ -83,7 +83,7 @@ noticeably under active edit, fall back to grep + LSP and revisit when codesight
 - **MCP-as-substrate decision timing.** Cline, openclaw, pmetal, and ontomics all speak MCP. Adopting ontomics in Phase
   2a effectively forces Linus to stand up an MCP client/registry earlier than ROADMAP currently has it. Do we want to
   pull that decision forward to Phase 2a explicitly, or run ontomics out-of-band (registered per-front-end) until Phase
-  3?
+  3? _Resolved (DEC-0018, see [answered-questions.md](../questions/answered-questions.md)): MCP-as-tool-substrate is no longer an open question; MCP ADR should be written at Phase 2a planning time; ontomics can be registered per-front-end now and folded into the Phase 2a MCP registry as it stands up._
 - **Benchmark on a real Dan project.** The README's 20× claim is on voxelmorph and ScribblePrompt — clean ML repos.
   Should the Phase 1 benchmark suite include an "ontomics on KnowledgeBase" test (Python, mixed domain) to confirm the
   ratio holds on something messier?

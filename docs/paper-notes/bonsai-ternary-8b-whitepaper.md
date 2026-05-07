@@ -226,6 +226,9 @@ kernels would close the deployment-path gap noted in §2.3.
 1. **Phase 1c default:** confirm Ternary Bonsai 8B as the headline BitNet-class baseline for the spike, with BitNet 2B4T
    as the second comparison point and Ternary Bonsai 4B as the middle-of-fairway candidate that fits alongside two
    concurrent Workers in 32 GB.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Phase 1c four-way spike confirmed —
+   Bonsai 1-bit 8B, PrismML ternary 8B, BitNet 2B4T, FP16 baseline on M1 Max (S7)._
 2. **Sparsity probe:** worth a 30-minute experiment on the released checkpoint to measure the actual fraction of ternary
    weights that are zero. This number tells us how much a real ternary kernel would beat the 2-bit deployment path,
    which scopes the potential pmetal contribution.

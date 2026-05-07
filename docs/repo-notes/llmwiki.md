@@ -89,6 +89,8 @@ box, that may displace llmwiki as the reference.
 - **Claim-typing interop.** The security synthesis recommends content-hashing and typed claims for KB entries. llmwiki's
   `documents` table has a free-form `tags JSON` column and no claim type. Should a Linus port add a `claim_type` column
   and SHA-256 of canonicalized content from day one, or is that a Phase 3 concern?
+  _Resolved (DEC-0048, see [answered-questions.md](../questions/answered-questions.md)): `model_prediction` edge class
+  with content hash and claim typing added to KB schema; required before any skill writes back (S6)._
 - **Differentiator confidence.** I read llmwiki's code but only the group framing for the other ten siblings. Before
   committing to "Study" rather than something stronger, would you want the same depth of read on `wikiloom`,
   `TheKnowledge`, and `OmegaWiki` first to confirm llmwiki really is the cleanest reference and not just the first one

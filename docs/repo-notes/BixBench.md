@@ -97,5 +97,9 @@ private Dan-task-suite, especially for any genomics analysis tasks Dan curates f
 - **LAB-Bench in parallel.** The sibling repo LAB-Bench is the literature-reasoning counterpart to BixBench's
   notebook-execution focus. Worth standing both up in Phase 1, or prioritize BixBench as the more mission-aligned and
   treat LAB-Bench as a later add?
+
+  _Resolved (S11, see [answered-questions.md](../questions/answered-questions.md)): Both adopted for Phase 1; LAB-Bench
+  is the broader knowledge-axis baseline; BixBench is the agent-harness benchmark. Dan-authored tasks weighted more
+  heavily than either in Phase 1 decision-making._
 - **Frontier baselines.** Should the Linus scorecard list the v1.5 paper's GPT-4o / Claude-3.5-Sonnet numbers as a
   visible ceiling on every BixBench run, or leave them out so Worker progress is judged on its own trajectory?

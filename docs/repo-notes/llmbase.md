@@ -85,6 +85,9 @@ thought out and the live deployments are evidence it works at scale.
 - **Operations-registry adoption.** The `Operation(name, handler, params, writes, category)` + `dispatch()` pattern is a
   near-drop-in answer to Phase 2a's "one tool, three surfaces (CLI / OpenAI-compat HTTP / MCP)" problem. Adopt it as the
   Linus tool-registry shape, or design a different abstraction that better fits the Maestro/Worker delegation model?
+  _Partially resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP
+  adopted as extensibility substrate; fastmcp's decorator API is the in-house Linus server pattern; the specific
+  operations-registry shape for Phase 2a remains to be decided._
 - **Two-layer recall vs Qdrant.** llmbase makes a defensible no-vector-DB argument at personal scale (TF-IDF over
   compiled concepts + verbatim raw fallback). The KnowledgeBase submodule already commits to Qdrant. Is Phase 3 hybrid
   retrieval `Qdrant + BM25/TF-IDF + compiled concept layer`, or stay vector-first and treat llmbase's two-layer pattern

@@ -222,6 +222,9 @@ constraint rather than a slogan.
    mix during this mid-career window is itself a high-value activity, not a dilution of focus — so the current shape may
    already be the right one. But the implication is to _protect_ that mix, not just tolerate it. Worth being explicit
    about.
+
+   _Resolved (S39, see [answered-questions.md](../questions/answered-questions.md)): Deliberate multidisciplinary
+   allocation paragraph added to VISION.md "The long view" section._
 2. **Linus as crowd-out risk.** Should "preserve room for Dan's multidisciplinary work" be an explicit Linus design
    constraint? Concretely: a working tool should reduce the time Dan spends on bench work, reading, and cross-domain
    exploration _less_ than it accelerates the rest of his work. If Linus becomes so engrossing that it monopolizes
@@ -229,6 +232,9 @@ constraint rather than a slogan.
 3. **Design principle in VISION.md.** Is "Linus aids late-career multidisciplinary synthesis, not early-career narrow
    specialization" worth promoting from a paper-note observation to an explicit design principle? It would have
    downstream consequences for KnowledgeBase queries, Worker dispatch, and UX defaults.
+
+   _Resolved (S39, see [answered-questions.md](../questions/answered-questions.md)): Multidisciplinary allocation
+   principle added to VISION.md "The long view" section as a deliberate design practice._
 4. **Cross-domain framing in the skills synthesis.** Does the "domain expertise as moat" line in
    skills-and-practices-synthesis.md need to become "cross-domain expertise as moat"? The paper provides specific
    empirical grounding for the cross-domain version; the narrow version is the version everyone else is also pursuing.

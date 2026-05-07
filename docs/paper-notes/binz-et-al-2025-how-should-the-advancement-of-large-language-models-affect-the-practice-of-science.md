@@ -193,6 +193,10 @@ re-reading the Memory Architecture spec with Marelli in hand.
    paragraph naming the four perspectives — and identifying Linus as Schulz-on-open-source, Bender-on-bespoke-tools,
    Marelli-on-attribution, Botvinick/Gershman-on-roadmap-agency — converts implicit bets into explicit and reviewable
    design philosophy. Cheap, durable, immediately useful as context for future Maestro sessions. Worth doing?
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): VISION.md updated with Binz et al.
+   four-perspectives citation and Linus positioning (S36)._
+
 2. **Should the audit log design be re-examined against Marelli-style attribution requirements?** The CLAUDE.md "audit
    log" line item is currently a one-liner. Marelli implies a richer specification: per-output records of model, prompt,
    retrieved context, tool calls, claimed-vs-retrieved citations, timestamps — designed so the audit log alone could
@@ -201,6 +205,10 @@ re-reading the Memory Architecture spec with Marelli in hand.
    verification methods defined before using LLMs." A short doc (`docs/EPISTEMIC-STANDARDS.md` or similar) defining the
    categories of claims Linus distinguishes (verified-against-source, model-asserted-uncited,
    model-asserted-cited-but-unverified, etc.) would operationalize this. Phase 2 deliverable, or premature?
+
+   _Resolved (DEC-0048, see [answered-questions.md](../questions/answered-questions.md)): Deferred to Phase 2a; KB
+   schema (DEC-0048 model\_prediction edges) must exist first (S22)._
+
 4. **Which of the four perspectives most resonates with you personally, and is that reflected in the documentation?**
    The implicit answer in the current docs reads as a Marelli-flavored hybrid (principles-based,
    accountability-centered) with Botvinick/Gershman commitments on roadmap agency. Accurate? If so, the docs would be
@@ -210,6 +218,10 @@ re-reading the Memory Architecture spec with Marelli in hand.
    the eventual "Linus joins the Maestro team" line gestures at Schulz's looser stance. Worth making the limits
    explicit: Linus may _propose_ roadmap items but never _commit_ them, even when fully capable. One-line addition to
    ROADMAP.md or CLAUDE.md.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Schulz/Marelli/Botvinick-Gershman
+   Philosophy section added to maestro-worker-protocol.md naming blend and Linus operationalizations (S37)._
+
 6. **Reproducibility from proprietary providers — has the Schulz horror story already happened to your work?** Schulz et
    al. report a paper revision blocked by a silent provider-side model change. If anything similar has been at risk in
    Dan's hosted-Claude work, that's the strongest possible motivation for accelerating the Phase 2 MVP and pinning

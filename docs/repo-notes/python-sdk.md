@@ -106,4 +106,6 @@ saturated" mode), at which point the SDK becomes a candidate dependency rather t
   `python-sdk`/Speakeasy shape as the template)?
 - **Differentiation from `openrouter-skills`.** Do you see Linus ever adopting the Agent-Skills standard for its own
   local-routing skill pack — i.e. publishing `linus-skills` for Claude Code, Cursor, etc. — or is that overkill given
-  Linus is a backend, not an agent skill?
+  Linus is a backend, not an agent skill? _Partially resolved (E6, see
+  [answered-questions.md](../questions/answered-questions.md)): SKILL.md YAML-frontmatter markdown format committed as
+  the Phase 7 Linus domain-skills standard; the question of a linus-skills routing pack specifically remains open._

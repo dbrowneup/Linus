@@ -79,7 +79,7 @@ carefully. Nothing beyond that.
   other regions (fieldwork sites, travel) matter?
 - **Qdrant-in-Docker vs. native vector store.** NOMAD uses Qdrant because it's a general-purpose offering; Linus's
   KnowledgeBase currently uses numpy-based similarity search. Are we promising Qdrant in Phase 4 only if benchmarks
-  force it, or do you want it regardless for a smoother long-term path?
+  force it, or do you want it regardless for a smoother long-term path? _Partially resolved (S60, see [answered-questions.md](../questions/answered-questions.md)): Docker is acceptable for stateful services that don't need GPU/ANE (Qdrant is explicitly named); Qdrant-in-Docker is a valid Phase 4 option if numpy-based search benchmarks force it._
 - **Explicit sovereignty statement in VISION.md.** NOMAD's phrasing ("Knowledge That Never Goes Offline," zero
   telemetry, no authentication by default because the network boundary is the trust boundary) is crisper than Linus
-  currently articulates. Worth lifting into VISION.md?
+  currently articulates. Worth lifting into VISION.md? _Partially resolved (E1, see [answered-questions.md](../questions/answered-questions.md)): VISION.md now has an explicit open-source-by-default / sovereignty "Release posture" section; the offline/zero-telemetry framing is addressed there._

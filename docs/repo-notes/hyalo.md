@@ -88,6 +88,10 @@ winner, but the Rust-binary distribution and the planned-rewrite `mv` are strong
 - **hyalo vs keppi bake-off.** Want a 30-minute Phase-1 spike that runs the same five operations (find by tag, bulk set
   status, rename + link rewrite, lint with schema, summary) on a sample vault under both tools and writes the verdict as
   an ADR in `docs/adr/`?
+
+  _Resolved (DEC-0026, see [answered-questions.md](../questions/answered-questions.md)): Both hyalo and keppi adopted
+  as Phase 3 KB tooling layer (S26)._
+
 - **Schema design.** The pmetal-style `[schema.types.iteration]` block is appealing for Linus's `experiments/` and
   `docs/adr/` directories. Adopt the iteration-file convention (`iter-NN-slug.md`,
   `planned → in-progress → completed → superseded`) for our work, or keep our looser status quo?

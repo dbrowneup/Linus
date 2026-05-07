@@ -186,6 +186,9 @@ set.
    — Hamiltonian decomposition on a fixed digraph, or a Cayley-graph cycle problem) live in `benchmarks/dan_tasks/` as a
    _Maestro-class_ eval, explicitly distinguished from Worker-class evals? This would formalize the role distinction in
    the benchmark suite itself rather than only in protocol docs.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): 5-task inaugural Maestro-class suite
+   planned at `benchmarks/dan_tasks/maestro/`; Dan authors tasks, Claude Code writes harness (S23)._
 3. **Worker-tractable analog?** Is there a sub-problem here a 7B Worker could plausibly handle — e.g., DFS the m = 3
    case, generate the Cayley-graph reformulation given a hint, write the verification harness? Decomposing a
    Maestro-class problem into Worker-tractable sub-tasks is itself an exercise; Knuth's exploration log is unusually
@@ -198,3 +201,6 @@ set.
    object type, separate from chat history and KnowledgeBase entries, designed to hold plan.md-style logs as queryable
    artifacts? This would let future Maestro sessions reuse prior exploration structure ("we tried fiber decomposition
    for problem X, here's where it stalled") instead of restarting cold.
+
+   _Partially resolved (DEC-0039, see [answered-questions.md](../questions/answered-questions.md)): Episodic schema
+   for multi-step tasks uses hybrid leaf + summary records (DEC-0039); explicit "exploration trajectory" type deferred._

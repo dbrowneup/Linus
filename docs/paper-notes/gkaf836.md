@@ -198,6 +198,9 @@ Reference databases are a requirement REBEAN deletes.
 1. **Should "metagenomic enzyme annotation" be a first-class Linus skill — and if so, in Phase 7 or earlier?** This
    paper plus your domain expertise is the strongest concrete instance of a _uniquely-Linus_ tool we've identified so
    far. Worth a roadmap line item, or wait until openclaw/MVP is settled?
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): REBEAN+DeepSeMS is one of the Phase 7
+   first-three skill pairings; bioSkills bundle adopted as Phase 7 inaugural package (S30, S31)._
 2. **Is the Bitbucket release directly usable, or does it need an MLX port?** Action item: clone
    `bromberglab/rebeanpkg`, check framework + license + checkpoint format. At 1.66M parameters a PyTorch → MLX port is
    hours of work, not weeks. Worth queuing as an experiment when bandwidth allows.

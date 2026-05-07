@@ -92,6 +92,8 @@ internals.
 - **MCP timing.** OMEGA is MCP-first; Linus's ARCHITECTURE.md is OpenAI-compat-first with MCP as a Phase 3+ option (per
   cline.md and pmetal.md notes). Does OMEGA's existence — and the fact that Cursor / Claw Code / Windsurf / Cline /
   Codex all already speak MCP — pull MCP earlier in the roadmap?
+  _Resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as
+  extensibility substrate; fastmcp as default framework; in-house servers build on fastmcp decorator API._
 - **Hook collision risk.** OMEGA writes into `~/.claude/settings.json`, `~/.claude.json`, and `~/.claude/CLAUDE.md`.
   Linus will eventually want to write into the same files for its own session hooks. Should Linus's settings model
   reserve a namespaced block from the start to avoid collision with tools like OMEGA, or treat it as a Phase 5b problem?

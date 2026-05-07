@@ -27,6 +27,8 @@ Read context-degradation, memory-systems, and tool-design fully in Phase 1 closi
 ## 7. Questions for Dan
 
 - **Context windowing strategy.** The lost-in-middle / U-curve phenomenon is real; should Linus adopt summarization for long sessions (simpler) or multi-turn reranking (smarter)? What's Dan's tolerance for losing detail in old conversation?
+  _Partially resolved (DEC-0032, see [answered-questions.md](../questions/answered-questions.md)): Phase 2 default is
+  16K in-context cap with overflow routed through the episodic store via summarization-or-retrieval; reranking deferred._
 - **Memory-graph design pattern.** Should Linus's KnowledgeBase expose a flat list of documents, or teach Workers to query the graph structure (functions, classes, call chains)? How much graph literacy should Workers be expected to have?
 - **Tool complexity budget.** How many MCP tools should Linus expose to Workers before diminishing returns kick in? The tool-design skill suggests orthogonality; is there a "one tool per job" rule Linus should follow?
 - **Evaluation coverage.** Dan's benchmarks (Phase 1 task suite) should probably measure context-efficiency (tokens used, tool calls made) alongside accuracy. Should Phase 1 close with eval framework that tracks these, or is accuracy-only acceptable for now?

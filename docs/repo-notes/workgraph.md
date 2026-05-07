@@ -82,19 +82,20 @@ not adopt as a runtime dependency.
 
 ## 7. Questions for Dan
 
-- **Graph vs. list as the orchestration substrate.** workgraph commits to a DAG with `--after` edges, cycles, and a
-  `restart_on_failure` policy. claude-task-master commits to an ordered list emitted from a PRD. Which fits the kinds of
-  work you actually delegate to Workers — bench sweeps and ablations (graph-shaped, dependencies real) or per-paper
-  synthesis batches (list-shaped, embarrassingly parallel)?
-- **JSONL store at the orchestration layer.** ARCHITECTURE.md mentions a session store and an audit log without picking
-  a format. Adopting workgraph's `.workgraph/graph.jsonl` shape (append-only, one record per event, human-readable) for
-  Linus's session store would be cheap and git-friendly. Or do you want SQLite from day one for query power?
+- **Graph vs. list as the orchestration substrate.**
+  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): workgraph JSONL DAG recommended as Phase
+  2a session-store shape; both graph and list patterns accommodated._
+- **JSONL store at the orchestration layer.**
+  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): workgraph JSONL append-only shape
+  recommended for Phase 2a session store and audit log._
 - **Agency / auto-evaluate as Linus's verification layer.** workgraph's `## Validation` convention plus a haiku-pinned
   evaluator is a lightweight version of what SAFETY.md's autonomy tier graduation needs. Worth lifting the convention
   into Linus's Maestro/Worker protocol now, or keep verification human-in-the-loop until Phase 7?
 - **The macOS gap.** Tree-kill via `/proc` doesn't exist on M1. If Linus borrows the heartbeat pattern, we need a
   `kqueue`-based or `pgrep -P`-based equivalent. Worth writing as a small Phase 1f experiment, or accept that on macOS a
   stuck Worker is a `wg kill --force` command rather than an automatic recovery?
+  _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): `/proc` gap acknowledged;
+  macOS port requires psutil-based equivalent. Specific implementation plan still open._
 - **Composing workgraph with claude-task-master.** A plausible Group-7 verdict is "task-master plans, workgraph
   executes" — task-master emits the DAG, workgraph runs it. Is that interesting enough to prototype in Phase 3, or
   should Linus own both halves natively in Python?

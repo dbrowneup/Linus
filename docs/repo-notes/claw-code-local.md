@@ -56,6 +56,8 @@ Claude-Code-style REPL. Pin a specific commit and plan to revisit if the upstrea
 - **Phase 5c deferred-or-done?** claw-code-local essentially already solves the "Linus terminal surface" requirement.
   The roadmap's 5c fallback ("a small custom terminal agent (~500 lines of Python)") may be dead on arrival. Happy to
   mark Phase 5c as "adopt claw-code-local" in the roadmap if you agree.
+  _Resolved (DEC-0021, see [answered-questions.md](../questions/answered-questions.md)): Phase 5c formally adopts
+  claw-code-local; 500-line custom Python agent fallback removed from ROADMAP._
 - **Skill parity.** The fork exposes Claude Code's `/skills` command, which means Anthropic-shaped `SKILL.md` files work
   inside it. That aligns with Linus's Phase 7 skills direction. Want a Phase 1e smoke-test that runs a trivial
   Linus-defined skill through claw-code-local against Ollama?

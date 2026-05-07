@@ -61,9 +61,15 @@ and use it as the template for Linus's own Phase 6d results table. Do not try to
 - **"Trust the OS" as a Linus design principle.** The flash-moe finding that every custom cache lost to the OS page
   cache is a strong generalizable principle. Explicitly promote it to a Linus engineering convention in CLAUDE.md, or
   keep it implicit?
+
+  _Resolved (DEC-0027, see [answered-questions.md](../questions/answered-questions.md)): Adopted as CLAUDE.md
+  Engineering Convention; OS page cache trusted by default for all mmap'd/SSD-streaming workloads._
 - **Autoresearch + flash-moe methodology fusion.** Phase 7c's overnight iteration loop is essentially the flash-moe
   experiment log run as a supervised AI loop against a tok/s target. Is this the first concrete use case for the Phase
   3b parallel-agent infrastructure, or does it stay a later-phase thing?
 - **Objective-C / Metal-direct as an escape hatch.** If Linus ever needs flash-moe-level control — say, to beat pmetal
   on a specific workload — we'd be writing Obj-C and Metal by hand. That's a skill Dan doesn't currently have. Is
   acquiring it a Phase 7+ bet, or ruled out in favor of "whatever pmetal supports"?
+
+  _Resolved (DEC-0027, see [answered-questions.md](../questions/answered-questions.md)): Obj-C + Metal accepted as a
+  language escape hatch; Linus stays on public Apple APIs; pmetal is the primary path, not custom Obj-C._

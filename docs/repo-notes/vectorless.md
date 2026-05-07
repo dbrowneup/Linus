@@ -93,6 +93,9 @@ smaller idea (navigable-tree tools as MCP) into Linus's own KB tool registry.
   assumption with a measurement, or is the hybrid path (vectors for recall, navigation for precision) already settled?
 - **Tool surface as MCP.** The shell-command vocabulary (`ls`/`cd`/`cat`/`grep`/`concepts`/`chain`) is the most concrete
   reusable artifact. Is this a Phase 2 KB-tool-registry candidate, or does it wait for Phase 3 hybrid retrieval design?
+  _Partially resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP
+  adopted as extensibility substrate with fastmcp; whether this shell-command vocabulary enters Phase 2 KB registry is
+  still open._
 - **Failure-mode tolerance.** Vectorless's "model fails, we fail" stance is the opposite of Linus's preference for
   graceful degradation in worker pipelines. If we adopt the navigation pattern, do we want to keep the strict stance or
   add KnowledgeBase-style fallbacks (BM25 backstop when the agent gives up)?

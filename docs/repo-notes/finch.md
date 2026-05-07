@@ -96,5 +96,7 @@ include even if the image itself is rebuilt.
 - **Coupling to BixBench as the eval.** Does it make sense to run BixBench against Linus's own port of the finch loop as
   the Phase 7 acceptance test, or build a Dan-specific notebook benchmark in `benchmarks/dan_tasks/` that more closely
   matches your real workflow (the genomics/RNA-seq problems you actually do)?
+  _Partially resolved (S11, S12, see [answered-questions.md](../questions/answered-questions.md)): BixBench adopted as
+  Phase 1 agent-harness benchmark; Dan-authored tasks weighted more heavily; both run in parallel._
 - **Multi-language support.** Finch supports Python, R, and Bash via `NBLanguage`. R is a meaningful fraction of
   bioinformatics. Is keeping R kernel support in Linus a Phase 7 requirement, or is Python-only acceptable for v1?

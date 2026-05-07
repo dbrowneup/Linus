@@ -106,3 +106,5 @@ the assistant-development workflow (vs the chat workflow openclaw covers) clearl
 - **DEC-0002 reaffirmation.** After reading this, does the "framework-agnostic protocol over HTTP" shape change your
   conviction on owning the orchestration layer, or does it reinforce it (because the protocol surface is what's worth
   owning, not the service implementation)?
+  _Resolved (DEC-0002, see [answered-questions.md](../questions/answered-questions.md)): orchestration backend remains
+  the core Linus product; scope bounded to sandbox, KB, MCP registry, and audit log (DEC-0020)._

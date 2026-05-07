@@ -61,6 +61,6 @@ implementation of the orchestration layer that can be tested against the Dan tas
   pydantic?
 - **The graph library for multi-step tasks.** Some of Dan's domain tasks (e.g., "analyze a paper, then run a
   computational workflow") map naturally to DAGs. Is pydantic-graph's type-hint syntax worth adopting, or keep agent
-  control flow as imperative loops?
+  control flow as imperative loops? _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): Workgraph JSONL append-only DAG is the recommended Phase 2a session-store and audit-log format; pydantic-graph as a control-flow layer is not committed but not excluded._
 - **Capabilities for Linus plugins.** Pydantic AI capabilities bundle {tools, instructions, model tweaks}. Should Linus
-  adopt this pattern, or is it over-engineered for Linus's tool + instruction model?
+  adopt this pattern, or is it over-engineered for Linus's tool + instruction model? _Partially resolved (DEC-0046, DEC-0050, see [answered-questions.md](../questions/answered-questions.md)): Tool registry has a deployment field (local/mcp/external_api); Role bundles capability_set + memory_access_tier — similar to Capabilities pattern but Linus-native._

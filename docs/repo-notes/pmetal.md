@@ -70,6 +70,8 @@ If it wobbles, fall back to Ollama + mlx-lm-ft and revisit pmetal at a later rel
 - **pmetal-mcp as Linus's tool registry path.** pmetal already ships 45 tools via MCP. Is that a serious candidate for
   the Phase 2a tool registry (Linus wraps pmetal-mcp + adds KnowledgeBase tools), or should Linus own tool definitions
   entirely and pmetal-mcp is study material?
+  _Partially resolved (DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): Linus owns in-house
+  tool definitions via fastmcp; pmetal-mcp consumed as external server, not the registry foundation._
 - **Dependency risk.** pmetal is one developer's project. It's impressive and signed, but single-maintainer risk is
   real. If adopted deeply, what's the fallback plan — pin a commit and accept no updates, or maintain readiness to
   migrate to mlx-lm + Ollama if pmetal goes stale?

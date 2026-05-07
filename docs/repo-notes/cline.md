@@ -63,10 +63,18 @@ becomes the dominant harness only after 1–2 phases of real use.
 - **Harness plurality.** You'll plausibly run Claude Code (Maestro), Cline (VS Code worker tasks), claw-code-local
   (terminal tasks), and openclaw (chat/voice) — all pointing at Linus. That's four front-ends. Is that the intended
   end-state, or is there a desire to converge on fewer once one proves out?
+
+  _Resolved (DEC-0017, see [answered-questions.md](../questions/answered-questions.md)): Harness plurality maintained
+  through Phase 5 with explicit role designations; convergence empirical not policy._
+
 - **MCP as the extensibility substrate.** Cline, openclaw, and pmetal all speak MCP. Adopting MCP as the
   tool-registration surface inside Linus is a plausible Phase 3 move — it means tools registered once are visible in all
   harnesses without custom glue. Architecturally cleaner, but carries MCP's complexity. Want to revisit this decision
   explicitly in Phase 3?
+
+  _Resolved (DEC-0018, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as the Linus
+  extensibility substrate; Phase 3 policy details (which tools, permissions, transport) remain open._
+
 - **Variant prompts for small / 1-bit models.** Cline's `xs` variant exists because tiny models need substantially
   different prompts. When Linus's Phase 6 produces a fine-tuned 1-bit model, it will likely need its own variant too.
   Plan for this in Phase 7 skills design, or defer?

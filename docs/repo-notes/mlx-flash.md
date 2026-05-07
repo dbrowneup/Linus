@@ -60,13 +60,13 @@ which task class.
 
 - **mlx-flash vs. flash-moe philosophically.** Same problem, different tradeoff: mlx-flash is framework-integrated +
   zero quality loss + predictive scheduling; flash-moe is bespoke + aggressively quantized
-  - manual pipeline. Which style should Linus prefer when forced to choose?
+  - manual pipeline. Which style should Linus prefer when forced to choose? _Resolved (S20, see [answered-questions.md](../questions/answered-questions.md)): Phase 6d targets mlx-flash for LoRA'd Qwen3-32B streamed from SSD; mlx-flash is the preferred path for models genuinely exceeding 32 GB RAM at native precision._
 - **The native-precision claim on M1 Max.** Nemotron-30B on a 16 GB Air at bit-perfect parity is the README headline;
   the unstated question is _tok/s_. Worth a small benchmark to see what native- precision streaming costs on your
   hardware before committing to it as a serving path.
 - **Streaming + 1-bit as a composite path.** Running a 1.58-bit 30B (hypothetical Ternary-Bonsai-30B) with mlx-flash
   streaming is combinatorially more memory-efficient than either alone. Is this a Phase 6d experiment target, or does it
-  wait until PrismML trains a large ternary Bonsai?
+  wait until PrismML trains a large ternary Bonsai? _Partially resolved (S20, see [answered-questions.md](../questions/answered-questions.md)): Phase 6d framing positions mlx-flash for ≥32 GB models; Bonsai 8B at 1.75 GB does not need streaming; ternary-30B combination deferred until PrismML produces a large ternary model._
 - **Hybrid KV cache as a Linus feature.** The 128-token FP16 + older- 8-bit disk-offloaded KV cache pattern is useful
   even without weight streaming. Should it be part of Phase 2a's minimum feature set, or deferred until a concrete
   long-context use case surfaces?

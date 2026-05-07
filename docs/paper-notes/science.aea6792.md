@@ -206,6 +206,10 @@ covers internal-state inspection of inference; this is unique in Group F.
    tooling). Worth deciding before mlx-lm integration solidifies. Recommend: stub `linus.observability.activations.*`
    API in ARCHITECTURE.md now, no-op for Ollama, real hooks for mlx-lm in Phase 6/7.
 
+   _Resolved (DEC-0054, see [answered-questions.md](../questions/answered-questions.md)): Activation hooks API stub
+   (`ActivationHooks` class, all no-ops) committed in `src/linus/` Phase 1; Phase 2 feasibility spike for mlx-lm
+   residual-stream exposure; Phase 6 steering ADR if spike passes._
+
 2. **Is real-time activation monitoring a feasible Phase 7 sandbox primitive on M1 Max, or too expensive?** The probe
    itself is small (a linear classifier over ~`L·p` features), but capturing per-block activations during generation has
    memory and latency cost. Worth a back-of-envelope estimate against Llama-3.1-8B-4bit on an M1 before committing to
@@ -215,6 +219,10 @@ covers internal-state inspection of inference; this is unique in Group F.
    supervised steering being cheaper than fine-tuning is strong. Should Linus's roadmap add an explicit "steering before
    fine-tuning" Phase 6 milestone — i.e., try to achieve a desired behavior with RFM steering first, escalate to LoRA
    only if steering is insufficient?
+
+   _Partially resolved (S47 / DEC-0054, see [answered-questions.md](../questions/answered-questions.md)): Activation
+   hooks stub covers the Phase 1 infrastructure prerequisite. Steering-vs-LoRA sequencing decision deferred to Phase 6
+   planning after the Phase 2 feasibility spike result._
 
 4. **Does this technique work on BitNet / extreme-quantized models?** The paper validates 4-bit Llama, which is
    reassuring, but BitNet's ternary weights and severely-quantized activations might break the linearity assumption that

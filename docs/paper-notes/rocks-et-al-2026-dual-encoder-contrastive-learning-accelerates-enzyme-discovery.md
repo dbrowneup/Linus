@@ -196,6 +196,9 @@ option. Measure first.
    created now, with Horizyn-1 as the lead worked example, so future Group C papers (and any future cross-modal
    scientific retrieval system) can reference it? The pattern is general enough that it deserves a permanent home.
 
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Pattern named "dual-encoder
+   cross-modal retrieval" and added to GLOSSARY.md with Horizyn-1 as primary example (S33)._
+
 3. **Comparison with tools you actually use:** How does Horizyn-1 compare in your hands to existing tools — DLKcat
    (kinetic prediction), ECnet/CLEAN (EC classification), or Foldseek (structural similarity)? The paper compares
    against CLIPZyme, BLAST, MMseqs2, and Foldseek and wins, but a domain practitioner's view on whether the predicted

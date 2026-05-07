@@ -215,12 +215,18 @@ suggestive of a design pattern, not proof of one.
 1. **Goal-congruence as a Worker-spec field.** Should the standard Worker spec template gain a
    `goal_orientation: [exploit | explore]` field, so the orchestration layer can decide whether two specs can batch into
    one Worker session or must be sequenced across sessions? Cheap to add and falsifiable.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Deferred to Phase 3 spawner spec;
+   optional annotation, not a Phase 2 hard requirement (S38)._
 2. **Learning-type tag on tasks.** Should each Worker spec be tagged with one of the four learning types — `reflexive`,
    `experimental`, `vicarious`, `contextual` — so a session-rhythm metric can be computed (e.g., "this session opened
    reflexive, did three experimentals, never returned — lacks the law-of-return")?
 3. **A "rhythm" health metric for Linus sessions.** Could the orchestration layer (or a post-session reviewer) score
    sessions for rhythm — alternation between reflexive checkpoints and experimental spikes, with reflexive bookends —
    and surface low-rhythm sessions for review? Testable on existing session logs without any architecture change.
+
+   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Compute session-rhythm metric
+   retrospectively on existing commit history first; prototype script in `experiments/` before prospective gate (S59)._
 4. **Skills synthesis update.** Should `docs/syntheses/skills-and-practices-synthesis.md` cite this paper as the
    empirical-team-research grounding for the parallel-Worker decomposition claim?
 5. **Session-template formalization.** The session-startup protocol is the opening reflexive bookend;

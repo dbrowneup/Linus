@@ -83,10 +83,14 @@ wants to fine-tune a domain-specific tool-selection policy.
 - **KnowledgeBase vs paper-qa division of labor.** KnowledgeBase already does PDF ingest, metadata, and a knowledge
   graph. Should paper-qa replace KnowledgeBase's retrieval/synthesis (KB stays corpus-of-record), or run alongside it as
   a second engine, or is the right move to fork paper-qa and graft KnowledgeBase's KG into the `GatherEvidence`
-  re-ranker?
+  re-ranker? _Resolved (DEC-0044, see [answered-questions.md](../questions/answered-questions.md)): paper-qa adopted as
+  Phase 2c retrieval-and-synthesis engine; KB stays corpus-of-record; Phase 3 swaps KB's retrieval layer to paper-qa's
+  tantivy index._
 - **Local-LLM floor.** Paper-qa explicitly warns 7B is too weak. Does the Phase 2c plan target Qwen2.5-14B as the
   default worker, accept the quality hit on 7B, or wait for a Phase 6 fine-tune that's specifically tuned for the
-  RCS/tool-selection prompts?
+  RCS/tool-selection prompts? _Resolved (DEC-0044, S12, see [answered-questions.md](../questions/answered-questions.md)):
+  Qwen3 (replacing Qwen2.5) as the minimum Worker floor; Qwen2.5-14B-Instruct or equivalent is the paper-qa local
+  minimum per DEC-0044._
 - **Citation accuracy as a metric.** The "superhuman" claim is largely about citation precision/recall vs human experts
   on LitQA2. Is that worth replicating as a Linus benchmark in `benchmarks/dan_tasks/` against your own biochem PDFs, or
   is "Dan's subjective satisfaction on real questions" the better signal?
@@ -95,4 +99,6 @@ wants to fine-tune a domain-specific tool-selection policy.
   figure retrieval), defer to a later phase, or run it selectively on starred papers?
 - **FutureHouse stack commitment.** Adopting paper-qa pulls in `fhlmi` and `fhaviary` as runtime deps and makes `ldp` an
   obvious Phase 6 candidate. Comfortable making FutureHouse a strategic upstream for Linus's scientific reasoning layer,
-  or do you want a paper-qa-only integration with an exit ramp?
+  or do you want a paper-qa-only integration with an exit ramp? _Resolved (DEC-0044, see
+  [answered-questions.md](../questions/answered-questions.md)): paper-qa-only integration committed for Phase 2c;
+  aviary and ldp deferred to Phase 6 if domain-specific fine-tuning of tool-selection is needed._

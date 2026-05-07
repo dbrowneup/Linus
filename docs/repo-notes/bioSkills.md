@@ -92,9 +92,15 @@ that is a strong argument for bundling skills with every Linus instance.
   scientifically: is this an evaluator saturation problem (rubric too coarse), is Intermediate actually too easy, or
   does in-context skill priming genuinely fail to help on multi-step tasks where the bottleneck is judgment rather than
   API recall? The answer changes how aggressively Linus should bet on skills as an autonomy-graduation lever.
+  _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): bioSkills adopted as Phase 7
+  inaugural bundle with a pre-launch A/B measurement gate; if no measurable lift on judgment-heavy tasks, skills launch
+  as opt-in rather than default-on (S30). Plateau mechanism remains an open empirical question._
 - **Local-model amplification.** The biggest gain (+0.049) was on Codex 5.4-Mini, the weaker model. Hypothesis: smaller
   / local models benefit more from skill priming than Sonnet does. Worth running bioSkills against Qwen2.5-Coder-32B and
   a future Linus fine-tune on the same 33-test BTB to test this empirically before Phase 7?
+  _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): S30 calls for re-running
+  Bio-Task Bench against the chosen Phase 2a worker model (Qwen3) before Phase 7; local-model amplification hypothesis
+  will be tested then._
 - **Heavy CLI tool surface.** ~25 Bioconda CLIs (samtools, bcftools, MACS3, IQ-TREE2, PLINK, ADMIXTURE, Salmon, STAR,
   Bakta, BRAKER3, …) need to be present for the skills to actually run. Make this a single conda env Linus manages, or
   per-project, or document and let the user provision?

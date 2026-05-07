@@ -88,6 +88,9 @@ from PyPI and wrap.
 - **LAB-Bench as a Maestro/Worker delta target.** LAB-Bench is published, with hosted-frontier scores presumably
   available. Worth running a local Qwen-Coder-32B vs. hosted-Claude head-to-head on LitQA2 / FigQA to size the gap
   before committing to fine-tuning?
+  _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): LAB-Bench MCQ-with-refusal
+  adopted as the Worker quality ceiling reference benchmark (S11); head-to-head run and fine-tuning gate remain open
+  pending Phase 1c data._
 - **Notebook environment as Linus's notebook tool.** The `aviary.notebook` package is a working Docker-sandboxed Jupyter
   executor. Adopt it as Linus's first sandboxed-code-execution skill in Phase 7, or roll a simpler `nbclient`-based
   local executor and accept lower isolation?

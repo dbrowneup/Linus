@@ -27,6 +27,11 @@ Use Vanna's tool-base-class design and user-context-injection pattern as the blu
 ## 7. Questions for Dan
 
 - **Custom Linus tools vs. MCP + Vanna pattern.** Should Linus tools follow Vanna's `Tool(BaseModel)` with permission checks, or use a simpler registry (just function + metadata)? Is the extra abstraction worth it for Phase 2a, or overkill?
+  _Resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP is the
+  extensibility substrate; fastmcp `@mcp.tool()` decorator API is the default for in-house Linus servers._
 - **User context flow.** Vanna threads User through every tool call automatically. Should Linus Workers be aware of their caller (Dan), or is that audit/logging-only? Does audit context need to flow into the task spec or just the log?
+  _Partially resolved (DEC-0050, DEC-0031, see [answered-questions.md](../questions/answered-questions.md)): Role
+  carries `memory_access_tier`; `memory_mode` and `cot_budget` are audit-logged per call; per-tool caller propagation
+  TBD in Phase 2a orchestration spec._
 - **Tool lifecycle hooks.** Vanna has pre-call (quota) and post-call (logging) hooks. For Linus, are there pre/post-tool scenarios worth supporting, or is a flat "execute + log" model enough?
 - **Streaming responses.** Vanna's web component consumes streamed JSON chunks (table, chart, text). If Linus ever needs a chat UI, should it support streaming or batch-return results? Does incremental feedback matter for Linus tasks (typically short, ~minutes)?

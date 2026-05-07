@@ -70,7 +70,9 @@ write our own in `.github/workflows/` rather than vendor or fork this repo.
 - **Group recategorisation.** prompt-vault is mis-shelved in Group 4 (cross-session persistent memory). It is a prompt
   library with one tangentially memory-adjacent piece (the Obsidian playbook). It probably belongs in a different group,
   perhaps with other "prompt patterns / agent-skill cookbooks" repos if any exist later, or it should be declassified
-  out of the curated set entirely. Want to move it?
+  out of the curated set entirely. Want to move it? _Resolved (see
+  [answered-questions.md](../questions/answered-questions.md)): S41 — G4 synthesis assigns prompt-vault an Ignore
+  verdict explicitly; repo is a prompt cookbook, not memory infrastructure._
 - **Auto-ADR cron.** The `auto-document-agent.md` pattern (run `git diff main` on a branch, emit an ADR if the change is
   architectural) would pair well with this repo's own DEC-NNNN discipline. Worth a small Phase 1c experiment to bolt
   onto our existing `.claude/settings.json` hooks, or premature?

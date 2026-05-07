@@ -95,3 +95,7 @@ or a Worker LLM. If MPS inference is unworkable, demote to study material until 
 - **Pretraining ambitions.** Phase 6 is fine-tuning on Apple Silicon. The 26M base model with a small LoRA on a bespoke
   corpus (e.g., your own genome collection) is plausibly tractable on M1 Max. Worth scoping as a Phase 6 candidate
   alongside the language-model fine-tunes, or strictly out of scope?
+
+  _Partially resolved (S31, see [answered-questions.md](../questions/answered-questions.md)): Bacformer+DeepSeMS is
+  a Phase 7 generalist × specialist pairing target. Phase 6 fine-tuning scope for the 26M base model not yet
+  explicitly decided._
