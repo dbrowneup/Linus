@@ -202,9 +202,100 @@ Dan reviews the audit log:
   - Anthropic API (only from hosted-Claude harnesses — not from Linus backend)
   - CrossRef REST (for KnowledgeBase metadata enrichment, consistent with KB's policy)
   - Wikipedia/Kiwix mirrors (Phase 4, user-approved)
-  - PyPI / conda-forge / crates.io (only for explicit package installs with confirmation)
+  - PyPI / conda-forge / crates.io (only for explicit package installs with confirmation; experimental packages always
+    go in disposable `uv` envs per DEC-0024, never in the linus conda env)
 
 Anything else is a confirmation event.
+
+## Supply Chain Incident Response
+
+Trigger conditions, containment, credential rotation, and attestation procedures for confirmed or suspected supply chain
+compromise (DEC-0024). Drafted ahead of any incident so under-stress execution is reliable.
+
+### Trigger conditions
+
+- `pip-audit` reports a HIGH or CRITICAL CVE in an installed package.
+- A package suddenly publishes a new release with an anomalous version-jump or unverified signing.
+- An unknown subprocess, network connection, or filesystem write originates from a Worker session and cannot be traced
+  to known tool calls.
+- An external advisory (Snyk, GitHub security advisory, project blog) names a package currently installed.
+- A package's behavior changes between sessions despite no version change in `requirements-locked.txt` (hash mismatch
+  detected).
+
+### Containment
+
+1. **Pause all in-flight Worker sessions** (`pkill -f ollama serve` if needed; close all VS Code Cline sessions; close
+   openclaw if active).
+2. **Snapshot the audit log** at `~/.linus/audit.jsonl` to a safe location
+   (`~/.linus/incidents/<YYYY-MM-DD>-audit.jsonl`).
+3. **Identify the compromised package's access scope:** what files, paths, and network resources did Worker sessions
+   touch since the package was last updated? Use the audit log.
+4. **Tear down the linus conda env:** `conda env remove -n linus`. Do not reuse the existing env even after a package
+   upgrade — adversarial state may persist in pip caches, byte-compiled `.pyc` files, or modified site-packages.
+5. **Disable Worker autonomy temporarily:** revert to Tier 0 (read-only) until attestation completes.
+
+### Credential rotation scope and order
+
+Rotate in this order (not in parallel — each rotation is auditable and recoverable):
+
+1. Anthropic API key (highest priority — all hosted Claude sessions).
+2. GitHub PAT / SSH keys (if the compromised package had filesystem access to `~/.ssh/` or `~/.config/gh/`).
+3. Hugging Face token (if the package may have accessed it).
+4. Any other API keys ever loaded into the env (review `~/.linus/audit.jsonl` to identify).
+
+### Attestation: verifying the rebuilt env is clean
+
+1. Recreate the linus env from `environment.yml` + `requirements-locked.txt` with hash verification:
+   `pip install --require-hashes -r requirements-locked.txt`.
+2. Run `pip-audit` against the fresh env; verify zero HIGH/CRITICAL CVEs.
+3. Compare installed package versions against the lock file — exact match required.
+4. Run a clean smoke test (Phase 1c spike, single config) in the rebuilt env; verify behavior matches pre-incident
+   baseline.
+5. Document the incident in `docs/incidents/<YYYY-MM-DD>-<short-name>.md`: timeline, scope, response actions,
+   lessons learned, policy updates (e.g., add a package to a permanent blocklist).
+6. Resume normal autonomy tier only after all five attestation steps complete.
+
+### `pip-audit` CVE response (non-incident, routine)
+
+`pip-audit` runs monthly per DEC-0024. CVE response by severity:
+
+- **CRITICAL:** treat as confirmed incident — invoke containment + rotation + attestation.
+- **HIGH:** triage → patched-version check → if available, env rebuild + lock-file regeneration; if not, document
+  mitigation in `docs/security-log.md`.
+- **MEDIUM:** queue for next quarterly curation review.
+- **LOW / informational:** note in `docs/security-log.md`; no action unless it ages out without remediation.
+
+## Generative biology — three-tier biosecurity policy
+
+Applies to any Linus skill or Worker task that generates or predicts biological sequences (DEC-0047). Three tiers based
+on genomic scope:
+
+**Tier A — Residue-level design (no gate).** Single-residue mutation prediction, small peptide design (<50 residues),
+protein-property prediction. No special approval required. Output tagged `biosecurity_tier: A` in the audit log.
+
+**Tier B — Gene-level design (sign-off required per invocation).** CDS/codon-level generation, gene-scale scaffold
+design, multi-gene pathway reconstruction. Requires explicit per-invocation Dan sign-off before tool call executes.
+Output tagged `biosecurity_tier: B`.
+
+**Tier C — Whole-genome design (sign-off + out-of-band review).** Whole-genome scaffold generation, phage genome
+assembly from scratch, chromosome-scale design. Requires explicit per-invocation Dan sign-off AND a separate
+out-of-band review before execution. Tool call refuses without both approvals. Output tagged `biosecurity_tier: C`.
+
+Tool registry entries for biology-generative tools must include a `biosecurity_tier` field. Workers invoking biology
+tools check this field at dispatch time and enforce the appropriate gate.
+
+## KnowledgeBase → hosted-Maestro flow policy
+
+KB content reaching a hosted-Maestro context (Claude API, Claude.ai) is governed by a `hosted-ok` / `hosted-forbidden`
+binary tag applied at ingest time (DEC-0053). Conservative default: new records tagged `hosted-forbidden` unless
+explicitly upgraded.
+
+- `hosted-ok`: published papers, public reference databases, public ontologies.
+- `hosted-forbidden`: Dan's personal notes, draft writing, financial data, LanzaTech proprietary data, anything from
+  `context/` that is not already public.
+
+Enforcement: the retrieval layer strips `hosted-forbidden` content before any prompt sent to a hosted model. No
+override at query time — only the ingest-time tag governs.
 
 ## Claude Code specific
 
