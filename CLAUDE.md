@@ -37,6 +37,8 @@ atom.
 - **Currently learning**: Rust, nodejs/npm, agentic systems, LLM inference/fine-tuning. Calibrate explanations
   accordingly — deep biology/Python/Linux fluency, newer to systems-language idioms and modern JS tooling.
 - **Hardware**: MacBook Pro 2021, Apple M1 Max, 32 GB unified memory, 10 CPU / 24 GPU / 16 ANE cores.
+- **Storage**: 400 GB available internal SSD; 1 TB external flash SSD with ~600 GB available, attached as needed.
+- **Location**: Hawthorn Woods, Illinois (greater Chicago area).
 
 ## North Star
 
@@ -107,8 +109,10 @@ working.
   optimized for Apple Silicon.
 - **Ollama** is the first worker-model server; runs on port 11434 via `brew services`.
 - **Rust** is installed inside the linus conda env via `conda install rust` (needed for pmetal).
-- **uv** is installed inside the linus conda env for fast Python package operations when needed (e.g.,
-  autoresearch-mlx).
+- **uv** is installed inside the linus conda env via conda. uv is the **disposable-env tool of choice** for
+  experimental packages: untrusted or experimental Python packages always run in a fresh `uv venv`, never installed
+  into the linus conda env. The linus conda env is the production substrate (hash-pinned); uv envs are scratch space
+  discarded after the experiment (DEC-0024).
 - **node/npm** installable inside conda env if openclaw or other JS-based components are used.
 - **poppler** is available via a Homebrew install to read PDF files in the context folder.
 
@@ -185,7 +189,7 @@ See [ROADMAP.md](ROADMAP.md) for full detail. Current phase markers:
             │  OpenAI-compatible HTTP
             ▼
   LINUS ORCHESTRATION LAYER  ← the product
-    router · tool registry · agent spawner · sandbox · session store · audit log
+    router · MCP tool registry · agent spawner · sandbox · session store · audit log
             │
     ┌───────┼───────┐
     ▼       ▼       ▼
@@ -295,6 +299,56 @@ Caveat: workgraph's tree-kill is Linux `/proc`-only; macOS port needs a `psutil`
 When interacting with hosted Claude (via Claude Code or this chat): arrive with context gathered, questions sharpened,
 and the task well-specified. Don't use Maestro tokens to read files Claude can't cache; pull excerpts and paste. Don't
 use Maestro tokens for well-specified implementation; hand the spec to a Worker.
+
+### Trust the OS page cache
+
+The flash-moe empirical finding — that a 9.8 GB Metal LRU cache wrapping mmap'd weight shards hurt throughput by 38%,
+and deleting it restored performance — is a Linus engineering convention (DEC-0027). Before designing custom caching for
+any data-streaming or weight-streaming workload, default to trusting macOS's unified page cache. Only build custom
+caching when measurement demonstrates the OS cache underperforms.
+
+### Public APIs only
+
+Linus's own code stays on supported public Apple APIs (CoreML, MLX, Metal). No reverse-engineering of Apple's private
+APIs (DEC-0027). pmetal uses supported APIs; the ANE reverse-engineering repo in `repos/ANE/` is methodology reference
+only, not vendored. If pmetal goes dormant, the fallback (Ollama + mlx-lm-ft) is fully public-API.
+
+### Multi-language stance
+
+Python is the core orchestration language. Components in Rust (pmetal, claw-code, claw-code-local),
+JavaScript/TypeScript (openclaw, some npm tooling), and Bash (stringing CLI tools) are acceptable when they fit the task
+(DEC-0027). No single-orchestration-language policy. Choose the language that fits the component.
+
+### Curation cadence
+
+`repos/`, `context/`, and `docs/` grow rapidly with reference material. Apply the curation protocol at
+`docs/protocols/curation-protocol.md` (DEC-0025): quarterly review with an explicit archive or removal pathway; removed
+content recorded in `docs/curation-log.md` with rationale and timestamp. Apply The Algorithm at each review: question
+every requirement; delete what no longer earns its keep. Next scheduled review: 2026-08-01.
+
+### Planning write-back cadence
+
+Every multi-question Maestro/Dan planning session closes with explicit time allocated for core-file write-back:
+CLAUDE.md, VISION.md, ROADMAP.md, ARCHITECTURE.md, SAFETY.md, DECISIONS.md, and relevant landscape and spec docs
+(DEC-0026). The natural artifact is a `docs/specs/planning-update-spec.md` (rewritten per session) that routes edits to
+the right files and then deploys Workers to execute them.
+
+### Memory pillar discipline
+
+Memory is a load-bearing architectural pillar (DEC-0028). Five layers: intra-step latent (Layer A), within-session
+scratchpad (Layer B), cross-session episodic (Layer C, SQLite + content hashes + git), investigation memory (Layer D,
+task-scoped multi-agent), and semantic knowledge (Layer E, KnowledgeBase). Implementation contract:
+[`docs/specs/memory-architecture.md`](docs/specs/memory-architecture.md).
+
+Three discipline rules apply across all Worker work:
+
+- **Scratchpad is durable.** Reasoning tokens are first-class addressable artifacts (DEC-0030); silently truncating
+  reasoning between turns is forbidden.
+- **Context is a resource to manage, not a capacity to fill.** Phase 2 default in-context cap: 16K tokens per Worker
+  call (DEC-0032); overflow routes through the episodic store; explicit cap-bypass is audit-logged.
+- **Memory mode is dispatch-time-explicit.** Every Worker call carries a `memory_mode`
+  (`stateless` / `session_stateful` / `project_stateful`) and a `cot_budget` (`logarithmic` / `linear` / `polynomial`)
+  per DEC-0031. Both recorded in the audit log.
 
 ### Typed structured prediction for biology skills (resolved 2026-05-06, S25)
 
@@ -438,6 +492,10 @@ column budget — paragraphs become long lines wrapped at 120, not the older 60�
 was bulk-reformatted in a single commit (see git log for `[format] prettier --write`); subsequent edits should not
 produce noisy reformatting diffs. Prettier also normalizes heading style, list marker style at true list positions
 (distinguishes from in-prose `+`), trailing whitespace, and final newlines.
+
+**Disposable uv envs for experimental packages.** Untrusted or experimental Python packages always go in a fresh
+`uv venv`, never `pip install` into the linus conda env (DEC-0024). The linus env is the production substrate,
+hash-pinned and audited. Create with `uv venv .venv && source .venv/bin/activate`; discard after the experiment.
 
 ---
 
