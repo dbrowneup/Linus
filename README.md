@@ -102,10 +102,9 @@ pip install -e .
 # 4. Verify
 python -c "import linus; print(linus.__version__)"
 
-# 5. Start Ollama and pull the worker model
+# 5. Start Ollama and pull the worker model (current floor: Qwen3 — best-available for 32 GB M1 Max)
 brew services start ollama
-ollama pull qwen2.5-coder:7b
-ollama pull mistral:7b-instruct
+ollama pull qwen3:14b   # or qwen3:8b depending on memory headroom; selection finalized in Phase 1c
 
 # 6. (Phase 2+) Launch the Linus backend
 # python -m linus.server  # not yet implemented

@@ -1,5 +1,23 @@
 # Planning Update Spec — revised 2026-05-06
 
+> **Status: COMPLETE (2026-05-07).** All seven Worker tasks were delivered, reviewed, and merged into `main`. This
+> document is preserved as the historical execution record for the planning arc that ran 2026-05-03 through
+> 2026-05-07; the next planning session will rewrite this file from scratch per the planning-write-back-cadence
+> convention (DEC-0026, CLAUDE.md). Per-task merge log:
+>
+> | Task | File(s)         | PR  | Merged                |
+> | ---- | --------------- | --- | --------------------- |
+> | A    | CLAUDE.md       | #18 | 2026-05-07 (Task A redo; original PR #12 was an empty-diff merge — see session summary for the incident) |
+> | B    | VISION.md       | #13 | 2026-05-07            |
+> | C    | ARCHITECTURE.md | #14 | 2026-05-07            |
+> | D    | ROADMAP.md      | #15 | 2026-05-07            |
+> | E    | SAFETY.md       | #16 | 2026-05-07            |
+> | F    | 3 new specs     | #17 | 2026-05-07            |
+> | G    | 4 KB-spec items | #11 | 2026-05-07            |
+>
+> Pre-release tags: `v0.1.0` (before merges), `v0.2.0` (after merges). Session recap:
+> [`docs/session-summaries/planning-update-execution-session-summary-2026-05-07.md`](../session-summaries/planning-update-execution-session-summary-2026-05-07.md).
+
 Actionable Worker tasks synthesizing all Maestro/Dan planning sessions from 2026-05-03 through 2026-05-06. Covers Tier
 0/1/2/3 + Memory Pillar M1–M17 + Sweep S1–S60 + Entrepreneurship E1–E12 resolutions. The question archive lives at
 [`docs/questions/answered-questions.md`](../questions/answered-questions.md). All ADRs live at
@@ -7,7 +25,7 @@ Actionable Worker tasks synthesizing all Maestro/Dan planning sessions from 2026
 
 ---
 
-## Audit summary (2026-05-06)
+## Audit summary (2026-05-06; superseded by status header above)
 
 ### DONE — no Worker action needed
 
@@ -29,20 +47,21 @@ Actionable Worker tasks synthesizing all Maestro/Dan planning sessions from 2026
   shared_context disambiguation; Qwen3/Ollama entries updated.
 - **`docs/questions/top-questions.md`**: All Tier 1, 2, 3 and Entrepreneurship items cleared.
 
-### NOT-STARTED — Worker tasks below
+### Worker tasks (now COMPLETE — see status header at top of file)
 
-Seven independent Worker tasks, all parallelizable (different files). Read **§ Worker context** before executing any
-task.
+Seven independent Worker tasks, all parallelizable (different files). All seven were merged 2026-05-07. Read
+**§ Worker context** below for the contract that governed execution; the per-task instructions remain as the
+historical record of what each Worker delivered.
 
-| Task | File(s)       | Rough size |
-| ---- | ------------- | ---------- |
-| A    | CLAUDE.md     | ~80 lines added |
-| B    | VISION.md     | ~50 lines added |
-| C    | ARCHITECTURE.md | ~120 lines added |
-| D    | ROADMAP.md    | ~180 lines added |
-| E    | SAFETY.md     | ~120 lines added |
-| F    | 3 new spec docs in `docs/specs/` | ~300 lines total |
-| G    | 3 new KB-spec docs in `docs/specs/kb/` | ~150 lines total |
+| Task | File(s)       | Rough size       | Merged PR |
+| ---- | ------------- | ---------------- | --------- |
+| A    | CLAUDE.md     | ~80 lines added  | #18       |
+| B    | VISION.md     | ~50 lines added  | #13       |
+| C    | ARCHITECTURE.md | ~120 lines added | #14     |
+| D    | ROADMAP.md    | ~180 lines added | #15       |
+| E    | SAFETY.md     | ~120 lines added | #16       |
+| F    | 3 new spec docs in `docs/specs/` | ~300 lines total | #17 |
+| G    | 4 new KB-spec docs in `docs/specs/kb/` | ~150 lines total | #11 |
 
 ---
 

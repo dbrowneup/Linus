@@ -1,7 +1,8 @@
 # Maestro/Worker Protocol
 
 This document describes the end-to-end workflow for delegating tasks from Maestro (Dan, operating via hosted Claude /
-Claude Code) to Workers (local models like Qwen2.5-Coder via Ollama, or future autonomous Linus agents).
+Claude Code) to Workers (local models — Qwen3 is the current floor for 32 GB M1 Max, served via Ollama; future
+autonomous Linus agents will inherit this protocol).
 
 The protocol ensures safe, auditable, traceable work and keeps Dan in the review loop while enabling parallel task
 execution.
@@ -237,7 +238,7 @@ git commit -m "Implement KB sync job with apscheduler
 
 ...
 
-Co-Authored-By: Ollama-Qwen2.5-Coder <noreply@ollama.local>"
+Co-Authored-By: Ollama-Qwen3 <noreply@ollama.local>"
 ```
 
 ### 3c. Test

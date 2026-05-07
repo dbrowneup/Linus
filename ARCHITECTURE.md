@@ -141,8 +141,11 @@ Useful for safety review, usage analysis, and autonomy graduation criteria.
 Stored under `src/linus/skills/<skill_name>/SKILL.md`. Invoked via the `linus.skill.invoke` tool. Phase 7 is when domain
 skills bloom.
 
-**Memory.** Deferred. Start with session history in the session store. A proper memory layer (long-term facts about Dan,
-preferences, past-conversation retrieval) is a Phase 3+ addition. Don't over-engineer before the need is concrete.
+**Memory.** First-class architectural pillar at Phase 2 (DEC-0028). Five layers (A–E) per DEC-0052; Phase 2 ships
+Layers B (within-session scratchpad), C (cross-session episodic SQLite + content hashes + git), and E
+(KnowledgeBase). Layer A (intra-step latent) stays implicit at v0; Layer D (investigation memory) ships in Phase 3
+alongside the multi-agent spawner. See the **Memory pillar** section below and
+[`docs/specs/memory-architecture.md`](docs/specs/memory-architecture.md) for the implementation contract.
 
 **RAG gateway.** Thin adapter layer between Linus's tool registry and KnowledgeBase's existing retrieval infrastructure.
 Adds caching, query logging, and the ability to fuse multiple retrieval sources (SPECTER2 + TF-IDF + KG) into a single
