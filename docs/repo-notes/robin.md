@@ -89,9 +89,6 @@ for Crow/Falcon or if a credible local literature-QA stack (paper-qa against Kno
 - **Prompt-validator convention.** Robin's "regex-parse `{placeholders}` and assert against an expected set at model
   construction" pattern would have caught half the KnowledgeBase prompt-template bugs. Worth adopting as a Linus prompt
   convention now, before there are many prompts to retrofit?
-- **paper-qa + KnowledgeBase as the local Crow replacement.**
-  _Resolved (DEC-0044, see [answered-questions.md](../questions/answered-questions.md)): paper-qa adopted as Phase 2c
-  KB retrieval engine; Robin pipeline is the natural Phase 7 skill on top._
 - **Therapeutics scope.** Robin's domain is small-molecule drug discovery for human disease via cell-culture assays —
   adjacent to but not the same as your genomics/computational-biology focus. Is a Robin-style "hypothesis pipeline"
   skill on Linus actually something you'd use, or is the value purely "study the patterns, build something different"?

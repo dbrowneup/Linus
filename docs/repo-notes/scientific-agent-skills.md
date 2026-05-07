@@ -100,12 +100,6 @@ hundreds of pre-documented entry points without writing any of them from scratch
 
 ## 7. Questions for Dan
 
-- **Skill format lock-in.** Adopting the Anthropic Agent Skills standard for Linus's tool registry means committing to
-  Claude-flavored markdown + YAML frontmatter as the source of truth. This is becoming a multi-vendor standard, but
-  Linus could alternately wrap each skill in a Linus-native tool definition. Commit to Agent Skills as Linus's native
-  format in Phase 7, or treat it as one of several formats the registry consumes?
-  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): YAML-frontmatter SKILL.md is the
-  committed Phase 7 standard; evaluate alternatives only if a concrete deficiency appears on real tasks (E6)._
 - **bioSkills vs. scientific-agent-skills overlap policy.** Both will install — bioSkills covers ~438 workflow skills,
   scientific-agent-skills covers 135 tool/database skills, and their bio-database surfaces overlap. Do we install both
   with namespacing (`bio/atac-seq`, `sci/scanpy`) and let agent skill-selection resolve, or do we curate a merged

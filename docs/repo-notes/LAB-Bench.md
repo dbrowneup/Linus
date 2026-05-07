@@ -104,9 +104,3 @@ train or fine-tune on a leaked LAB-Bench record.
 - **DbQA as a Phase 7 skill driver.** The 9 DbQA subtasks each correspond to a different biological database (GTRD,
   miRNA targets, oncogenic signatures, viral PPI, etc.). Do you want Linus's Phase 7 skill set to track this list — one
   domain tool per database — or is this too narrow vs. the actual queries you run day-to-day in your own work?
-- **Canary hygiene.** The canary string is a superset of BIG-bench's. Should it go into a single
-  `benchmarks/canaries.txt` file plus an ingestion-time grep block in KnowledgeBase, or does the KB submodule already
-  have a contamination-filter hook we should extend?
-
-  _Resolved (S2, see [answered-questions.md](../questions/answered-questions.md)): Workflow-separation rule, not a
-  code blocklist. LAB-Bench JSONL goes in `benchmarks/` only; derived tasks authored fresh; no ADR needed._

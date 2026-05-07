@@ -99,12 +99,6 @@ chat-history ingest from his own DMs/Discords (unlikely on the current roadmap).
 
   _Partially resolved (DEC-0015, see [answered-questions.md](../questions/answered-questions.md)): Dual approach
   adopted (RDF via rdflib/SPARQL + property graph); both are Phase 3 KB substrates; Weaviate/Neo4j not adopted._
-- **Google ADK as an orchestration framework.** Beever's pipeline is expressed as ADK `SequentialAgent` /
-  `ParallelAgent` rather than ad-hoc Python. Is ADK on the table for Linus's orchestration layer, or do we want to own
-  the agent-graph abstraction ourselves to keep the dependency surface small?
-
-  _Resolved (DEC-0002, DEC-0020, see [answered-questions.md](../questions/answered-questions.md)): Linus owns its
-  orchestration layer; ADK not adopted; scope is sandbox + KB + MCP registry + audit._
 - **MCP tool surface.** Beever ships 16 tools through `fastmcp`. Is the Phase 2/3 plan for Linus's MCP surface similarly
   scoped (discovery, retrieval, graph traversal, long-running ops), or narrower for v1?
 

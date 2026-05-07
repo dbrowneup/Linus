@@ -94,11 +94,6 @@ you are running iii-engine.
   _Partially resolved (DEC-0022, see [answered-questions.md](../questions/answered-questions.md)): Parallel Worker KB
   write coordination resolved as serialized writes + write-time contradiction surfacing; lease/signal/checkpoint
   vocabulary for Phase 3 still open._
-- **iii-engine evaluation.** It's a real piece of engineering and not crazy as a Worker-orchestration runtime in its own
-  right. Worth a 30-minute look before fully closing the door, or are you firm that Linus's runtime is Python
-  orchestration over SQLite and iii is out of scope full stop?
-  _Resolved (DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): SQLite + content hashes + git
-  committed as the Phase 2 v0 substrate; iii-engine dependency is out of scope._
 - **Headline-benchmark interpretation.** The 95.2% R@5 LongMemEval-S number is with embeddings on but LLM compression
   off (the no-op default). Should Linus replicate LongMemEval-S as part of the Phase 2 episodic-memory acceptance
   criteria, and if so against the same `all-MiniLM-L6-v2` baseline so numbers are comparable across group repos?

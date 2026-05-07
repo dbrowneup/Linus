@@ -89,17 +89,3 @@ string) is the right shape for Linus's KB tools, or whether a native Linus tool 
 - **Hybrid retrieval order.** Keppi's MCP server hard-codes `semantic_search → keyword_search → graph traversal`. For
   paper retrieval the natural order may invert (citation-graph expansion from a known paper, then semantic re-rank). Do
   we want a single canonical retrieval recipe in Phase 3, or pluggable strategies per task type?
-- **`hyalo` vs `keppi` for vault interop.** If Linus eventually mounts your personal Obsidian vault as a corpus, do we
-  pick one of these two, or compose them — keppi for traversal, hyalo for authoring/synthesis?
-  _Resolved (S26, see [answered-questions.md](../questions/answered-questions.md)): hyalo for lint + transactional link
-  rewrites; keppi for bounded-BFS-with-decay context_pack retrieval; both Phase 3 KB tooling layer._
-- **MCP-as-tool-surface revisited.** Keppi, pmetal, and Cline all ship MCP servers. Phase 3's tool-registry decision is
-  becoming load-bearing; is now the time for an ADR on "MCP as Linus's tool surface vs. native registry," or does it
-  stay open until we have a working KB tool to register?
-  _Resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as
-  extensibility substrate; fastmcp as default in-house framework; external servers consumed as-is (S3)._
-- **Context-pack as a Linus primitive.** `context_pack(topic, token_budget) → reading set` is exactly the shape of a
-  Linus tool a Worker would call before starting a task. Want to spec this as a Phase 2a/3 primitive explicitly, or wait
-  until a concrete Worker workflow demands it?
-  _Resolved (S26, see [answered-questions.md](../questions/answered-questions.md)): keppi adopted as Phase 3 KB
-  tooling; context_pack retrieval pattern is the targeted capability (bounded-BFS-with-decay)._

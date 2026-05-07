@@ -91,14 +91,6 @@ complementary, not competing.
 - **Codesight on non-web Python.** The detectors are tuned for web frameworks (routes, ORMs, components). On a pure
   numerical/scientific Python repo with no routes and no ORM, the output may be mostly the dependency graph and env
   vars. Is that still worth the tool slot, or should we bake a science-flavored variant later?
-- **MCP tool registry shape.** codesight, ontomics, fastmcp, qmd, vectorless, WeKnora are all candidates for the Phase
-  2/3 tool surface. Do we want to settle the MCP-as-registry question (raised in cline.md, openclaw, pmetal-mcp) before
-  adding any of them, or pick one as a forcing function?
-
-  _Resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as
-  extensibility substrate; fastmcp as the default in-house MCP framework. codesight and ontomics both integrate as
-  complementary Phase 2a tool slots (S27)._
-
 - **Differentiator I could not pin down.** I can distinguish codesight from ontomics confidently, but the line between
   codesight's wiki-mode and a vectorless/WeKnora retrieval pass is fuzzy when the source is markdown rather than code.
   Worth comparing those three explicitly in a follow-up note before Phase 3 retrieval design lands.

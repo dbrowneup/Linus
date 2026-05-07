@@ -76,28 +76,12 @@ wrong scale ceiling. The 1-2 hours spent reading it pay off as KB-spec input, no
 
 ## 7. Questions for Dan
 
-- **Boundary call.** Engram's wiki-shaped "memory" is Layer D in Garrison's framing. Do you agree the Linus memory
-  pillar should keep Layer C (episodic, DEC-0029 SQLite) and Layer D (semantic, KnowledgeBase) as fully separate
-  substrates with separate write paths, and treat anything wiki-shaped as Layer D regardless of marketing?
-
-  _Resolved (DEC-0028, DEC-0052, see [answered-questions.md](../questions/answered-questions.md)): Five-layer memory
-  pillar confirmed; Layer C (episodic/SQLite) and Layer E (semantic/KnowledgeBase) are fully separate substrates with
-  separate write paths._
-
 - **Lint as a Layer C verb.** Engram's `lint` finds contradictions, stale entries, orphans across the corpus. The
   episodic spec has consolidation (DEC-0039) but no integrity pass. Is a periodic LLM-mediated "audit your own episodic
   store for contradictions" worth a DEC slot, or premature?
 - **Write-time-synthesis vs. write-time-raw.** DEC-0029 stores raw turns + content hashes (write-time-raw). Engram does
   write-time-synthesis (LLM rewrites the corpus on every save). For the KB write side specifically — does Linus want
   ingestion to do engram-style synthesis into the KB, or stay raw-ingest with retrieval-time synthesis?
-- **Strict Pydantic on LLM tool outputs.** Engram validates every LLM response before acting. The Linus tool registry
-  spec is silent on this. Should the orchestration layer make Pydantic-validated LLM outputs a default contract for any
-  tool whose effect is mediated by the LLM's response?
-
-  _Resolved (S25, see [answered-questions.md](../questions/answered-questions.md)): Typed structured prediction with
-  free-text rationale adopted as CLAUDE.md Engineering Convention for any biology or domain skill producing a predictive
-  output — Pydantic-validated outputs are the standard shape._
-
 - **Differentiator confidence.** Within Group 4, engram is the clearest "wiki, not memory" outlier; the others
   (agentmemory, anamnesis, omega-memory, remember, prompt-vault, openaugi, memex) are presumably more episodic-shaped.
   Worth deferring final layer-C-substrate ADR refinements until the rest of the group is noted, in case one of them has

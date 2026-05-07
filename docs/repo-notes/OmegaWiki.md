@@ -75,13 +75,6 @@ surface.
 
 ## 7. Questions for Dan
 
-- **Skill standard adoption.** OmegaWiki uses the Anthropic Skills format (`SKILL.md` + on-demand `references/`)
-  verbatim. Should Phase 7 commit to this as Linus's skill standard so skills written for Linus are also loadable by
-  hosted Claude Code, or do we want a Linus-native format that local workers handle better?
-
-  _Resolved (E6, see [answered-questions.md](../questions/answered-questions.md)): YAML-frontmatter markdown with
-  single `skill` tool is the committed Linus Phase 7 standard (ROADMAP.md Phase 7a updated). Evaluate alternatives
-  only if a concrete deficiency is demonstrated on real Linus tasks._
 - **Claim / experiment / idea entities in KnowledgeBase v1.** OmegaWiki's wiki schema treats `claims`, `experiments`,
   `ideas`, and `failure_reason` as first-class. Should Phase 2 KB adopt that vocabulary now (cheap while the schema is
   still soft) or stay paper-centric until a real research workflow forces the question?

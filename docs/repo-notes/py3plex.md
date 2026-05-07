@@ -107,8 +107,3 @@ Claude Code, and see whether the DSL holds up under real KB queries before commi
 - **Formal verification adoption.** CrossHair + icontract + z3 is a serious testing posture. Adopting even just
   icontract `@require`/`@ensure` for Linus's tool registry and sandbox boundary code would be cheap and high-value. Want
   to add this as a Known Library / Engineering Convention now, or wait for a concrete pain point?
-- **MCP-as-tool-substrate, again.** py3plex ships an MCP server alongside pmetal's, openclaw's, and Cline's MCP support.
-  The Phase 3 question — "is MCP the tool-registration substrate?" — keeps recurring. Three serious local-AI-adjacent
-  projects in this repo collection have already answered yes. Time to make the call?
-  _Resolved (DEC-0018, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as Linus
-  extensibility substrate; fastmcp is the default in-house framework (DEC-0045)._

@@ -88,13 +88,6 @@ or run Codebuff or Freebuff as part of Linus — the cloud-and-ads economics def
   Claude Code via Anthropic's API with bypass-permissions, prompted by a Codebuff-authored Prompting Agent, judged by
   three Gemini 2.5 Pro instances. Each of those is a knob that could tilt the result. Worth replicating before citing?
   If so, that's a Phase 1b-ish exercise that needs OpenRouter and Anthropic API budget.
-- **Agent-definition shape.** Codebuff's `SecretAgentDefinition` (model, prompt, toolNames, spawnableAgents, handleSteps
-  generator, outputMode) is a concrete TypeScript schema. Linus has not committed to a worker-definition schema yet.
-  Adopt this shape directly (in Python/Pydantic), translate to a YAML-first format, or design fresh?
-
-  _Resolved (DEC-0050, DEC-0051, see [answered-questions.md](../questions/answered-questions.md)): Role is a
-  first-class type (role_id, capability_set, memory_access_tier, critic_eligible); AgentReport is the typed inter-agent
-  message format; Phase 3 spawner spec will finalize._
 - **Inline context-pruner pattern.** Buffy spawns `context-pruner` _every step_ via `spawn_agent_inline`. That is one
   way to keep long sessions tractable; it costs a model call per turn. Worth evaluating against the alternatives
   (LLMLingua, summarization checkpoints, SCoT/Letta-style memory) for Linus's Phase 3?

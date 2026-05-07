@@ -79,12 +79,6 @@ decision-log mechanism become directly useful and TradingAgents may graduate to 
 
 ## 7. Questions for Dan
 
-- **Domain transfer of the bull/bear debate.** The most interesting Linus-applicable idea here is the structured
-  adversarial debate between two researchers over a shared report set. Is there a scientific-workflow analog you'd want
-  Linus to run — e.g., "supports hypothesis" vs "alternative explanation" debate over a set of paper summaries from
-  KnowledgeBase — and if so, should the Phase 3 spec include it explicitly or wait for Phase 7?
-  _Resolved (E4/S55, see [answered-questions.md](../questions/answered-questions.md)): Adversarial debate as Worker
-  primitive deferred to empirical testing in dan_tasks; do not architect for debate now._
 - **Two-tier LLM split as a Linus convention.** TradingAgents' `deep_think_llm` / `quick_think_llm` distinction is a
   clean pattern — analysts on a cheap fast model, managers on a strong model. Should Linus formalize this as a config
   convention (and as a Maestro/Worker boundary marker) in ARCHITECTURE.md before Phase 3?

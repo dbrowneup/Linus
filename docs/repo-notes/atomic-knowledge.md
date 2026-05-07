@@ -88,12 +88,6 @@ focused half-day read with the example KB open beside the schemas.
   LLM-Wiki siblings. With the protocol-first framing being the loudest. Does that match what you noticed reading them,
   or is there a fourth angle (the candidate-lifecycle state machine? the `evals/` acceptance scripts?) that landed
   harder for you?
-- **Single-writer assumption.** The protocol presumes one agent maintaining one KB at a time. Phase 3 wants parallel
-  workers. Is the right pattern per-worker scratch KBs that get merged into a canonical KB by Maestro, or one shared KB
-  with file-level locking — and either way, is that a problem worth solving in Phase 2 or deferring to Phase 3?
-
-  _Resolved (DEC-0022, see [answered-questions.md](../questions/answered-questions.md)): Serialized writes through a
-  coordinator with write-time contradiction surfacing; Phase 3 spec target._
 - **Autonomy-tier alignment.** AGENT.md says "ask before deletes, archives, bulk cleanup, large restructures." SAFETY.md
   is going to want a more graduated tier model. Do we want to write the mapping (Atomic Knowledge's prompt rules →
   Linus's autonomy tiers) as an explicit ADR, or treat the AK defaults as Tier-0 and graduate from there in Phase 7?

@@ -182,22 +182,15 @@ set.
    `docs/repo-notes/` (Knuth, Tao's blog posts, the residue paper [10] above, and similar)? It is a small corpus that
    calibrates expectations and provides discussion fodder; not load-bearing for any single phase, but useful when
    arguing about Maestro/Worker boundaries with future collaborators.
-2. **Maestro-class benchmark?** Should a small open combinatorial problem (smaller than Knuth's, but in the same family
-   — Hamiltonian decomposition on a fixed digraph, or a Cayley-graph cycle problem) live in `benchmarks/dan_tasks/` as a
-   _Maestro-class_ eval, explicitly distinguished from Worker-class evals? This would formalize the role distinction in
-   the benchmark suite itself rather than only in protocol docs.
-
-   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): 5-task inaugural Maestro-class suite
-   planned at `benchmarks/dan_tasks/maestro/`; Dan authors tasks, Claude Code writes harness (S23)._
-3. **Worker-tractable analog?** Is there a sub-problem here a 7B Worker could plausibly handle — e.g., DFS the m = 3
+2. **Worker-tractable analog?** Is there a sub-problem here a 7B Worker could plausibly handle — e.g., DFS the m = 3
    case, generate the Cayley-graph reformulation given a hint, write the verification harness? Decomposing a
    Maestro-class problem into Worker-tractable sub-tasks is itself an exercise; Knuth's exploration log is unusually
    well-suited as a source because the steps are already labeled.
-4. **plan.md as protocol mandate?** The forced-documentation pattern Stappers used — "update before doing anything else,
+3. **plan.md as protocol mandate?** The forced-documentation pattern Stappers used — "update before doing anything else,
    no exceptions" — should that become a default in the Maestro/Worker protocol document, with a settings.json hook that
    enforces it for long-running Worker sessions? The cost is near zero; the upside is recoverability when Workers fail
    mid-task (which they will).
-5. **Trajectory store in the memory pillar?** Should the memory architecture have an explicit "exploration trajectory"
+4. **Trajectory store in the memory pillar?** Should the memory architecture have an explicit "exploration trajectory"
    object type, separate from chat history and KnowledgeBase entries, designed to hold plan.md-style logs as queryable
    artifacts? This would let future Maestro sessions reuse prior exploration structure ("we tried fiber decomposition
    for problem X, here's where it stalled") instead of restarting cold.

@@ -91,10 +91,3 @@ those revisits requires keeping the clone; the repo can be deleted from `repos/`
 - **Anti-pattern enforcement.** The LangChain/LangGraph removal was decided once. Is it worth a one-line lint check or a
   pre-commit hook that flags `import langchain` / `from langgraph` to keep that decision from drifting back in via
   copied tutorial code?
-- **Granite as a worker model.** IBM's Granite 3.x models are Apache-2.0 and available via Ollama. Do they merit a
-  benchmark slot in the Phase 1c worker-model bake-off alongside Qwen2.5-Coder and Mistral-7B, or is the 3B/8B Granite
-  family not competitive enough on your task suite to spend the eval cycles?
-
-  _Resolved (S7, S12, see [answered-questions.md](../questions/answered-questions.md)): Phase 1c four-way bake-off
-  fixed at Bonsai 8B 1-bit, PrismML ternary 8B, BitNet 2B4T, and FP16 baseline; Qwen3 is the Worker floor. Granite not
-  in the Phase 1c slate._

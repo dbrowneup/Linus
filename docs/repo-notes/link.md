@@ -86,13 +86,6 @@ story (BM25, embeddings, claim-typing) with comparable simplicity, prefer that o
 - **Confidence tags vs. claim-typing.** The security synthesis argues for typed claims with content-hashed identifiers;
   Link uses inline `[confidence: high/medium/low]` strings in prose. Are those compatible — confidence as a field on a
   typed claim — or does adopting claim-typing mean abandoning Link's prose-friendly tagging?
-- **MCP as the KnowledgeBase tool surface.** Link ships `link-mcp` as the agent-facing API. Phase 3 was scoped as
-  "deeper KB integration" without committing to a protocol. Should Linus's KB tools be MCP-native from the start so that
-  any harness (Cline, Claude Code, openclaw, claw-code) gets KB access for free?
-
-  _Resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as
-  extensibility substrate; in-house KB tools will use fastmcp. KnowledgeBase access will be MCP-native._
-
 - **Wiki maintenance as a Worker job.** The Link model is "agent ingests, agent compiles, agent maintains." On Linus
   that's a Worker loop running on Qwen2.5-Coder or a future fine-tuned Linus. Is wiki maintenance a good first
   long-running Worker task to design around in Phase 3, or does it belong later?

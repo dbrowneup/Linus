@@ -27,9 +27,5 @@ Not for direct adoption, but the agent orchestration and error-recovery patterns
 ## 7. Questions for Dan
 
 - **Vision-to-code in Linus's domain.** Would a sketch-based bioinformatics workflow generator (genes → proteins → pathways as sketches) be a Phase 3/4 Linus feature, or out of scope?
-- **Fixer agent applicability.** The error-recovery loop here (execute → detect → fix) could extend to code generation (generate → lint → fix → test). Is this a Phase 6 pattern Linus should prototype?
-  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Spawner-based per-stage validation hooks
-  adopted (execute → detect → fix, fixer-agent as separate spawned Worker); this is a Phase 2a+ orchestration primitive,
-  not Phase 6._
 - **Local vision models.** Qwen VL 8B runs locally via Ollama. Is local vision-capability on the M1 Max a Linus stretch goal (Phase 6+), or deferred?
 - **Instruction file brittleness.** The regex-based template marker extraction is fragile. If Linus builds similar code-generation pipelines, should it invest in AST-based extraction or structured code IR from the start?

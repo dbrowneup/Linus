@@ -82,12 +82,6 @@ not adopt as a runtime dependency.
 
 ## 7. Questions for Dan
 
-- **Graph vs. list as the orchestration substrate.**
-  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): workgraph JSONL DAG recommended as Phase
-  2a session-store shape; both graph and list patterns accommodated._
-- **JSONL store at the orchestration layer.**
-  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): workgraph JSONL append-only shape
-  recommended for Phase 2a session store and audit log._
 - **Agency / auto-evaluate as Linus's verification layer.** workgraph's `## Validation` convention plus a haiku-pinned
   evaluator is a lightweight version of what SAFETY.md's autonomy tier graduation needs. Worth lifting the convention
   into Linus's Maestro/Worker protocol now, or keep verification human-in-the-loop until Phase 7?

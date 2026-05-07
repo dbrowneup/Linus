@@ -80,19 +80,9 @@ re-implement in-house.
 - **Financial-intelligence priority.** The total-landscape doc lists financial knowledge as a desired Linus skill. Is
   that a near-term Phase 7 target (build a Linus equivalent of Dexter against free data sources) or a "nice eventually"
   marker that can sit until later phases?
-- **Compaction prompt as Phase 2 starting point.** Dexter's compact.ts prompt is a strong, tested template for
-  "summarize tool results without losing numbers." Want to lift it directly into the Linus context-manager spec, or
-  design from scratch and use Dexter only as a sanity check?
-  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Dexter two-tier compaction pattern
-  (microcompact + full-compact) lifted into Phase 2 context-manager spec as a design constraint (E5)._
 - **Single-agent vs multi-agent default.** Dexter explicitly bets on one capable agent; TradingAgents and QuantAgent bet
   on committees. Linus's Phase 3 ("Knowledge & Parallel Agents") implies fan-out is desirable. Do we treat Dexter's
   single-agent-loop shape as the per-Worker default and reserve multi-agent for orchestration above it, or design for
   committee-style debate within a single Worker too?
-- **SKILL.md as the Linus skill format.** Dexter, Anthropic, and others are converging on YAML-frontmatter markdown for
-  skill definitions. Adopt the same format for Linus's Phase 7 skill catalog so skills are portable, or specify a
-  Linus-native format with richer typing?
-  _Resolved (see [answered-questions.md](../questions/answered-questions.md)): YAML-frontmatter markdown (`SKILL.md`) is
-  the committed Linus Phase 7 standard; evaluate alternatives only if a concrete deficiency surfaces (E6)._
 - **WhatsApp / phone interface.** Out of scope for Linus's current roadmap, but the Baileys gateway is a working pattern
   for "Linus you can text from a hike." Worth a Phase 8 placeholder, or actively not-wanted on privacy grounds?

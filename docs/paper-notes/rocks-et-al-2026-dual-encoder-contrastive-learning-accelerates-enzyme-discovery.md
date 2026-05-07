@@ -192,32 +192,25 @@ option. Measure first.
    Silicon via PyTorch-MPS, but a clean MLX port would be cheaper at inference time. Worth checking before committing to
    a Phase 7 skill spec.
 
-2. **Architectural pattern as named synthesis:** Should `docs/syntheses/dual-encoder-cross-modal-retrieval.md` be
-   created now, with Horizyn-1 as the lead worked example, so future Group C papers (and any future cross-modal
-   scientific retrieval system) can reference it? The pattern is general enough that it deserves a permanent home.
-
-   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Pattern named "dual-encoder
-   cross-modal retrieval" and added to GLOSSARY.md with Horizyn-1 as primary example (S33)._
-
-3. **Comparison with tools you actually use:** How does Horizyn-1 compare in your hands to existing tools — DLKcat
+2. **Comparison with tools you actually use:** How does Horizyn-1 compare in your hands to existing tools — DLKcat
    (kinetic prediction), ECnet/CLEAN (EC classification), or Foldseek (structural similarity)? The paper compares
    against CLIPZyme, BLAST, MMseqs2, and Foldseek and wins, but a domain practitioner's view on whether the predicted
    enzymes are _actually useful starting points for engineering_ is worth more than the benchmark numbers.
 
-4. **Phase 7 skill scoping:** Is `enzyme-match` (reaction → ranked enzymes) niche enough that it should wait until Phase
+3. **Phase 7 skill scoping:** Is `enzyme-match` (reaction → ranked enzymes) niche enough that it should wait until Phase
    7, or general enough — given biocatalysis is a recurring theme in your work — that a thin wrapper around the released
    weights belongs in Phase 3 alongside KnowledgeBase v1? The 14 GB embedding store fits the M1 Max comfortably.
 
-5. **Reaction-fingerprint dependency surface:** Horizyn-1 relies on RDKit (ECFP6) and DRFP for reaction encoding. If
+4. **Reaction-fingerprint dependency surface:** Horizyn-1 relies on RDKit (ECFP6) and DRFP for reaction encoding. If
    Linus already needs RDKit for KnowledgeBase chemistry parsing, this is free. If not, it's a moderate dependency to
    add. Worth confirming the chemistry-tooling decision once, ahead of any skill that touches molecular representations.
 
-6. **Pair with REMME/REBEAN and METL?** The natural Linus packaging is a three-skill biocatalysis trio: REMME/REBEAN
+5. **Pair with REMME/REBEAN and METL?** The natural Linus packaging is a three-skill biocatalysis trio: REMME/REBEAN
    (find candidate enzymes from sequence data), Horizyn-1 (match candidates to target reactions), METL (engineer the
    chosen enzyme via small-data prediction). Should this trio be planned as a unit for Phase 7, or are they three
    independent skills that happen to compose well?
 
-7. **Active-learning loop:** The paper points to a "lab-in-the-loop" active learning strategy in the discussion — the
+6. **Active-learning loop:** The paper points to a "lab-in-the-loop" active learning strategy in the discussion — the
    model nominates the next reaction to characterize based on embedding-space distance, the wet-lab returns data, the
    model fine-tunes. Is there a Linus-shaped role here as the orchestration layer between a query, the model's
    recommendations, an experimental protocol generator, and a results database? It's speculative, but it's the kind of

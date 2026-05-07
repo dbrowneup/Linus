@@ -171,24 +171,16 @@ Section 3.
 
 ## Open questions for Dan
 
-1. **Modern reference paper.** Is there value in adding a "modern Transformer architecture reference" to the corpus —
-   something that surveys RoPE, RMSNorm, SwiGLU, GQA, pre-norm, and the rest of the post-2017 standard kit in one place?
-   The Llama 3 paper covers it implicitly, but a focused reference (e.g., a recent survey or a clean blog post like
-   Karpathy's nanoGPT writeups) might be a better daily-driver companion to this one. If yes, it's a small Worker task
-   to find and download.
-
-   _Resolved (see [answered-questions.md](../questions/answered-questions.md)): infra-foundations-synthesis.md
-   Transformer stack section added covering RoPE, RMSNorm, SwiGLU, GQA, pre-norm conventions (S40)._
-2. **Attention-as-implementation-target paper.** Linus will eventually need to run attention efficiently on Metal/ANE.
+1. **Attention-as-implementation-target paper.** Linus will eventually need to run attention efficiently on Metal/ANE.
    Should the corpus include FlashAttention-1/2/3 (Tri Dao) as the canonical "how attention is actually implemented on
    accelerators" reference? The original FlashAttention paper is short and load-bearing for any throughput conversation.
-3. **KV cache economics.** Given the M1 Max 32 GB constraint, the KV cache is going to dominate long-context inference
+2. **KV cache economics.** Given the M1 Max 32 GB constraint, the KV cache is going to dominate long-context inference
    cost for Linus. Worth a dedicated note on KV-cache memory math (per-layer K and V tensors of shape [batch,
    n_kv_heads, seq_len, d_head] in the chosen dtype) tied to specific Worker models? This is implicit in this paper but
    never spelled out.
-4. **Encoder-only relevance.** The KnowledgeBase embedding stack uses encoder-only models (BERT-family). Worth treating
+3. **Encoder-only relevance.** The KnowledgeBase embedding stack uses encoder-only models (BERT-family). Worth treating
    the encoder half of this paper as the historical root of that stack, and adding a BERT note (1810.04805) explicitly
    to the corpus to close that loop?
-5. **Bibliographic hygiene.** This is the canonical citation. Should `docs/glossary.md` or a similar file maintain a "if
+4. **Bibliographic hygiene.** This is the canonical citation. Should `docs/glossary.md` or a similar file maintain a "if
    you only read five papers in the Linus corpus, read these" pointer with this one at the top? The corpus is going to
    grow; new readers (future Dan, future Worker fine-tunes trained on this repo) need the orientation.
