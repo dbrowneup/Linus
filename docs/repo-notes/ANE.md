@@ -55,11 +55,5 @@ exists.
 
 ## 7. Questions for Dan
 
-- _Resolved (see [answered-questions.md](../questions/answered-questions.md)): ANE deferred to Phase 2 as conditional follow-up benchmark, gated on favorable pmetal Phase 1b verdict; T2.9._
-
 - **Read-or-defer on the Maderix substack series.** The three articles are arguably the best documentation of the ANE
   that exists. Worth reading now, or defer to whenever an ANE decision is actually forced?
-
-- _Resolved (DEC-0027, see [answered-questions.md](../questions/answered-questions.md)): Linus stays on public APIs (CoreML, MLX, Metal); pmetal carries any private-API risk; ANE reverse-engineering repo is reference only._
-
-- _Resolved (DEC-0027, see [answered-questions.md](../questions/answered-questions.md)): Linus strictly on public Apple APIs; private-API usage stays in pmetal, not vendored into Linus._

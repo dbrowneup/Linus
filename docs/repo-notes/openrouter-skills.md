@@ -94,13 +94,5 @@ can't run" (e.g. Llama 4 Maverick at full quality), revisit and install `openrou
 - **Open Responses adoption.** Linus's Phase 2a says "OpenAI-compatible endpoint." Is the actual target the OpenAI Chat
   Completions shape (legacy, what Ollama serves), the OpenAI Responses shape (newer, stateful), or the Open Responses
   spec documented in this repo? The three are not interchangeable and the choice locks in client compatibility.
-- **Skills bundle for Linus itself.** OmegaWiki (24), infranodus-skills (15), AgenticResearchWiki (2), openrouter-skills
-  (8) — there's a clear pattern of vendors shipping Skills bundles. Should Linus ship its own Skills bundle
-  (`linus-skills`?) for KnowledgeBase queries, sandbox operations, and pmetal commands once Phase 7 lands, or is that
-  premature given Anthropic's Skills format may evolve? _Resolved (DEC-0018, E6, see [answered-questions.md](../questions/answered-questions.md)): MCP is the extensibility substrate; SKILL.md format is the committed Phase 7 standard for Linus domain skills._
-- **Server-tools vs client-tools partition.** OpenRouter's `openrouter:web_search` etc. is executed remotely by them.
-  When Linus exposes a tool registry, which surface does it expose tools through — MCP (which Cline and openclaw
-  consume), Skills (which Claude Code and many editors consume), or both? They're not equivalent and double-publishing
-  has maintenance cost. _Resolved (DEC-0018, see [answered-questions.md](../questions/answered-questions.md)): MCP is the primary extensibility substrate for Linus tool exposure; Skills are the Phase 7 delivery format for domain skills bundles._
 - **Differentiator confidence.** The README only lists 7 skills but the `skills/` tree contains 8 (`openrouter-video` is
   undocumented). Worth flagging upstream, or just note and move on?

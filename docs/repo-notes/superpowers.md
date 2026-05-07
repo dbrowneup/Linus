@@ -28,9 +28,6 @@ Extract the skill template (metadata format, progressive disclosure, trigger mec
 
 - **Subagent review gates.** Superpowers does two-stage review (spec compliance, then code quality) before marking work complete. Should Linus Workers do the same, or does Dan review once at the end-of-task level?
 - **RED-GREEN-REFACTOR enforcement.** Superpowers deletes code written before tests and enforces TDD strictly. Is this the standard Dan wants Linus Workers to follow, or does it depend on task type (tests required vs. exploratory)?
-- **Marketplace vs. embedded skills.** Superpowers distributes skills via per-harness marketplaces. Should Linus Phase 2a bundle Worker skills in the codebase (simpler for a local system), or build skill discovery and auto-update infrastructure early? _Resolved (E6, see [answered-questions.md](../questions/answered-questions.md)): embedded SKILL.md
-  YAML-frontmatter markdown format committed as the Phase 7 Linus domain-skills standard; marketplace-style discovery
-  is not the Phase 7 model._
 - **Design-review loops.** Superpowers gates implementation on design approval. For Linus Workers, should every task spec require Dan sign-off before implementation starts, or only for high-risk work (e.g., knowledge-graph changes)? _Partially resolved (S15, see [answered-questions.md](../questions/answered-questions.md)): validation-gate
   primitive lives in the spawner (quality surface), not the sandbox (enforcement surface); per-stage fixer-agents are
   the pattern; the specific sign-off policy for KB changes remains open._

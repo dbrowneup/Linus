@@ -77,7 +77,7 @@ Revisit during Phase 7 if a local text-network-analysis component lands as part 
 
 - **Skills format as the Phase 7 contract.** Both this repo and `OmegaWiki` use the Anthropic SKILL.md format with
   frontmatter `name`/`description`/optional `allowed-tools`. Should Linus commit to that exact format for its Phase 7
-  domain skills, or define a Linus-specific superset (e.g., adding hardware/budget hints, mandatory smoke-test stubs)? _Resolved (E6, see [answered-questions.md](../questions/answered-questions.md)): YAML-frontmatter SKILL.md is the committed Phase 7 standard for Linus domain skills; evaluate alternatives only if a concrete deficiency is demonstrated on real Linus tasks._
+  domain skills, or define a Linus-specific superset (e.g., adding hardware/budget hints, mandatory smoke-test stubs)?
 - **Cognitive-variability framework — useful or noise?** The four-state model (biased/focused/diversified/dispersed)
   maps interestingly onto Maestro/Worker review loops: a Worker stuck in BIASED could be nudged toward DIVERSIFIED by
   loading `critical-perspective`. Worth a Phase 1e experiment, or filed under "interesting but not load-bearing"?

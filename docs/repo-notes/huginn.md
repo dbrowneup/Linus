@@ -52,9 +52,9 @@ CLAUDE.md (Python-specific version of the Huginn-style pattern).
 
 - **Multi-agent workflows as first-class.** Huginn treats agent DAGs as first-class objects with a UI for composition.
   Should Linus Phase 2a assume multi-step task specs from the start, or is single-agent-per-task adequate until Phase 3
-  demands parallelism? _Resolved (DEC-0050, DEC-0051, see [answered-questions.md](../questions/answered-questions.md)): Role as first-class type and typed AgentReport are Phase 3 spawner primitives; Phase 2a uses single-agent dispatch; multi-step fan-out deferred to Phase 3._
+  demands parallelism?
 - **Event schema design.** Huginn's events are bare JSON; type safety is implicit. When Linus chains multiple workers,
-  should event types be schema-defined (Pydantic models, Protocol Buffers) or duck-typed? _Resolved (DEC-0051, see [answered-questions.md](../questions/answered-questions.md)): Typed AgentReport with required fields (task_id, role_id, status, result, rationale, evidence, timestamp) is the inter-agent message format; Pydantic-typed, appended to workgraph JSONL._
+  should event types be schema-defined (Pydantic models, Protocol Buffers) or duck-typed?
 - **Persistent state for long-running workflows.** Huginn uses the database; Linus Phase 2a uses a JSONL DAG log. How
   many intermediate states should Linus log per workflow to enable debugging and resume-after-crash? _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): Workgraph JSONL append-only DAG is the committed Phase 2a session-store shape; leaf + summary hybrid schema per DEC-0039; exact per-workflow log granularity not yet specified._
 

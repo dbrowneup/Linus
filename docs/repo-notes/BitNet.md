@@ -56,13 +56,3 @@ Keep `repos/BitNet/` as reference. Do _not_ build `bitnet.cpp` into Linus. Do tw
 day and informs every downstream decision. (b) Bookmark the BitNet Distillation paper as the Phase 6 dark-horse
 candidate — if `pmetal`'s LoRA pipeline turns out viable, BitDistill becomes a serious alternative or complement to LoRA
 for producing a Linus-branded model.
-
-## 7. Questions for Dan
-
-- _Resolved (DEC-0013, see [answered-questions.md](../questions/answered-questions.md)): BitNet 2B4T spike adopted as first concrete Phase 1c experiment; 1-bit via Ollama pull + benchmark sweep is the Phase 1c path, not an earlier roadmap item._
-
-- _Resolved (DEC-0014, see [answered-questions.md](../questions/answered-questions.md)): BitDistill as parallel Phase 6a experiment alongside FP16-LoRA; accepted if it beats FP16-LoRA on Dan task suite; S21._
-
-- _Resolved (see [answered-questions.md](../questions/answered-questions.md)): Lane decision deferred to Phase 6a/6b boundary pending Phase 1c BitNet data; T1.3._
-
-- _Resolved (DEC-0027, see [answered-questions.md](../questions/answered-questions.md)): ANE kernel investment deferred to Phase 2 conditional benchmark; Linus stays on public APIs; T2.9._

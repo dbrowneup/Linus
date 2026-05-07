@@ -60,7 +60,7 @@ which task class.
 
 - **mlx-flash vs. flash-moe philosophically.** Same problem, different tradeoff: mlx-flash is framework-integrated +
   zero quality loss + predictive scheduling; flash-moe is bespoke + aggressively quantized
-  - manual pipeline. Which style should Linus prefer when forced to choose? _Resolved (S20, see [answered-questions.md](../questions/answered-questions.md)): Phase 6d targets mlx-flash for LoRA'd Qwen3-32B streamed from SSD; mlx-flash is the preferred path for models genuinely exceeding 32 GB RAM at native precision._
+  - manual pipeline. Which style should Linus prefer when forced to choose?
 - **The native-precision claim on M1 Max.** Nemotron-30B on a 16 GB Air at bit-perfect parity is the README headline;
   the unstated question is _tok/s_. Worth a small benchmark to see what native- precision streaming costs on your
   hardware before committing to it as a serving path.

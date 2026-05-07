@@ -131,7 +131,3 @@ PCA is used in any Linus pipeline.
 1. **Why is this paper in your `context/papers/` folder?** Is it for the geometry methodology (visualization tool), the
    biology applications (Ising-as-Boltzmann ↔ gene regulation), or because of the surface-level "hypercube" word overlap
    with JPmHC? Knowing your motivation would refocus the note.
-2. _Resolved (T3.18 batch, see [answered-questions.md](../questions/answered-questions.md)): BitNet weight visualization
-   via the Horiike PCA-projection method resolved in the T3.18 batch of smaller open items._
-3. _Resolved (T3.16, see [answered-questions.md](../questions/answered-questions.md)): Reproducibility + interpretability
-   over fancy stochastic methods adopted as a Linus practice/stance (DEC-0027)._

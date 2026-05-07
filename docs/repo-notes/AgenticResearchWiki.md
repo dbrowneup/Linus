@@ -86,8 +86,6 @@ as a target pattern) and during Phase 3 when KnowledgeBase project workspaces ge
   vs. research-via-LLMs) and `agentic-wiki-builder` (agent-maintained vs. agent-constructed) on README evidence alone.
   Once the other two notes land, want me to revisit and tighten the contrast?
 
-- _Resolved (DEC-0028, DEC-0039, see [answered-questions.md](../questions/answered-questions.md)): Memory Architecture spec (layers A–E, hybrid episodic schema) is the canonical Linus write-back pattern; AgenticResearchWiki is a useful worked example reference._
-
 - **Per-experiment wikis.** Tencent's framing is one wiki per project. Linus has many concurrent experiments under
   `experiments/`. Does each experiment get a mini-wiki, or does this convention only kick in for multi-month efforts
   (Phase 6 fine-tuning, Phase 4 data-sovereignty datasets)?

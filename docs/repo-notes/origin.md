@@ -94,12 +94,6 @@ workspace in the collection.
 
 ## 7. Questions for Dan
 
-- **Memory layer ownership.** The Memory Architecture spec is fresh. Is the intent for Linus to _own_ the memory store
-  (KnowledgeBase + bespoke schema) or to _consume_ one (Origin daemon as sidecar)? This decision flips Origin from
-  "study material" to "architectural dependency." _Resolved (DEC-0028, DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): Linus owns the memory store; Phase 2 substrate is SQLite + content hashes + git for Layer C; Origin stays study material until the memory spec is concretely implemented, then revisit as sidecar candidate._
-- **MCP as the integration substrate.** Origin's primary surface is MCP; pmetal's `pmetal-mcp` exposes 45 tools the same
-  way; cline and openclaw both speak MCP. Three of the four most relevant repos in the collection have converged on MCP.
-  Want to make MCP-as-tool-substrate an explicit Phase 3 ADR rather than letting it accrete? _Resolved (DEC-0018, see [answered-questions.md](../questions/answered-questions.md)): MCP adopted as the extensibility substrate; MCP ADR to be written at Phase 2a planning time._
 - **AGPL hygiene.** Origin is the second AGPL repo encountered (after a few others in earlier groups). Do we want a
   written rule in SAFETY.md or DECISIONS.md that AGPL code is allowed as an out-of-process dependency but never
   vendored, with the Apache-2.0 boundary types as the integration surface?
