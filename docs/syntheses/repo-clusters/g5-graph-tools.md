@@ -278,12 +278,9 @@ paper); the code is AGPL. The Python port on GitLab (`DiscourseDiversity`) is MI
 codebase. Confirm the policy — "re-implement from the paper, never copy, and verify MIT ports are independently clean
 before borrowing" — and document it as a DECISIONS.md entry rather than leaving it implicit in the repo note.
 
-**MCP as tool-registration substrate.** Four projects in the repo collection (pmetal, Cline, keppi, py3plex) now ship
-MCP servers as their primary tool-surface. Group 5 adds enough evidence that this question should be scheduled for a
-dedicated ADR session: is MCP the tool-registration substrate for Linus's Phase 3 KB tools, or does Linus build a native
-registry? The infranodus-skills SaaS-dependency problem (MCP-dependent skills that require a paid API key) is also an
-existence proof that MCP adoption does not automatically mean local-first — the ADR should include a "local-only MCP
-policy" as a design constraint.
+_Resolved (DEC-0018, DEC-0045, DEC-0046): MCP is Linus's tool-registration substrate from Phase 2 onwards; the
+registry is built on fastmcp. Local-only MCP is the default; external MCP servers requiring paid API keys are
+governed by DEC-0046's `external_api_tool` registry class with a `deployment` field._
 
 **InfraNodus self-hosting.** If Linus reaches Phase 3 with a working text-network-analysis layer over KnowledgeBase, the
 MCP-dependent skills in infranodus-skills become interesting again if that layer can expose an InfraNodus-compatible

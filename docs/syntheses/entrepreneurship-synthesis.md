@@ -298,22 +298,12 @@ so the thread is findable later, not so they are answered now.
 
 ### Tier 1 — release-posture and framing decisions worth making early
 
-**E1. Open-source release posture as a default architectural commitment.** Dan's instinct is that Linus, if
-successful, should be released open source — "for science, for society," consistent with the
-Pauling/Torvalds naming. This commitment, made early, prevents architectural drift toward proprietary surfaces
-later. Open: codify the open-source-by-default posture in VISION.md and add a one-paragraph rationale, with a
-deliberate carve-out that "if Linus succeeds enough that Dan wants to commercialize a derivative, that decision
-remains open" — i.e., open-source is the baseline, not a bind. Recommendation: codify; the architectural
-decisions that follow (license-compatible deps, no proprietary internal APIs, contributor-friendly module
-boundaries) are easier to honor as defaults than as retrofits.
+_E1 resolved (VISION.md "Release posture" principle, codified 2026-05-06): open-source-by-default is the committed
+baseline. A commercial derivative remains an open future decision but the default does not foreclose it. See
+VISION.md "Release posture" for the rationale and architectural consequences._
 
-**E2. Reframe `docs/entrepreneurial-surface.md` as `docs/knowledge-mining-surface.md` (or similar).** The
-2026-05-03 Tier 2 #14 resolution committed to a Phase 2 deliverable named `docs/entrepreneurial-surface.md`. The
-2026-05-05 reframe argues the real entrepreneurial gunpowder is the knowledge in Dan's files, with Linus as the
-mining tool — productization is downstream. Open: rename the deliverable to reflect this reframe (e.g.,
-`docs/knowledge-mining-surface.md`), or keep the original name and let the contents reflect the priority order?
-Recommendation: rename. The new name is more honest about what the document is _for_ and removes the implicit
-push toward early productization.
+_E2 resolved (ROADMAP.md Phase 2g, VISION.md): renamed to `docs/knowledge-mining-surface.md`. The local-files-as-
+gunpowder framing is canonical. The doc is a Phase 2g deliverable — write only after Linus is demonstrably useful._
 
 ### Tier 2 — transferable g10-finance patterns worth tracking (not commercial-specific)
 
@@ -338,10 +328,9 @@ runs for hours and where quantitative claims must be preserved across compaction
 Phase 2 context-manager spec, or design from scratch? Recommendation: lift verbatim with attribution; it is
 tested prior art. This is internal-Linus architecture, not commercial-specific.
 
-**E6. SKILL.md as the Phase 7 skills bundle format.** dexter, OpenBB, bioSkills, scientific-agent-skills, and
-autoresearch all use YAML-frontmatter markdown skills with a single `skill` tool. Open: commit to this format as
-the Linus standard for Phase 7, or evaluate alternatives? Recommendation: commit; the format is converging toward
-a de facto standard. (Cross-references S30 on inaugural skills bundle.)
+_E6 resolved (ROADMAP.md Phase 7a, biology-phase7-roadmap.md): YAML-frontmatter markdown with a single `skill` tool
+is the committed Linus Phase 7 skills-bundle format. Evaluate alternatives only if a concrete deficiency is
+demonstrated on real Linus tasks._
 
 ### Tier 3 — longer-horizon framing, deferred until Linus is demonstrably useful
 
@@ -368,19 +357,12 @@ private moats. Open: which of these are already true in the existing architectur
 ADRs to lock in? Recommendation: a short audit pass when E1 codifies — likely Phase 2 — to surface anything that
 silently assumed proprietary deployment.
 
-**E11. AlphaGenome non-commercial license — relevant only conditionally.** S29 already tracks this as an open
-question on the biology pillar's commercial readiness. From the entrepreneurship-synthesis perspective: with the
-2026-05-05 reframe (productization deferred, open-source-by-default), AlphaGenome's NC license is _not_ blocking;
-it is a constraint to revisit if and when commercial use becomes a real question. Cross-reference S29; do not
-duplicate.
+_E11 resolved (biology-phase7-roadmap.md, S29): AlphaGenome NC license is not blocking given the open-source-by-
+default posture (E1). Revisit only if commercial use becomes real._
 
-**E12. `docs/knowledge-mining-surface.md` first-draft scope (renamed from `entrepreneurial-surface.md` per E2).**
-The document captures: Dan profile, the local-files-as-gunpowder reframe, the whiteboard pipeline (workspace →
-custom tools → private-Claude-equivalent → fine-tuning → eventual entrepreneurial application), the seven
-opportunities as long-tail possibilities (not action items), the g10-finance transferable patterns, and an
-explicit "deferred until Linus is demonstrably useful" stance. Open: write in Phase 2 or defer to Phase 3? With
-the deferred posture, Phase 3 is honest; Phase 2 is fine if the document is explicitly framed as "tracking, not
-acting."
+_E12 resolved (ROADMAP.md Phase 2g): scheduled as a Phase 2 deliverable. The committed scope matches the bullet
+list above — Dan profile, local-files-as-gunpowder reframe, whiteboard pipeline, seven opportunities as long-tail
+possibilities, g10-finance transferable patterns, "deferred until Linus is demonstrably useful" stance._
 
 ---
 

@@ -236,11 +236,10 @@ as a Linus evaluation target.
 a test-set construction artifact. Do you want to read the _Nat. Comp. Sci._ paper critically yourself, or route that
 review to a Worker with the paper in context and a structured rubric for checking train/test overlap?
 
-**Pairing with scientific-agent-skills.** bioSkills (438) plus scientific-agent-skills from G8 (135) produces roughly
-573 skills as the Phase 7 inaugural catalogue, with bioSkills handling the bioinformatics specifics and
-scientific-agent-skills handling the broader lab-science agent patterns. Does that pairing feel right from your vantage
-point, or are there overlapping skills categories between the two repos that would create confusion for a Worker
-receiving both in context?
+_Resolved (ROADMAP.md Phase 7a, `docs/specs/biology-phase7-roadmap.md`): the bioSkills + scientific-agent-skills
+pairing (~573 total) is the committed Phase 7 inaugural skills bundle. Pre-launch A/B gate on 5 tasks decides
+whether the bundle launches default-on or opt-in. The overlap-confusion concern is the empirical question for the
+A/B test._
 
 ---
 

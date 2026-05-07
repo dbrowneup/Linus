@@ -303,12 +303,10 @@ env needs.
 
 ## Open questions for Dan
 
-**The KnowledgeBase vs paper-qa substrate decision.** Three options are on the table: (1) paper-qa becomes the
-retrieval/synthesis engine with KnowledgeBase as the corpus-of-record and tantivy index; (2) paper-qa runs as a second
-engine alongside KnowledgeBase's existing retrieval; (3) paper-qa's patterns are lifted into KnowledgeBase directly
-without the paper-qa dependency. Which is acceptable depends on how much paper-qa's `GatherEvidence` re-ranking buys
-over what KnowledgeBase already does. The smoke-test result on 10 papers will make this concrete. Is there a quality bar
-that would cause you to build from scratch rather than adopt paper-qa wholesale?
+_Resolved (DEC-0044, `docs/specs/kb/paper-qa-substrate-integration.md`): paper-qa adopted as the Phase 2c
+retrieval-and-synthesis engine in an "adopt + extend" pattern (option 1). KnowledgeBase remains the
+corpus-of-record; paper-qa sits above the RDF + property-graph substrate. The 5-paper smoke-test gate is the
+phasing primitive for the integration._
 
 **Biology RLVR verifier candidates.** ether0's chemistry recipe generalizes if the oracle side generalizes. The
 candidate verifiers above (BLAST, ESMFold pLDDT, ClinVar, eQTL direction-of-effect) are based on what's publicly
@@ -330,11 +328,10 @@ match the kinds you actually saw burn experiments (buffer swaps, centrifuge spee
 whether a local model answering "correctly" on this benchmark actually demonstrates wet-lab reasoning or is
 pattern-matching against training data. Your ground truth here is directly useful.
 
-**FutureHouse as a strategic upstream.** Adopting paper-qa as the Phase 2c substrate and ldp's agent contract for Phase
-3 Workers effectively makes FutureHouse a strategic upstream vendor in the same way Ollama and mlx-lm are inference
-upstreams. The upside is a cohesive, evaluated, scientifically literate stack with Apache 2.0 across the workspace. The
-downside is tracking two or three additional package release cadences. Is FutureHouse a stable enough upstream for that
-role, or do you want a paper-qa-only integration with a deliberate exit ramp before taking on ldp?
+_Partially resolved (DEC-0044, paper-qa-substrate-integration.md): paper-qa adopted; aviary runtime dependency is
+acceptable; ldp policy-training framework explicitly NOT pulled in until a Phase 6 fine-tuning spike validates the
+benefit. The strategic-upstream question is bounded — paper-qa-only integration with deliberate exit ramp before
+ldp commitment._
 
 ---
 
