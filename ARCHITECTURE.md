@@ -105,7 +105,12 @@ This is the product. A Python package, built iteratively starting in Phase 2.
 **Router.** Receives OpenAI-compatible requests. Selects the appropriate worker model based on request metadata and task
 class. Routes to the chosen inference engine.
 
-**Tool registry.** Catalog of Linus-native tools, grouped by domain:
+**Tool registry.** Catalog of Linus-native tools, grouped by domain.
+
+The tool registry is **MCP-shape from Phase 2 onwards** (DEC-0018, DEC-0045). Linus exposes a Linus-native MCP server
+(built on fastmcp's decorator API); Linus also consumes external MCP servers via a client adapter — pmetal's MCP server
+is the first integration target. Tools registered once become visible across all harnesses (Cline, openclaw, Claude
+Code, claw-code-local) without per-harness adapters.
 
 - `linus.knowledge.*` — papers search, paper get, cluster context, KG query, SPECTER2 nearest neighbors (wraps
   KnowledgeBase)
@@ -145,8 +150,8 @@ context object.
 
 ### Inference backends
 
-- **Ollama.** First-stop Worker model server. Homebrew install, Metal acceleration. Current models:
-  `mistral:7b-instruct`, `qwen2.5-coder:7b`. Suitable for Phase 1 and 2.
+- **Ollama.** First-stop Worker model server. Homebrew install, Metal acceleration. Current Worker model: Qwen3
+  (best-available for 32 GB M1 Max). Suitable for Phase 1 and 2.
 - **pmetal serve** (Phase 1 evaluation, Phase 2+ if adopted). Apple Silicon native, written in Rust, with custom Metal
   kernels, native ANE pipeline, and OpenAI-compatible serving. Offers capabilities beyond Ollama/mlx-lm: fused kernels,
   ANE integration, LoRA-adapter- aware serving, FP8 runtime quantization. Serious candidate for primary serving backend.
@@ -172,6 +177,15 @@ Linus tools. Specifically:
 - Wrap the similarity graph and knowledge graph as queryable resources
 - Expose all the above via the tool registry under `linus.knowledge.*`
 
+The KB data model is **dual** (DEC-0015): both RDF (rdflib + optional Oxigraph backend for SPARQL performance) and
+property graph (networkx; Kuzu evaluated at Phase 3). Linus's adapter exposes them as separate tool families:
+
+- `linus.knowledge.sparql.*` — RDF/SPARQL queries; ontology alignment (GO/MeSH/ChEBI/UniProt) added at Phase 3.
+- `linus.knowledge.graph.*` — property-graph traversal, neighbor queries, cluster context.
+
+KB v1 also surfaces a per-paper quality scorecard (DEC-0019) as a retrieval-time signal — peer-review status, preprint
+flag, data/code availability, retraction status, RaKUn keyphrase coverage, citation/age. Not a hard gate.
+
 **Qdrant** (optional, Phase 3+): if KnowledgeBase's current numpy-based similarity search hits scalability limits, add
 Qdrant in Docker as the vector DB. Not needed for the MVP.
 
@@ -194,7 +208,41 @@ metric + budget + keep-or-revert loop. Let a Worker iterate overnight. Review re
 - **Data package registry** at `~/.linus/data_packages.json` tracking installed datasets, versions, update availability
 - **Update check tool** polling upstream sources; user approves any downloads
 
-Docker is acceptable for these services (stateless, no Metal needs).
+Docker is acceptable for these services; they do not require Metal passthrough.
+
+## Memory pillar
+
+Memory is lifted to a first-class architectural pillar at Phase 2 (DEC-0028). Five layers:
+
+| Layer | Name                       | Lifetime                   | Substrate                                          | Phase              |
+| ----- | -------------------------- | -------------------------- | -------------------------------------------------- | ------------------ |
+| A     | Intra-step latent state    | Single forward pass        | KV cache (model-internal)                          | Phase 1 (implicit) |
+| B     | Within-session scratchpad  | Single session             | In-context window, capped at 16K tokens            | Phase 2            |
+| C     | Cross-session episodic     | Persistent                 | SQLite + content hashes + git                      | Phase 2            |
+| D     | Investigation memory       | Single investigation (task-scoped) | SQLite `investigations.db`                 | Phase 3            |
+| E     | Semantic knowledge         | Persistent                 | KnowledgeBase (RDF + property graph)               | Phase 2            |
+
+Implementation contract and API surface: [`docs/specs/memory-architecture.md`](docs/specs/memory-architecture.md).
+
+**Memory Budget Accounting.** Memory budget is a first-class architectural quantity. Linus's design target is tens of
+dollars of electricity per day on a single M1 Max, narrowing the gap to the human-with-pen-and-paper lower bound
+through substrate (DEC-0029), discipline (DEC-0030, 0031, 0032), and measurement (DEC-0033, 0035).
+
+**Router primitives.** Every Worker dispatch carries `memory_mode` (`stateless` / `session_stateful` /
+`project_stateful`) and `cot_budget` (`logarithmic` / `linear` / `polynomial`) as first-class fields in the dispatch
+struct, recorded in the audit log (DEC-0031).
+
+**Runtime directory layout:**
+
+```text
+~/.linus/
+├── episodic.db          # Layer B + C SQLite substrate (DEC-0029)
+├── investigations.db    # Layer D SQLite substrate (DEC-0052)
+├── audit.jsonl          # append-only audit log (DEC-0030/0031/0032)
+├── registry/
+│   └── models.json      # Worker registry with capability tags + CoT-gap fingerprints
+└── incidents/           # incident snapshots per SAFETY.md
+```
 
 ## Boundary rules
 
@@ -243,15 +291,20 @@ Every Linus tool that touches the filesystem or shell MUST:
 
 Phase 2 delivers a minimal but real version of this architecture:
 
-- Router: single-engine (Ollama), no intelligent dispatch yet
-- Tool registry: 3–5 tools (knowledge search, file read/write, sandboxed shell)
-- Agent spawner: NOT in Phase 2 — deferred to Phase 3
-- Sandbox: policy enforced, allowlist/blocklist live
-- Session store: SQLite, simple
-- Audit log: JSONL, append-only
-- Skills: NOT in Phase 2 — deferred to Phase 7 when we know what skills matter
-- Memory: NOT in Phase 2 — session history only
-- RAG gateway: KnowledgeBase v1 (search + metadata)
+- **Router**: single-engine (Ollama or pmetal per Phase 1b verdict), no intelligent dispatch yet.
+- **Tool registry**: MCP-shape from start (DEC-0018); 3–5 tools (knowledge SPARQL search, knowledge graph traversal,
+  file read/write, sandboxed shell).
+- **Agent spawner**: NOT in Phase 2 — deferred to Phase 3.
+- **Sandbox**: policy enforced, allowlist/blocklist live, trust-tier tagging on all context items.
+- **Session store**: SQLite, simple.
+- **Audit log**: JSONL, append-only at `~/.linus/audit.jsonl`.
+- **Skills**: NOT in Phase 2 — deferred to Phase 7.
+- **Memory**: Layer B (scratchpad) and Layer C (cross-session episodic) active; Layer D (investigation) deferred to
+  Phase 3; Layer E (KnowledgeBase) via the RAG gateway.
+- **RAG gateway**: KnowledgeBase v1 with dual SPARQL + graph substrate (DEC-0015) and per-paper quality scorecard
+  (DEC-0019).
+- **Output synthesis**: Maestro-side synthesis compresses Worker outputs into balanced bullets + prose with citation
+  drill-down before Dan review (DEC-0023).
 
 Phase 3 extends: parallel agents, deeper KnowledgeBase integration, first skills.
 
@@ -261,16 +314,12 @@ Phase 6 extends: training backend (pmetal or mlx-lm-ft), first fine-tuned adapte
 
 ## Open architectural questions (revisit as they become concrete)
 
-- **Protocol for parallel agent coordination.** Shared SQLite vs. Python multiprocessing queues vs. Redis vs. LangGraph
-  state store. Decide in Phase 3 based on concrete workload.
-- **Long-term memory design.** Embedding-based similarity over past conversations? Entity-linked facts? Deferred until a
-  concrete use case surfaces.
-- **MCP (Model Context Protocol) adoption.** Potentially useful for letting Linus consume MCP servers (e.g., `mcporter`
-  as openclaw does). Evaluate in Phase 3 once we see how tool-use patterns settle.
-- **Voice input routing.** When openclaw voice wake is integrated, does the voice stream go through Linus, or does
-  openclaw transcribe and send text? Probably text, but validate when we get there.
-- **Mobile companion architecture.** openclaw has iOS/Android node support via WebSocket. The question of whether Dan's
-  phone talks to Linus directly or via an openclaw relay is deferred to Phase 9.
-
-These remain open on purpose. The Algorithm says delete requirements that aren't forced; these are forced when we hit
-them, not before.
+- **Parallel agent write coordination.** Resolved (DEC-0022): serialized writes through coordinator with write-time
+  contradiction surfacing. Spec target: `docs/specs/kb/parallel-worker-write-coordination.md`. Implementation Phase 3.
+- **Long-term memory design.** Resolved (DEC-0028–0043). Five-layer architecture; implementation spec at
+  `docs/specs/memory-architecture.md`. Layer D (investigation memory) and beyond in Phase 3.
+- **MCP adoption.** Resolved (DEC-0018): adopt as extensibility substrate from Phase 2 onwards.
+- **Voice input routing.** Resolved: openclaw transcribes to text before sending to Linus; Phase 5 adoption.
+- **Per-Worker-class tool-use templates.** Resolved (DEC-0027): Phase 7 plan using role-differentiated templates.
+  Phase 2 tool registry built without single-template assumptions.
+- **Inference backend.** Proposed (DEC-0049): pmetal vs. MLX-native PrismML fork; gate decision at Phase 1b verdict.
