@@ -59,16 +59,24 @@ for producing a Linus-branded model.
 
 ## 7. Questions for Dan
 
-- **How aggressively do we want to chase 1.58-bit on Apple Silicon as a first-class path?** Bitnet.cpp's ~7 tok/s at
-  100B on M2 Ultra implies a ~40–50B ternary model could be feasible on the M1 Max. Is that compelling enough to put an
-  "MLX/Metal ternary runtime" experiment earlier in the roadmap (Phase 2–3 experimental branch) rather than waiting for
-  Phase 6+?
-- **BitNet Distillation as a fine-tuning path.** Would you accept a 1.58-bit distilled Qwen2.5 variant as the Phase 6
-  deliverable if it beats a FP16-LoRA'd counterpart on Dan task suite, given it sacrifices some smoothness in exchange
-  for much larger effective capacity?
-- **Ternary base models vs. converted models.** Native ternary training (BitNet b1.58 2B4T) vs. post-hoc distillation
-  (BitDistill) vs. post-hoc quantization (run FP16 Qwen at 2-bit via bitnet.cpp-style kernels) — three different
-  philosophies. Any strong prior?
-- **Hardware bet.** The BitNet papers repeatedly call for "new hardware designed for 1-bit LLMs." The ANE is closer to
-  that than Metal is. Is investing in ANE kernel development (via pmetal or directly) worth Linus dev time in Phase 2–3,
-  or does it stay a Phase 7+ project?
+1. **Phase 1c sweep inclusion threshold.** The recommendation is to add BitNet b1.58 2B4T and Llama3-8B-1.58 to the
+   Phase 1c benchmark sweep via Ollama. Is the bar "include both" or "include only the one whose GGUF lands
+   cleanest in `ollama pull`"? The 8B retrain is the more interesting datapoint (1.58-bit at Llama-3 architecture)
+   but is also more likely to surface integration gotchas.
+2. **CPU-path build for measurement.** `bitnet.cpp`'s ARM CPU kernels would compile on M1 Max and produce a
+   directly comparable tok/s + RSS measurement against the Ollama Metal-hybrid path. Is it worth the build cost
+   (CMake + cross-compile flags) to get that comparison datapoint, or trust the published 7 tok/s on M2 Ultra
+   (`2502.11880`) plus Ollama's Metal numbers?
+3. **BitDistill on Qwen2.5-7B as a Phase 6 spike.** The BitNet Distillation paper claims 10x memory savings and
+   2.65x CPU speed on a Qwen2.5 base. If `pmetal`'s LoRA pipeline matures (DEC-0006, DEC-0012), is BitDistill on
+   Dan's preferred Qwen-family base the right Phase 6 first attempt, or is conventional LoRA still the safer
+   baseline before a 1-bit pipeline gets greenlit?
+4. **Metal kernel pattern reuse.** The LUT method (`I2_S` / `TL1` / `TL2` variants) and the W2A8 weight permutation
+   trick (sixteen ternary values into a 32-bit int, dp4a inner product) are concrete templates. If pmetal or a
+   Linus-internal kernel ever wants to pack low-bit weights into wider words on Metal, is there an explicit Phase
+   1b/Phase 6 deliverable worth scoping that lifts these patterns into a Metal shader, or is that
+   premature optimization until the model side justifies it?
+5. **MLX as the strategic 1-bit lane.** The note recommends MLX (Bonsai-demo) and pmetal as the serious Apple
+   Silicon 1-bit work, with `bitnet.cpp` as reference only. Does that ordering still hold given Bonsai-demo's
+   limited model coverage and pmetal's evaluation status (DEC-0049 — pmetal-vs-prismml-fork-deferred-phase1b)?
+   Worth re-confirming at the next Phase 1 review.

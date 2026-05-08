@@ -170,7 +170,7 @@ top-performing teams have non-monotonic within-project arcs (alternating reflexi
 _structure of practice_ dominates _intensity of practice_ across at least two very different time scales. For Linus:
 scheduling matters more than throughput maximization.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 This is a study of humans in 102 corporate innovation teams and 61 MBA student teams. The participants are people with
 motivation, fatigue, social dynamics, status concerns, and psychological safety. None of these constructs apply directly
@@ -212,21 +212,15 @@ suggestive of a design pattern, not proof of one.
 
 ## Open questions for Dan
 
-1. **Goal-congruence as a Worker-spec field.** Should the standard Worker spec template gain a
-   `goal_orientation: [exploit | explore]` field, so the orchestration layer can decide whether two specs can batch into
-   one Worker session or must be sequenced across sessions? Cheap to add and falsifiable.
-2. **Learning-type tag on tasks.** Should each Worker spec be tagged with one of the four learning types — `reflexive`,
+1. **Learning-type tag on tasks.** Should each Worker spec be tagged with one of the four learning types — `reflexive`,
    `experimental`, `vicarious`, `contextual` — so a session-rhythm metric can be computed (e.g., "this session opened
    reflexive, did three experimentals, never returned — lacks the law-of-return")?
-3. **A "rhythm" health metric for Linus sessions.** Could the orchestration layer (or a post-session reviewer) score
-   sessions for rhythm — alternation between reflexive checkpoints and experimental spikes, with reflexive bookends —
-   and surface low-rhythm sessions for review? Testable on existing session logs without any architecture change.
-4. **Skills synthesis update.** Should `docs/syntheses/skills-and-practices-synthesis.md` cite this paper as the
+2. **Skills synthesis update.** Should `docs/syntheses/skills-and-practices-synthesis.md` cite this paper as the
    empirical-team-research grounding for the parallel-Worker decomposition claim?
-5. **Session-template formalization.** The session-startup protocol is the opening reflexive bookend;
+3. **Session-template formalization.** The session-startup protocol is the opening reflexive bookend;
    checkpoint-after-3-4-edits is the intermediate return. Should there be an explicit _closing reflexive bookend_
    (forced session summary + ADR check before commit) to complete the rhythm? The paper would predict the missing close
    leaves coordination quality on the table.
-6. **Project-stage confound, honestly.** The authors flag that learning-type ↔ project-stage alignment may explain much
+4. **Project-stage confound, honestly.** The authors flag that learning-type ↔ project-stage alignment may explain much
    of their result. Is the right scheduling unit "kind of work" (reflexive vs. experimental) or "phase of project"
    (Phase 1 recon vs. Phase 6 fine-tuning)? Worth keeping in mind before over-investing in goal-congruence machinery.

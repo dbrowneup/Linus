@@ -78,23 +78,22 @@ specifically to monetise FutureHouse research. But the patterns are worth liftin
 the `choix`-based pairwise tournament ranker into a Linus utility for Phase 3 candidate-selection use cases; (2) adopt
 the `Prompts.validate_all_prompts` regex+expectations pattern when Linus grows a prompt registry in Phase 2b or 3; (3)
 use Robin's pipeline as the design template for a future Linus "drug-repurposing" or "hypothesis-generation" skill in
-Phase 7, with KnowledgeBase + a local paper-qa replacing Crow/Falcon. Re-evaluate if FutureHouse open-sources weights
-for Crow/Falcon or if a credible local literature-QA stack (paper-qa against KnowledgeBase) reaches parity.
+Phase 7, with KnowledgeBase + a local paper-qa replacing Crow/Falcon. The "paper-qa locally against KnowledgeBase" half
+of that substitution is now resolved per **DEC-0044** (paper-qa as KB retrieval engine, accepted 2026-05-06), so the
+Phase 7 Robin-style skill substrate is no longer hypothetical — only the orchestration layer on top remains a design
+question. Re-evaluate if FutureHouse open-sources weights for Crow/Falcon.
 
 ## 7. Questions for Dan
 
-- **Pairwise ranker as a Linus primitive.** The `choix.ilsr_pairwise` tournament is a 50-line lift and would let any
-  Linus skill that produces N alternatives pick a winner without trusting a single LLM-as-judge call. Want this in the
-  Phase 2 utility belt, or wait until a skill needs it?
-- **Prompt-validator convention.** Robin's "regex-parse `{placeholders}` and assert against an expected set at model
-  construction" pattern would have caught half the KnowledgeBase prompt-template bugs. Worth adopting as a Linus prompt
-  convention now, before there are many prompts to retrofit?
-- **paper-qa + KnowledgeBase as the local Crow replacement.** Robin's Edison dependence collapses to "we need a
-  literature-QA agent." If paper-qa runs locally against KnowledgeBase well enough, Robin's pipeline becomes a
-  reasonable Phase 7 skill template. Worth a Phase-1 spike on paper-qa-against-KB to find out?
-- **Therapeutics scope.** Robin's domain is small-molecule drug discovery for human disease via cell-culture assays —
-  adjacent to but not the same as your genomics/computational-biology focus. Is a Robin-style "hypothesis pipeline"
-  skill on Linus actually something you'd use, or is the value purely "study the patterns, build something different"?
-- **Tournament ranking vs LLM-as-judge in benchmarks.** The Dan-tasks benchmark suite will need a way to score free-form
-  outputs. Pairwise tournament + Bradley-Terry is more expensive but lower variance than rubric scoring. Worth piloting
-  on one benchmark task as a methodology test?
+1. **Pairwise ranker as a Linus primitive.** The `choix.ilsr_pairwise` tournament is a 50-line lift and would let any
+   Linus skill that produces N alternatives pick a winner without trusting a single LLM-as-judge call. Want this in the
+   Phase 2 utility belt, or wait until a skill needs it?
+2. **Prompt-validator convention.** Robin's "regex-parse `{placeholders}` and assert against an expected set at model
+   construction" pattern would have caught half the KnowledgeBase prompt-template bugs. Worth adopting as a Linus prompt
+   convention now, before there are many prompts to retrofit?
+3. **Therapeutics scope.** Robin's domain is small-molecule drug discovery for human disease via cell-culture assays —
+   adjacent to but not the same as your genomics/computational-biology focus. Is a Robin-style "hypothesis pipeline"
+   skill on Linus actually something you'd use, or is the value purely "study the patterns, build something different"?
+4. **Tournament ranking vs LLM-as-judge in benchmarks.** The Dan-tasks benchmark suite will need a way to score
+   free-form outputs. Pairwise tournament + Bradley-Terry is more expensive but lower variance than rubric scoring.
+   Worth piloting on one benchmark task as a methodology test?

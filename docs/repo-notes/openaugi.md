@@ -80,21 +80,26 @@ episodic records starts mattering.
 
 ## 7. Questions for Dan
 
-- **Schema lift, verbatim or extended?** OpenAugi's `(blocks, links)` schema covers DEC-0029's addressability/
-  disambiguation/temporal/integrity needs cleanly. Adopt the column set verbatim and add `session_id`, `turn_id`,
-  `parent_turn_id`, `segment`, `trust_level` as new columns on `blocks`, or rename to `episodes` + `episode_links` to
-  make the ownership boundary obvious from schema names alone?
-- **sqlite-vec instead of Qdrant for v0.** OpenAugi runs FTS5 + sqlite-vec inside the same file as the source-of-truth
-  table, which deletes a service from the architecture. Worth re-opening the v0 Qdrant decision in light of this, or is
-  the Qdrant choice already locked for reasons orthogonal to substrate-count (e.g., HNSW perf, multi-tenant scoping)?
-- **OpenAugi vs memex split.** OpenAugi gives a typed graph an agent queries through tools; memex gives a governed
-  markdown wiki an agent reads as files. These are complementary, not competitive — OpenAugi as Layer C substrate, memex
-  as the cross-session "constitution" layer over project artifacts. Want this articulated as an ADR before Phase 2a, or
-  leave it implicit until both prove out?
-- **Context-block kind in the schema.** OpenAugi makes "compiled navigational metadata" a first-class block kind
-  (`context_block:cluster`, hub summaries, concept pages). Linus's spec doesn't yet name an equivalent — should the
-  Phase 2 schema reserve a `kind="context_block:*"` family up front, or is that premature before Phase 3 retrieval
-  patterns crystallize?
-- **`get_context` as Linus's default retrieval verb.** OpenAugi collapses semantic+keyword+dedup+MMR+link-expansion into
-  one tool with sensible defaults. Adopt that as the Linus Phase 3 retrieval entry point, or expose the five modes
-  individually and let the Worker compose?
+1. **Schema lift, verbatim or extended?** OpenAugi's `(blocks, links)` schema covers DEC-0029's addressability/
+   disambiguation/temporal/integrity needs cleanly. Adopt the column set verbatim and add `session_id`, `turn_id`,
+   `parent_turn_id`, `segment`, `trust_level` as new columns on `blocks`, or rename to `episodes` + `episode_links` to
+   make the ownership boundary obvious from schema names alone? _Partially resolved (DEC-0029, see
+   [answered-questions.md](../questions/answered-questions.md)): SQLite + content hashes + git confirmed as v0 episodic
+   substrate; detailed schema columns deferred to Phase 2 memory-architecture.md spec._
+2. **sqlite-vec instead of Qdrant for v0.** OpenAugi runs FTS5 + sqlite-vec inside the same file as the source-of-truth
+   table, which deletes a service from the architecture. Worth re-opening the v0 Qdrant decision in light of this, or is
+   the Qdrant choice already locked for reasons orthogonal to substrate-count (e.g., HNSW perf, multi-tenant scoping)?
+   _Partially resolved (DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): DEC-0029 commits to
+   SQLite for the episodic layer (Layer C); Qdrant remains the KB vector store; the two stores serve different layers
+   and are not directly competing._
+3. **OpenAugi vs memex split.** OpenAugi gives a typed graph an agent queries through tools; memex gives a governed
+   markdown wiki an agent reads as files. These are complementary, not competitive — OpenAugi as Layer C substrate,
+   memex as the cross-session "constitution" layer over project artifacts. Want this articulated as an ADR before Phase
+   2a, or leave it implicit until both prove out?
+4. **Context-block kind in the schema.** OpenAugi makes "compiled navigational metadata" a first-class block kind
+   (`context_block:cluster`, hub summaries, concept pages). Linus's spec doesn't yet name an equivalent — should the
+   Phase 2 schema reserve a `kind="context_block:*"` family up front, or is that premature before Phase 3 retrieval
+   patterns crystallize?
+5. **`get_context` as Linus's default retrieval verb.** OpenAugi collapses semantic+keyword+dedup+MMR+link-expansion
+   into one tool with sensible defaults. Adopt that as the Linus Phase 3 retrieval entry point, or expose the five modes
+   individually and let the Worker compose?

@@ -36,11 +36,11 @@ registry: a Python function with a Google-style docstring becomes an OpenAI-shap
 Compared with **paper-qa**, which is a _consumer_ of aviary (`GradablePaperQAEnvironment` in
 `packages/labbench/src/aviary/envs/labbench/env.py` wraps a paper-qa `Settings` into a step/reward loop), and **ldp**,
 which is the agent-side runtime that drives aviary's environments via `RolloutManager`, aviary alone is by far the
-smallest dependency — pure Python, only pydantic + httpx + docstring_parser. Phase 6 use: wrap Dan's existing genomics /
+smallest dependency — pure Python, only pydantic + httpx + docstring*parser. Phase 6 use: wrap Dan's existing genomics /
 biochemistry tasks (KnowledgeBase queries, sequence checks, paper grading) as `Environment` subclasses, register a
 `TaskDataset`, and the same code is reachable by both an LDP rollout (for RL fine-tuning of a local Qwen / Mistral /
 Linus worker) and a plain LiteLLM agent (for benchmarking). The `LAB-Bench` package is also directly relevant as a
-_baseline benchmark_ for Dan's domain — a standardized biology-QA harness that hosted Claude has presumably been
+\_baseline benchmark* for Dan's domain — a standardized biology-QA harness that hosted Claude has presumably been
 measured on, giving a Maestro/Worker delta to chase. The `EnvironmentClient` + `TaskDatasetServer` split is a useful
 prior-art pattern for Linus's own orchestration layer if a tool ever grows too heavy to live in the agent process.
 
@@ -50,12 +50,10 @@ The functional `fenv` API is cute but the class-based `Environment` subclass is 
 repo actually uses; Linus should mirror the class-based pattern. Aviary's `Renderer`, `dataset_server`, and `cli`
 (`aviary tools <env>` browser) are useful only for demos/debugging. Within the FutureHouse stack the division of labour
 is clean: **aviary** = env + tool + message + dataset; **ldp** = agent, policy, rollout, training; **paper-qa** = a
-heavy retrieval
-
-- QA environment plugged into aviary via the `labbench` package; **LAB-Bench** = the dataset and grading rubric.
-  Differentiator within the siblings: aviary is the _only_ one of the FutureHouse trio that is small, self-contained,
-  and interesting on its own — `paper-qa` only matters with a corpus, `ldp` only matters once you're committed to RL
-  training, but aviary's Tool/Environment abstractions are valuable to Linus even if RL never happens.
+heavy retrieval-QA environment plugged into aviary via the `labbench` package; **LAB-Bench** = the dataset and grading
+rubric. Differentiator within the siblings: aviary is the _only_ one of the FutureHouse trio that is small,
+self-contained, and interesting on its own — `paper-qa` only matters with a corpus, `ldp` only matters once you're
+committed to RL training, but aviary's Tool/Environment abstractions are valuable to Linus even if RL never happens.
 
 ## 5. What's incompatible or out of scope
 
@@ -69,6 +67,10 @@ task, not an incompatibility. Python 3.11+ requirement is satisfied by the `linu
 
 ## 6. Recommendation: **Study (with a Phase 6 path to Integrate)**
 
+Note that aviary is already an indirect runtime dependency via paper-qa (DEC-0044, accepted 2026-05-06): `paper-qa`
+imports `fhaviary` as a hard dep, so when Linus adopts paper-qa as the Phase 2c KnowledgeBase retrieval engine, aviary
+ships in the linus env as a transitive install whether or not Linus uses its `Environment` abstractions directly.
+
 Phase 1: read the paper, run the GSM8K and Counter tutorial notebooks against an Ollama-hosted worker via LiteLLM to
 verify the API ergonomics on Apple Silicon. Phase 6: when the RL/fine-tuning question becomes concrete, decide whether
 aviary + LDP is the rollout substrate or whether pmetal's GRPO trainer wants its own env wrapper. If Dan's domain
@@ -78,19 +80,21 @@ from PyPI and wrap.
 
 ## 7. Questions for Dan
 
-- **Benchmark substrate.** Should `benchmarks/dan_tasks/` be implemented as aviary `Environment`s from day one (so Phase
-  6 RL is a config flip, not a rewrite), or kept as a lighter custom-eval-runner format and ported only if/when RL
-  becomes real?
-- **LDP vs pmetal-trainer for RL.** Both can drive aviary environments in principle, but LDP is Python-native and
-  assumes LiteLLM-style endpoints, while pmetal owns the model weights and offers GRPO/DAPO directly. Is the Phase 6
-  plan "aviary envs + LDP rollouts + pmetal as the served model," or "aviary envs + a pmetal-native rollout shim"?
-  They're different glue problems.
-- **LAB-Bench as a Maestro/Worker delta target.** LAB-Bench is published, with hosted-frontier scores presumably
-  available. Worth running a local Qwen-Coder-32B vs. hosted-Claude head-to-head on LitQA2 / FigQA to size the gap
-  before committing to fine-tuning?
-- **Notebook environment as Linus's notebook tool.** The `aviary.notebook` package is a working Docker-sandboxed Jupyter
-  executor. Adopt it as Linus's first sandboxed-code-execution skill in Phase 7, or roll a simpler `nbclient`-based
-  local executor and accept lower isolation?
-- **Tool definition surface.** `Tool.from_function` (signature + docstring → schema) is much cleaner than the
-  Cline-style "variant prompts per model family" approach. Standardize on it for Linus's tool registry, or treat it as
-  one of several adapters into a Linus-native `Tool` type?
+1. **Benchmark substrate.** Should `benchmarks/dan_tasks/` be implemented as aviary `Environment`s from day one (so
+   Phase 6 RL is a config flip, not a rewrite), or kept as a lighter custom-eval-runner format and ported only if/when
+   RL becomes real?
+2. **LDP vs pmetal-trainer for RL.** Both can drive aviary environments in principle, but LDP is Python-native and
+   assumes LiteLLM-style endpoints, while pmetal owns the model weights and offers GRPO/DAPO directly. Is the Phase 6
+   plan "aviary envs + LDP rollouts + pmetal as the served model," or "aviary envs + a pmetal-native rollout shim"?
+   They're different glue problems.
+3. **LAB-Bench as a Maestro/Worker delta target.** LAB-Bench is published, with hosted-frontier scores presumably
+   available. Worth running a local Qwen-Coder-32B vs. hosted-Claude head-to-head on LitQA2 / FigQA to size the gap
+   before committing to fine-tuning? _Partially resolved (see
+   [answered-questions.md](../questions/answered-questions.md)): LAB-Bench MCQ-with-refusal adopted as the Worker
+   quality ceiling reference benchmark (S11); head-to-head run and fine-tuning gate remain open pending Phase 1c data._
+4. **Notebook environment as Linus's notebook tool.** The `aviary.notebook` package is a working Docker-sandboxed
+   Jupyter executor. Adopt it as Linus's first sandboxed-code-execution skill in Phase 7, or roll a simpler
+   `nbclient`-based local executor and accept lower isolation?
+5. **Tool definition surface.** `Tool.from_function` (signature + docstring → schema) is much cleaner than the
+   Cline-style "variant prompts per model family" approach. Standardize on it for Linus's tool registry, or treat it as
+   one of several adapters into a Linus-native `Tool` type?

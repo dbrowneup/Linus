@@ -52,13 +52,7 @@ Rust agent harness can be.
 
 ## 7. Questions for Dan
 
-- **Is "Linus has its own CLI harness" a Phase 5 goal, or OK to stay on Claude Code + claw-code-local forever?** ROADMAP
-  5c mentions a ~500-line custom terminal agent as a fallback. The fork handles the local-model case today, so this may
-  be a dead requirement.
-- **ACP/Zed as a Linus surface.** claw-code's ACP ambitions overlap with any future Linus-in-Zed idea. Not a
-  2026-current path, but worth flagging if you care about the Zed ecosystem.
-- **Rust as a Linus language.** claw-code, claw-code-local, and pmetal are all Rust. If Linus stays Python-first for
-  orchestration but has Rust-based components (pmetal bindings, future CLI), is that fine, or do you want a stated "one
-  orchestration language" policy?
-- **Read `PHILOSOPHY.md` now or defer?** It's short; likely contains framing worth lifting into Linus's own docs if
-  relevant. I can pull excerpts into VISION.md if useful.
+1. **ACP/Zed as a Linus surface.** claw-code's ACP ambitions overlap with any future Linus-in-Zed idea. Not a
+   2026-current path, but worth flagging if you care about the Zed ecosystem.
+2. **Read `PHILOSOPHY.md` now or defer?** It's short; likely contains framing worth lifting into Linus's own docs if
+   relevant. I can pull excerpts into VISION.md if useful.

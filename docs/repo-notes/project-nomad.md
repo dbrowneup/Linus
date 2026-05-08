@@ -10,7 +10,7 @@ in a management UI ("Command Center") at `localhost:8080`. Tagline: "Knowledge T
 is **inspiration only** — a bill of materials showing which third-party components a data-sovereignty layer can be built
 from, not code to adopt.
 
-## 2. Content overview (not architecture)
+## 2. Architecture summary
 
 NOMAD is a distribution, not a framework. Its real contribution is the _curated list_: Kiwix (ZIMs for Wikipedia,
 medical references, survival guides, ebooks), Kolibri (Khan Academy), ProtoMaps (offline PMTiles), CyberChef (offline
@@ -68,18 +68,23 @@ carefully. Nothing beyond that.
 
 ## 7. Questions for Dan
 
-- **Phase 4 scope ambition.** Roadmap Phase 4 now includes Kolibri as a named integration target alongside Kiwix and
-  PMTiles. CyberChef is noted as a Docker-acceptable stateless service if data-munging tooling is wanted. FlatNotes is
-  replaced by Obsidian vault integration. The open question: is CyberChef worth adding as a Phase 4 tool, or is it out
-  of scope for a research assistant?
-- **Kiwix ZIM selection.** The practical question that NOMAD resolves by asking the user: which Wikipedia subset? Full
-  English is ~100 GB; Simple English is ~1 GB; there are topical ZIMs (medical, Wikipedia-for-schools). Any preference
-  for genomics / biochem / chemistry-focused ZIMs if they exist?
-- **PMTiles regions.** Offline maps are only useful for specific places. Oregon + PNW makes sense given context. Any
-  other regions (fieldwork sites, travel) matter?
-- **Qdrant-in-Docker vs. native vector store.** NOMAD uses Qdrant because it's a general-purpose offering; Linus's
-  KnowledgeBase currently uses numpy-based similarity search. Are we promising Qdrant in Phase 4 only if benchmarks
-  force it, or do you want it regardless for a smoother long-term path?
-- **Explicit sovereignty statement in VISION.md.** NOMAD's phrasing ("Knowledge That Never Goes Offline," zero
-  telemetry, no authentication by default because the network boundary is the trust boundary) is crisper than Linus
-  currently articulates. Worth lifting into VISION.md?
+1. **Phase 4 scope ambition.** Roadmap Phase 4 now includes Kolibri as a named integration target alongside Kiwix and
+   PMTiles. CyberChef is noted as a Docker-acceptable stateless service if data-munging tooling is wanted. FlatNotes is
+   replaced by Obsidian vault integration. The open question: is CyberChef worth adding as a Phase 4 tool, or is it out
+   of scope for a research assistant?
+2. **Kiwix ZIM selection.** The practical question that NOMAD resolves by asking the user: which Wikipedia subset? Full
+   English is ~100 GB; Simple English is ~1 GB; there are topical ZIMs (medical, Wikipedia-for-schools). Any preference
+   for genomics / biochem / chemistry-focused ZIMs if they exist?
+3. **PMTiles regions.** Offline maps are only useful for specific places. Oregon + PNW makes sense given context. Any
+   other regions (fieldwork sites, travel) matter?
+4. **Qdrant-in-Docker vs. native vector store.** NOMAD uses Qdrant because it's a general-purpose offering; Linus's
+   KnowledgeBase currently uses numpy-based similarity search. Are we promising Qdrant in Phase 4 only if benchmarks
+   force it, or do you want it regardless for a smoother long-term path? _Partially resolved (S60, see
+   [answered-questions.md](../questions/answered-questions.md)): Docker is acceptable for stateful services that don't
+   need GPU/ANE (Qdrant is explicitly named); Qdrant-in-Docker is a valid Phase 4 option if numpy-based search
+   benchmarks force it._
+5. **Explicit sovereignty statement in VISION.md.** NOMAD's phrasing ("Knowledge That Never Goes Offline," zero
+   telemetry, no authentication by default because the network boundary is the trust boundary) is crisper than Linus
+   currently articulates. Worth lifting into VISION.md? _Partially resolved (E1, see
+   [answered-questions.md](../questions/answered-questions.md)): VISION.md now has an explicit open-source-by-default /
+   sovereignty "Release posture" section; the offline/zero-telemetry framing is addressed there._

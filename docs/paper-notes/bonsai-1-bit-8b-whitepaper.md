@@ -147,7 +147,7 @@ revisions, deterministic attention, identical generation parameters across model
 code execution, rule-based scoring with LLM fallback only on extraction failure. `benchmarks/dan_tasks/` should adopt
 this from the start.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 Headline throughput numbers are reported on **M4 Pro, not M1 Max**. Bandwidth differs (M4 Pro ~273 GB/s vs M1 Max ~400
 GB/s); the 1-bit kernel is bandwidth-bound, so M1 Max may actually be faster — but published numbers do not transfer
@@ -194,26 +194,19 @@ kernel work would eventually need to be ported or integrated.
 
 ## Open questions for Dan
 
-1. **Phase 1c scope expansion.** Should the BitNet spike formally expand to a "1-bit / native-low-bit shootout" — BitNet
-   b1.58 2B4T, Bonsai 1-bit 1.7B / 4B / 8B, the upcoming Bonsai-ternary variant, all benchmarked on M1 Max with the
-   `dan_tasks` suite and the task-completion-time methodology? That's the natural scope given what just landed; worth
-   confirming before the spike spec is written.
-2. **`Bonsai-demo` integration path.** Does the demo wrap PrismML's MLX fork, llama.cpp Metal, or both? The answer
+1. **`Bonsai-demo` integration path.** Does the demo wrap PrismML's MLX fork, llama.cpp Metal, or both? The answer
    determines whether Linus needs to vendor and track a forked MLX install, or can run Bonsai through stock llama.cpp +
    Metal kernels. The maintenance cost differs significantly.
-3. **Default-Worker decision criteria.** If Bonsai 1-bit 8B reproduces ~70 average benchmark and ~100+ tok/s on M1 Max
+2. **Default-Worker decision criteria.** If Bonsai 1-bit 8B reproduces ~70 average benchmark and ~100+ tok/s on M1 Max
    with ~1.5 GB peak RSS, does it become the **default Linus Worker** for general tasks, displacing Qwen2.5-Coder for
    non-code work? What benchmark margin or quality threshold would trigger that switch?
-4. **Quality-floor probe.** PrismML's published average is 70.5; Qwen3-8B at FP16 is 79.3. Nine points is a lot or a
+3. **Quality-floor probe.** PrismML's published average is 70.5; Qwen3-8B at FP16 is 79.3. Nine points is a lot or a
    little depending on the task. Is it worth a small targeted eval — say, 30 of Dan's actual scientific-Q&A and
    code-review prompts side-by-side between Bonsai-1bit-8B and a comparable FP16 7–8B — before committing Bonsai as a
    default? That would catch a "fluent but unreliable" failure mode the standard benchmarks would miss.
-5. **Compression-recipe watch.** If PrismML or the community ever publishes the Bonsai compression method, a
+4. **Compression-recipe watch.** If PrismML or the community ever publishes the Bonsai compression method, a
    domain-tuned Qwen3-8B → 1-bit Bonsai-format Linus model becomes plausible. Worth an explicit watch item, separate
    from the BitNet from-scratch path?
-6. **MLX fork strategy.** Long-term, does Linus pin to PrismML's MLX fork, contribute upstream support for scale-only
-   quant formats (which would let MLX match GGUF's 1.125 bits/weight), or wait for pmetal to subsume both? The fork is a
-   real maintenance liability and the question deserves an ADR before the inference layer hardens.
 
 ---
 

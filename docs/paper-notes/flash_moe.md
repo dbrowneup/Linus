@@ -121,7 +121,7 @@ author_, with Dan Woods directing the research over 24 hours of continuous colla
 operating model CLAUDE.md describes for Linus. Worth studying not just for the technical content but as an existence
 proof of what disciplined Maestro-Worker collaboration can produce.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 - **Hardware specifics**: M3 Max NVMe at 17.5 GB/s is 3× M1 Max's 6 GiB/s. Linus' actual numbers will be substantially
   lower; the technique is what transfers, not the throughput.
@@ -154,3 +154,7 @@ proof of what disciplined Maestro-Worker collaboration can produce.
    Or is that too meta?
 3. Combining BitNet experts with Flash-MoE streaming would push the memory/quality frontier further. Realistic Phase 8
    direction, or premature?
+
+   _Partially resolved (DEC-0041, see [answered-questions.md](../questions/answered-questions.md)): minGRU + BitNet
+   cross-product adopted as Phase 8 long-horizon research direction; BitNet + Flash-MoE combination is an adjacent
+   speculation, not yet explicitly scoped (DEC-0041)._

@@ -5,13 +5,12 @@
 Beever Atlas is an "LLM-first wiki knowledge base" whose unique source of truth is **team chat** — Slack, Discord,
 Microsoft Teams, and Mattermost — rather than papers, PDFs, URLs, or files on disk. It pulls a workspace's channel
 history through a TypeScript bot service, runs a six-stage Google-ADK ingestion pipeline that distils raw messages into
-atomic facts, entities, and relationships, persists them into a dual semantic-plus-graph memory (Weaviate + Neo4j
-
-- MongoDB + Redis), and continuously rebuilds a per-channel auto-maintained wiki on top. Two consumer surfaces hang off
-  that memory: a React dashboard with a streaming QA agent and a `fastmcp`-served MCP endpoint exposing 16 tools to
-  Claude Code / Cursor. The README is explicit that the design quotes Karpathy's "LLMs read wikis, not chat logs"
-  observation — making this a Group 3 sibling of agentic-wiki-builder, AgenticResearchWiki, llm-research-wiki,
-  llm-wikidata, atomic-knowledge, and obsidian-llm-wiki-local — but the chat-as-source axis sets it apart from every
+atomic facts, entities, and relationships, persists them into a dual semantic-plus-graph memory (Weaviate + Neo4j +
+MongoDB + Redis), and continuously rebuilds a per-channel auto-maintained wiki on top. Two consumer surfaces hang off
+that memory: a React dashboard with a streaming QA agent and a `fastmcp`-served MCP endpoint exposing 16 tools to
+Claude Code / Cursor. The README is explicit that the design quotes Karpathy's "LLMs read wikis, not chat logs"
+observation — making this a Group 3 sibling of agentic-wiki-builder, AgenticResearchWiki, llm-research-wiki,
+llm-wikidata, atomic-knowledge, and obsidian-llm-wiki-local — but the chat-as-source axis sets it apart from every
   other repo in that group, which all assume a document/file/URL ingest pattern. It is also the only repo in the group
   that ships as a multi-service Docker Compose product (backend + bot + web + four datastores) targeted at small teams.
 
@@ -44,11 +43,10 @@ demonstrates it at production scale with a real graph store and a real query rou
 `gather → compile → cache` shape with per-resource async locks (`wiki/builder.py`) is a clean pattern Linus's
 KnowledgeBase wiki layer can copy outright. The 6-stage ADK pipeline shows a concrete way to express "preprocess →
 (extract facts ‖ extract entities) → (embed ‖ validate) → persist" as a typed pipeline, including the ParallelAgent
-placement — Linus's Phase 3 parallel-agents design can lift this skeleton directly. The dual semantic
-
-- graph memory with a smart router is the strongest answer in the Group 3 cohort to the "vector RAG can't do relational
-  questions" problem; KnowledgeBase v2 likely wants this shape. The `fastmcp` 16-tool MCP surface is a good reference
-  for the eventual Linus MCP server.
+placement — Linus's Phase 3 parallel-agents design can lift this skeleton directly. The dual semantic + graph memory
+with a smart router is the strongest answer in the Group 3 cohort to the "vector RAG can't do relational questions"
+problem; KnowledgeBase v2 likely wants this shape. The `fastmcp` 16-tool MCP surface is a good reference for the
+eventual Linus MCP server.
 
 The chat-as-source axis is what differentiates beever-atlas from every Group 3 sibling: agentic-wiki-builder ingests
 single source files, llm-research-wiki and AgenticResearchWiki ingest research outputs, llm-wikidata targets the
@@ -90,18 +88,23 @@ chat-history ingest from his own DMs/Discords (unlikely on the current roadmap).
 
 ## 7. Questions for Dan
 
-- **Wiki-first-RAG for KnowledgeBase v2.** Beever's thesis is that retrieval should hit a continuously-distilled per-
-  source wiki, not raw chunks. KnowledgeBase v1 is chunk-based RAG. Is "distil each paper into a structured wiki page at
-  ingest, then retrieve against that" an explicit Phase 3 design move, or out of scope?
-- **Dual semantic + graph memory.** Beever runs Weaviate + Neo4j with a smart router that picks per question. The
-  current Linus plan is Qdrant-only. Is a graph store (Neo4j, Memgraph, or even a SQLite-on-disk triple table) on the
-  roadmap for relational queries over the paper corpus?
-- **Google ADK as an orchestration framework.** Beever's pipeline is expressed as ADK `SequentialAgent` /
-  `ParallelAgent` rather than ad-hoc Python. Is ADK on the table for Linus's orchestration layer, or do we want to own
-  the agent-graph abstraction ourselves to keep the dependency surface small?
-- **MCP tool surface.** Beever ships 16 tools through `fastmcp`. Is the Phase 2/3 plan for Linus's MCP surface similarly
-  scoped (discovery, retrieval, graph traversal, long-running ops), or narrower for v1?
-- **Adapter abstraction for non-paper sources.** Beever's `BaseAdapter` + `NormalizedMessage` cleanly separates "where
-  the bytes come from" from "what the pipeline does with them." Even ignoring chat, Dan has papers, threads, notes, and
-  pics. Is there value in defining a similar `BaseSource` abstraction in KnowledgeBase before more source types
-  accumulate, or is that premature?
+1. **Wiki-first-RAG for KnowledgeBase v2.** Beever's thesis is that retrieval should hit a continuously-distilled per-
+   source wiki, not raw chunks. KnowledgeBase v1 is chunk-based RAG. Is "distil each paper into a structured wiki page
+   at ingest, then retrieve against that" an explicit Phase 3 design move, or out of scope?
+2. **Dual semantic + graph memory.** Beever runs Weaviate + Neo4j with a smart router that picks per question. The
+   current Linus plan is Qdrant-only. Is a graph store (Neo4j, Memgraph, or even a SQLite-on-disk triple table) on the
+   roadmap for relational queries over the paper corpus?
+
+   _Partially resolved (DEC-0015, see [answered-questions.md](../questions/answered-questions.md)): Dual approach
+   adopted (RDF via rdflib/SPARQL + property graph); both are Phase 3 KB substrates; Weaviate/Neo4j not adopted._
+
+3. **MCP tool surface.** Beever ships 16 tools through `fastmcp`. Is the Phase 2/3 plan for Linus's MCP surface
+   similarly scoped (discovery, retrieval, graph traversal, long-running ops), or narrower for v1?
+
+   _Partially resolved (DEC-0045, DEC-0046, see [answered-questions.md](../questions/answered-questions.md)): fastmcp
+   adopted as MCP framework; deployment field in registry schema; v1 tool count and scope TBD at Phase 2a._
+
+4. **Adapter abstraction for non-paper sources.** Beever's `BaseAdapter` + `NormalizedMessage` cleanly separates "where
+   the bytes come from" from "what the pipeline does with them." Even ignoring chat, Dan has papers, threads, notes, and
+   pics. Is there value in defining a similar `BaseSource` abstraction in KnowledgeBase before more source types
+   accumulate, or is that premature?

@@ -99,7 +99,7 @@ paper cold is a prerequisite for reading anything else in the corpus.
 Concrete load-bearing implications for Linus design:
 
 - **Quantization (BitNet thread).** The BitNet papers ([2310.11453v1](2310.11453v1.md), [2402.17764v1](2402.17764v1.md),
-  [2504.18415v2](2504.18415v2.md), [2504.12285v1](2504.12285v1.md)) replace the FP linear projections inside attention
+  [2504.18415v2](2504.18415v2.md), [2504.12285v2](2504.12285v2.md)) replace the FP linear projections inside attention
   and FFN with 1-bit / 1.58-bit weights. The architecture they replace is exactly this one. Understanding which tensors
   are quantized (the WiQ/WiK/WiV/WO and FFN W1/W2 matrices) requires Section 3 of this paper as the reference.
 - **Memory-pillar complexity (Garrison thread).** The TC0 / hard-attention / soft-attention expressivity bounds in
@@ -122,7 +122,7 @@ Concrete load-bearing implications for Linus design:
 Phase relevance: foundational reference, not phase-gated. Cite from Phases 1, 2, 6, 7. Re-read sections 3.2 and 4 before
 any quantization, fine-tuning, or KV-cache work.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 The specific 2017 numbers are dead. d_model=512, h=8, N=6, d_ff=2048 are toy sizes by 2025 standards (Llama-3-8B is
 N=32, d_model=4096, d_ff=14336, h=32 with 8 KV heads via GQA). The base/big distinction is gone — modern models have a
@@ -149,7 +149,7 @@ other paper in the corpus assumes you know it.
 ## Connections
 
 The BitNet thread ([2310.11453v1](2310.11453v1.md), [2402.17764v1](2402.17764v1.md), [2504.18415v2](2504.18415v2.md),
-[2504.12285v1](2504.12285v1.md)) modifies the linear projections inside this architecture. Read Section 3.2 of this
+[2504.12285v2](2504.12285v2.md)) modifies the linear projections inside this architecture. Read Section 3.2 of this
 paper before any of those.
 
 The memory-pillar / expressivity thread ([2305.15408v5](2305.15408v5.md), [2310.07923v5](2310.07923v5.md), and the rest
@@ -171,21 +171,16 @@ Section 3.
 
 ## Open questions for Dan
 
-1. **Modern reference paper.** Is there value in adding a "modern Transformer architecture reference" to the corpus —
-   something that surveys RoPE, RMSNorm, SwiGLU, GQA, pre-norm, and the rest of the post-2017 standard kit in one place?
-   The Llama 3 paper covers it implicitly, but a focused reference (e.g., a recent survey or a clean blog post like
-   Karpathy's nanoGPT writeups) might be a better daily-driver companion to this one. If yes, it's a small Worker task
-   to find and download.
-2. **Attention-as-implementation-target paper.** Linus will eventually need to run attention efficiently on Metal/ANE.
+1. **Attention-as-implementation-target paper.** Linus will eventually need to run attention efficiently on Metal/ANE.
    Should the corpus include FlashAttention-1/2/3 (Tri Dao) as the canonical "how attention is actually implemented on
    accelerators" reference? The original FlashAttention paper is short and load-bearing for any throughput conversation.
-3. **KV cache economics.** Given the M1 Max 32 GB constraint, the KV cache is going to dominate long-context inference
+2. **KV cache economics.** Given the M1 Max 32 GB constraint, the KV cache is going to dominate long-context inference
    cost for Linus. Worth a dedicated note on KV-cache memory math (per-layer K and V tensors of shape [batch,
    n_kv_heads, seq_len, d_head] in the chosen dtype) tied to specific Worker models? This is implicit in this paper but
    never spelled out.
-4. **Encoder-only relevance.** The KnowledgeBase embedding stack uses encoder-only models (BERT-family). Worth treating
+3. **Encoder-only relevance.** The KnowledgeBase embedding stack uses encoder-only models (BERT-family). Worth treating
    the encoder half of this paper as the historical root of that stack, and adding a BERT note (1810.04805) explicitly
    to the corpus to close that loop?
-5. **Bibliographic hygiene.** This is the canonical citation. Should `docs/glossary.md` or a similar file maintain a "if
+4. **Bibliographic hygiene.** This is the canonical citation. Should `docs/glossary.md` or a similar file maintain a "if
    you only read five papers in the Linus corpus, read these" pointer with this one at the top? The corpus is going to
    grow; new readers (future Dan, future Worker fine-tunes trained on this repo) need the orientation.

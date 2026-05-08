@@ -88,20 +88,25 @@ that is a strong argument for bundling skills with every Linus instance.
 
 ## 7. Questions for Dan
 
-- **Bio-Task Bench Intermediate plateau.** Both agents land at 0.96–0.97 on Intermediate with or without skills. Read
-  scientifically: is this an evaluator saturation problem (rubric too coarse), is Intermediate actually too easy, or
-  does in-context skill priming genuinely fail to help on multi-step tasks where the bottleneck is judgment rather than
-  API recall? The answer changes how aggressively Linus should bet on skills as an autonomy-graduation lever.
-- **Local-model amplification.** The biggest gain (+0.049) was on Codex 5.4-Mini, the weaker model. Hypothesis: smaller
-  / local models benefit more from skill priming than Sonnet does. Worth running bioSkills against Qwen2.5-Coder-32B and
-  a future Linus fine-tune on the same 33-test BTB to test this empirically before Phase 7?
-- **Heavy CLI tool surface.** ~25 Bioconda CLIs (samtools, bcftools, MACS3, IQ-TREE2, PLINK, ADMIXTURE, Salmon, STAR,
-  Bakta, BRAKER3, …) need to be present for the skills to actually run. Make this a single conda env Linus manages, or
-  per-project, or document and let the user provision?
-- **Single-cell coverage match.** The 14 single-cell skills cover scRNA-seq, scATAC, perturb-seq, lineage tracing
-  (Cassiopeia), cell-cell communication (CellChat-style + MeboCost metabolite communication). Does this map onto the
-  scRNA-seq workflows you actually run, or are there missing methods (e.g. specific batch-correction or trajectory tools
-  you prefer) that we'd want to author additional skills for?
-- **Entrepreneurial surface.** The skills synthesis flagged scientific-literature intelligence and bioinformatics
-  pipeline documentation as Phase 1+ surfaces. bioSkills is essentially a working v0 of the second one. Worth reaching
-  out to GPTomics (the maintainer) to compare notes, or keep this as private ammunition for the Linus-as-product story?
+1. **Bio-Task Bench Intermediate plateau.** Both agents land at 0.96–0.97 on Intermediate with or without skills. Read
+   scientifically: is this an evaluator saturation problem (rubric too coarse), is Intermediate actually too easy, or
+   does in-context skill priming genuinely fail to help on multi-step tasks where the bottleneck is judgment rather than
+   API recall? The answer changes how aggressively Linus should bet on skills as an autonomy-graduation lever.
+   _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): bioSkills adopted as Phase 7
+   inaugural bundle with a pre-launch A/B measurement gate; if no measurable lift on judgment-heavy tasks, skills launch
+   as opt-in rather than default-on (S30). Plateau mechanism remains an open empirical question._
+2. **Local-model amplification.** The biggest gain (+0.049) was on Codex 5.4-Mini, the weaker model. Hypothesis: smaller
+   / local models benefit more from skill priming than Sonnet does. Worth running bioSkills against Qwen2.5-Coder-32B
+   and a future Linus fine-tune on the same 33-test BTB to test this empirically before Phase 7? _Partially resolved
+   (see [answered-questions.md](../questions/answered-questions.md)): S30 calls for re-running Bio-Task Bench against
+   the chosen Phase 2a worker model (Qwen3) before Phase 7; local-model amplification hypothesis will be tested then._
+3. **Heavy CLI tool surface.** ~25 Bioconda CLIs (samtools, bcftools, MACS3, IQ-TREE2, PLINK, ADMIXTURE, Salmon, STAR,
+   Bakta, BRAKER3, …) need to be present for the skills to actually run. Make this a single conda env Linus manages, or
+   per-project, or document and let the user provision?
+4. **Single-cell coverage match.** The 14 single-cell skills cover scRNA-seq, scATAC, perturb-seq, lineage tracing
+   (Cassiopeia), cell-cell communication (CellChat-style + MeboCost metabolite communication). Does this map onto the
+   scRNA-seq workflows you actually run, or are there missing methods (e.g. specific batch-correction or trajectory
+   tools you prefer) that we'd want to author additional skills for?
+5. **Entrepreneurial surface.** The skills synthesis flagged scientific-literature intelligence and bioinformatics
+   pipeline documentation as Phase 1+ surfaces. bioSkills is essentially a working v0 of the second one. Worth reaching
+   out to GPTomics (the maintainer) to compare notes, or keep this as private ammunition for the Linus-as-product story?

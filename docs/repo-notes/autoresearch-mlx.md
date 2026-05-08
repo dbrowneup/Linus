@@ -67,14 +67,12 @@ actually runs.
 
 ## 7. Questions for Dan
 
-- **Smoke run timing.** Run the verbatim 5-minute loop now alongside Phase 1b's pmetal evaluation so we have a
-  hardware-local baseline on this M1 Max before Phase 6d needs it, or wait until 6d formally opens?
-- **Payload swap for Phase 6d.** Is the first real Linus autoloop a LoRA sweep with held-out PPL on Dan's corpus, or go
-  straight to a Dan-task-suite scorer despite the higher per-experiment cost?
-- **Autonomy tier for "NEVER STOP".** `program.md` assumes an agent running unsupervised overnight on its own branch,
-  committing freely. SAFETY.md doesn't authorize that today. Is overnight-autonomous- on-an-agent-branch the right first
-  graduation step in Phase 7?
-- **`program.md` → SKILL.md.** Promote it to the Anthropic `SKILL.md` convention as the template for Linus's first real
-  skill, or keep `program.md` flavor for now?
-- **Muon variant.** The README hints the working (non-public) port used Muon to reach `1.294526` on M4 Max. Worth
-  porting Muon into our fork as the first agent-driven experiment, or stay AdamW-only?
+1. **Smoke run timing.** Run the verbatim 5-minute loop now alongside Phase 1b's pmetal evaluation so we have a
+   hardware-local baseline on this M1 Max before Phase 6d needs it, or wait until 6d formally opens?
+2. **Payload swap for Phase 6d.** Is the first real Linus autoloop a LoRA sweep with held-out PPL on Dan's corpus, or go
+   straight to a Dan-task-suite scorer despite the higher per-experiment cost?
+3. **Autonomy tier for "NEVER STOP".** `program.md` assumes an agent running unsupervised overnight on its own branch,
+   committing freely. SAFETY.md doesn't authorize that today. Is overnight-autonomous- on-an-agent-branch the right
+   first graduation step in Phase 7?
+4. **Muon variant.** The README hints the working (non-public) port used Muon to reach `1.294526` on M4 Max. Worth
+   porting Muon into our fork as the first agent-driven experiment, or stay AdamW-only?

@@ -83,17 +83,16 @@ you are running iii-engine.
 
 ## 7. Questions for Dan
 
-- **Hook taxonomy adoption.** The 13-hook lifecycle catalog (SessionStart through TaskCompleted) maps cleanly onto
-  Garrison's four sub-requirements. Want a follow-up doc that ports this to a Linus-native list as part of the Phase 2
-  episodic-memory spec, or keep that scoped to DEC-0029 work?
-- **MCP surface scope.** agentmemory exposes 51 memory tools; mem0 exposes ~5; Letta exposes ~12. Where on that spectrum
-  should Linus's Layer-C MCP surface land in Phase 3 — minimal-and-composable, or comprehensive-and-curated?
-- **Lease / signal / checkpoint primitives.** These are real answers to Phase 3 parallel-Worker write coordination.
-  Worth promoting from "implementation detail" to a named DEC alongside DEC-0029, or premature to formalize before the
-  v0 substrate ships?
-- **iii-engine evaluation.** It's a real piece of engineering and not crazy as a Worker-orchestration runtime in its own
-  right. Worth a 30-minute look before fully closing the door, or are you firm that Linus's runtime is Python
-  orchestration over SQLite and iii is out of scope full stop?
-- **Headline-benchmark interpretation.** The 95.2% R@5 LongMemEval-S number is with embeddings on but LLM compression
-  off (the no-op default). Should Linus replicate LongMemEval-S as part of the Phase 2 episodic-memory acceptance
-  criteria, and if so against the same `all-MiniLM-L6-v2` baseline so numbers are comparable across group repos?
+1. **Hook taxonomy adoption.** The 13-hook lifecycle catalog (SessionStart through TaskCompleted) maps cleanly onto
+   Garrison's four sub-requirements. Want a follow-up doc that ports this to a Linus-native list as part of the Phase 2
+   episodic-memory spec, or keep that scoped to DEC-0029 work?
+2. **MCP surface scope.** agentmemory exposes 51 memory tools; mem0 exposes ~5; Letta exposes ~12. Where on that
+   spectrum should Linus's Layer-C MCP surface land in Phase 3 — minimal-and-composable, or comprehensive-and-curated?
+3. **Lease / signal / checkpoint primitives.** These are real answers to Phase 3 parallel-Worker write coordination.
+   Worth promoting from "implementation detail" to a named DEC alongside DEC-0029, or premature to formalize before the
+   v0 substrate ships? _Partially resolved (DEC-0022, see [answered-questions.md](../questions/answered-questions.md)):
+   Parallel Worker KB write coordination resolved as serialized writes + write-time contradiction surfacing;
+   lease/signal/checkpoint vocabulary for Phase 3 still open._
+4. **Headline-benchmark interpretation.** The 95.2% R@5 LongMemEval-S number is with embeddings on but LLM compression
+   off (the no-op default). Should Linus replicate LongMemEval-S as part of the Phase 2 episodic-memory acceptance
+   criteria, and if so against the same `all-MiniLM-L6-v2` baseline so numbers are comparable across group repos?

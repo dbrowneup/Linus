@@ -104,7 +104,7 @@ about a regulatory network, say), this paper gives a visualization recipe.
 outward). Knowing _what_ PCA captures and _what it distorts_ (distance near origin) is a transferable insight whenever
 PCA is used in any Linus pipeline.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 - **Not about AI/LLMs**. The paper makes no claims about neural networks; the connection to BitNet is my own
   speculation.
@@ -131,11 +131,3 @@ PCA is used in any Linus pipeline.
 1. **Why is this paper in your `context/papers/` folder?** Is it for the geometry methodology (visualization tool), the
    biology applications (Ising-as-Boltzmann ↔ gene regulation), or because of the surface-level "hypercube" word overlap
    with JPmHC? Knowing your motivation would refocus the note.
-2. **BitNet weight visualization**: would you find it useful if I drafted a small experiment spec —
-   `experiments/bitnet-weight-hypercube.md` — that takes a small BitNet checkpoint, extracts the sign-pattern of one
-   layer's weights, treats each input row as a hypercube vertex, and applies the PCA projection from this paper? It's
-   curiosity-driven, not Phase 6 critical, but might give surprising structural insight into what 1-bit LLMs encode.
-3. **Methodological methodology**: the paper's framing of "we want reproducible AND interpretable visualizations of
-   high-dim binary data" maps onto a question we'll have downstream when Linus produces visualizations of agent state,
-   KB structure, etc. Worth elevating as a Linus design principle (reproducibility + interpretability over fancy
-   stochastic methods)?

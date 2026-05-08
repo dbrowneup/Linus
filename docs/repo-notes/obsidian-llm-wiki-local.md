@@ -85,20 +85,20 @@ the equivalent Linus modules.
 
 ## 7. Questions for Dan
 
-- **Lift `structured_output.py` directly?** It is MIT, ~300 lines, no exotic dependencies, and solves a problem Linus
-  will hit in Phase 1 the day a Qwen2.5 Worker is asked for JSON. Vendor it under `src/linus/inference/structured.py`
-  with attribution, or rewrite from scratch?
-- **Compared to its Group 2/3 siblings (`AgenticResearchWiki` is hosted-API-first; `agentic-wiki-builder`,
-  `llm-research-wiki`, `llm-wikidata`, `atomic-knowledge`, `beever-atlas` are mostly hosted-first too), this is the only
-  one that treats Ollama as the default and OpenAI-compat as the fallback.** Does that local-first commitment plus the
-  reject-and-explain loop make `obsidian-llm-wiki-local` the canonical Group-3 reference for Linus, with the others as
-  contrast cases?
-- **Reject-and-explain as a Linus Skill primitive.** Imagine a Phase 7 Linus Skill where any Worker output can be
-  rejected with a free-text critique that gets injected into the next invocation, capped at 5 attempts. Is that worth
-  spec'ing now while the pattern is fresh, or premature?
-- **Obsidian as a Linus front-end, ever?** The `wiki/` output is plain markdown with `[[wikilinks]]` and YAML
-  frontmatter — Obsidian-readable for free. If KnowledgeBase eventually exports synthesis pages in this shape, Dan gets
-  graph view and backlinks at zero cost. Phase 4 candidate, or out of scope?
-- **The vault layout vs. the KnowledgeBase submodule.** `obsidian-llm-wiki-local`'s discipline (immutable `raw/`, all
-  generated state under a single hidden directory, atomic writes, hand-edit detection) is the right pattern. Is
-  KnowledgeBase already shaped this way, or worth a Phase 2 audit before deeper integration?
+1. **Lift `structured_output.py` directly?** It is MIT, ~300 lines, no exotic dependencies, and solves a problem Linus
+   will hit in Phase 1 the day a Qwen2.5 Worker is asked for JSON. Vendor it under `src/linus/inference/structured.py`
+   with attribution, or rewrite from scratch?
+2. **Compared to its Group 2/3 siblings (`AgenticResearchWiki` is hosted-API-first; `agentic-wiki-builder`,
+   `llm-research-wiki`, `llm-wikidata`, `atomic-knowledge`, `beever-atlas` are mostly hosted-first too), this is the
+   only one that treats Ollama as the default and OpenAI-compat as the fallback.** Does that local-first commitment plus
+   the reject-and-explain loop make `obsidian-llm-wiki-local` the canonical Group-3 reference for Linus, with the others
+   as contrast cases?
+3. **Reject-and-explain as a Linus Skill primitive.** Imagine a Phase 7 Linus Skill where any Worker output can be
+   rejected with a free-text critique that gets injected into the next invocation, capped at 5 attempts. Is that worth
+   spec'ing now while the pattern is fresh, or premature?
+4. **Obsidian as a Linus front-end, ever?** The `wiki/` output is plain markdown with `[[wikilinks]]` and YAML
+   frontmatter — Obsidian-readable for free. If KnowledgeBase eventually exports synthesis pages in this shape, Dan gets
+   graph view and backlinks at zero cost. Phase 4 candidate, or out of scope?
+5. **The vault layout vs. the KnowledgeBase submodule.** `obsidian-llm-wiki-local`'s discipline (immutable `raw/`, all
+   generated state under a single hidden directory, atomic writes, hand-edit detection) is the right pattern. Is
+   KnowledgeBase already shaped this way, or worth a Phase 2 audit before deeper integration?

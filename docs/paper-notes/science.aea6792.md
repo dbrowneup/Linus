@@ -151,7 +151,7 @@ internally.
 supply-chain risk but treats the model as a black box. Activation-level inspection adds a third defensive axis:
 behavioral monitoring from inside the model.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 **Hosted Maestro is opaque to all of this.** The technique fundamentally requires read/write access to per-block
 activations during the forward pass. Linus's Maestro path (Anthropic API, Claude.ai) does not expose this and never
@@ -200,34 +200,32 @@ covers internal-state inspection of inference; this is unique in Group F.
 
 ## Open questions for Dan
 
-1. **Should Linus's local Worker inference layer (pmetal-serve / mlx-lm / Ollama) expose activation hooks?** The
-   architecture decision is binary: either the inference layer is a black box (faster to ship, no observability story)
-   or it exposes per-block hooks (more engineering, but enables steering, monitoring, and any future activation-based
-   tooling). Worth deciding before mlx-lm integration solidifies. Recommend: stub `linus.observability.activations.*`
-   API in ARCHITECTURE.md now, no-op for Ollama, real hooks for mlx-lm in Phase 6/7.
-
-2. **Is real-time activation monitoring a feasible Phase 7 sandbox primitive on M1 Max, or too expensive?** The probe
+1. **Is real-time activation monitoring a feasible Phase 7 sandbox primitive on M1 Max, or too expensive?** The probe
    itself is small (a linear classifier over ~`L·p` features), but capturing per-block activations during generation has
    memory and latency cost. Worth a back-of-envelope estimate against Llama-3.1-8B-4bit on an M1 before committing to
    the design.
 
-3. **Supervised steering as a behavior-modulation lever — Phase 6 prerequisite to LoRA?** The paper's case for
+2. **Supervised steering as a behavior-modulation lever — Phase 6 prerequisite to LoRA?** The paper's case for
    supervised steering being cheaper than fine-tuning is strong. Should Linus's roadmap add an explicit "steering before
    fine-tuning" Phase 6 milestone — i.e., try to achieve a desired behavior with RFM steering first, escalate to LoRA
    only if steering is insufficient?
 
-4. **Does this technique work on BitNet / extreme-quantized models?** The paper validates 4-bit Llama, which is
+   _Partially resolved (S47 / DEC-0054, see [answered-questions.md](../questions/answered-questions.md)): Activation
+   hooks stub covers the Phase 1 infrastructure prerequisite. Steering-vs-LoRA sequencing decision deferred to Phase 6
+   planning after the Phase 2 feasibility spike result._
+
+3. **Does this technique work on BitNet / extreme-quantized models?** The paper validates 4-bit Llama, which is
    reassuring, but BitNet's ternary weights and severely-quantized activations might break the linearity assumption that
    makes additive `ε·v` work. This is an empirical question worth flagging if BitNet (Group A) becomes a serious
    deployment target — possibly a small spike experiment in `experiments/`.
 
-5. **Where does the dataset for our first concept vectors come from?** The paper's GPT-4o-generated
+4. **Where does the dataset for our first concept vectors come from?** The paper's GPT-4o-generated
    400-statement-per-concept pipeline assumes cloud-LLM access. For a "private, local" Linus, do we accept GPT-4o or
    hosted Maestro as a one-time bootstrapping cost for concept-vector training data, or do we want a fully-local
    pipeline using a strong Worker (with the quality hit that implies)? This affects whether the activation-monitoring
    story can claim full data sovereignty.
 
-6. **First concept to actually try.** If we do this, the first concept matters for credibility. Candidates:
+5. **First concept to actually try.** If we do this, the first concept matters for credibility. Candidates:
    hallucination (most general, biggest payoff for KnowledgeBase RAG), terseness (smallest scope, easiest to evaluate),
    or pandemic-pathogen-synthesis-adjacent content (highest-stakes safety demo, hardest to label). Recommend
    hallucination first — the monitoring evaluation is well-defined and the result is immediately useful in Phase 3.

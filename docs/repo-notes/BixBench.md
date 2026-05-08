@@ -84,18 +84,15 @@ private Dan-task-suite, especially for any genomics analysis tasks Dan curates f
 
 ## 7. Questions for Dan
 
-- **Dataset overlap risk.** BixBench questions derive from 60 published notebooks. If Dan has read any of those source
-  papers (likely, given the field), there is a contamination concern when Dan-curated tasks share provenance. Want to
-  log which capsules Dan recognizes and treat them as "no-credit" items in the Linus scorecard?
-- **Open-ended vs MCQ for Dan-task-suite.** BixBench supports both modes; the open-ended setting with LLM-judge grading
-  is more realistic but noisier. For the private Dan-task-suite, do we follow BixBench and offer both, or commit to one
-  mode (likely open-ended with hand-graded rubric for the held-out subset)?
-- **Docker vs native kernel.** BixBench defaults to a Docker Jupyter env. On the M1 Max that loses Metal/ANE access for
-  any in-notebook ML; for bio-analytics work this rarely matters (pandas/scipy/biopython), but for any benchmark task
-  involving local inference inside the notebook it would. Run BixBench in `use_docker: false` mode to keep parity with
-  Linus's actual deployment surface, or accept the Docker default for reproducibility?
-- **LAB-Bench in parallel.** The sibling repo LAB-Bench is the literature-reasoning counterpart to BixBench's
-  notebook-execution focus. Worth standing both up in Phase 1, or prioritize BixBench as the more mission-aligned and
-  treat LAB-Bench as a later add?
-- **Frontier baselines.** Should the Linus scorecard list the v1.5 paper's GPT-4o / Claude-3.5-Sonnet numbers as a
-  visible ceiling on every BixBench run, or leave them out so Worker progress is judged on its own trajectory?
+1. **Dataset overlap risk.** BixBench questions derive from 60 published notebooks. If Dan has read any of those source
+   papers (likely, given the field), there is a contamination concern when Dan-curated tasks share provenance. Want to
+   log which capsules Dan recognizes and treat them as "no-credit" items in the Linus scorecard?
+2. **Open-ended vs MCQ for Dan-task-suite.** BixBench supports both modes; the open-ended setting with LLM-judge grading
+   is more realistic but noisier. For the private Dan-task-suite, do we follow BixBench and offer both, or commit to one
+   mode (likely open-ended with hand-graded rubric for the held-out subset)?
+3. **Docker vs native kernel.** BixBench defaults to a Docker Jupyter env. On the M1 Max that loses Metal/ANE access for
+   any in-notebook ML; for bio-analytics work this rarely matters (pandas/scipy/biopython), but for any benchmark task
+   involving local inference inside the notebook it would. Run BixBench in `use_docker: false` mode to keep parity with
+   Linus's actual deployment surface, or accept the Docker default for reproducibility?
+4. **Frontier baselines.** Should the Linus scorecard list the v1.5 paper's GPT-4o / Claude-3.5-Sonnet numbers as a
+   visible ceiling on every BixBench run, or leave them out so Worker progress is judged on its own trajectory?

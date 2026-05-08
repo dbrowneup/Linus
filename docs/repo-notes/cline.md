@@ -60,15 +60,8 @@ becomes the dominant harness only after 1–2 phases of real use.
 
 ## 7. Questions for Dan
 
-- **Harness plurality.** You'll plausibly run Claude Code (Maestro), Cline (VS Code worker tasks), claw-code-local
-  (terminal tasks), and openclaw (chat/voice) — all pointing at Linus. That's four front-ends. Is that the intended
-  end-state, or is there a desire to converge on fewer once one proves out?
-- **MCP as the extensibility substrate.** Cline, openclaw, and pmetal all speak MCP. Adopting MCP as the
-  tool-registration surface inside Linus is a plausible Phase 3 move — it means tools registered once are visible in all
-  harnesses without custom glue. Architecturally cleaner, but carries MCP's complexity. Want to revisit this decision
-  explicitly in Phase 3?
-- **Variant prompts for small / 1-bit models.** Cline's `xs` variant exists because tiny models need substantially
-  different prompts. When Linus's Phase 6 produces a fine-tuned 1-bit model, it will likely need its own variant too.
-  Plan for this in Phase 7 skills design, or defer?
-- **Browser use.** Cline's browser tool relies on Anthropic's Computer Use — a frontier-model capability. Local models
-  plausibly can't drive it reliably. Is browser-based agentic work a Linus use case, or does it stay Maestro-only?
+1. **Variant prompts for small / 1-bit models.** Cline's `xs` variant exists because tiny models need substantially
+   different prompts. When Linus's Phase 6 produces a fine-tuned 1-bit model, it will likely need its own variant too.
+   Plan for this in Phase 7 skills design, or defer?
+2. **Browser use.** Cline's browser tool relies on Anthropic's Computer Use — a frontier-model capability. Local models
+   plausibly can't drive it reliably. Is browser-based agentic work a Linus use case, or does it stay Maestro-only?

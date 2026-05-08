@@ -127,7 +127,7 @@ form, and use it as a Maestro-class evaluation in `benchmarks/dan_tasks/`. Run i
 then against the strongest local Worker (gap measurement). The gap is the per-token Maestro premium; the trajectory
 length is the memory-architecture stress test.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 **Not a recipe for Workers.** Nothing in this paper transfers to local 7B–14B inference. Claude Opus 4.6 is the frontier
 model of its release window; the closest Linus Workers (Qwen2.5-Coder-7B, Mistral-7B, future LoRA-tuned 8B) will not
@@ -182,19 +182,18 @@ set.
    `docs/repo-notes/` (Knuth, Tao's blog posts, the residue paper [10] above, and similar)? It is a small corpus that
    calibrates expectations and provides discussion fodder; not load-bearing for any single phase, but useful when
    arguing about Maestro/Worker boundaries with future collaborators.
-2. **Maestro-class benchmark?** Should a small open combinatorial problem (smaller than Knuth's, but in the same family
-   — Hamiltonian decomposition on a fixed digraph, or a Cayley-graph cycle problem) live in `benchmarks/dan_tasks/` as a
-   _Maestro-class_ eval, explicitly distinguished from Worker-class evals? This would formalize the role distinction in
-   the benchmark suite itself rather than only in protocol docs.
-3. **Worker-tractable analog?** Is there a sub-problem here a 7B Worker could plausibly handle — e.g., DFS the m = 3
+2. **Worker-tractable analog?** Is there a sub-problem here a 7B Worker could plausibly handle — e.g., DFS the m = 3
    case, generate the Cayley-graph reformulation given a hint, write the verification harness? Decomposing a
    Maestro-class problem into Worker-tractable sub-tasks is itself an exercise; Knuth's exploration log is unusually
    well-suited as a source because the steps are already labeled.
-4. **plan.md as protocol mandate?** The forced-documentation pattern Stappers used — "update before doing anything else,
+3. **plan.md as protocol mandate?** The forced-documentation pattern Stappers used — "update before doing anything else,
    no exceptions" — should that become a default in the Maestro/Worker protocol document, with a settings.json hook that
    enforces it for long-running Worker sessions? The cost is near zero; the upside is recoverability when Workers fail
    mid-task (which they will).
-5. **Trajectory store in the memory pillar?** Should the memory architecture have an explicit "exploration trajectory"
+4. **Trajectory store in the memory pillar?** Should the memory architecture have an explicit "exploration trajectory"
    object type, separate from chat history and KnowledgeBase entries, designed to hold plan.md-style logs as queryable
    artifacts? This would let future Maestro sessions reuse prior exploration structure ("we tried fiber decomposition
    for problem X, here's where it stalled") instead of restarting cold.
+
+   _Partially resolved (DEC-0039, see [answered-questions.md](../questions/answered-questions.md)): Episodic schema
+   for multi-step tasks uses hybrid leaf + summary records (DEC-0039); explicit "exploration trajectory" type deferred._

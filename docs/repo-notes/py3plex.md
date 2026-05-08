@@ -9,8 +9,8 @@ Skrlj/Kralj/Lavrac papers (Applied Network Science; Complex Networks VII) and ha
 set on the README — Tests, Examples, Tutorial, Code Quality, Benchmarks, Documentation, Formal Verification (CrossHair +
 icontract + z3), Fuzzing — is unusually serious for an academic graph library and is what makes this repo worth real
 attention rather than filing as "yet another NetworkX wrapper." For Linus this lands squarely in the Phase 2 KB graph
-layer (DEC-0026/27, dual RDF + property graph) and in Phase 3 hybrid retrieval where embeddings + community structure +
-centrality have to compose cleanly.
+layer (DEC-0015, dual RDF + property graph substrates) and in Phase 3 hybrid retrieval where embeddings + community
+structure + centrality have to compose cleanly.
 
 ## 2. Architecture summary
 
@@ -32,9 +32,9 @@ exposes 7 tools and 3 resources covering the DSL v2 surface for AI-agent use.
 ## 3. What's reusable in Linus
 
 The most directly relevant piece for Phase 2 is the **DSL v2 + executor + provenance triple**. Linus has already
-committed (via the dual-substrate decision in Crossing 3) to networkx as the property-graph engine sitting beside
-rdflib; py3plex's `multi_layer_network` is a `networkx.MultiDiGraph`-based container, so a Linus KnowledgeBase property
-graph could in principle be wrapped as a degenerate one-layer py3plex network and gain the entire DSL-driven query/
+committed (via the dual-substrate decision in DEC-0015) to networkx as the property-graph engine sitting beside rdflib;
+py3plex's `multi_layer_network` is a `networkx.MultiDiGraph`-based container, so a Linus KnowledgeBase property graph
+could in principle be wrapped as a degenerate one-layer py3plex network and gain the entire DSL-driven query/
 community/centrality/uncertainty stack at the cost of one dependency. Even if Linus does not adopt the multilayer
 container, the DSL design
 (`Q.nodes().where(degree__gt=5).compute('pagerank').uq(method='perturbation', n_samples=100, ci=0.95).execute(network)`)
@@ -55,9 +55,8 @@ library, not a discourse-analysis web app — it provides the algorithmic substr
 opinionated UX over a narrower analytical model (text-as-graph). Against the `agentic-wiki-builder` DuckDB+NetworkX
 pattern Linus already references, py3plex is the natural upgrade path the day a single-graph property store starts
 needing typed layers (papers vs. concepts vs. citations) and the day uncertainty quantification on centrality matters
-for "is this concept actually a hub or just one perturbation away from being marginal?" — questions a plain `networkx`
-
-- DuckDB stack cannot answer without a new layer of code that py3plex has already written and tested.
+for "is this concept actually a hub or just one perturbation away from being marginal?" — questions a plain `networkx` +
+DuckDB stack cannot answer without a new layer of code that py3plex has already written and tested.
 
 ## 4. What's inspiration only
 
@@ -94,19 +93,17 @@ Claude Code, and see whether the DSL holds up under real KB queries before commi
 
 ## 7. Questions for Dan
 
-- **Does Linus's KB actually become multilayer?** The DEC-0026/27 dual-substrate decision is RDF + property graph, not
-  multilayer-property graph. If the property graph stays single-layer (one node-type universe, edges typed by relation),
-  py3plex is overkill and plain networkx + a custom query helper is the right size. If layers (paper / concept / claim /
-  author / source) are first-class, py3plex is the obvious substrate. Which way are you leaning before Phase 2 starts?
-- **DSL design ownership.** py3plex's DSL v2 is genuinely well-designed, but importing it means Linus's graph query
-  surface is shaped by an upstream library's roadmap. Do we want to fork the DSL design into a Linus-native query
-  builder (lighter, KB-shaped, fewer concepts), or accept the dependency to avoid rebuilding what works?
-- **Uncertainty quantification in KB retrieval.** py3plex makes confidence intervals on centrality/community a one-line
-  `.uq(...)` clause. The synthesis-landscape work emphasizes epistemic standards and claim typing; UQ on graph-derived
-  rankings is a natural extension. Is this a Phase 3 priority, or a Phase 4+ refinement?
-- **Formal verification adoption.** CrossHair + icontract + z3 is a serious testing posture. Adopting even just
-  icontract `@require`/`@ensure` for Linus's tool registry and sandbox boundary code would be cheap and high-value. Want
-  to add this as a Known Library / Engineering Convention now, or wait for a concrete pain point?
-- **MCP-as-tool-substrate, again.** py3plex ships an MCP server alongside pmetal's, openclaw's, and Cline's MCP support.
-  The Phase 3 question — "is MCP the tool-registration substrate?" — keeps recurring. Three serious local-AI-adjacent
-  projects in this repo collection have already answered yes. Time to make the call?
+1. **Does Linus's KB actually become multilayer?** The DEC-0015 dual-substrate decision is RDF + property graph, not
+   multilayer-property graph. If the property graph stays single-layer (one node-type universe, edges typed by
+   relation), py3plex is overkill and plain networkx + a custom query helper is the right size. If layers (paper /
+   concept / claim / author / source) are first-class, py3plex is the obvious substrate. Which way are you leaning
+   before Phase 2 starts?
+2. **DSL design ownership.** py3plex's DSL v2 is genuinely well-designed, but importing it means Linus's graph query
+   surface is shaped by an upstream library's roadmap. Do we want to fork the DSL design into a Linus-native query
+   builder (lighter, KB-shaped, fewer concepts), or accept the dependency to avoid rebuilding what works?
+3. **Uncertainty quantification in KB retrieval.** py3plex makes confidence intervals on centrality/community a one-line
+   `.uq(...)` clause. The synthesis-landscape work emphasizes epistemic standards and claim typing; UQ on graph-derived
+   rankings is a natural extension. Is this a Phase 3 priority, or a Phase 4+ refinement?
+4. **Formal verification adoption.** CrossHair + icontract + z3 is a serious testing posture. Adopting even just
+   icontract `@require`/`@ensure` for Linus's tool registry and sandbox boundary code would be cheap and high-value.
+   Want to add this as a Known Library / Engineering Convention now, or wait for a concrete pain point?

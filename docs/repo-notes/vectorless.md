@@ -85,16 +85,20 @@ smaller idea (navigable-tree tools as MCP) into Linus's own KB tool registry.
 
 ## 7. Questions for Dan
 
-- **Bake-off scope.** Should the Vectorless evaluation use a hosted model (gpt-4o-mini, Claude Haiku) for an honest
-  quality ceiling, a local Ollama worker for an honest Linus-on-MacBook ceiling, or both? The two answers could be very
-  different and shape whether this pattern is "worker territory" at all.
-- **Crossing 3 implications.** Vectorless's existence is an argument that a Linus KB built _purely_ on graph +
-  shell-command tools, with no vectors, might be viable. Crossing 3 currently assumes vectors. Do we want to defend that
-  assumption with a measurement, or is the hybrid path (vectors for recall, navigation for precision) already settled?
-- **Tool surface as MCP.** The shell-command vocabulary (`ls`/`cd`/`cat`/`grep`/`concepts`/`chain`) is the most concrete
-  reusable artifact. Is this a Phase 2 KB-tool-registry candidate, or does it wait for Phase 3 hybrid retrieval design?
-- **Failure-mode tolerance.** Vectorless's "model fails, we fail" stance is the opposite of Linus's preference for
-  graceful degradation in worker pipelines. If we adopt the navigation pattern, do we want to keep the strict stance or
-  add KnowledgeBase-style fallbacks (BM25 backstop when the agent gives up)?
-- **engram comparison.** Is there a planned engram experiment where we can run head-to-head with Vectorless on the same
-  documents and same questions, so the "compile-don't-retrieve" thesis gets a real measurement instead of a vibe?
+1. **Bake-off scope.** Should the Vectorless evaluation use a hosted model (gpt-4o-mini, Claude Haiku) for an honest
+   quality ceiling, a local Ollama worker for an honest Linus-on-MacBook ceiling, or both? The two answers could be very
+   different and shape whether this pattern is "worker territory" at all.
+2. **Crossing 3 implications.** Vectorless's existence is an argument that a Linus KB built _purely_ on graph +
+   shell-command tools, with no vectors, might be viable. Crossing 3 currently assumes vectors. Do we want to defend
+   that assumption with a measurement, or is the hybrid path (vectors for recall, navigation for precision) already
+   settled?
+3. **Tool surface as MCP.** The shell-command vocabulary (`ls`/`cd`/`cat`/`grep`/`concepts`/`chain`) is the most
+   concrete reusable artifact. Is this a Phase 2 KB-tool-registry candidate, or does it wait for Phase 3 hybrid
+   retrieval design? _Partially resolved (DEC-0018, DEC-0045, see
+   [answered-questions.md](../questions/answered-questions.md)): MCP adopted as extensibility substrate with fastmcp;
+   whether this shell-command vocabulary enters Phase 2 KB registry is still open._
+4. **Failure-mode tolerance.** Vectorless's "model fails, we fail" stance is the opposite of Linus's preference for
+   graceful degradation in worker pipelines. If we adopt the navigation pattern, do we want to keep the strict stance or
+   add KnowledgeBase-style fallbacks (BM25 backstop when the agent gives up)?
+5. **engram comparison.** Is there a planned engram experiment where we can run head-to-head with Vectorless on the same
+   documents and same questions, so the "compile-don't-retrieve" thesis gets a real measurement instead of a vibe?

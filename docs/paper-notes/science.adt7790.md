@@ -167,7 +167,7 @@ and pacing; this paper shows that individual development has a sweet spot of mul
 depth. Together the wave argues that Linus should value variety, breadth, and rest as design properties rather than
 treating raw throughput as the only axis to optimize.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 Nearly nothing in this paper transfers to model training, inference, quantization, RAG, or any other technical layer of
 Linus. There is no mechanism here to translate "multidisciplinary practice" into a regime for fine-tuning a 7B model —
@@ -217,22 +217,14 @@ constraint rather than a slogan.
 
 ## Open questions for Dan
 
-1. **Time allocation.** Does this paper change the rough split between Linus development, biochemistry / genomics work,
-   and new-domain learning (Rust, LLM internals, agentic systems)? The paper's evidence suggests the multidisciplinary
-   mix during this mid-career window is itself a high-value activity, not a dilution of focus — so the current shape may
-   already be the right one. But the implication is to _protect_ that mix, not just tolerate it. Worth being explicit
-   about.
-2. **Linus as crowd-out risk.** Should "preserve room for Dan's multidisciplinary work" be an explicit Linus design
+1. **Linus as crowd-out risk.** Should "preserve room for Dan's multidisciplinary work" be an explicit Linus design
    constraint? Concretely: a working tool should reduce the time Dan spends on bench work, reading, and cross-domain
    exploration _less_ than it accelerates the rest of his work. If Linus becomes so engrossing that it monopolizes
    attention, the paper's evidence says that's a long-term loss even if short-term productivity rises.
-3. **Design principle in VISION.md.** Is "Linus aids late-career multidisciplinary synthesis, not early-career narrow
-   specialization" worth promoting from a paper-note observation to an explicit design principle? It would have
-   downstream consequences for KnowledgeBase queries, Worker dispatch, and UX defaults.
-4. **Cross-domain framing in the skills synthesis.** Does the "domain expertise as moat" line in
+2. **Cross-domain framing in the skills synthesis.** Does the "domain expertise as moat" line in
    skills-and-practices-synthesis.md need to become "cross-domain expertise as moat"? The paper provides specific
    empirical grounding for the cross-domain version; the narrow version is the version everyone else is also pursuing.
-5. **Honest scope.** Where would over-applying this paper to Linus do active harm? The temptation is to invoke it as
+3. **Honest scope.** Where would over-applying this paper to Linus do active harm? The temptation is to invoke it as
    validation for any breadth-favoring decision — but most Linus design decisions don't need or benefit from
    human-development grounding. A small filter: only invoke this paper when the decision actually concerns long-horizon
    human-Linus interaction patterns (who Linus serves, what activities it should preserve, what synthesis it should

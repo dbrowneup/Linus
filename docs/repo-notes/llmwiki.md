@@ -77,19 +77,16 @@ box, that may displace llmwiki as the reference.
 
 ## 7. Questions for Dan
 
-- **Karpathy-wiki vs. KnowledgeBase RAG.** llmwiki's whole bet is "agent-maintained markdown wiki beats RAG-on-raw-PDFs
-  for compounding research knowledge." KnowledgeBase today is a RAG/graph system. Is the Phase 2 KB v1 model a RAG-only
-  baseline, an llmwiki-style compiled-wiki layer, or both side by side with the wiki citing back into the RAG?
-- **MCP surface size.** llmwiki gives Claude five tools (`guide`, `search`, `read`, `write`, `delete`) and that appears
-  to be enough for a maintained wiki. pmetal-mcp ships 45. Is the Phase 3 target for Linus closer to five-per-domain or
-  to a flat 30-50 catalog?
-- **Workspace cardinality.** llmwiki enforces one workspace per MCP server entry. For Linus, do you want one KB MCP
-  endpoint covering all of `context/`, or one per subcorpus (papers, notes, threads, books) so that scope is explicit to
-  the agent?
-- **Claim-typing interop.** The security synthesis recommends content-hashing and typed claims for KB entries. llmwiki's
-  `documents` table has a free-form `tags JSON` column and no claim type. Should a Linus port add a `claim_type` column
-  and SHA-256 of canonicalized content from day one, or is that a Phase 3 concern?
-- **Differentiator confidence.** I read llmwiki's code but only the group framing for the other ten siblings. Before
-  committing to "Study" rather than something stronger, would you want the same depth of read on `wikiloom`,
-  `TheKnowledge`, and `OmegaWiki` first to confirm llmwiki really is the cleanest reference and not just the first one
-  read?
+1. **Karpathy-wiki vs. KnowledgeBase RAG.** llmwiki's whole bet is "agent-maintained markdown wiki beats RAG-on-raw-PDFs
+   for compounding research knowledge." KnowledgeBase today is a RAG/graph system. Is the Phase 2 KB v1 model a RAG-only
+   baseline, an llmwiki-style compiled-wiki layer, or both side by side with the wiki citing back into the RAG?
+2. **MCP surface size.** llmwiki gives Claude five tools (`guide`, `search`, `read`, `write`, `delete`) and that appears
+   to be enough for a maintained wiki. pmetal-mcp ships 45. Is the Phase 3 target for Linus closer to five-per-domain or
+   to a flat 30-50 catalog?
+3. **Workspace cardinality.** llmwiki enforces one workspace per MCP server entry. For Linus, do you want one KB MCP
+   endpoint covering all of `context/`, or one per subcorpus (papers, notes, threads, books) so that scope is explicit
+   to the agent?
+4. **Differentiator confidence.** I read llmwiki's code but only the group framing for the other ten siblings. Before
+   committing to "Study" rather than something stronger, would you want the same depth of read on `wikiloom`,
+   `TheKnowledge`, and `OmegaWiki` first to confirm llmwiki really is the cleanest reference and not just the first one
+   read?

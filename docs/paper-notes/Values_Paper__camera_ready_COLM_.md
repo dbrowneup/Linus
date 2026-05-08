@@ -163,7 +163,7 @@ warmth in technical contexts) would make the dependency visible and testable.
 signal — is a template for Linus's audit-log monitoring. If a Worker starts expressing values it normally does not (a
 coder model producing "dominance" outputs), that is a tripwire worth logging.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 The data is **consumer Claude.ai**, Free and Pro, in a chat product. Linus uses hosted Claude through Claude Code and
 the API in a fundamentally different mode: longer context, tool-using, more technical, less subjective, fewer
@@ -226,25 +226,18 @@ KB write-back path; see "What's reusable" above.
 
 ## Open questions for Dan
 
-1. **Document Maestro-value dependencies?** Should Linus add a `docs/maestro-protocol.md` (or extend VISION.md) listing
-   the Claude values Linus relies on (epistemic honesty for synthesis, transparency for tool-use) and the values Linus
-   actively counters in its prompts (over-hedging, sycophantic mirroring, default warmth in technical contexts)? Making
-   the dependency explicit would let us notice when a Maestro version change shifts the relied-on behaviors.
-2. **Worker-values audit pipeline?** The paper's bottom-up extraction is implementable in small. Worth scoping a Phase
+1. **Worker-values audit pipeline?** The paper's bottom-up extraction is implementable in small. Worth scoping a Phase
    6/7 deliverable that runs an analogous extraction over Linus's audit log to characterize Worker value expression —
    with the explicit goal of detecting Worker behavior drift after fine-tunes or quantization changes?
-3. **Task-spec template change.** The context-dependence finding implies that _every_ Linus task spec implicitly summons
+2. **Task-spec template change.** The context-dependence finding implies that _every_ Linus task spec implicitly summons
    a value frame. Should the orchestration layer's task-spec template have a mandatory `value_frame` field (e.g.,
    "terse, skeptical, non-mirroring" vs. "warm, supportive, expansive") to make this explicit and avoid relying on the
    Maestro's default?
-4. **Security synthesis update.** The previous security framing of hosted-Maestro risk centered on data exfiltration
+3. **Security synthesis update.** The previous security framing of hosted-Maestro risk centered on data exfiltration
    (deanonymization angle, [2602.16800v2.md](2602.16800v2.md)). This paper adds a _behavioral-variability_ angle: the
    Maestro's value frame shifts predictably with topic, which is a different kind of risk (predictability of output
    style across security-sensitive vs. non-sensitive contexts). Worth a paragraph in the Group F security synthesis?
-5. **KB write-back rule from privacy-preserving aggregation.** The paper's "release only above minimum-cluster
+4. **KB write-back rule from privacy-preserving aggregation.** The paper's "release only above minimum-cluster
    threshold" rule is a clean architectural primitive. Should Linus adopt it explicitly: per-session content stays
    per-session unless a pattern recurs across ≥N sessions, at which point it can be promoted to KB? This protects
    against single-conversation leakage by construction and is testable.
-6. **Mirroring vs. sycophancy detection.** The paper flags the open question of whether the 20% support-mirroring rate
-   is appropriate or sycophantic. For Linus's own prompts to the Maestro, is there value in periodically running a "did
-   you mirror or did you disagree" check on Maestro outputs to detect drift toward sycophancy?

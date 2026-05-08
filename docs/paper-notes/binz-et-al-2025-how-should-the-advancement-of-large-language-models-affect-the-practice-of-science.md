@@ -140,7 +140,7 @@ open-source, Bender on bespoke domain tools, Marelli on attribution, and Botvini
 stronger anchor than the current language, immediately legible to a future contributor or to hosted Claude in a future
 session.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 The paper's audience is scientists publishing in PNAS — it discusses authorship, peer review, manuscript fabrication,
 journal policy. Linus is not a publishing system; publication-bound prescriptions (CRediT updates, dedicated
@@ -189,28 +189,15 @@ re-reading the Memory Architecture spec with Marelli in hand.
 
 ## Open questions for Dan
 
-1. **Should VISION.md or CLAUDE.md cite this Perspective and stake out Linus's positions explicitly?** Adding one
-   paragraph naming the four perspectives — and identifying Linus as Schulz-on-open-source, Bender-on-bespoke-tools,
-   Marelli-on-attribution, Botvinick/Gershman-on-roadmap-agency — converts implicit bets into explicit and reviewable
-   design philosophy. Cheap, durable, immediately useful as context for future Maestro sessions. Worth doing?
-2. **Should the audit log design be re-examined against Marelli-style attribution requirements?** The CLAUDE.md "audit
+1. **Should the audit log design be re-examined against Marelli-style attribution requirements?** The CLAUDE.md "audit
    log" line item is currently a one-liner. Marelli implies a richer specification: per-output records of model, prompt,
    retrieved context, tool calls, claimed-vs-retrieved citations, timestamps — designed so the audit log alone could
    justify any output downstream. Promote this to a Phase 2 design document with Marelli's principles cited?
-3. **Is there a Linus "epistemic standards" document worth writing?** Marelli calls for "clear quality criteria and
-   verification methods defined before using LLMs." A short doc (`docs/EPISTEMIC-STANDARDS.md` or similar) defining the
-   categories of claims Linus distinguishes (verified-against-source, model-asserted-uncited,
-   model-asserted-cited-but-unverified, etc.) would operationalize this. Phase 2 deliverable, or premature?
-4. **Which of the four perspectives most resonates with you personally, and is that reflected in the documentation?**
+2. **Which of the four perspectives most resonates with you personally, and is that reflected in the documentation?**
    The implicit answer in the current docs reads as a Marelli-flavored hybrid (principles-based,
    accountability-centered) with Botvinick/Gershman commitments on roadmap agency. Accurate? If so, the docs would be
    improved by saying so out loud. If not, what is missing?
-5. **Schulz vs. Botvinick/Gershman on roadmap delegation: is there a case for ever letting Linus choose its own next
-   phase?** Botvinick/Gershman would say no, regardless of capability. The current Linus design implicitly agrees, but
-   the eventual "Linus joins the Maestro team" line gestures at Schulz's looser stance. Worth making the limits
-   explicit: Linus may _propose_ roadmap items but never _commit_ them, even when fully capable. One-line addition to
-   ROADMAP.md or CLAUDE.md.
-6. **Reproducibility from proprietary providers — has the Schulz horror story already happened to your work?** Schulz et
+3. **Reproducibility from proprietary providers — has the Schulz horror story already happened to your work?** Schulz et
    al. report a paper revision blocked by a silent provider-side model change. If anything similar has been at risk in
    Dan's hosted-Claude work, that's the strongest possible motivation for accelerating the Phase 2 MVP and pinning
    Worker model versions in the audit log from day one.

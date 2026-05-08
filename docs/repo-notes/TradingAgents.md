@@ -79,21 +79,17 @@ decision-log mechanism become directly useful and TradingAgents may graduate to 
 
 ## 7. Questions for Dan
 
-- **Domain transfer of the bull/bear debate.** The most interesting Linus-applicable idea here is the structured
-  adversarial debate between two researchers over a shared report set. Is there a scientific-workflow analog you'd want
-  Linus to run — e.g., "supports hypothesis" vs "alternative explanation" debate over a set of paper summaries from
-  KnowledgeBase — and if so, should the Phase 3 spec include it explicitly or wait for Phase 7?
-- **Two-tier LLM split as a Linus convention.** TradingAgents' `deep_think_llm` / `quick_think_llm` distinction is a
-  clean pattern — analysts on a cheap fast model, managers on a strong model. Should Linus formalize this as a config
-  convention (and as a Maestro/Worker boundary marker) in ARCHITECTURE.md before Phase 3?
-- **Decision-log + reflection pattern.** The `~/.tradingagents/memory/trading_memory.md` mechanism — append outcome,
-  compute realized result, feed prior lessons into the next run's manager prompt — is a near-drop-in template for a
-  Linus "what worked / what didn't" memory. Is that interesting enough to spec independently, or does it stay coupled to
-  whatever KnowledgeBase ends up being?
-- **Personal finance as a Phase 7 skill.** The README is firm that this is research-only and not investment advice.
-  Setting that aside — do you ever want Linus to do private personal-finance research (analyze a 401k, model a
-  refinance, evaluate a stock) such that TradingAgents' `dataflows/` adapters become useful, or is finance permanently
-  out of scope for Linus?
-- **LangGraph as Linus's orchestration substrate.** TradingAgents, like several other agent frameworks, builds on
-  LangGraph. Linus has not committed to an orchestration library yet. Is LangGraph in the running for Phase 2a's
-  orchestration layer, or is the plan to write a thinner Linus-native graph runner and avoid that dep?
+1. **Two-tier LLM split as a Linus convention.** TradingAgents' `deep_think_llm` / `quick_think_llm` distinction is a
+   clean pattern — analysts on a cheap fast model, managers on a strong model. Should Linus formalize this as a config
+   convention (and as a Maestro/Worker boundary marker) in ARCHITECTURE.md before Phase 3?
+2. **Decision-log + reflection pattern.** The `~/.tradingagents/memory/trading_memory.md` mechanism — append outcome,
+   compute realized result, feed prior lessons into the next run's manager prompt — is a near-drop-in template for a
+   Linus "what worked / what didn't" memory. Is that interesting enough to spec independently, or does it stay coupled
+   to whatever KnowledgeBase ends up being?
+3. **Personal finance as a Phase 7 skill.** The README is firm that this is research-only and not investment advice.
+   Setting that aside — do you ever want Linus to do private personal-finance research (analyze a 401k, model a
+   refinance, evaluate a stock) such that TradingAgents' `dataflows/` adapters become useful, or is finance permanently
+   out of scope for Linus?
+4. **LangGraph as Linus's orchestration substrate.** TradingAgents, like several other agent frameworks, builds on
+   LangGraph. Linus has not committed to an orchestration library yet. Is LangGraph in the running for Phase 2a's
+   orchestration layer, or is the plan to write a thinner Linus-native graph runner and avoid that dep?

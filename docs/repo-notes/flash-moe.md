@@ -11,10 +11,10 @@ clearest demonstration of what's possible on current Apple Silicon when you thro
 
 ## 2. Architecture summary
 
-Per-layer pipeline (4.28 ms average): attention projections + delta-net on GPU (1.22 ms), o_proj + norm + routing on GPU
+Per-layer pipeline (4.28 ms average): attention projections + delta-net on GPU (1.22 ms), o*proj + norm + routing on GPU
 (0.55 ms), top-K routing on CPU (0.003 ms), parallel `pread()` of K=4 expert weights from SSD (2.41 ms — the
 bottleneck), then a deferred GPU command that runs expert forward + combine + norm while the next layer's attention
-projections are already being encoded. The counterintuitive result is that _no custom expert cache_ beats the OS page
+projections are already being encoded. The counterintuitive result is that \_no custom expert cache* beats the OS page
 cache: every attempt (Metal LRU, malloc cache, LZ4 compressed cache) lost to the kernel's built-in page-cache LRU, which
 achieves ~71% hit rate naturally with zero code. The Metal kernels are hand-tuned: an FMA-optimized 4-bit dequant that
 pre-computes `scale*x` and `bias*x` so dequant+multiply becomes one fused multiply-add (+12%), a fused SwiGLU, batched
@@ -55,15 +55,9 @@ and use it as the template for Linus's own Phase 6d results table. Do not try to
 
 ## 7. Questions for Dan
 
-- **The 32 GB flash-moe analogue.** flash-moe ran ~400B on 48 GB. On the M1 Max 32 GB with a slower SSD, the comfortable
-  ceiling is probably a ~100–150B MoE or a 30–50B dense-1-bit model. Want me to sketch a concrete Phase 6d target ("get
-  MODEL X running at N tok/s on Dan's hardware") once Phase 1b closes?
-- **"Trust the OS" as a Linus design principle.** The flash-moe finding that every custom cache lost to the OS page
-  cache is a strong generalizable principle. Explicitly promote it to a Linus engineering convention in CLAUDE.md, or
-  keep it implicit?
-- **Autoresearch + flash-moe methodology fusion.** Phase 7c's overnight iteration loop is essentially the flash-moe
-  experiment log run as a supervised AI loop against a tok/s target. Is this the first concrete use case for the Phase
-  3b parallel-agent infrastructure, or does it stay a later-phase thing?
-- **Objective-C / Metal-direct as an escape hatch.** If Linus ever needs flash-moe-level control — say, to beat pmetal
-  on a specific workload — we'd be writing Obj-C and Metal by hand. That's a skill Dan doesn't currently have. Is
-  acquiring it a Phase 7+ bet, or ruled out in favor of "whatever pmetal supports"?
+1. **The 32 GB flash-moe analogue.** flash-moe ran ~400B on 48 GB. On the M1 Max 32 GB with a slower SSD, the
+   comfortable ceiling is probably a ~100–150B MoE or a 30–50B dense-1-bit model. Want me to sketch a concrete Phase 6d
+   target ("get MODEL X running at N tok/s on Dan's hardware") once Phase 1b closes?
+2. **Autoresearch + flash-moe methodology fusion.** Phase 7c's overnight iteration loop is essentially the flash-moe
+   experiment log run as a supervised AI loop against a tok/s target. Is this the first concrete use case for the Phase
+   3b parallel-agent infrastructure, or does it stay a later-phase thing?

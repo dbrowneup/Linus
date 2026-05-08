@@ -35,15 +35,16 @@ is plain markdown files; persistence is the user's git repo or filesystem, and t
 ## 3. What's reusable in Linus
 
 The **Persona.md pattern** — a single small file injected into every session that captures evolving user preferences,
-naming conventions, and code style — is directly reusable as Layer D (long-term semantic memory in the
-memory-architecture spec). It is the simplest, most legible implementation of "the model learns how I work" that any of
-the eight memory repos in this survey offers, and it would slot into Linus's `linus.memory.persona.read()` contract with
-very little adaptation. The **REMEMBER.md cascading rulebook** (global rules, per-project overrides, named sections that
-either append-to or `Override:`-replace defaults) is a clean precedent for how Linus's tool registry might let users
-customise routing without forking plugin code. The **session-start hook + brain-index tool** shape
-(`remember_brain_index` returns a compact tree of all entities for the agent to ground against) is exactly the kind of
-pre-prompt context-injection Linus's orchestration layer needs in Phase 2a, and the implementation is ~200 lines of Node
-— a useful reference for sizing.
+naming conventions, and code style — is directly reusable as Layer E (long-term semantic memory in the
+memory-architecture spec; renamed from Layer D per DEC-0052, when investigation memory took the Layer D slot). It is the
+simplest, most legible implementation of "the model learns how I work" that any of the eight memory repos in this survey
+offers, and it would slot into Linus's `linus.memory.persona.read()` contract with very little adaptation. The
+**REMEMBER.md cascading rulebook** (global rules, per-project overrides, named sections that either append-to or
+`Override:`-replace defaults) is a clean precedent for how Linus's tool registry might let users customise routing
+without forking plugin code. The **session-start hook + brain-index tool** shape (`remember_brain_index` returns a
+compact tree of all entities for the agent to ground against) is exactly the kind of pre-prompt context-injection
+Linus's orchestration layer needs in Phase 2a, and the implementation is ~200 lines of Node — a useful reference for
+sizing.
 
 ## 4. What's inspiration only
 
@@ -74,30 +75,32 @@ the same vault could be regenerated from Linus's SQLite store if a markdown expo
 
 Read `index.js`, `scripts/extract.js`, and the `REMEMBER.md` rulebook before finalising the Phase 2a
 `linus.memory.persona` and `linus.memory.episodic.recall_session` implementations. Borrow the Persona.md
-single-file-injection pattern explicitly (note it as prior art in the relevant ADR; the relationship to Layer D is the
-load-bearing one). Borrow the `extract.js` Claude-Code-transcript walker as reference for the eventual
-backfill-from-history tool. Do **not** vendor the package, do **not** install the plugin alongside Linus during Phase 2
-(it would race Linus on memory writes), and revisit only if Phase 5 OpenClaw integration surfaces a need for a
-markdown-vault export of Linus's episodic store — at which point the routing-rulebook concept is a candidate for the
-export's organisational schema.
+single-file-injection pattern explicitly (note it as prior art in the relevant ADR; the relationship to Layer E
+(semantic, renumbered from Layer D per DEC-0052) is the load-bearing one). Borrow the `extract.js`
+Claude-Code-transcript walker as reference for the eventual backfill-from-history tool. Do **not** vendor the package,
+do **not** install the plugin alongside Linus during Phase 2 (it would race Linus on memory writes), and revisit only if
+Phase 5 OpenClaw integration surfaces a need for a markdown-vault export of Linus's episodic store — at which point the
+routing-rulebook concept is a candidate for the export's organisational schema.
 
 ## 7. Questions for Dan
 
-- **Persona vs trust-level scratchpad.** Remember's `Persona.md` is unbounded — every observation gets appended as an
-  "evidence line" with no provenance. DEC-0030 mandates trust levels on scratchpad segments. Should Linus's Layer D
-  persona inherit the same trust-level tagging, or is Persona-class data (style preferences, naming conventions) always
-  trust=high by definition?
-- **Markdown vault as Layer C export.** SQLite is the source of truth for episodic memory (DEC-0029), but a read-only
-  markdown-vault projection would let Dan browse memory in Obsidian and let openclaw see memory without speaking SQL.
-  Worth a small export-tool spike in Phase 2b, or premature?
-- **Retroactive backfill from `~/.claude/projects/*.jsonl`.** Dan has months of Claude Code transcripts already.
-  Remember's `extract.js` shows the walker works. Is backfilling Linus's Layer C from this corpus a Phase 2b
-  deliverable, or a Phase 3 "knowledge & parallel agents" item?
-- **OpenClaw plugin co-existence.** If Dan installs Remember.md inside OpenClaw for personal Obsidian-vault curation,
-  and Linus also writes memory through its own pathway, the two are independent stores with no sync. Is that acceptable
-  separation, or does this argue for Linus owning the only memory write-path and Remember-the-tool being uninstalled
-  once Phase 2a ships?
-- **Differentiation gap with `openaugi` / `memex`.** Remember's distinguishing move is the routing-rulebook ontology;
-  `openaugi` and `memex` solve adjacent problems (graph extraction from vaults, capture-and-search). Are any of the
-  three sibling repos worth installing in parallel for a week of personal use to test the Obsidian-vault pattern in
-  practice, or is the survey enough?
+1. **Persona vs trust-level scratchpad.** Remember's `Persona.md` is unbounded — every observation gets appended as an
+   "evidence line" with no provenance. DEC-0030 mandates trust levels on scratchpad segments. Should Linus's Layer E
+   persona (semantic; renumbered from Layer D per DEC-0052) inherit the same trust-level tagging, or is Persona-class
+   data (style preferences, naming conventions) always trust=high by definition? _Partially resolved (DEC-0030, see
+   [answered-questions.md](../questions/answered-questions.md)): DEC-0030 mandates trust-level tagging on scratchpad
+   segments; persona-class data trust policy TBD in Phase 2a memory spec._
+2. **Markdown vault as Layer C export.** SQLite is the source of truth for episodic memory (DEC-0029), but a read-only
+   markdown-vault projection would let Dan browse memory in Obsidian and let openclaw see memory without speaking SQL.
+   Worth a small export-tool spike in Phase 2b, or premature?
+3. **Retroactive backfill from `~/.claude/projects/*.jsonl`.** Dan has months of Claude Code transcripts already.
+   Remember's `extract.js` shows the walker works. Is backfilling Linus's Layer C from this corpus a Phase 2b
+   deliverable, or a Phase 3 "knowledge & parallel agents" item?
+4. **OpenClaw plugin co-existence.** If Dan installs Remember.md inside OpenClaw for personal Obsidian-vault curation,
+   and Linus also writes memory through its own pathway, the two are independent stores with no sync. Is that acceptable
+   separation, or does this argue for Linus owning the only memory write-path and Remember-the-tool being uninstalled
+   once Phase 2a ships?
+5. **Differentiation gap with `openaugi` / `memex`.** Remember's distinguishing move is the routing-rulebook ontology;
+   `openaugi` and `memex` solve adjacent problems (graph extraction from vaults, capture-and-search). Are any of the
+   three sibling repos worth installing in parallel for a week of personal use to test the Obsidian-vault pattern in
+   practice, or is the survey enough?

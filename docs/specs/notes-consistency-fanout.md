@@ -1,0 +1,377 @@
+# Notes Consistency Fan-Out Spec
+
+**Date:** 2026-05-08 **Status:** spec authored; canary pending. **Owner:** Maestro (Dan + Claude Code).
+
+**Related:** [`CLAUDE.md`](../../CLAUDE.md) §Doc-type conventions; §Measure, don't just estimate; §Agent fan-out:
+probe permissions first. [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md).
+[`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md).
+
+---
+
+## Goal
+
+Bring all 195 per-source notes — 98 in [`docs/paper-notes/`](../paper-notes/) and 97 in
+[`docs/repo-notes/`](../repo-notes/) — into uniform structure, terminology, and Linus-current framing per the
+"Doc-type conventions" section in [`CLAUDE.md`](../../CLAUDE.md). The notes are good; they need alignment and
+freshening against the current decision and spec corpus (DEC-0001..0054, current `docs/specs/`, current phase
+scoping), not rewriting.
+
+## Scope
+
+In scope:
+
+- All `*.md` files in `docs/paper-notes/` excluding `INDEX.md` and `README.md` (98 files).
+- All `*.md` files in `docs/repo-notes/` excluding `INDEX.md` and `README.md` (97 files).
+- For each note: structural alignment, link/anchor fixes, phase/DEC mapping in "What's reusable in Linus",
+  open-questions sequential renumbering where Policy A deletions left gaps.
+
+Out of scope (do not touch):
+
+- `docs/syntheses/`, `docs/audits/`, `docs/landscapes/`, `docs/questions/`, `docs/specs/` (other than this file),
+  `docs/protocols/`, `docs/cybersecurity-notes/`, `docs/session-summaries/`, `docs/curation-log.md`.
+- The submodule at [`modules/KnowledgeBase/`](../../modules/KnowledgeBase/).
+- The reference clones under [`repos/`](../../repos/) (read-only for verification, never edited).
+- Core docs (CLAUDE.md, VISION.md, ARCHITECTURE.md, ROADMAP.md, SAFETY.md, DECISIONS.md, GLOSSARY.md, README.md).
+
+## Bin assignments
+
+13 topic-coherent bins. Every file appears in exactly one bin. Stems below are filename without `.md` suffix and
+without path; agent prompt resolves them to full paths.
+
+| Bin | Theme | Count | File stems |
+|-----|-------|-------|-----------|
+| B1 | Apple Silicon / low-bit / inference | 19 | 2310.11453v1, 2312.11514v3, 2402.17764v1, 2411.04965v1, 2502.11880v1, 2504.12285v2, 2504.18415v2, 2510.13998v1, 2508.15734v1, bonsai-1-bit-8b-whitepaper, bonsai-ternary-8b-whitepaper, flash_moe, ANE, BitNet, Bonsai-demo, flash-moe, mlx-flash, pmetal, QiMeng-cpu-v1 |
+| B2 | Memory / scratchpad / TTT / CoT / RNN / KV / transformer arch (papers) | 25 | NIPS-2017-attention-is-all-you-need-Paper, 1910.07467, 2002.05202, 2102.05095v4, 2104.09864, 2203.15556v1, 2205.11916v4, 2303.12712v5, 2305.13245, 2305.15408v5, 2306.12456v2, 2310.07923v5, 2311.12351, 2407.21783v3, 2410.01201v3, 2411.07279v2, 2412.04604v2, 2412.06769v3, 2412.17794v1, 2502.16721v1, 2508.09834, bandaru_transformer_design_guide_pt2_modern_architecture, jytan_2025_crystallization_of_transformer_architectures, mughal_context_window_management, raschka_2025_big_llm_architecture_comparison |
+| B3 | Memory / context / persistence (repos) | 9 | agentmemory, anamnesis, codebase-memory-mcp, engram, memex, omega-memory, openaugi, prompt-vault, remember |
+| B4 | Agentic systems / orchestration (papers) | 7 | 2026.02.09.704801v1, 2304.05332v1, 2503.19065v1, 2506.13023v1, 2510.09244v1, 2511.02824v2, 2603.24629v1 |
+| B5 | LLM Wiki engines + patterns (g2 + g3) | 18 | AgenticResearchWiki, OmegaWiki, TheKnowledge, agentic-wiki-builder, atomic-knowledge, beever-atlas, link, llm-research-wiki, llm-wikidata, llmbase, llmwiki, llmwiki-cli, obsidian-llm-wiki-local, swarmvault, synthadoc, wikidesk, wikiloom, wikimind |
+| B6 | Bio foundation models + genomics (papers) | 9 | 2025.07.20.665723v2, 2025.07.21.665832v2, 2025.09.12.675911v1, gkaf836, s41467-025-60872-5, s41586-025-10014-0, s41586-026-10176-5, s41592-025-02776-2, s42256-025-01044-4 |
+| B7 | Generative biology + function annotation/discovery (papers) | 12 | 1-s2.0-S0022283626000513-main, 2024.12.19.629561v2, 2025.03.02.641084v1, 2025.04.19.649272v1, 2025.05.13.653614v2, 2026.03.19.712954v1, 2026.04.22.720063v1, 2306.03809v1, 2505.23579v2, 2604.05181v1, rocks-et-al-2026-dual-encoder-contrastive-learning-accelerates-enzyme-discovery, s41592-026-03030-z |
+| B8 | Bio repos (g9) + sci-agents (g8) | 18 | 2407.10362v3, 2503.00096v3, Bacformer, BioReason, BixBench, LAB-Bench, Sketch2Simulation, aviary, bioSkills, claude-prism, deepsems, ether0, finch, ibmdotcom-tutorials, ldp, paper-qa, robin, scientific-agent-skills |
+| B9 | Finance / quant (g10 + papers) | 11 | 2402.03755v1, 2412.03220, 2412.20138v7, 2509.09995v3, 2511.20099v4, 2511.20100v1, OpenBB, QuantAgent, TradingAgents, dexter, nixtla |
+| B10 | MCP tools (g6) + harness repos (g7) + analogues | 27 | WeKnora, claude-squad, claude-task-master, codebuff, codesight, dlt, dspy, extractthinker, fastmcp, gptme, gravityfile, huginn, k-dense-byok, lmnr, markdownify-mcp, ontomics, openrouter-skills, origin, promptfoo, pydantic-ai, python-sdk, qmd, rendergit, semanticworkbench, vanna, vectorless, workgraph |
+| B11 | Graph tools (g5) + KG papers | 8 | 2003.02320v6, OptimusKG, hyalo, infranodus, infranodus-skills, keppi, py3plex, s41019-017-0055-z |
+| B12 | Skills / practices / humans-teams / cog-sci / LLMs-in-science | 14 | PIIS0896627324008080, agent-skills-for-context-engineering, autoresearch, autoresearch-mlx, binz-et-al-2025-how-should-the-advancement-of-large-language-models-affect-the-practice-of-science, claude-cycles, claw-code, claw-code-local, cline, harvey-et-al-2023-the-dynamics-of-team-learning-harmony-and-rhythm-in-teamwork-arrangements-for-innovation, nihms-2096004, openclaw, science.adt7790, superpowers |
+| B13 | Safety / alignment / privacy / values + long-tail / uncovered / KB-foundation | 18 | 0549, 2208.07262v1, 2401.00422v3, 2406.17557v2, 2408.08073v2, 2410.11381, 2506.02070v3, 2506.05007v1, 2511.09057v3, 2602.16800v2, 2602.18308v2, 2604.27269v1, Horiike-Orthogonal projections of hypercubes-2025-Physical Review E copy, Values_Paper__camera_ready_COLM_, d41586-026-00974-2, project-nomad, s41586-025-08600-3, science.aea6792 |
+
+**Total: 195 files. Sum across bins matches.**
+
+For each bin, a stem from `docs/paper-notes/` is a paper-note; a stem from `docs/repo-notes/` is a repo-note. Bin
+B1 mixes both (the BitNet thread papers + the apple-silicon repos). Bins B3, B5, B10, B11 are repo-only; B2, B4,
+B6, B7, B9, B12 mix paper-notes with related repos when applicable.
+
+## Per-agent allowed tools (allowlist)
+
+The fan-out is structurally simple — agents read the assigned files, edit in place, and report. The allowlist
+below is what each agent receives in its prompt. Anything outside the allowlist is forbidden.
+
+- **Read** — on the agent's assigned bin files (paper-notes paths and repo-notes paths listed in the prompt).
+- **Read** — on the corresponding source material:
+  - For paper-notes: the PDF at `context/papers/<paper-id>.pdf` if it exists. Read renders PDFs.
+  - For repo-notes: the clone at `repos/<repo-name>/` for verifying claims against actual code/README.
+- **Read** — on `docs/adr/` for DEC ID lookups when claims need a citation.
+- **Read** — on this spec doc and on auto-loaded `CLAUDE.md`.
+- **Edit** / **Write** — on the assigned bin's note files only (no other paths).
+- **Glob** / **Grep** — restricted to the agent's bin file paths and the allowed source-material paths above.
+- **Bash** — `git add` and `git commit` only, restricted to the worktree. No other Bash. No network. No
+  spawning sub-agents.
+
+Forbidden (do not propose):
+
+- Reading any other notes outside the assigned bin (other paper-notes / repo-notes).
+- Reading `docs/syntheses/`, `docs/audits/`, `docs/landscapes/`, `docs/questions/`, `docs/protocols/`,
+  `docs/session-summaries/`, `docs/cybersecurity-notes/`, `docs/curation-log.md`.
+- Reading the submodule `modules/KnowledgeBase/`.
+- Editing anything outside the assigned bin's note files.
+- `git push`, `gh`, `git checkout`, `git merge`, `git rebase`, branch-switching, force-anything.
+
+Cross-bin consistency is Maestro's job at consolidation, not the agent's.
+
+## Per-note rubric
+
+For each note in the bin, the agent verifies and minimally edits to match the canonical shape per
+[`CLAUDE.md`](../../CLAUDE.md) §Doc-type conventions.
+
+**First action: batch section-heading rename.** Before per-note work, scan all assigned bin files for the
+legacy heading `## What's NOT applicable` (without ` / hype filter` suffix) — this was found across all 17
+paper-notes in the canary (B13). Variants to normalize: `## What's NOT applicable`, `## What's not applicable`,
+or any case-variant. Apply the rename to canonical `## What's NOT applicable / hype filter` across every file
+needing it, then make a single batch commit:
+`[notes-consistency] B<N>: canonical 'NOT applicable / hype filter' rename across <count> notes`. Then proceed
+to per-note rubric work below.
+
+Then for each note, in order of the rubric:
+
+1. **Frontmatter (paper-notes only).** Ensure YAML frontmatter contains `title`, `source`, `authors`,
+   `affiliation`, `date`, `pdf`, `tags`. Add missing fields where derivable from existing prose. Don't fabricate.
+2. **H1 title** matches paper title (paper-notes) or `# <repo-name> (\`<owner/repo>\`)` (repo-notes).
+3. **Section headings** match the canonical order exactly. Reorder if needed; do not rename or invent.
+4. **"What's reusable in Linus"** — each point maps to a phase (Phase 1..8) and references a DEC or spec where
+   applicable. Stale phase claims (e.g., "Phase 3 spec for X" when X is now Phase 2) get updated. If the agent
+   cannot verify a phase or DEC mapping from `docs/adr/`, leave the prose as-is and flag the note in the report.
+5. **"Connections"** — relative markdown links only. Verify each link's target exists (Glob/Read on the path).
+   Fix broken links if the target moved within the agent's allowed paths; flag if the target moved outside.
+   **Report ALL broken or missing cross-references** to other paper-notes / repo-notes in the
+   `broken_or_missing_cross_references` field of the report — even ones the surrounding prose acknowledges as
+   conditional. These often point Dan to interesting follow-up papers/repos to add to the corpus.
+6. **"Open questions for Dan"** — numbered sequentially with no gaps. Renumber to close gaps left by prior
+   Policy A deletions. Partial-resolved items use canonical citation format per CLAUDE.md (DEC-NNNN preferred;
+   S-NN / E-NN / M-NN tolerated and left as-is). Repo-notes with bulleted (not numbered) items in Section 7:
+   leave bullets as-is and flag in `cross_bin_observations` — Maestro normalizes at consolidation per
+   CLAUDE.md.
+7. **Repo-note recommendation verdict** — one of: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore**.
+   If a note uses different vocabulary (e.g. "evaluate", "consider"), normalize to the closest canonical verdict.
+8. **Prose style** — per CLAUDE.md §Writing style for docs: prose over bullet dumps. Don't rewrite prose for
+   style alone; only adjust if a section is bullet-heavy where it should reason.
+9. **No vestigial headers** (`# Group N Questions for Dan — Extract` etc.) — delete if present.
+
+**Missing canonical sections — diagnostic flag.** If a paper-note lacks `## Connections` and/or
+`## Open questions for Dan`, do NOT invent content (Hard Constraint #1). Instead, briefly diagnose: was the
+omission likely **accidental** (the source material's scope and the rest of the note's prose would clearly
+support such content if written), or **intentional/justified** (source is genuinely sparse, the paper or repo
+is narrowly scoped, or the existing prose explicitly addresses the absence)? One sentence per flagged note.
+Maestro uses this triage to commission section-creation passes targeted at accidental omissions only.
+
+**Framing-mismatch / unrelated flag.** If a note characterizes its source as out-of-scope, irrelevant to Linus,
+unreusable, or not applicable — and that framing seems strong relative to what the source actually contains
+(reading the PDF or repo briefly to check) — flag it in `framing_mismatch_flags`. The original note may have
+been written without full understanding of why Dan included this source. Dan has noted, e.g., that the WHAM
+paper was included specifically because world models are an interesting alternative to LLMs, but the note
+characterizes the WHAM triple as "deferred / not lifted wholesale." This kind of categorization should be the
+exception, not the rule. One sentence per flagged note: what the note says + why it might warrant
+re-evaluation. Don't edit the note's framing; only flag.
+
+## Hard constraints
+
+- **No invented technical claims.** If a "reusable in Linus" claim is unverifiable from the source material
+  (paper PDF or repo code), flag the note for Maestro and leave the prose untouched.
+- **No semantic-meaning changes** to any reusable claim. Restructure / standardize / link-fix only.
+- **Stay strictly inside the assigned bin's file set** plus the permitted source material.
+- **Commit shape (revised post-canary).** ONE batch commit for the canonical heading rename across all bin
+  files needing it (first action). Then atomic per-note commits for substantive per-note rubric work, with
+  message `[notes-consistency] <note-stem>: <what changed>`. Notes touched only by the batch rename get one
+  commit (the batch); they do NOT also get an individual commit. Notes needing additional substantive edits
+  beyond the rename get one additional commit.
+- **Emit the standardized summary report verbatim** at the end of the agent's response.
+
+## Standardized summary report
+
+Every agent emits this YAML block verbatim at the end of its response. Variation in report shape is what made
+prior fan-outs hard to consolidate; this template removes that surface area entirely.
+
+```yaml
+# Notes-Consistency Fan-Out — Bin Report
+bin_id: B<N>
+notes_total: <int>
+notes_touched: <int>
+notes_unchanged: <int>
+notes_flagged: <int>
+start_iso: 2026-MM-DDTHH:MM:SSZ
+end_iso:   2026-MM-DDTHH:MM:SSZ
+elapsed_seconds: <int>
+
+per_note:
+  - path: docs/paper-notes/<id>.md           # or docs/repo-notes/<name>.md
+    status: touched | unchanged | flagged
+    fixes_applied:
+      - frontmatter: <description or "none">
+      - sections: <description or "none">
+      - phase_mapping: <description or "none">
+      - dec_links: <description or "none">
+      - links: <description or "none">
+      - prose: <description or "none">
+      - open_questions_renumbering: <description or "none">
+      - verdict_normalization: <description or "none">  # repo-notes only
+    flag_reason: <empty if not flagged; one-sentence reason if flagged>
+  # ... one entry per note in the bin
+
+missing_sections_diagnosis:
+  # One entry per note flagged for missing Connections or Open-questions section.
+  # Skip this list if no notes were flagged for missing sections.
+  - path: docs/paper-notes/<id>.md
+    missing: ["Connections", "Open questions for Dan"]   # one or both
+    diagnosis: accidental | intentional-justified
+    one_sentence: <terse rationale, e.g. "Source PDF clearly supports both
+                   sections; existing prose has cross-references in narrative
+                   but not as Connections list" (accidental) or "Single-page
+                   commentary; no other Linus-relevant work to connect to"
+                   (intentional-justified)>
+
+framing_mismatch_flags:
+  # One entry per note that frames its source as out-of-scope / irrelevant /
+  # unreusable in a way that may warrant Dan's re-evaluation. Skip if none.
+  - path: docs/paper-notes/<id>.md
+    note_says: <one phrase from the note's framing>
+    one_sentence: <why this might be a misread of why Dan included the source>
+
+broken_or_missing_cross_references:
+  # Every broken link to another note in docs/paper-notes/ or docs/repo-notes/.
+  # Include even if surrounding prose acknowledges conditional existence —
+  # these are leads for Dan's follow-up curation. Skip if none.
+  - in_note: docs/paper-notes/<id>.md
+    broken_link_target: docs/paper-notes/<missing-id>.md
+    surrounding_context: <one short clause from the prose around the link>
+
+cross_bin_observations: |
+  Free-text section. Things not captured by the structured fields above.
+  Keep terse. Empty string if nothing.
+
+estimate_vs_actual: |
+  Estimated: <maestro estimate in minutes from spec>
+  Actual:    <elapsed_seconds / 60 minutes>
+  Variance note: <one sentence if >20% off; empty otherwise>
+```
+
+## Canary procedure (L4)
+
+Before the parallel fan-out, one foreground (non-worktree) canary agent runs **Bin B13** as the canary. B13 is
+the long-tail / safety / KB-foundation bin; it has the most heterogeneous content, so if the rubric works on B13
+it will work on the topically-tighter bins. Maestro reads the canary's report and diff, refines this spec if
+needed, and only then dispatches the remaining 12 bins in parallel via worktree mode.
+
+If the canary blocks at any allowlisted-tool step (e.g., a Read on `repos/<name>/` is denied, or `git commit` in
+worktree fails), Maestro fixes the permission/spec issue before the parallel fan-out — never debug 12 stuck
+agents.
+
+## Branch / PR strategy
+
+Single base branch `agent/notes-consistency-sweep` off the current branch
+(`agent/notes-cleanup-fanout`). Each parallel agent works in a worktree off this base. Maestro consolidates by
+cherry-picking each worktree's per-note commits onto the base branch in deterministic bin order
+(B1, B2, …, B13) at the end. **Single PR** with per-bin commit groups inside.
+
+**Worktree base requirement (lesson from this fan-out).** Every parallel worktree must branch from the **same
+commit** — specifically, the head of the base branch at the moment the fan-out is dispatched. In this fan-out,
+some worktrees branched off `origin/main` and some off other intermediate commits, which forced several agents
+to merge `agent/notes-consistency-sweep` mid-task to obtain the spec doc and prior canary state, and produced
+two cherry-pick conflicts during consolidation (engram.md and remember.md, where worktrees tried to update
+sections that had already been deleted by Policy A on the base). Future fan-outs MUST specify the base commit
+SHA in the agent prompt and verify each worktree starts from that SHA before any work.
+
+When PR #24 (the prior `agent/notes-cleanup-fanout` content) merges to main, this branch will rebase cleanly.
+
+## Estimates and time tracking
+
+Per the new "Measure, don't just estimate" CLAUDE.md convention:
+
+- **Maestro estimate (revised post-canary).** Canary B13 took 5 min vs 20 min estimate (75% under). Revised
+  per-bin anchors: 5 min for ≤12-file bins (B3/B4/B6/B7/B9/B11/B12), 8-10 min for 14-19 file bins
+  (B1/B5/B8/B12/B13), 12-15 min for the largest bins (B2 at 25 files, B10 at 27). Wall time for parallel
+  fan-out is bounded by the slowest bin (~15 min). Total revised estimate: spec ~done, canary ~done,
+  parallel fan-out ~15 min wall, consolidation ~20 min, PR ~10 min → ~45 min remaining.
+- **Maestro fills the Status section below at consolidation** with measured wall time and variance note.
+
+## Status (filled at execution)
+
+- 2026-05-08 17:00 ish UTC: spec authored.
+- 2026-05-08 17:08 UTC: canary on B13 complete (5 min wall, 18 commits, 8 notes flagged). Spec refined with
+  canary-driven §First-action batch rename, missing-sections diagnostic flag, framing-mismatch flag,
+  broken-cross-reference reporting.
+- 2026-05-08 17:42-18:18 UTC: parallel fan-out on B1-B12 complete. 12 worktree agents dispatched in
+  parallel; all returned. Per-bin wall times ranged 19-36 min; parallel max ~36 min (B2). Two worktrees
+  (B6, B11) had their commits land on the base branch directly via the harness rather than on per-worktree
+  branches; the rest were cherry-picked at consolidation.
+- 2026-05-08 18:30 UTC: Maestro consolidation complete. 32 commits cherry-picked from 10 worktree branches
+  + 7 commits already on base (B6 + B11 + B11's substantive fixes). 2 cherry-pick conflicts resolved
+  manually (engram.md and remember.md — both cases where worktree commits tried to update Layer D→E
+  references on questions that had already been deleted by Policy A; resolution kept HEAD's deletion in
+  engram and merged HEAD's partial-resolved annotation with the worktree's Layer E rename in remember).
+- 2026-05-08 18:30 UTC: measured wall time. Total: ~1.5h (canary 5 min + parallel fan-out 36 min wall + spec
+  refinement 5 min + consolidation 25 min + PR 0 min — already open). Vs ~3h estimate, came in 50% under.
+  Per-bin: parallel agents averaged 22 min vs 5-15 min estimates (~2-3x over). Estimates need recalibration:
+  per-bin work is dominated by full-read time even when edit count is small, and worktree-vs-main path
+  resolution adds ~5-10 min of debugging overhead on average. Future estimates: 15-25 min per bin regardless
+  of file count, parallel max ~30 min for 200-file scope.
+- 2026-05-08 19:30 UTC: post-consolidation follow-up pass executed (spot-check, reframe, QiMeng promotion,
+  bullet→numbered normalization, prettier corruption fix, section-creation commission). 20-file random
+  spot-check found 1 minor sub-heading variant (now fixed). 3 notes reframed per Dan's intent
+  (s41586-025-08600-3 WHAM, 2511.20100v1 QiMeng-Kernel, QuantAgent repo). QiMeng promoted out of
+  g1-apple-silicon and infra-foundations into a new LLM-hardware-design category seeded at
+  `docs/specs/qimeng-category-promotion.md`. Bullet→numbered normalization across 95 repo-notes Section 7.
+  Prettier `+`→`-` corruption fixed in beever-atlas + wikimind. Section-creation commission pass added
+  Connections + Open-questions to 12 paper-notes and Section 7 to BitNet repo-note (1 paper-note —
+  2511.09057v3 PAN — diagnosed intentional-justified, no edits).
+
+## Aggregate flag inventory
+
+Across all 13 bins (canary B13 + fan-out B1-B12), per the standardized summary reports:
+
+**Notes touched / unchanged / flagged.** 195 total; ~120 touched (mostly the canonical heading rename);
+~70 unchanged; ~25 flagged for Maestro consolidation review.
+
+**Missing canonical sections — for follow-up commission pass.** ~14 paper-notes lack `## Connections` and/or
+`## Open questions for Dan` sections. Diagnostic split: ~6 accidental (clear support in source for both
+sections) and ~8 intentional/justified (blog-post variants in B2 use `## Cross-references` as a parallel
+canonical convention; sparse-coverage long-tail papers in B13 / B4 / B9 / B11 legitimately have no obvious
+connections or questions). Maestro to commission a section-creation pass on the ~6 accidental cases as
+follow-up work.
+
+**Framing-mismatch flags (potential outliers in Dan's intent).** 2 explicit flags from B9: `2511.20100v1`
+("GPU-specific... Linus runs on Apple Silicon") and the QuantAgent repo-note's "Ignore" verdict on a clean
+multi-agent template — both potentially undervaluing transferable orchestration patterns. The earlier
+WHAM example (s41586-025-08600-3) framing-mismatch was implicit in B13's flags (note characterizes WHAM
+triple as "deferred / not lifted wholesale" but Dan's interest is world-models-as-LLM-alternative). For
+Dan to re-evaluate at consolidation review.
+
+**Broken / missing cross-references — potential follow-up reading.** ~12 broken or missing cross-references
+flagged; most are pointers to papers that were never filed (e.g., 2210.02747v1 Lipman flow matching;
+LucaOne under bioRxiv stem rather than Nature DOI; Evo 2 under earlier bioRxiv stem; placeholder `(.)`
+links in 2412.20138v7 for Boiko/Gomes, Kosmos, BioGuider, Sketch2Simulation, "Fundamentals of LLM Agents",
+"Practical Guide for LLM Eval"). Several are leads for Dan's follow-up curation pass.
+
+**Mis-binned files.** 2 papers (`2511.20099v4` QiMeng-CRUX Verilog code-gen, `2511.20100v1` QiMeng-Kernel
+GPU kernel generation) classified into B9 by alphabetical-ID adjacency to QuantAgent rather than topic.
+They belong in a code-gen / fine-tuning / orchestration cluster (likely a future B14, or merge into B10).
+Both also lack Connections + Open-questions sections.
+
+**Bulleted Section 7 in repo-notes — Maestro normalization pending.** ~80 of 97 repo-notes use bulleted
+items in Section 7 instead of canonical numbered. Per CLAUDE.md §Doc-type conventions, Maestro normalizes
+this at consolidation; per-note authors during normal work do not. Single corpus-wide Maestro pass to
+convert can be queued as a follow-up.
+
+**Stale cross-references caught.** B5 caught a `DEC-0026/27` → `DEC-0015` correction (KB dual-graph
+substrate — DEC-0026/27 are unrelated). B11 propagated the same correction across `infranodus`,
+`infranodus-skills`, `py3plex`. Total 11 token-level swaps across 4 files.
+
+**Layer D → Layer E renumbering caught.** B3 caught 3 stale `Layer D = semantic` references in `engram`,
+`memex`, `remember` that hadn't propagated after DEC-0052 renamed Layer D (semantic) to Layer E (when
+investigation memory took the Layer D slot). These were updated with explanatory `(per DEC-0052)`
+parentheticals. Other bins may have similar drift; recommend a corpus-wide grep at follow-up:
+`grep -rn "Layer D" docs/repo-notes/ docs/paper-notes/`.
+
+**Pre-existing prettier corruption flagged.** B5 spotted in-prose `+` characters that prettier had
+rewritten to `-` list markers in `beever-atlas.md` and `wikimind.md` (a documented Known Library Quirk in
+CLAUDE.md). Left unedited per Hard Constraint #2; Maestro to schedule a corpus-wide grep + rejoin pass.
+
+**Edit-tool reliability concerns.** B2, B4, B8, B12 reported worktree-vs-main path-resolution issues
+where Edit tool calls landed in the main worktree instead of the agent's worktree, requiring revert +
+redo via Bash sed-equivalents. This added ~5-15 min per affected bin. Worth flagging to the harness
+provider; for now, future fan-out agents should prefer in-worktree `cd` + sed/awk via Bash for any
+multi-file mechanical operation.
+
+---
+
+## Agent prompt template (reference)
+
+Maestro composes per-bin prompts from this template, substituting `<BIN_ID>`, `<BIN_THEME>`, `<FILE_LIST>`, and
+the per-bin estimate. The template is here for traceability; it's not invoked directly.
+
+```
+You are running as a fan-out Worker for the Linus notes-consistency sweep. Read this spec first:
+docs/specs/notes-consistency-fanout.md (and the auto-loaded CLAUDE.md §Doc-type conventions).
+
+Your bin: <BIN_ID> — <BIN_THEME>.
+Files in your bin (filename stems; resolve to docs/paper-notes/<stem>.md or docs/repo-notes/<stem>.md based on
+which directory contains it):
+<FILE_LIST>
+
+Per-bin estimate: <N> minutes.
+
+For each file, apply the per-note rubric (spec §Per-note rubric). Honor all hard constraints (spec §Hard
+constraints) and stay within the allowlisted tools (spec §Per-agent allowed tools). For each note touched,
+make an atomic commit in your worktree with message
+`[notes-consistency] <note-stem>: <what changed>`.
+
+When done, emit the standardized summary report YAML block (spec §Standardized summary report) verbatim at the
+end of your response. Record start_iso, end_iso, elapsed_seconds accurately.
+```

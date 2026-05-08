@@ -55,14 +55,5 @@ exists.
 
 ## 7. Questions for Dan
 
-- **Does the ANE existence proof change Phase 1b?** The pmetal evaluation plan currently treats ANE serving as a
-  nice-to-have. Given pmetal ships with an ANE pipeline and this repo shows training is viable, should "ANE prefill +
-  GPU decode" become an explicit benchmark configuration alongside plain Ollama vs. pmetal-GPU?
-- **Read-or-defer on the Maderix substack series.** The three articles are arguably the best documentation of the ANE
-  that exists. Worth reading now, or defer to whenever an ANE decision is actually forced?
-- **Private-API risk appetite for Linus.** pmetal uses some of the same `_ANEClient` surface. That's a fine bet for a
-  personal project but means macOS updates can break things. Happy to document that risk in DECISIONS.md when Phase 2's
-  inference backend is chosen, or would you prefer a policy of "ANE-only if officially supported API exists"?
-- **Reverse-engineering as a Linus practice.** This repo demonstrates the value of treating Apple's private APIs as fair
-  game for research. Is that a stance you want Linus to inherit, or keep Linus strictly on public APIs (CoreML, MLX,
-  Metal) and let pmetal carry any private-API risk?
+1. **Read-or-defer on the Maderix substack series.** The three articles are arguably the best documentation of the ANE
+   that exists. Worth reading now, or defer to whenever an ANE decision is actually forced?

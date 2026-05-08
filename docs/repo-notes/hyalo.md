@@ -82,18 +82,15 @@ winner, but the Rust-binary distribution and the planned-rewrite `mv` are strong
 
 ## 7. Questions for Dan
 
-- **Vault location.** Does Linus's note vault live at `context/notes/` (gitignored, personal), as a new top-level
-  `vault/` (tracked but Dan-owned), or inside `modules/KnowledgeBase/` next to the paper corpus? Hyalo's `.hyalo.toml`
-  has to point somewhere and the schema lives next to it.
-- **hyalo vs keppi bake-off.** Want a 30-minute Phase-1 spike that runs the same five operations (find by tag, bulk set
-  status, rename + link rewrite, lint with schema, summary) on a sample vault under both tools and writes the verdict as
-  an ADR in `docs/adr/`?
-- **Schema design.** The pmetal-style `[schema.types.iteration]` block is appealing for Linus's `experiments/` and
-  `docs/adr/` directories. Adopt the iteration-file convention (`iter-NN-slug.md`,
-  `planned → in-progress → completed → superseded`) for our work, or keep our looser status quo?
-- **Claude Code integration scope.** `hyalo init --claude` writes a vault-scoped rule that overrides Maestro's default
-  Read/Edit behavior. Comfortable with that landing in `.claude/` for `context/notes/**`, or do you want the override
-  scoped tighter?
-- **Phase 3 graph producer.** When the KB graph layer comes online, do we use hyalo's `link_graph` output as the seed
-  (cheap, already computed) and add `py3plex`/`infranodus` analysis on top, or keep the graph layer hyalo-independent so
-  the vault tooling stays swappable?
+1. **Vault location.** Does Linus's note vault live at `context/notes/` (gitignored, personal), as a new top-level
+   `vault/` (tracked but Dan-owned), or inside `modules/KnowledgeBase/` next to the paper corpus? Hyalo's `.hyalo.toml`
+   has to point somewhere and the schema lives next to it.
+2. **Schema design.** The pmetal-style `[schema.types.iteration]` block is appealing for Linus's `experiments/` and
+   `docs/adr/` directories. Adopt the iteration-file convention (`iter-NN-slug.md`,
+   `planned → in-progress → completed → superseded`) for our work, or keep our looser status quo?
+3. **Claude Code integration scope.** `hyalo init --claude` writes a vault-scoped rule that overrides Maestro's default
+   Read/Edit behavior. Comfortable with that landing in `.claude/` for `context/notes/**`, or do you want the override
+   scoped tighter?
+4. **Phase 3 graph producer.** When the KB graph layer comes online, do we use hyalo's `link_graph` output as the seed
+   (cheap, already computed) and add `py3plex`/`infranodus` analysis on top, or keep the graph layer hyalo-independent
+   so the vault tooling stays swappable?

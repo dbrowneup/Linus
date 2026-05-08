@@ -170,7 +170,7 @@ four extras under EvalScope with vLLM on H100. `benchmarks/dan_tasks/` should mi
 comparing to Bonsai claims, and pair tok/s with the wall-clock task-completion methodology from
 [Speed and Conversational LLMs (2502.16721v1)](2502.16721v1.md).
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 Throughput and energy numbers are from M4 Pro 48 GB, not M1 Max 32 GB. Relative speedup vs FP16 (5.2x decode) likely
 transfers reasonably — both are unified-memory Apple Silicon — but absolute throughput on M1 Max will be lower (smaller
@@ -223,16 +223,13 @@ kernels would close the deployment-path gap noted in §2.3.
 
 ## Open questions for Dan
 
-1. **Phase 1c default:** confirm Ternary Bonsai 8B as the headline BitNet-class baseline for the spike, with BitNet 2B4T
-   as the second comparison point and Ternary Bonsai 4B as the middle-of-fairway candidate that fits alongside two
-   concurrent Workers in 32 GB.
-2. **Sparsity probe:** worth a 30-minute experiment on the released checkpoint to measure the actual fraction of ternary
+1. **Sparsity probe:** worth a 30-minute experiment on the released checkpoint to measure the actual fraction of ternary
    weights that are zero. This number tells us how much a real ternary kernel would beat the 2-bit deployment path,
    which scopes the potential pmetal contribution.
-3. **MLX-vs-vLLM score sanity check:** the published 75.5 average is from vLLM/H100. Spot-check IFEval and HumanEval+ on
+2. **MLX-vs-vLLM score sanity check:** the published 75.5 average is from vLLM/H100. Spot-check IFEval and HumanEval+ on
    the MLX-deployed Apple Silicon version to confirm the deployment path does not silently degrade quality.
-4. **Phase 6 target format:** is "fine-tune Qwen3-8B on Dan corpus, then ternary-quantize Bonsai-style" the canonical
+3. **Phase 6 target format:** is "fine-tune Qwen3-8B on Dan corpus, then ternary-quantize Bonsai-style" the canonical
    roadmap for the first Linus-branded checkpoint, or do we wait for native pmetal training paths first?
-5. **Worker count budgeting:** at 2.16 GiB resident per 8B Bonsai instance, the M1 Max can comfortably hold 4-6
+4. **Worker count budgeting:** at 2.16 GiB resident per 8B Bonsai instance, the M1 Max can comfortably hold 4-6
    concurrent Workers plus orchestration, KV caches, and Qdrant/Kiwix overhead. Does this change the orchestration-layer
    router design — is parallel agent fan-out a Phase 2 concern rather than Phase 3?

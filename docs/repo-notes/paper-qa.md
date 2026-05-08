@@ -71,28 +71,18 @@ defer until needed. License is Apache 2.0 across the workspace, no surprises.
 
 ## 6. Recommendation: **Integrate**
 
-Adopt paper-qa as the Phase 2c KnowledgeBase retrieval-and-synthesis engine. The integration plan: smoke-test
-`pip install paper-qa[local]`, point it at a 10-paper sample from `context/papers/`, configure
-`embedding="st-multi-qa-MiniLM-L6-cos-v1"` and `llm="ollama/qwen2.5:14b"` via LiteLLM config, run a `pqa ask` against a
-known biochem question, log tok/s and answer quality. If acceptable, expose it as a Linus tool in Phase 2c and add it to
-the Phase 1e Maestro/Worker loop as the "look it up in Dan's papers" capability. Revisit aviary/ldp only if Phase 6
-wants to fine-tune a domain-specific tool-selection policy.
+Adopt paper-qa as the Phase 2c KnowledgeBase retrieval-and-synthesis engine (resolved as **DEC-0044**, accepted
+2026-05-06; closes question S1). The integration plan: smoke-test `pip install paper-qa[local]`, point it at a 10-paper
+sample from `context/papers/`, configure `embedding="st-multi-qa-MiniLM-L6-cos-v1"` and `llm="ollama/qwen2.5:14b"` via
+LiteLLM config, run a `pqa ask` against a known biochem question, log tok/s and answer quality. If acceptable, expose it
+as a Linus tool in Phase 2c and add it to the Phase 1e Maestro/Worker loop as the "look it up in Dan's papers"
+capability. Revisit aviary/ldp only if Phase 6 wants to fine-tune a domain-specific tool-selection policy.
 
 ## 7. Questions for Dan
 
-- **KnowledgeBase vs paper-qa division of labor.** KnowledgeBase already does PDF ingest, metadata, and a knowledge
-  graph. Should paper-qa replace KnowledgeBase's retrieval/synthesis (KB stays corpus-of-record), or run alongside it as
-  a second engine, or is the right move to fork paper-qa and graft KnowledgeBase's KG into the `GatherEvidence`
-  re-ranker?
-- **Local-LLM floor.** Paper-qa explicitly warns 7B is too weak. Does the Phase 2c plan target Qwen2.5-14B as the
-  default worker, accept the quality hit on 7B, or wait for a Phase 6 fine-tune that's specifically tuned for the
-  RCS/tool-selection prompts?
-- **Citation accuracy as a metric.** The "superhuman" claim is largely about citation precision/recall vs human experts
-  on LitQA2. Is that worth replicating as a Linus benchmark in `benchmarks/dan_tasks/` against your own biochem PDFs, or
-  is "Dan's subjective satisfaction on real questions" the better signal?
-- **Multimodal enrichment cost.** `parsing.multimodal=True` adds an LLM call per figure/table at index time. For your
-  ~thousand-paper corpus that's a substantial one-time hit. Run it (and pay the time/tokens once for permanently better
-  figure retrieval), defer to a later phase, or run it selectively on starred papers?
-- **FutureHouse stack commitment.** Adopting paper-qa pulls in `fhlmi` and `fhaviary` as runtime deps and makes `ldp` an
-  obvious Phase 6 candidate. Comfortable making FutureHouse a strategic upstream for Linus's scientific reasoning layer,
-  or do you want a paper-qa-only integration with an exit ramp?
+1. **Citation accuracy as a metric.** The "superhuman" claim is largely about citation precision/recall vs human experts
+   on LitQA2. Is that worth replicating as a Linus benchmark in `benchmarks/dan_tasks/` against your own biochem PDFs,
+   or is "Dan's subjective satisfaction on real questions" the better signal?
+2. **Multimodal enrichment cost.** `parsing.multimodal=True` adds an LLM call per figure/table at index time. For your
+   ~thousand-paper corpus that's a substantial one-time hit. Run it (and pay the time/tokens once for permanently better
+   figure retrieval), defer to a later phase, or run it selectively on starred papers?

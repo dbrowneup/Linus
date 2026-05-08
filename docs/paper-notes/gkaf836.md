@@ -147,7 +147,7 @@ reproducible because the SRA accession lists are in supplementary tables.
 structural-property regression + classification head) generalizes beyond DNA. Any future Linus-specific encoder over
 Dan's domain corpora (chemical SMILES, mass-spec, scientific text fragments) could borrow the same template.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 **Resolution ceiling.** REBEAN classifies only the **seven first-level EC classes**, not the 4-level EC hierarchy
 practitioners actually want (e.g., 1.14.13.1, "salicylate 1-monooxygenase"). For most bench-biology and
@@ -195,25 +195,22 @@ Reference databases are a requirement REBEAN deletes.
 
 ## Open questions for Dan
 
-1. **Should "metagenomic enzyme annotation" be a first-class Linus skill — and if so, in Phase 7 or earlier?** This
-   paper plus your domain expertise is the strongest concrete instance of a _uniquely-Linus_ tool we've identified so
-   far. Worth a roadmap line item, or wait until openclaw/MVP is settled?
-2. **Is the Bitbucket release directly usable, or does it need an MLX port?** Action item: clone
+1. **Is the Bitbucket release directly usable, or does it need an MLX port?** Action item: clone
    `bromberglab/rebeanpkg`, check framework + license + checkpoint format. At 1.66M parameters a PyTorch → MLX port is
    hours of work, not weeks. Worth queuing as an experiment when bandwidth allows.
-3. **How does REBEAN compare to your current go-to tools?** You almost certainly use some combination of eggNOG-mapper,
+2. **How does REBEAN compare to your current go-to tools?** You almost certainly use some combination of eggNOG-mapper,
    KEGG-via-BLAST/HMMER, possibly mi-faser itself given Bromberg lab is upstream of much of this. A side-by-side on a
    sample you already have ground truth for would settle whether REBEAN earns Linus inclusion or just gets noted.
-4. **Can REMME-from-scratch be the Linus pretraining proof-of-concept?** It's small enough that _full_ pretraining on M1
+3. **Can REMME-from-scratch be the Linus pretraining proof-of-concept?** It's small enough that _full_ pretraining on M1
    Max with MLX is genuinely feasible — not LoRA, not adapter, real pretraining. That would be a Phase 6 milestone
    unlike any other in the wave (Evo 2 / Bacformer / LucaOne are not retrainable on a laptop; REMME is). Worth a spike?
-5. **EC depth roadmap.** First-level EC is interesting but practitioners want 4-level. Is there appetite for Linus to
+4. **EC depth roadmap.** First-level EC is interesting but practitioners want 4-level. Is there appetite for Linus to
    host a fine-tuned per-class downstream classifier (REMME → "if predicted EC 1, run a finer EC 1.x.y.z model") — and
    would that be Worker work or Maestro-spec work?
-6. **KnowledgeBase schema implications.** If REBEAN annotations become KG nodes, do read-level annotations live as
+5. **KnowledgeBase schema implications.** If REBEAN annotations become KG nodes, do read-level annotations live as
    ephemeral evidence linked to gene/genome nodes, or as first-class entities? The volume difference is 4–5 orders of
    magnitude (genes ~10⁴–10⁵ per sample, reads ~10⁸–10⁹). Worth a brief schema-design conversation before any production
    run.
-7. **Privacy angle.** Some metagenomes (human gut, clinical) are sensitive. A reference-free, locally-run annotator
+6. **Privacy angle.** Some metagenomes (human gut, clinical) are sensitive. A reference-free, locally-run annotator
    avoids the data-residency problems of uploading to KEGG/MG-RAST/MGnify web services. Is that a use case you'd
    actually want — or is your work primarily on public/environmental samples where this isn't a concern?

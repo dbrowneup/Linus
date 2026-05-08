@@ -91,19 +91,21 @@ saturated" mode), at which point the SDK becomes a candidate dependency rather t
 
 ## 7. Questions for Dan
 
-- **Vocabulary lift, yes or no?** Adopting OpenRouter's `provider` field shape verbatim (with `order`,
-  `allow_fallbacks`, `sort`, `only`/`ignore`) means any client already speaking OpenRouter — including Cline and
-  openclaw — can drive Linus's router with no per-client config. The cost is binding Linus's wire format to OpenRouter's
-  evolution. Worth it for Phase 2a, or design a Linus-native vocabulary from scratch?
-- **Sort criteria for a single-machine router.** OpenRouter's `price | throughput | latency | exacto` doesn't quite map.
-  On a 32 GB M1 Max the meaningful axes are probably `latency | throughput | memory_pressure | quality_tier`. Want to
-  pin the Linus sort enum now, or defer until Phase 3 when there are actually >1 local backends to choose between?
-- **Burst-to-paid-API escape hatch.** The north star says "no paid APIs required for operation," not "forbidden." Is
-  there a future where Linus _optionally_ falls back to OpenRouter (or hosted Anthropic) when a local backend OOMs or
-  fails — and if so, this SDK becomes a real dependency. Worth flagging in ROADMAP, or off-limits?
-- **Speakeasy for the eventual `linus-py`.** When Linus ships its own client in Phase 5+, would you rather hand-write
-  the SDK (full control, more taste) or generate it from the OpenAPI spec (free updates, less work, the
-  `python-sdk`/Speakeasy shape as the template)?
-- **Differentiation from `openrouter-skills`.** Do you see Linus ever adopting the Agent-Skills standard for its own
-  local-routing skill pack — i.e. publishing `linus-skills` for Claude Code, Cursor, etc. — or is that overkill given
-  Linus is a backend, not an agent skill?
+1. **Vocabulary lift, yes or no?** Adopting OpenRouter's `provider` field shape verbatim (with `order`,
+   `allow_fallbacks`, `sort`, `only`/`ignore`) means any client already speaking OpenRouter — including Cline and
+   openclaw — can drive Linus's router with no per-client config. The cost is binding Linus's wire format to
+   OpenRouter's evolution. Worth it for Phase 2a, or design a Linus-native vocabulary from scratch?
+2. **Sort criteria for a single-machine router.** OpenRouter's `price | throughput | latency | exacto` doesn't quite
+   map. On a 32 GB M1 Max the meaningful axes are probably `latency | throughput | memory_pressure | quality_tier`. Want
+   to pin the Linus sort enum now, or defer until Phase 3 when there are actually >1 local backends to choose between?
+3. **Burst-to-paid-API escape hatch.** The north star says "no paid APIs required for operation," not "forbidden." Is
+   there a future where Linus _optionally_ falls back to OpenRouter (or hosted Anthropic) when a local backend OOMs or
+   fails — and if so, this SDK becomes a real dependency. Worth flagging in ROADMAP, or off-limits?
+4. **Speakeasy for the eventual `linus-py`.** When Linus ships its own client in Phase 5+, would you rather hand-write
+   the SDK (full control, more taste) or generate it from the OpenAPI spec (free updates, less work, the
+   `python-sdk`/Speakeasy shape as the template)?
+5. **Differentiation from `openrouter-skills`.** Do you see Linus ever adopting the Agent-Skills standard for its own
+   local-routing skill pack — i.e. publishing `linus-skills` for Claude Code, Cursor, etc. — or is that overkill given
+   Linus is a backend, not an agent skill? _Partially resolved (E6, see
+   [answered-questions.md](../questions/answered-questions.md)): SKILL.md YAML-frontmatter markdown format committed as
+   the Phase 7 Linus domain-skills standard; the question of a linus-skills routing pack specifically remains open._

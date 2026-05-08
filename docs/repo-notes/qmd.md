@@ -74,16 +74,16 @@ schema and the JS-runtime cost don't fit. Treat the MCP server as a reference fo
 
 ## 7. Questions for Dan
 
-- **Is RRF+rerank the right Phase 3 fusion target for KnowledgeBase?** qmd's blend of RRF, original-query ×2 weight,
-  top-rank bonus, and position-aware rerank merging is more elaborate than "RRF k=60." Worth porting wholesale, or start
-  with vanilla RRF and earn complexity by measurement?
-- **Phase 1f baseline scope.** Does running qmd against a Markdown slice of the corpus (notes/, threads/, maybe paper
-  abstracts) and comparing top-k against KnowledgeBase's retriever count as a useful Phase 1f data point, or is the
-  Markdown-only constraint too narrow to be informative?
-- **Three inference stacks on one box.** Ollama, pmetal (pending Phase 1b), and qmd's node-llama-cpp would each load
-  their own Metal context. If qmd is adopted even as a study tool, do we cap it to short-lived runs, or accept a
-  resident MCP daemon as a third concurrent inference process?
-- **Query-expansion fine-tune.** Tobi shipped a 1.7B Qwen3 fine-tuned for query expansion. This is a tractable Phase 6
-  exercise on Dan's corpus — useful as a first LoRA target, or distract from harder scientific-domain fine-tunes?
-- **Differentiator vs siblings (vectorless, WeKnora).** I called qmd "narrowest of the three." Useful framing, or would
-  Dan rather see them ranked on a different axis (Apple-Silicon-native, Markdown-fit, MCP-readiness)?
+1. **Is RRF+rerank the right Phase 3 fusion target for KnowledgeBase?** qmd's blend of RRF, original-query ×2 weight,
+   top-rank bonus, and position-aware rerank merging is more elaborate than "RRF k=60." Worth porting wholesale, or
+   start with vanilla RRF and earn complexity by measurement?
+2. **Phase 1f baseline scope.** Does running qmd against a Markdown slice of the corpus (notes/, threads/, maybe paper
+   abstracts) and comparing top-k against KnowledgeBase's retriever count as a useful Phase 1f data point, or is the
+   Markdown-only constraint too narrow to be informative?
+3. **Three inference stacks on one box.** Ollama, pmetal (pending Phase 1b), and qmd's node-llama-cpp would each load
+   their own Metal context. If qmd is adopted even as a study tool, do we cap it to short-lived runs, or accept a
+   resident MCP daemon as a third concurrent inference process?
+4. **Query-expansion fine-tune.** Tobi shipped a 1.7B Qwen3 fine-tuned for query expansion. This is a tractable Phase 6
+   exercise on Dan's corpus — useful as a first LoRA target, or distract from harder scientific-domain fine-tunes?
+5. **Differentiator vs siblings (vectorless, WeKnora).** I called qmd "narrowest of the three." Useful framing, or would
+   Dan rather see them ranked on a different axis (Apple-Silicon-native, Markdown-fit, MCP-readiness)?

@@ -73,18 +73,18 @@ a runtime dependency of any Linus core component.
 
 ## 7. Questions for Dan
 
-- **Forecasting as a Phase 7 skill?** Time series forecasting is a clean candidate for the first non-trivial Linus
-  domain skill — well-defined I/O, easy benchmarks, useful both for finance and for omics/environmental data. Worth a
-  Phase 7a entry, or does this stay informal?
-- **Open-weight foundation TS models in Phase 6.** TimesFM (Google, ~200M) and Chronos (Amazon, T5-based, 20M–700M) are
-  open and run on MPS. Interesting as Phase 6 fine-tuning targets on omics-trajectory or epidemiological data — or is
-  biological time-series data shaped too differently from generic series for transfer to work?
-- **Data-sovereignty rule on TimeGPT.** Worth writing an explicit ADR that hosted-model TS APIs (TimeGPT, Google Vertex
-  Forecast, AWS Forecast) are forbidden for any series derived from patient samples or unpublished experiments, even if
-  a user explicitly opts in?
-- **Anomaly detection for instrument data.** `detect_anomalies` is a natural fit for QC of long-running biology
-  instruments (sequencer flow rates, mass-spec ion currents, qPCR baselines). Is there a real corpus of such series in
-  `context/` that could become a Linus benchmark?
-- **Hierarchical reconciliation for multi-omics.** `hierarchicalforecast` enforces consistency between aggregate and
-  disaggregate forecasts (parent species + sub-species, total mRNA + per-isoform). Useful pattern for omics where
-  pathway-level + gene-level forecasts must reconcile, or unrelated to how you actually analyze that data?
+1. **Forecasting as a Phase 7 skill?** Time series forecasting is a clean candidate for the first non-trivial Linus
+   domain skill — well-defined I/O, easy benchmarks, useful both for finance and for omics/environmental data. Worth a
+   Phase 7a entry, or does this stay informal?
+2. **Open-weight foundation TS models in Phase 6.** TimesFM (Google, ~200M) and Chronos (Amazon, T5-based, 20M–700M) are
+   open and run on MPS. Interesting as Phase 6 fine-tuning targets on omics-trajectory or epidemiological data — or is
+   biological time-series data shaped too differently from generic series for transfer to work?
+3. **Data-sovereignty rule on TimeGPT.** Worth writing an explicit ADR that hosted-model TS APIs (TimeGPT, Google Vertex
+   Forecast, AWS Forecast) are forbidden for any series derived from patient samples or unpublished experiments, even if
+   a user explicitly opts in?
+4. **Anomaly detection for instrument data.** `detect_anomalies` is a natural fit for QC of long-running biology
+   instruments (sequencer flow rates, mass-spec ion currents, qPCR baselines). Is there a real corpus of such series in
+   `context/` that could become a Linus benchmark?
+5. **Hierarchical reconciliation for multi-omics.** `hierarchicalforecast` enforces consistency between aggregate and
+   disaggregate forecasts (parent species + sub-species, total mRNA + per-isoform). Useful pattern for omics where
+   pathway-level + gene-level forecasts must reconcile, or unrelated to how you actually analyze that data?

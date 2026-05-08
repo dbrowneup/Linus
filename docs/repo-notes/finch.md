@@ -84,17 +84,19 @@ include even if the image itself is rebuilt.
 
 ## 7. Questions for Dan
 
-- **Sandbox decision for Phase 7.** Three options: (a) accept emulated x86 Docker and the slowness, (b) build an arm64
-  bioinformatics image (real packaging work, many bioconda pins to revisit), (c) skip Docker and isolate via a
-  per-Worker conda env + sandbox-exec. Which way should the spec lean?
-- **Notebook-as-artifact in KnowledgeBase.** Finch produces a `notebook.ipynb` per task as a first-class shareable
-  artifact. Should Linus's KnowledgeBase store agent-produced notebooks alongside papers and notes — i.e., does "agent
-  ran this analysis" become a retrievable, citable object?
-- **Rerun-everything cost on local hardware.** The "rerun whole notebook on every edit" invariant is elegant but
-  expensive on a laptop for analyses with 10+ minute cells. Acceptable cost for the simplicity, or do we add cell-level
-  cache invalidation in the Linus port?
-- **Coupling to BixBench as the eval.** Does it make sense to run BixBench against Linus's own port of the finch loop as
-  the Phase 7 acceptance test, or build a Dan-specific notebook benchmark in `benchmarks/dan_tasks/` that more closely
-  matches your real workflow (the genomics/RNA-seq problems you actually do)?
-- **Multi-language support.** Finch supports Python, R, and Bash via `NBLanguage`. R is a meaningful fraction of
-  bioinformatics. Is keeping R kernel support in Linus a Phase 7 requirement, or is Python-only acceptable for v1?
+1. **Sandbox decision for Phase 7.** Three options: (a) accept emulated x86 Docker and the slowness, (b) build an arm64
+   bioinformatics image (real packaging work, many bioconda pins to revisit), (c) skip Docker and isolate via a
+   per-Worker conda env + sandbox-exec. Which way should the spec lean?
+2. **Notebook-as-artifact in KnowledgeBase.** Finch produces a `notebook.ipynb` per task as a first-class shareable
+   artifact. Should Linus's KnowledgeBase store agent-produced notebooks alongside papers and notes — i.e., does "agent
+   ran this analysis" become a retrievable, citable object?
+3. **Rerun-everything cost on local hardware.** The "rerun whole notebook on every edit" invariant is elegant but
+   expensive on a laptop for analyses with 10+ minute cells. Acceptable cost for the simplicity, or do we add cell-level
+   cache invalidation in the Linus port?
+4. **Coupling to BixBench as the eval.** Does it make sense to run BixBench against Linus's own port of the finch loop
+   as the Phase 7 acceptance test, or build a Dan-specific notebook benchmark in `benchmarks/dan_tasks/` that more
+   closely matches your real workflow (the genomics/RNA-seq problems you actually do)? _Partially resolved (S11, S12,
+   see [answered-questions.md](../questions/answered-questions.md)): BixBench adopted as Phase 1 agent-harness
+   benchmark; Dan-authored tasks weighted more heavily; both run in parallel._
+5. **Multi-language support.** Finch supports Python, R, and Bash via `NBLanguage`. R is a meaningful fraction of
+   bioinformatics. Is keeping R kernel support in Linus a Phase 7 requirement, or is Python-only acceptable for v1?

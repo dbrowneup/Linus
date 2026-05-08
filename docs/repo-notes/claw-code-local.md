@@ -53,15 +53,12 @@ Claude-Code-style REPL. Pin a specific commit and plan to revisit if the upstrea
 
 ## 7. Questions for Dan
 
-- **Phase 5c deferred-or-done?** claw-code-local essentially already solves the "Linus terminal surface" requirement.
-  The roadmap's 5c fallback ("a small custom terminal agent (~500 lines of Python)") may be dead on arrival. Happy to
-  mark Phase 5c as "adopt claw-code-local" in the roadmap if you agree.
-- **Skill parity.** The fork exposes Claude Code's `/skills` command, which means Anthropic-shaped `SKILL.md` files work
-  inside it. That aligns with Linus's Phase 7 skills direction. Want a Phase 1e smoke-test that runs a trivial
-  Linus-defined skill through claw-code-local against Ollama?
-- **Upstream drift.** claw-code-local is a thin fork. If upstream adds meaningful features (ACP/Zed mode, MCP
-  refinement), should Linus maintain its own mini-patches on top, or wait for the fork to rebase? Informs the
-  dependency-tracking pattern we adopt.
-- **Behavioral parity with local models.** The fork ships the patches but doesn't validate _which_ local models produce
-  usable tool calls inside claw-code's templates. This is the kind of empirical question the Dan task suite is built
-  for. Want the Phase 1d suite extended with a "tool-use-through-claw-code" axis?
+1. **Skill parity.** The fork exposes Claude Code's `/skills` command, which means Anthropic-shaped `SKILL.md` files
+   work inside it. That aligns with Linus's Phase 7 skills direction. Want a Phase 1e smoke-test that runs a trivial
+   Linus-defined skill through claw-code-local against Ollama?
+2. **Upstream drift.** claw-code-local is a thin fork. If upstream adds meaningful features (ACP/Zed mode, MCP
+   refinement), should Linus maintain its own mini-patches on top, or wait for the fork to rebase? Informs the
+   dependency-tracking pattern we adopt.
+3. **Behavioral parity with local models.** The fork ships the patches but doesn't validate _which_ local models produce
+   usable tool calls inside claw-code's templates. This is the kind of empirical question the Dan task suite is built
+   for. Want the Phase 1d suite extended with a "tool-use-through-claw-code" axis?

@@ -81,18 +81,21 @@ one.
 
 ## 7. Questions for Dan
 
-- **Chunk-id convention.** Are you ready to commit the Phase 2 KB schema to `sha256(source_hash + chunk_index)[:N]`
-  truncated chunk ids, or do you want full-length hashes everywhere for zero-collision peace of mind? WikiLoom uses 12
-  hex chars (48 bits); the KB might have orders of magnitude more chunks long-term.
-- **Write-back protection model.** Does the KB need an auto-region marker (durable, survives re-synthesis) plus a
-  commit-prefix flag (soft, cleared by next auto-action), or is one of the two layers enough for our use case? The
-  marker is more invasive on page bodies; the prefix is invisible but easier to lose.
-- **Linker confidence tiers.** WikiLoom's 95 / 85 / 70 cutoffs come from PKM heuristics. For a research KB linking
-  scientific entities, the prior is different. Do we want to start from these defaults and tune, or design our own
-  scoring scale from scratch?
-- **Cross-sibling check.** I claimed the deterministic-linking + structural-provenance combo is sharpest in WikiLoom
-  across the eleven. That claim should be re-verified against `TheKnowledge` and `wikimind` notes when those are written
-  — flag this as a follow-up so the differentiation list stays honest.
-- **Git-as-substrate scope.** Is the Linus orchestration log itself a candidate for the same "auto-commit with
-  classifying prefix" pattern, separate from the KB? It's a clean audit trail, but it does mean every Linus session that
-  touches state writes commits.
+1. **Chunk-id convention.** Are you ready to commit the Phase 2 KB schema to `sha256(source_hash + chunk_index)[:N]`
+   truncated chunk ids, or do you want full-length hashes everywhere for zero-collision peace of mind? WikiLoom uses 12
+   hex chars (48 bits); the KB might have orders of magnitude more chunks long-term.
+2. **Write-back protection model.** Does the KB need an auto-region marker (durable, survives re-synthesis) plus a
+   commit-prefix flag (soft, cleared by next auto-action), or is one of the two layers enough for our use case? The
+   marker is more invasive on page bodies; the prefix is invisible but easier to lose.
+3. **Linker confidence tiers.** WikiLoom's 95 / 85 / 70 cutoffs come from PKM heuristics. For a research KB linking
+   scientific entities, the prior is different. Do we want to start from these defaults and tune, or design our own
+   scoring scale from scratch?
+4. **Cross-sibling check.** I claimed the deterministic-linking + structural-provenance combo is sharpest in WikiLoom
+   across the eleven. That claim should be re-verified against `TheKnowledge` and `wikimind` notes when those are
+   written — flag this as a follow-up so the differentiation list stays honest.
+5. **Git-as-substrate scope.** Is the Linus orchestration log itself a candidate for the same "auto-commit with
+   classifying prefix" pattern, separate from the KB? It's a clean audit trail, but it does mean every Linus session
+   that touches state writes commits. _Partially resolved (DEC-0029, see
+   [answered-questions.md](../questions/answered-questions.md)): cross-session episodic store uses SQLite + git for
+   persistence; auto-commit classifying prefix pattern not adopted for the orchestration log specifically — audit log is
+   JSONL append-only per DEC-0039._

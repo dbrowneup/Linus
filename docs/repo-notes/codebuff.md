@@ -84,19 +84,16 @@ or run Codebuff or Freebuff as part of Linus — the cloud-and-ads economics def
 
 ## 7. Questions for Dan
 
-- **Eval claim scrutiny.** The "61% vs 53%" headline rests on Codebuff's own harness — `evals/runners/claude.ts` runs
-  Claude Code via Anthropic's API with bypass-permissions, prompted by a Codebuff-authored Prompting Agent, judged by
-  three Gemini 2.5 Pro instances. Each of those is a knob that could tilt the result. Worth replicating before citing?
-  If so, that's a Phase 1b-ish exercise that needs OpenRouter and Anthropic API budget.
-- **Agent-definition shape.** Codebuff's `SecretAgentDefinition` (model, prompt, toolNames, spawnableAgents, handleSteps
-  generator, outputMode) is a concrete TypeScript schema. Linus has not committed to a worker-definition schema yet.
-  Adopt this shape directly (in Python/Pydantic), translate to a YAML-first format, or design fresh?
-- **Inline context-pruner pattern.** Buffy spawns `context-pruner` _every step_ via `spawn_agent_inline`. That is one
-  way to keep long sessions tractable; it costs a model call per turn. Worth evaluating against the alternatives
-  (LLMLingua, summarization checkpoints, SCoT/Letta-style memory) for Linus's Phase 3?
-- **OpenRouter as model bus.** Codebuff routes every agent through OpenRouter slugs; this is how it offers per-agent
-  model selection so cheaply. Linus's stance is local-first, but Phase 1's Maestro/Worker loop already uses Anthropic
-  for Maestro. Is OpenRouter a candidate for the "non-Maestro paid models" tier (i.e. cheap planners), or stays out?
-- **Differentiator vs claude-squad.** claude-squad runs N independent Claude Code instances side-by-side; Codebuff
-  decomposes one request internally. These are orthogonal patterns and Linus might want both — many Workers each
-  internally decomposed. Worth making this distinction explicit in ARCHITECTURE.md when the Worker catalog is drafted?
+1. **Eval claim scrutiny.** The "61% vs 53%" headline rests on Codebuff's own harness — `evals/runners/claude.ts` runs
+   Claude Code via Anthropic's API with bypass-permissions, prompted by a Codebuff-authored Prompting Agent, judged by
+   three Gemini 2.5 Pro instances. Each of those is a knob that could tilt the result. Worth replicating before citing?
+   If so, that's a Phase 1b-ish exercise that needs OpenRouter and Anthropic API budget.
+2. **Inline context-pruner pattern.** Buffy spawns `context-pruner` _every step_ via `spawn_agent_inline`. That is one
+   way to keep long sessions tractable; it costs a model call per turn. Worth evaluating against the alternatives
+   (LLMLingua, summarization checkpoints, SCoT/Letta-style memory) for Linus's Phase 3?
+3. **OpenRouter as model bus.** Codebuff routes every agent through OpenRouter slugs; this is how it offers per-agent
+   model selection so cheaply. Linus's stance is local-first, but Phase 1's Maestro/Worker loop already uses Anthropic
+   for Maestro. Is OpenRouter a candidate for the "non-Maestro paid models" tier (i.e. cheap planners), or stays out?
+4. **Differentiator vs claude-squad.** claude-squad runs N independent Claude Code instances side-by-side; Codebuff
+   decomposes one request internally. These are orthogonal patterns and Linus might want both — many Workers each
+   internally decomposed. Worth making this distinction explicit in ARCHITECTURE.md when the Worker catalog is drafted?

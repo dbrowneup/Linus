@@ -48,25 +48,10 @@ minutes" look quite different. Several README recommendations (switch to TinySto
 to 256, drop `TOTAL_BATCH_SIZE` to 2^14) address exactly this. For Linus's real workflows the budget should probably be
 longer (30 min – 2 hr) and the targets should be Dan-task-suite scores rather than raw val_bpb.
 
-## 6. Recommendation: \*\*Study upstream, integrate the MLX fork
-
-experimentally\*\*
+## 6. Recommendation: **Study upstream, integrate the MLX fork experimentally**
 
 Do not use the upstream repo directly — the CUDA dependency and 5-minute/H100 budget don't match Linus's reality. Do use
 `autoresearch-mlx` (already cloned) as the Phase 6d and Phase 7c prototype. Concretely: in Phase 6, adopt the
 `program.md` + single- edit-file + fixed-budget + keep-or-revert loop as the template for overnight LoRA sweeps (agent
 edits a single `lora_config.py`, runs training, compares to baseline on Dan task suite, keeps or reverts via git). In
 Phase 7c, adopt the same loop for inference experimentation with tok/s-target.
-
-## 7. Questions for Dan
-
-- **First real use of autoresearch methodology.** Phase 6d or Phase 1b's pmetal evaluation? The pmetal LoRA trial is a
-  natural first loop: Maestro (me, or you + me) writes the `program.md`, Worker iterates overnight, we wake up to a
-  benchmark table. Low risk, exercises the whole Maestro/Worker protocol on real work.
-- **Metric for Linus's loops.** Karpathy uses val_bpb for its architecture-fairness. Linus's analogue is Dan task suite
-  score, which is higher-variance and slower-per-evaluation. Are we willing to lengthen the per-experiment budget (30
-  min+) to get the higher-signal metric, or keep short loops on proxy metrics?
-- **`program.md` as SKILL.md.** autoresearch's `program.md` is essentially a lightweight skill. Promoting it to the
-  Anthropic `SKILL.md` convention makes it portable between Claude Code and Linus. Worth doing in Phase 7, or premature?
-- **Read the Karpathy tweets linked in the README.** Short. Likely contain framing worth surfacing in VISION.md if you
-  want Linus to inherit some of the "research org as code" posture explicitly.

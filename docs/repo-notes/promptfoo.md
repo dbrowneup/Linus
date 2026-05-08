@@ -21,8 +21,8 @@ jailbreak, toxicity, etc.). Test results include token counts, latency, costs, a
 
 ## 3. What's reusable in Linus
 
-Promptfoo is the direct fit for **Linus's Dan Task Suite** (the benchmarks/ folder). Build a promptfooconfig.yaml
-that tests Linus prompts and models against the 50-100 task cases Dan cares about (e.g., genomics Q&A, code-generation,
+Promptfoo is the direct fit for **Linus's Dan Task Suite** (the benchmarks/ folder). Build a promptfooconfig.yaml that
+tests Linus prompts and models against the 50-100 task cases Dan cares about (e.g., genomics Q&A, code-generation,
 summarization). Reuse Promptfoo's Ollama provider to test against local workers (Qwen2.5-Coder, Mistral-7B, future
 fine-tuned Linus). The JSON output (success/score/error per test) feeds automated regression detection and Phase 1
 baseline measurements. Red-teaming plugins (prompt injection, refusal jailbreaks) are valuable for safety validation of
@@ -38,11 +38,11 @@ valuable evidence that the tool scales to production scenarios.
 
 ## 5. What's incompatible or out of scope
 
-Promptfoo is not a training framework; it measures, not improves. For Phase 6 fine-tuning, Linus needs pmetal or
-mlx-lm, not promptfoo. Node.js/npm dependency adds a second language runtime; Linus's Python-first stack means
-promptfoo runs alongside the core (not inside). The tool has a learning curve; Dan's task suite will need careful
-definition and maintenance. Costs scale with eval size (10 configs × 50 tests × 5 model variations = 2500 API calls
-if using remote models); local Ollama avoids costs but has latency tradeoff.
+Promptfoo is not a training framework; it measures, not improves. For Phase 6 fine-tuning, Linus needs pmetal or mlx-lm,
+not promptfoo. Node.js/npm dependency adds a second language runtime; Linus's Python-first stack means promptfoo runs
+alongside the core (not inside). The tool has a learning curve; Dan's task suite will need careful definition and
+maintenance. Costs scale with eval size (10 configs × 50 tests × 5 model variations = 2500 API calls if using remote
+models); local Ollama avoids costs but has latency tradeoff.
 
 ## 6. Recommendation: **Integrate (Phase 1 close)**
 
@@ -54,11 +54,11 @@ red-teaming to scan for prompt injection in tool descriptions.
 
 ## 7. Questions for Dan
 
-- **Dan Task Suite scope.** Start with 20-50 representative cases or go for the full 100-item suite now? Smaller
-  suite iterates faster; larger suite catches more regressions but has slower iteration.
-- **Custom graders vs. built-in assertions.** For genomics/chemistry Q&A, does Linus need custom Python graders (e.g.,
-  compare extracted gene names to a reference set), or do semantic similarity + equality checks suffice?
-- **Multi-model comparison.** Phase 1 baseline: single model (Ollama Qwen2.5-Coder) or compare Qwen vs. Mistral vs.
-  local Claude? (Latter is heavier but more informative.)
-- **Red-teaming scope.** Which attack vectors matter most for Linus Phase 1? (e.g., prompt injection in KB queries,
-  jailbreak attempts on tool descriptions, data exfiltration via search?
+1. **Dan Task Suite scope.** Start with 20-50 representative cases or go for the full 100-item suite now? Smaller suite
+   iterates faster; larger suite catches more regressions but has slower iteration.
+2. **Custom graders vs. built-in assertions.** For genomics/chemistry Q&A, does Linus need custom Python graders (e.g.,
+   compare extracted gene names to a reference set), or do semantic similarity + equality checks suffice?
+3. **Multi-model comparison.** Phase 1 baseline: single model (Ollama Qwen2.5-Coder) or compare Qwen vs. Mistral vs.
+   local Claude? (Latter is heavier but more informative.)
+4. **Red-teaming scope.** Which attack vectors matter most for Linus Phase 1? (e.g., prompt injection in KB queries,
+   jailbreak attempts on tool descriptions, data exfiltration via search?

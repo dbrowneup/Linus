@@ -82,18 +82,21 @@ thought out and the live deployments are evidence it works at scale.
 
 ## 7. Questions for Dan
 
-- **Operations-registry adoption.** The `Operation(name, handler, params, writes, category)` + `dispatch()` pattern is a
-  near-drop-in answer to Phase 2a's "one tool, three surfaces (CLI / OpenAI-compat HTTP / MCP)" problem. Adopt it as the
-  Linus tool-registry shape, or design a different abstraction that better fits the Maestro/Worker delegation model?
-- **Two-layer recall vs Qdrant.** llmbase makes a defensible no-vector-DB argument at personal scale (TF-IDF over
-  compiled concepts + verbatim raw fallback). The KnowledgeBase submodule already commits to Qdrant. Is Phase 3 hybrid
-  retrieval `Qdrant + BM25/TF-IDF + compiled concept layer`, or stay vector-first and treat llmbase's two-layer pattern
-  as a curiosity?
-- **Compiled concept layer over papers.** llmbase's central bet is that a LLM-maintained markdown wiki over your corpus
-  is more useful than raw chunks. For Dan's papers/notes/threads — do you want a compiled concept layer on top of the
-  existing KnowledgeBase chunks, or is the chunk-and-retrieve baseline sufficient for Phase 2?
-- **Sibling differentiation.** `llmbase` and `llmwiki` (the namesake sibling) share an author namespace and framing. Is
-  there value in studying both, or should one be designated canonical and the other ignored?
-- **Autonomous worker model.** llmbase's worker thread (CBETA every 6h, compile every 1h, health every 24h) is the
-  simplest "always-on KB" pattern in the group. Is an always-on background ingest/compile/heal loop in scope for Linus,
-  or does ingestion stay user-initiated through Phase 4?
+1. **Operations-registry adoption.** The `Operation(name, handler, params, writes, category)` + `dispatch()` pattern is
+   a near-drop-in answer to Phase 2a's "one tool, three surfaces (CLI / OpenAI-compat HTTP / MCP)" problem. Adopt it as
+   the Linus tool-registry shape, or design a different abstraction that better fits the Maestro/Worker delegation
+   model? _Partially resolved (DEC-0018, DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): MCP
+   adopted as extensibility substrate; fastmcp's decorator API is the in-house Linus server pattern; the specific
+   operations-registry shape for Phase 2a remains to be decided._
+2. **Two-layer recall vs Qdrant.** llmbase makes a defensible no-vector-DB argument at personal scale (TF-IDF over
+   compiled concepts + verbatim raw fallback). The KnowledgeBase submodule already commits to Qdrant. Is Phase 3 hybrid
+   retrieval `Qdrant + BM25/TF-IDF + compiled concept layer`, or stay vector-first and treat llmbase's two-layer pattern
+   as a curiosity?
+3. **Compiled concept layer over papers.** llmbase's central bet is that a LLM-maintained markdown wiki over your corpus
+   is more useful than raw chunks. For Dan's papers/notes/threads — do you want a compiled concept layer on top of the
+   existing KnowledgeBase chunks, or is the chunk-and-retrieve baseline sufficient for Phase 2?
+4. **Sibling differentiation.** `llmbase` and `llmwiki` (the namesake sibling) share an author namespace and framing. Is
+   there value in studying both, or should one be designated canonical and the other ignored?
+5. **Autonomous worker model.** llmbase's worker thread (CBETA every 6h, compile every 1h, health every 24h) is the
+   simplest "always-on KB" pattern in the group. Is an always-on background ingest/compile/heal loop in scope for Linus,
+   or does ingestion stay user-initiated through Phase 4?

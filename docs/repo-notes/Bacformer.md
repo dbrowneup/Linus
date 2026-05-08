@@ -76,22 +76,32 @@ practical speeds (PAO1-sized genome in single-digit minutes is the bar), Bacform
 that takes a GenBank path or an NCBI accession and returns contextual embeddings + downstream task outputs to either Dan
 or a Worker LLM. If MPS inference is unworkable, demote to study material until Linus has a remote-GPU offload story.
 
+Biosecurity note: per **DEC-0047** (SAFETY.md three-tier policy, accepted 2026-05-06), the
+`bacformer-causal-protein-family-modeling-complete-genomes` checkpoint's gene-level / family-token generation is
+explicitly Tier B — explicit Dan sign-off per invocation, logged in the audit trail, not agentic-executable without
+approval. Read-only embedding / clustering / zero-shot-operon use of the masked checkpoints stays Tier A (standard
+sandbox).
+
 ## 7. Questions for Dan
 
-- **Which downstream task carries the most weight for you?** The eight checkpoints cover masked vs causal vs
-  essential-genes-finetuned, MAG vs complete-genome. Operon ID, essential-gene prediction, and strain clustering all
-  have ready tutorials — is one of these the natural first Linus skill, or is the contextualised-embedding output itself
-  the primary product (i.e., upstream of your own KnowledgeBase analyses)?
-- **Bacformer vs your existing pipelines.** You have 13 years of genomics tooling. Where does a 300M protein-aware
-  encoder land relative to whatever you currently use for, say, operon calling or MAG QC — replacement, ensemble member,
-  or "interesting embedding signal to graft onto existing scoring"?
-- **The protein-family-token causal checkpoint.** `bacformer-causal-protein-family-modeling-complete-genomes` can
-  generate plausible bacterial genomes at the family level. Is that something you want to expose as a Linus capability
-  (synthetic-genome scaffolds, hypothesis generation), or strictly off-piste?
-- **Differentiation from BioReason and the DNA-LLM landscape.** I argued in section 3 that Bacformer occupies a distinct
-  slot (above-ORF, prokaryote-only, encoder-only, no reasoning head). Does that framing match your read, or is there
-  overlap I'm missing — e.g., do you see Bacformer embeddings being plugged into a BioReason-style reasoning loop as a
-  Phase 7+ composite?
-- **Pretraining ambitions.** Phase 6 is fine-tuning on Apple Silicon. The 26M base model with a small LoRA on a bespoke
-  corpus (e.g., your own genome collection) is plausibly tractable on M1 Max. Worth scoping as a Phase 6 candidate
-  alongside the language-model fine-tunes, or strictly out of scope?
+1. **Which downstream task carries the most weight for you?** The eight checkpoints cover masked vs causal vs
+   essential-genes-finetuned, MAG vs complete-genome. Operon ID, essential-gene prediction, and strain clustering all
+   have ready tutorials — is one of these the natural first Linus skill, or is the contextualised-embedding output
+   itself the primary product (i.e., upstream of your own KnowledgeBase analyses)?
+2. **Bacformer vs your existing pipelines.** You have 13 years of genomics tooling. Where does a 300M protein-aware
+   encoder land relative to whatever you currently use for, say, operon calling or MAG QC — replacement, ensemble
+   member, or "interesting embedding signal to graft onto existing scoring"?
+3. **The protein-family-token causal checkpoint.** `bacformer-causal-protein-family-modeling-complete-genomes` can
+   generate plausible bacterial genomes at the family level. Is that something you want to expose as a Linus capability
+   (synthetic-genome scaffolds, hypothesis generation), or strictly off-piste?
+4. **Differentiation from BioReason and the DNA-LLM landscape.** I argued in section 3 that Bacformer occupies a
+   distinct slot (above-ORF, prokaryote-only, encoder-only, no reasoning head). Does that framing match your read, or is
+   there overlap I'm missing — e.g., do you see Bacformer embeddings being plugged into a BioReason-style reasoning loop
+   as a Phase 7+ composite?
+5. **Pretraining ambitions.** Phase 6 is fine-tuning on Apple Silicon. The 26M base model with a small LoRA on a bespoke
+   corpus (e.g., your own genome collection) is plausibly tractable on M1 Max. Worth scoping as a Phase 6 candidate
+   alongside the language-model fine-tunes, or strictly out of scope?
+
+   _Partially resolved (S31, see [answered-questions.md](../questions/answered-questions.md)): Bacformer+DeepSeMS is a
+   Phase 7 generalist × specialist pairing target. Phase 6 fine-tuning scope for the 26M base model not yet explicitly
+   decided._

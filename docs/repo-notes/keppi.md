@@ -82,18 +82,10 @@ string) is the right shape for Linus's KB tools, or whether a native Linus tool 
 
 ## 7. Questions for Dan
 
-- **KB graph schema parity.** Keppi's edge types are vault-author-shaped (`wikilink`, `embed`, `related_to`,
-  `tag_overlap`, `folder_proximity`). The KnowledgeBase corpus is paper-shaped (`cites`, `cited_by`, `co_author`,
-  `shared_topic`, `shared_doi`). Should we define the Phase 2 KB edge schema explicitly before borrowing Keppi's
-  weighting scheme, or pick weights empirically once the graph is built?
-- **Hybrid retrieval order.** Keppi's MCP server hard-codes `semantic_search → keyword_search → graph traversal`. For
-  paper retrieval the natural order may invert (citation-graph expansion from a known paper, then semantic re-rank). Do
-  we want a single canonical retrieval recipe in Phase 3, or pluggable strategies per task type?
-- **`hyalo` vs `keppi` for vault interop.** If Linus eventually mounts your personal Obsidian vault as a corpus, do we
-  pick one of these two, or compose them — keppi for traversal, hyalo for authoring/synthesis?
-- **MCP-as-tool-surface revisited.** Keppi, pmetal, and Cline all ship MCP servers. Phase 3's tool-registry decision is
-  becoming load-bearing; is now the time for an ADR on "MCP as Linus's tool surface vs. native registry," or does it
-  stay open until we have a working KB tool to register?
-- **Context-pack as a Linus primitive.** `context_pack(topic, token_budget) → reading set` is exactly the shape of a
-  Linus tool a Worker would call before starting a task. Want to spec this as a Phase 2a/3 primitive explicitly, or wait
-  until a concrete Worker workflow demands it?
+1. **KB graph schema parity.** Keppi's edge types are vault-author-shaped (`wikilink`, `embed`, `related_to`,
+   `tag_overlap`, `folder_proximity`). The KnowledgeBase corpus is paper-shaped (`cites`, `cited_by`, `co_author`,
+   `shared_topic`, `shared_doi`). Should we define the Phase 2 KB edge schema explicitly before borrowing Keppi's
+   weighting scheme, or pick weights empirically once the graph is built?
+2. **Hybrid retrieval order.** Keppi's MCP server hard-codes `semantic_search → keyword_search → graph traversal`. For
+   paper retrieval the natural order may invert (citation-graph expansion from a known paper, then semantic re-rank). Do
+   we want a single canonical retrieval recipe in Phase 3, or pluggable strategies per task type?

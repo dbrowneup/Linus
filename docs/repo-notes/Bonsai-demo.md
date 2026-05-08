@@ -55,14 +55,9 @@ in ~2.5 GB, it meaningfully reframes what "local worker model" means on 32 GB.
 
 ## 7. Questions for Dan
 
-- **Bonsai-8B and Ternary-Bonsai-8B in the Phase 1c baseline sweep?** This is the cheapest test of the 1-bit
-  quality-cost frontier on your hardware. Happy to write a smoke-test spec for it.
-- **PrismML's `llama-server` as the interim OpenAI-compatible endpoint for the Phase 1e Maestro/Worker loop?** It ships
-  today and routes to the Metal backend, buying time before `pmetal serve` is evaluated. The alternative is staying on
-  Ollama and accepting that Ollama does not yet have `Q1_0` Metal kernels.
-- **Native-1-bit vs. distilled-to-1-bit (BitDistill) as Linus's fine-tuning path.** Bonsai trained from scratch with
-  1-bit / ternary weights. BitDistill takes an FP16 model and distills down. Different risks. Do you want to run both
-  experiments in parallel at Phase 6, or pick a lane?
-- **PrismML's llama.cpp and MLX forks as upstream-tracking dependencies.** They've committed to upstreaming; do we track
-  their forks as study references and adopt the upstreamed kernels once merged, or pin a specific fork commit as a Linus
-  dependency?
+1. **PrismML's `llama-server` as the interim OpenAI-compatible endpoint for the Phase 1e Maestro/Worker loop?**
+   _Partially resolved (DEC-0049, see [answered-questions.md](../questions/answered-questions.md)): pmetal vs. PrismML
+   fork deferred to Phase 1b verdict; llama-server interim use remains open pending that verdict._
+2. **PrismML's llama.cpp and MLX forks as upstream-tracking dependencies.** They've committed to upstreaming; do we
+   track their forks as study references and adopt the upstreamed kernels once merged, or pin a specific fork commit as
+   a Linus dependency?

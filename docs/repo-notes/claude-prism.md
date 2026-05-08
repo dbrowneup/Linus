@@ -84,20 +84,20 @@ claude-prism's shell becomes a real reference architecture rather than a curiosi
 
 ## 7. Questions for Dan
 
-- **Paper-drafting as a Worker task.** Does the Phase 7 skills graduation include "draft a methods section from a
-  notebook" or "convert a markdown draft to a journal-formatted LaTeX manuscript" as named Worker capabilities, or is
-  manuscript writing always a Maestro+Dan activity? The answer changes whether claude-prism's shell is interesting at
-  all.
-- **K-Dense skills corpus relationship.** Two repos in this group (claude-prism and scientific-agent-skills) install the
-  same K-Dense bundle. Should Linus pick the K-Dense corpus as its canonical Phase 7 scientific-skills baseline, or is
-  OmegaWiki's Anthropic-authored set or some merged superset more appropriate for a PhD biochemist's workflow?
-- **Tectonic embedding.** Embedding Tectonic costs a substantial Rust dependency tree (harfbuzz, icu, freetype,
-  graphite2). For a Linus-side LaTeX capability, is "shell out to a system `tectonic` binary" enough, or is the
-  embedded-engine pattern worth the build complexity?
-- **Local LLM fit.** Suppose Phase 6 produces a Linus fine-tune capable of competent LaTeX editing on a given
-  manuscript. Would patching claude-prism's `claude.rs` to talk to a local OpenAI-compatible endpoint be a reasonable
-  Phase 8 spike, or is the Claude-CLI-subprocess assumption baked deep enough that a fork is impractical?
-- **Differentiator confidence.** I read claude-prism as "K-Dense scientific skills wrapped in a LaTeX/PDF/Zotero writing
-  GUI." If you see a sharper differentiator after using the DMG — particularly something the K-Dense
-  scientific-agent-skills app doesn't already provide — please flag it; I had to stop short of running both apps
-  side-by-side.
+1. **Paper-drafting as a Worker task.** Does the Phase 7 skills graduation include "draft a methods section from a
+   notebook" or "convert a markdown draft to a journal-formatted LaTeX manuscript" as named Worker capabilities, or is
+   manuscript writing always a Maestro+Dan activity? The answer changes whether claude-prism's shell is interesting at
+   all.
+2. **K-Dense skills corpus relationship.** Two repos in this group (claude-prism and scientific-agent-skills) install
+   the same K-Dense bundle. Should Linus pick the K-Dense corpus as its canonical Phase 7 scientific-skills baseline, or
+   is OmegaWiki's Anthropic-authored set or some merged superset more appropriate for a PhD biochemist's workflow?
+3. **Tectonic embedding.** Embedding Tectonic costs a substantial Rust dependency tree (harfbuzz, icu, freetype,
+   graphite2). For a Linus-side LaTeX capability, is "shell out to a system `tectonic` binary" enough, or is the
+   embedded-engine pattern worth the build complexity?
+4. **Local LLM fit.** Suppose Phase 6 produces a Linus fine-tune capable of competent LaTeX editing on a given
+   manuscript. Would patching claude-prism's `claude.rs` to talk to a local OpenAI-compatible endpoint be a reasonable
+   Phase 8 spike, or is the Claude-CLI-subprocess assumption baked deep enough that a fork is impractical?
+5. **Differentiator confidence.** I read claude-prism as "K-Dense scientific skills wrapped in a LaTeX/PDF/Zotero
+   writing GUI." If you see a sharper differentiator after using the DMG — particularly something the K-Dense
+   scientific-agent-skills app doesn't already provide — please flag it; I had to stop short of running both apps
+   side-by-side.

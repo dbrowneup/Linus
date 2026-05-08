@@ -70,19 +70,24 @@ those revisits requires keeping the clone; the repo can be deleted from `repos/`
 
 ## 7. Questions for Dan
 
-- **Docling for KnowledgeBase ingestion.** Your current pipeline uses pypdf with the decompression-limit workaround.
-  Docling handles scans, tables, and slide decks that pypdf mangles. Worth a Phase 2 spike to compare on a sample of
-  your harder papers — chemistry-figure-heavy, table-heavy, or scanned legacy PDFs — or is pypdf good enough for the
-  corpus you actually have?
-- **A2A vs ad-hoc.** When Phase 3 multi-agent fan-out lands, do you want a named wire protocol (A2A, ACP, MCP, or
-  similar) for Worker-to-Worker communication, or is in-process Python plus a shared session store enough for the scales
-  Linus operates at?
-- **Langfuse vs homegrown audit log.** SAFETY.md implies an audit log without specifying its shape. Is a Langfuse-style
-  trace store the right target for Phase 2, or does a SQLite event table satisfy the auditability goal at lower
-  complexity?
-- **Anti-pattern enforcement.** The LangChain/LangGraph removal was decided once. Is it worth a one-line lint check or a
-  pre-commit hook that flags `import langchain` / `from langgraph` to keep that decision from drifting back in via
-  copied tutorial code?
-- **Granite as a worker model.** IBM's Granite 3.x models are Apache-2.0 and available via Ollama. Do they merit a
-  benchmark slot in the Phase 1c worker-model bake-off alongside Qwen2.5-Coder and Mistral-7B, or is the 3B/8B Granite
-  family not competitive enough on your task suite to spend the eval cycles?
+1. **Docling for KnowledgeBase ingestion.** Your current pipeline uses pypdf with the decompression-limit workaround.
+   Docling handles scans, tables, and slide decks that pypdf mangles. Worth a Phase 2 spike to compare on a sample of
+   your harder papers — chemistry-figure-heavy, table-heavy, or scanned legacy PDFs — or is pypdf good enough for the
+   corpus you actually have?
+2. **A2A vs ad-hoc.** When Phase 3 multi-agent fan-out lands, do you want a named wire protocol (A2A, ACP, MCP, or
+   similar) for Worker-to-Worker communication, or is in-process Python plus a shared session store enough for the
+   scales Linus operates at?
+
+   _Partially resolved (DEC-0051, see [answered-questions.md](../questions/answered-questions.md)): AgentReport typed
+   inter-agent message format adopted for Phase 3+; A2A/ACP specifically not adopted._
+
+3. **Langfuse vs homegrown audit log.** SAFETY.md implies an audit log without specifying its shape. Is a Langfuse-style
+   trace store the right target for Phase 2, or does a SQLite event table satisfy the auditability goal at lower
+   complexity?
+
+   _Partially resolved (DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): Episodic memory
+   substrate is SQLite + content hashes + git; audit log shape follows the same substrate. Langfuse not adopted._
+
+4. **Anti-pattern enforcement.** The LangChain/LangGraph removal was decided once. Is it worth a one-line lint check or
+   a pre-commit hook that flags `import langchain` / `from langgraph` to keep that decision from drifting back in via
+   copied tutorial code?

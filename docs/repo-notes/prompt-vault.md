@@ -13,7 +13,7 @@ executable footprint: one weekly GitHub Action (`update-claude-md.yml`) that run
 prompt against the repo it lives in and opens a PR with the resulting CLAUDE.md edit. Everything else is text intended
 to be pasted into a chat or dropped into a `.claude/commands/` folder.
 
-## 2. Content overview
+## 2. Architecture summary
 
 `claude-md-memory-workflow` is the most operational artifact: a weekly cron-triggered Action that uses
 `anthropics/claude-code-action@beta` with `mode: agent`, hands Claude a long structured prompt covering 12 review
@@ -67,16 +67,12 @@ write our own in `.github/workflows/` rather than vendor or fork this repo.
 
 ## 7. Questions for Dan
 
-- **Group recategorisation.** prompt-vault is mis-shelved in Group 4 (cross-session persistent memory). It is a prompt
-  library with one tangentially memory-adjacent piece (the Obsidian playbook). It probably belongs in a different group,
-  perhaps with other "prompt patterns / agent-skill cookbooks" repos if any exist later, or it should be declassified
-  out of the curated set entirely. Want to move it?
-- **Auto-ADR cron.** The `auto-document-agent.md` pattern (run `git diff main` on a branch, emit an ADR if the change is
-  architectural) would pair well with this repo's own DEC-NNNN discipline. Worth a small Phase 1c experiment to bolt
-  onto our existing `.claude/settings.json` hooks, or premature?
-- **Self-updating CLAUDE.md.** Would you want the weekly cron to keep CLAUDE.md honest against the repo, given how often
-  we are amending it as the architecture decisions land? The risk is that an automated PR overwrites the careful prose
-  style for a more mechanical bullet-style summary.
-- **Obsidian playbook relevance.** Do you maintain (or plan to maintain) an Obsidian vault for `context/notes/` or the
-  paper corpus? If yes, the `vault_connectivity_agent.md` and `transcript_processing_agent.md` prompts are concretely
-  useful; if no, the entire `obisidian-knowledge-graph/` subdirectory is dead weight for Linus's purposes.
+1. **Auto-ADR cron.** The `auto-document-agent.md` pattern (run `git diff main` on a branch, emit an ADR if the change
+   is architectural) would pair well with this repo's own DEC-NNNN discipline. Worth a small Phase 1c experiment to bolt
+   onto our existing `.claude/settings.json` hooks, or premature?
+2. **Self-updating CLAUDE.md.** Would you want the weekly cron to keep CLAUDE.md honest against the repo, given how
+   often we are amending it as the architecture decisions land? The risk is that an automated PR overwrites the careful
+   prose style for a more mechanical bullet-style summary.
+3. **Obsidian playbook relevance.** Do you maintain (or plan to maintain) an Obsidian vault for `context/notes/` or the
+   paper corpus? If yes, the `vault_connectivity_agent.md` and `transcript_processing_agent.md` prompts are concretely
+   useful; if no, the entire `obisidian-knowledge-graph/` subdirectory is dead weight for Linus's purposes.

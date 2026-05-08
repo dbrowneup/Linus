@@ -213,16 +213,13 @@ second-order polynomials, RoPE's periodicity at base frequency 10000 becomes a p
 quality degradation from MQA is a function of how aggressively KV heads are compressed. For a Phase 6 practitioner
 doing LoRA on M1 Max, Bandaru is the first-stop reference when the math in a model card needs grounding.
 
-### Hardware AI research footnote
+### Hardware AI research — promoted to its own category
 
-The 2026-05-05 session also added the [QiMeng family](../paper-notes/2506.05007v1.md) — including [QiMeng-CRUX](../paper-notes/2511.20099v4.md)
-and [the companion system design paper](../paper-notes/2511.20100v1.md) — alongside [Cheng et al.'s superscalar
-processor design paper](../paper-notes/0549.md) and [a related CPU design paper](../paper-notes/2306.12456v2.md) as
-hardware AI research now in the corpus. The verdict is informative but not directive for Linus Phase 1–3: QiMeng's
-three-layer LLM-driven chip design system and its structured intermediate representation (CRUX) are compelling
-instances of domain-specific AI orchestration — the same Maestro/Worker pattern Linus implements, applied to a
-different domain — and worth a periodic check as LLM-assisted hardware design matures. None of these papers is a
-Linus implementation target before Phase 4.
+LLM-driven hardware design papers (the QiMeng family, Cheng et al.'s superscalar processor design, and adjacent CPU
+design papers) have been promoted out of infra-foundations into a forthcoming LLM-hardware-design category. See
+[`docs/specs/qimeng-category-promotion.md`](../specs/qimeng-category-promotion.md) for the staging plan; the new
+thematic synthesis (`llm-hardware-design-synthesis.md`) and cluster synthesis are deferred until Dan's planned ~4
+additional repos and ~8 additional papers land. This footnote is preserved as a breadcrumb.
 
 ### Flow Matching and Diffusion Models — the math reference for an adjacent universe
 
