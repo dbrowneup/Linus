@@ -141,7 +141,7 @@ millions of proteins for arbitrary reactions — global, shallow, cross-protein.
 Horizyn-1 nominates the wild-type seed; METL guides directed-evolution mutagenesis on top. Both in the Linus skill
 catalog enables a full local discovery → engineering loop.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 The wet-lab portions — cloning, BL21(DE3) expression, Ni-NTA purification, LC-MS MRM, colorimetric assays — are not
 Linus's job. Linus suggests enzymes; humans run the bench. The paper makes this division crisp and Linus should keep it
