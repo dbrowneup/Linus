@@ -68,13 +68,19 @@ Real-money trading is explicitly out of scope and explicitly dangerous — the R
 Linus exposure to this code must stay in research/backtest mode; the line between "analyzes a chart" and "places an
 order" is a single API-key swap.
 
-## 6. Recommendation: **Ignore** (for the scientific-computing core; Study if Dan wants the financial-knowledge adjacency)
+## 6. Recommendation: **Study** (the multi-agent decomposition pattern; financial domain is off-mission)
 
-QuantAgent is a clean, small, readable example of LangGraph multi-agent decomposition, but the domain is off-mission and
-the architectural lessons are subsumed by **TradingAgents** (richer decomposition) for the multi-agent pattern and by
-**OpenBB** (broader data substrate) for the financial-knowledge adjacency. If Phase 7 ever produces a "financial
-analysis" skill for Linus, revisit this repo for prompt design and the chart-vision pattern. Otherwise leave it as
-reference clone — no code to vendor, no submodule to add.
+QuantAgent is the cleanest minimal multi-agent template in the corpus — a four-role linear pipeline
+(measurer → recognizer → contextualizer → decider) coordinated by a single LangGraph `StateGraph` over a shared state
+dict, ~30 lines of orchestration glue plus role-specific tool bindings. That decomposition shape is the load-bearing
+reusable artifact for Linus and warrants real study even though the financial domain itself is off-mission. The
+sibling [TradingAgents](TradingAgents.md) shows how to scale deliberation with debate-style multi-team rosters;
+QuantAgent shows how thin a useful pipeline can be — the two together bracket the orchestration design space at its
+minimal and maximal ends, and Linus needs both ends visible when the agent-spawner spec (DEC-0050) is fleshed out.
+The financial domain itself is off-mission and the trade-decision specifics are inspiration only; the
+prompt-engineering choices and the vision-LLM-on-rendered-chart pattern are general-purpose techniques worth lifting.
+No code to vendor, no submodule to add — read the four-agent wiring, copy the template shape into Phase 2/3
+orchestration design, leave the financial layer behind.
 
 ## 7. Questions for Dan
 
