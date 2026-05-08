@@ -170,7 +170,7 @@ four extras under EvalScope with vLLM on H100. `benchmarks/dan_tasks/` should mi
 comparing to Bonsai claims, and pair tok/s with the wall-clock task-completion methodology from
 [Speed and Conversational LLMs (2502.16721v1)](2502.16721v1.md).
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 Throughput and energy numbers are from M4 Pro 48 GB, not M1 Max 32 GB. Relative speedup vs FP16 (5.2x decode) likely
 transfers reasonably — both are unified-memory Apple Silicon — but absolute throughput on M1 Max will be lower (smaller

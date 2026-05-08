@@ -147,7 +147,7 @@ revisions, deterministic attention, identical generation parameters across model
 code execution, rule-based scoring with LLM fallback only on extraction failure. `benchmarks/dan_tasks/` should adopt
 this from the start.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 Headline throughput numbers are reported on **M4 Pro, not M1 Max**. Bandwidth differs (M4 Pro ~273 GB/s vs M1 Max ~400
 GB/s); the 1-bit kernel is bandwidth-bound, so M1 Max may actually be faster — but published numbers do not transfer
