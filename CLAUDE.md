@@ -120,57 +120,180 @@ working.
 
 ```
 Linus/
-├── CLAUDE.md              # This file — read first in every session
-├── VISION.md              # The north star; project philosophy
-├── ARCHITECTURE.md        # System design, layer boundaries, component diagram
-├── ROADMAP.md             # Phased plan with targets
-├── SAFETY.md              # Sandbox policy, autonomy tiers, forbidden ops
-├── DECISIONS.md           # Pointer + index for the per-file ADRs in docs/adr/
-├── GLOSSARY.md            # Terms, component names, Linus-specific vocabulary
-├── README.md              # Entry point for humans
-├── environment.yml        # conda env spec for `linus`
-├── pyproject.toml         # Python package config for src/linus/
+├── CLAUDE.md                                     # This file — read first in every session
+├── VISION.md                                     # The north star; project philosophy
+├── ARCHITECTURE.md                               # System design, layer boundaries, component diagram
+├── ROADMAP.md                                    # Phased plan with targets
+├── SAFETY.md                                     # Sandbox policy, autonomy tiers, forbidden ops
+├── DECISIONS.md                                  # Pointer + index for the per-file ADRs in docs/adr/
+├── GLOSSARY.md                                   # Terms, component names, Linus-specific vocabulary
+├── README.md                                     # Entry point for humans
+├── environment.yml                               # conda env spec for `linus`
+├── pyproject.toml                                # Python package config for src/linus/
 ├── .gitignore
-├── .gitmodules            # KnowledgeBase submodule pinning
-├── src/                   # Linus source code — the product
-│   └── linus/             # Python package
-├── modules/               # Tracked live dependencies (submodules)
-│   └── KnowledgeBase/     # Dan's paper corpus + RAG + knowledge graph
-├── repos/                 # Reference clones (gitignored); read-only study material
-│   ├── BitNet/            # Microsoft 1-bit LLM inference
-│   ├── Bonsai-demo/       # PrismML 1-bit 8B MLX model
-│   ├── flash-moe/         # Dan Woods Metal/Obj-C MoE streaming
-│   ├── mlx-flash/         # Matt Wong MLX weight streaming
-│   ├── pmetal/            # Epistates Rust ML platform for Apple Silicon
-│   ├── autoresearch/      # Karpathy agentic research loop methodology
-│   ├── autoresearch-mlx/  # MLX-flavored variant of Karpathy's research loop
-│   ├── ANE/               # Maderix ANE reverse-engineering
-│   ├── claw-code/         # ultraworkers Rust CLI agent harness (inspiration; Anthropic-only)
-│   ├── claw-code-local/   # codetwentyfive fork adding Ollama backend (more practical lead)
-│   ├── openclaw/          # openclaw local-first gateway (reference/future front-end)
-│   ├── cline/             # VS Code agentic coding extension
-│   └── project-nomad/     # Offline knowledge server (inspiration only)
-├── context/               # Dan's personal context (gitignored: papers, threads, notes, pics)
+├── .gitmodules                                   # KnowledgeBase submodule pinning
+├── src/                                          # Linus source code — the product
+│   └── linus/                                    # Python package
+├── modules/                                      # Tracked live dependencies (submodules)
+│   └── KnowledgeBase/                            # Dan's paper corpus + RAG + knowledge graph
+├── repos/                                        # Reference clones (gitignored); read-only study material
+├── context/                                      # Dan's personal context (gitignored: papers, threads, notes, pics)
 │   ├── papers/
 │   ├── books/
 │   ├── threads/
 │   ├── notes/
 │   └── pics/
-├── benchmarks/            # Evaluation harnesses, Dan task suite, results
-│   ├── dan_tasks/         # Private benchmark suite (Dan-authored)
-│   └── results/           # Dated JSON result files
-├── experiments/           # Throwaway scripts, ablations, quick tests
-└── docs/                  # Long-form writing, synthesis notes
-    ├── adr/               # Per-file ADRs (NNNN-<slug>.md matching DEC-NNNN ids)
-    ├── landscapes/        # total-landscape, synthesis-landscape (paper/repo are deprecated stubs)
-    ├── paper-notes/       # ~100 per-paper write-ups + INDEX.md
-    ├── papers/            # Paper-corpus index (paper-notes/INDEX.md mirror; pointer doc)
-    ├── protocols/         # maestro-worker-protocol, curation-protocol
-    ├── questions/         # top-questions, open-questions, answered-questions
-    ├── repo-notes/        # ~99 per-repo write-ups + INDEX.md
-    ├── session-summaries/ # Maestro session recaps (one per substantive session)
-    ├── specs/             # Implementation specs (memory-architecture, phase*-spike, kb/, etc.)
-    └── syntheses/         # 14 thematic + 11 cluster (g1–g11) synthesis docs
+├── benchmarks/                                   # Evaluation harnesses, Dan task suite, results
+│   ├── dan_tasks/                                # Private benchmark suite (Dan-authored)
+│   └── results/                                  # Dated JSON result files
+├── experiments/                                  # Throwaway scripts, ablations, quick tests
+└── docs/                                                                 # Long-form writing, synthesis notes
+    ├── README.md                                                         # Tour of the docs tree
+    ├── curation-log.md                                                   # Per-DEC-0025 archive/removal record
+    ├── repo-notes/                                                       # ~99 per-repo write-ups + INDEX.md
+    ├── paper-notes/                                                      # ~100 per-paper write-ups + INDEX.md
+    ├── adr/                                                              # Per-file ADRs (NNNN-<slug>.md matching DEC-NNNN ids)
+    │   ├── README.md                                                     # ADR index and authoring conventions
+    │   ├── 0001-project-name-and-namesake.md                             # Pauling/Torvalds + carbon-atom rationale
+    │   ├── 0002-orchestration-backend-as-core-product.md                 # Linus is the orchestration layer, not a harness
+    │   ├── 0003-knowledgebase-submodule.md                               # KnowledgeBase tracked as a git submodule, not vendored
+    │   ├── 0004-mambaforge-conda-env.md                                  # mambaforge + conda env named `linus`
+    │   ├── 0005-openai-compatible-protocol.md                            # Linus speaks OpenAI HTTP for harness portability
+    │   ├── 0006-pmetal-phase1-evaluation.md                              # Phase 1 pmetal smoke-test gate
+    │   ├── 0007-claude-code-terminal-maestro.md                          # Claude Code in terminal is the Maestro harness
+    │   ├── 0008-openclaw-frontend-native-app.md                          # openclaw as Phase 5+ native front-end target
+    │   ├── 0009-lm-studio-discovery-only.md                              # LM Studio is discovery-only; not a Linus front-end
+    │   ├── 0010-engineering-conventions-from-kb.md                       # Inherit KB conventions (smoke-test, quirks, etc.)
+    │   ├── 0011-lightweight-branching-then-gitflow.md                    # Lightweight branches now; GitFlow later
+    │   ├── 0012-pmetal-primary-inference-candidate.md                    # pmetal is the primary Phase 1 inference candidate
+    │   ├── 0013-bitnet-2b4t-spike.md                                     # BitNet 2B4T spike scoping
+    │   ├── 0014-phase6-finetuning-lane-deferred.md                       # Fine-tuning lane defers to Phase 6
+    │   ├── 0015-kb-dual-graph-substrates.md                              # KB carries dual graph substrates
+    │   ├── 0016-kb-spec-split-convention.md                              # KB-spec lives in docs/specs/kb/
+    │   ├── 0017-harness-plurality-roles.md                               # Multiple harnesses coexist; each has a role
+    │   ├── 0018-mcp-extensibility-substrate.md                           # MCP is the tool-extensibility substrate
+    │   ├── 0019-kb-ingest-quality-surface.md                             # KB ingest exposes a quality-gate surface
+    │   ├── 0020-orchestration-scope-bounded.md                           # Orchestration scope is bounded; harnesses stay separate
+    │   ├── 0021-phase5c-claw-code-local.md                               # claw-code-local lands in Phase 5c
+    │   ├── 0022-parallel-worker-write-coordination.md                    # How parallel Workers coordinate writes
+    │   ├── 0023-output-interface-citations-llm-wiki.md                   # Output interface includes citations + LLM Wiki
+    │   ├── 0024-security-posture-supply-chain.md                         # Supply-chain posture; uv envs for experimental pkgs
+    │   ├── 0025-curation-protocol.md                                     # Quarterly curation review protocol
+    │   ├── 0026-planning-write-back-cadence.md                           # Each planning session ends with core-doc write-back
+    │   ├── 0027-linus-practice-stance-batch.md                           # Public APIs only, OS page cache, multi-language stance
+    │   ├── 0028-memory-architecture-phase2-pillar.md                     # Memory is a Phase 2 architectural pillar
+    │   ├── 0029-episodic-memory-substrate.md                             # Episodic memory substrate (Layer C) choice
+    │   ├── 0030-scratchpad-first-class-artifact.md                       # Reasoning scratchpad is durable, addressable
+    │   ├── 0031-router-primitives-cot-budget-memory-mode.md              # Router primitives: cot_budget + memory_mode
+    │   ├── 0032-in-context-window-cap-policy.md                          # 16K default in-context cap with audit-logged bypass
+    │   ├── 0033-cot-gap-fingerprint-registry-property.md                 # CoT-gap fingerprint as registry property
+    │   ├── 0034-worker-size-vs-cot-length-comparison.md                  # Worker-size vs CoT-length comparison framework
+    │   ├── 0035-arc-agi-as-memory-diagnostic.md                          # ARC-AGI as a memory-architecture diagnostic
+    │   ├── 0036-kv-cache-continuity-architectural-constraint.md          # KV-cache continuity as architectural constraint
+    │   ├── 0037-ttt-apple-silicon-viability-spike.md                     # Test-time training Apple Silicon viability spike
+    │   ├── 0038-mingru-mlx-port-spike.md                                 # minGRU MLX-port spike
+    │   ├── 0039-episodic-schema-hybrid-leaf-summary.md                   # Hybrid leaf+summary episodic schema
+    │   ├── 0040-faithfulness-audit-deferred.md                           # CoT faithfulness audit deferred
+    │   ├── 0041-mingru-bitnet-phase8-research-direction.md               # minGRU + BitNet as Phase 8 research direction
+    │   ├── 0042-coconut-phase6-substrate-experiment.md                   # COCONUT as Phase 6 substrate experiment
+    │   ├── 0043-memory-mode-finetuning-targets-phase6.md                 # Memory-mode-specific fine-tuning targets in Phase 6
+    │   ├── 0044-paper-qa-kb-retrieval-engine.md                          # paper-qa as KB retrieval engine
+    │   ├── 0045-fastmcp-mcp-framework-default.md                         # fastmcp is the default MCP framework
+    │   ├── 0046-external-api-tool-registry-deployment-field.md           # Tool registry tags external-API deployment
+    │   ├── 0047-biosecurity-tier-control-generative-biology.md           # Biosecurity tiers gate generative biology
+    │   ├── 0048-kb-model-prediction-edge-class.md                        # Model-prediction edges are a first-class KB edge class
+    │   ├── 0049-pmetal-vs-prismml-fork-deferred-phase1b.md               # pmetal vs PrismML fork decision deferred to Phase 1b
+    │   ├── 0050-role-first-class-type-agent-spawner.md                   # Role is a first-class type in the agent spawner
+    │   ├── 0051-agent-report-typed-inter-agent-message.md                # AgentReport is the typed inter-agent message
+    │   ├── 0052-investigation-memory-layer-d.md                          # Investigation memory is Layer D in the memory model
+    │   ├── 0053-kb-hosted-maestro-flow-policy.md                         # Policy for KB content flowing to hosted Maestro
+    │   └── 0054-activation-hooks-api-stub.md                             # Activation-hooks API stub for Phase 2+
+    ├── audits/                                                           # Per-synthesis citation-traceability audits
+    │   └── citation-traceability-2026-05-05/                             # 2026-05-05 audit batch (one .md per thematic synthesis)
+    │       ├── agentic-systems-audit.md                                  # Audit for agentic-systems-synthesis.md
+    │       ├── biological-foundation-models-audit.md                     # Audit for biological-foundation-models-synthesis.md
+    │       ├── entrepreneurship-audit.md                                 # Audit for entrepreneurship-synthesis.md
+    │       ├── function-annotation-discovery-audit.md                    # Audit for function-annotation-discovery-synthesis.md
+    │       ├── generative-biology-audit.md                               # Audit for generative-biology-synthesis.md
+    │       ├── humans-teams-performance-audit.md                         # Audit for humans-teams-performance-synthesis.md
+    │       ├── infra-foundations-audit.md                                # Audit for infra-foundations-synthesis.md
+    │       ├── llm-wiki-audit.md                                         # Audit for llm-wiki-synthesis.md
+    │       ├── llms-in-science-audit.md                                  # Audit for llms-in-science-synthesis.md
+    │       ├── memory-audit.md                                           # Audit for memory-synthesis.md
+    │       ├── native-low-bit-apple-silicon-audit.md                     # Audit for native-low-bit-apple-silicon-synthesis.md
+    │       ├── safety-alignment-privacy-audit.md                         # Audit for safety-alignment-privacy-synthesis.md
+    │       ├── security-audit.md                                         # Audit for security-synthesis.md
+    │       └── skills-and-practices-audit.md                             # Audit for skills-and-practices-synthesis.md
+    ├── cybersecurity-notes/                                              # Government/standards primers (genomics/biotech focus)
+    │   ├── index.md                                                      # Tour of the cybersecurity-notes folder
+    │   ├── 01-NIST-Framework-v1.1.md                                     # NIST Cybersecurity Framework v1.1 summary
+    │   ├── 02-NIST-SP-800-207-ZeroTrust.md                               # NIST SP 800-207 zero-trust architecture
+    │   ├── 03-NIST-SP-800-171r2-CUI.md                                   # NIST SP 800-171r2 controlled unclassified info
+    │   ├── 04-NCSC-China-Genomics.md                                     # NCSC advisory on China + genomics data
+    │   ├── 05-HHS-Cyberthreats-Biotech.md                                # HHS cyberthreats to the biotech sector
+    │   ├── 06-Foley-Biotech-IP-Confidentiality.md                        # Foley brief on biotech IP confidentiality
+    │   └── 07-NCCoE-Genomics-Workshop.md                                 # NCCoE genomics-cybersecurity workshop notes
+    ├── landscapes/                                                       # Repo/paper/synthesis landscape rollups
+    │   ├── total-landscape.md                                            # Cross-corpus rollup (active)
+    │   ├── synthesis-landscape.md                                        # Synthesis-doc rollup (active)
+    │   ├── paper-landscape.md                                            # Deprecated stub; see paper-notes/INDEX.md
+    │   └── repo-landscape.md                                             # Deprecated stub; see repo-notes/INDEX.md
+    ├── protocols/                                                        # Operational protocols
+    │   ├── maestro-protocol.md                                           # Maestro role, behavioral disciplines L1-L7, work-split rubric
+    │   ├── maestro-worker-protocol.md                                    # Maestro/Worker hand-off protocol (spec → invoke → review)
+    │   └── curation-protocol.md                                          # Quarterly curation review protocol (DEC-0025)
+    ├── questions/                                                        # Question lifecycle: top → open → answered
+    │   ├── top-questions.md                                              # Current working set (R1, R2-NN promotions)
+    │   ├── open-questions.md                                             # Per-source mirror of open per-note questions
+    │   └── answered-questions.md                                         # Resolution archive with DEC links + uncovered audit
+    ├── session-summaries/                                                # Date-prefixed Maestro session recaps
+    │   ├── 2026-05-03-memory-pillar-session-summary.md                   # Memory pillar resolution session
+    │   ├── 2026-05-03-paper-notes-session-summary.md                     # Paper-notes generation session
+    │   ├── 2026-05-03-top-questions-resolution-session-summary.md        # Top-questions Round 1 resolution
+    │   ├── 2026-05-04-fan-out-session-summary.md                         # Section 7 fan-out session
+    │   ├── 2026-05-05-landscape-rollup-session-summary.md                # Landscape rollup session
+    │   ├── 2026-05-05-planning-update-session-summary.md                 # Planning-update spec authoring session
+    │   └── 2026-05-07-planning-update-execution-session-summary.md       # Planning-update Worker fan-out + L1-L7 lessons
+    ├── specs/                                                            # Implementation specs (living docs)
+    │   ├── kb/                                                           # KnowledgeBase-specific specs
+    │   │   ├── canaries.yaml                                             # KB canary test set (machine-readable)
+    │   │   ├── canary-blocklist.md                                       # KB canary blocklist (curated)
+    │   │   ├── model-prediction-edges.md                                 # Model-prediction edge-class spec (DEC-0048)
+    │   │   └── paper-qa-substrate-integration.md                         # paper-qa integration spec (DEC-0044)
+    │   ├── memory-architecture.md                                        # 5-layer memory pillar implementation contract (DEC-0028+)
+    │   ├── phase1c-spike.md                                              # Phase 1c Worker-selection spike spec
+    │   ├── phase3-spawner.md                                             # Phase 3 agent-spawner design-intent stub (DEC-0050)
+    │   ├── phase6d-streaming-target.md                                   # Phase 6d weight-streaming target spec
+    │   ├── biology-phase7-roadmap.md                                     # Phase 7 biology-skills roadmap
+    │   ├── planning-update-spec.md                                       # Most-recent planning-update task router (rewritten per session)
+    │   └── synthesis-cleanup-spec.md                                     # Synthesis open-questions cleanup spec (Policy B)
+    └── syntheses/                                                        # 14 thematic + 11 cluster syntheses
+        ├── repo-clusters/                                                # 11 repo-cluster syntheses (g1-g11)
+        │   ├── g1-apple-silicon.md                                       # Apple Silicon inference + training
+        │   ├── g2-wiki-engines.md                                        # LLM Wiki engine implementations
+        │   ├── g3-wiki-patterns.md                                       # LLM Wiki agent-driven build patterns
+        │   ├── g4-memory.md                                              # Agent persistent memory
+        │   ├── g5-graph-tools.md                                         # Knowledge-graph + network-analysis tooling
+        │   ├── g6-mcp-tools.md                                           # MCP servers + code/document context tools
+        │   ├── g7-harnesses.md                                           # Agent harnesses, orchestration, model routing
+        │   ├── g8-sci-agents.md                                          # Scientific reasoning agents (FutureHouse stack + adjacents)
+        │   ├── g9-bio.md                                                 # Bioinformatics + domain-specific science models
+        │   ├── g10-finance.md                                            # Finance / quant agents
+        │   └── g11-agent-frameworks.md                                   # General-purpose agent frameworks
+        ├── agentic-systems-synthesis.md                                  # Agentic-systems thematic synthesis
+        ├── biological-foundation-models-synthesis.md                     # Biological foundation models thematic synthesis
+        ├── entrepreneurship-synthesis.md                                 # Entrepreneurship thematic synthesis (E1-E12)
+        ├── function-annotation-discovery-synthesis.md                    # Function annotation + discovery synthesis
+        ├── generative-biology-synthesis.md                               # Generative biology thematic synthesis
+        ├── humans-teams-performance-synthesis.md                         # Humans, teams, performance synthesis
+        ├── infra-foundations-synthesis.md                                # Infrastructure foundations synthesis
+        ├── llm-wiki-synthesis.md                                         # LLM Wiki thematic synthesis
+        ├── llms-in-science-synthesis.md                                  # LLMs in science thematic synthesis
+        ├── memory-synthesis.md                                           # Memory thematic synthesis
+        ├── native-low-bit-apple-silicon-synthesis.md                     # Native low-bit Apple Silicon synthesis
+        ├── safety-alignment-privacy-synthesis.md                         # Safety, alignment, privacy synthesis
+        ├── security-synthesis.md                                         # Security thematic synthesis
+        └── skills-and-practices-synthesis.md                             # Skills + practices thematic synthesis
 ```
 
 ## Phased Plan
