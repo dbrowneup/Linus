@@ -55,5 +55,5 @@ exists.
 
 ## 7. Questions for Dan
 
-- **Read-or-defer on the Maderix substack series.** The three articles are arguably the best documentation of the ANE
-  that exists. Worth reading now, or defer to whenever an ANE decision is actually forced?
+1. **Read-or-defer on the Maderix substack series.** The three articles are arguably the best documentation of the ANE
+   that exists. Worth reading now, or defer to whenever an ANE decision is actually forced?

@@ -12,7 +12,7 @@ direct tension with Linus's "no paid APIs required for operation" north star (se
 not subscription, so it's a softer tension than Anthropic-direct usage, but it still means none of these skills could
 run in a fully offline Linus deployment.
 
-## 2. Content overview
+## 2. Architecture summary
 
 The eight shipped skills divide cleanly into three groups. **Scaffolding skills** generate full TypeScript/Bun project
 trees: `create-agent-tui` builds a terminal UI agent ("create-react-app for terminal agents") with 14 built-in tools,
@@ -87,12 +87,12 @@ can't run" (e.g. Llama 4 Maverick at full quality), revisit and install `openrou
 
 ## 7. Questions for Dan
 
-- **OpenRouter as a sanctioned escape hatch?** The "no paid APIs required" rule is about _required_, not _forbidden_. Is
-  there a tier of Linus tasks where reaching out to OpenRouter for a model size local hardware can't host (Llama 4
-  Maverick, Claude Opus 4.7 itself via the OpenRouter route) is acceptable, or is OpenRouter strictly off the table even
-  as opt-in?
-- **Open Responses adoption.** Linus's Phase 2a says "OpenAI-compatible endpoint." Is the actual target the OpenAI Chat
-  Completions shape (legacy, what Ollama serves), the OpenAI Responses shape (newer, stateful), or the Open Responses
-  spec documented in this repo? The three are not interchangeable and the choice locks in client compatibility.
-- **Differentiator confidence.** The README only lists 7 skills but the `skills/` tree contains 8 (`openrouter-video` is
-  undocumented). Worth flagging upstream, or just note and move on?
+1. **OpenRouter as a sanctioned escape hatch?** The "no paid APIs required" rule is about _required_, not _forbidden_.
+   Is there a tier of Linus tasks where reaching out to OpenRouter for a model size local hardware can't host (Llama 4
+   Maverick, Claude Opus 4.7 itself via the OpenRouter route) is acceptable, or is OpenRouter strictly off the table
+   even as opt-in?
+2. **Open Responses adoption.** Linus's Phase 2a says "OpenAI-compatible endpoint." Is the actual target the OpenAI Chat
+   Completions shape (legacy, what Ollama serves), the OpenAI Responses shape (newer, stateful), or the Open Responses
+   spec documented in this repo? The three are not interchangeable and the choice locks in client compatibility.
+3. **Differentiator confidence.** The README only lists 7 skills but the `skills/` tree contains 8 (`openrouter-video`
+   is undocumented). Worth flagging upstream, or just note and move on?

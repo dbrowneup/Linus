@@ -70,15 +70,15 @@ tightly bound to OpenCode to be a starting skeleton.
 
 ## 7. Questions for Dan
 
-- **Provenance model.** Is `git blame` provenance enough for KnowledgeBase, or does Phase 2 need explicit
-  paper-id-to-claim back-references because PDFs get rewritten and reflowed across ingest runs?
-- **Branch-per-session as protocol.** The README's session pattern is essentially `agent/<uuid>/wiki-update`. Want to
-  enshrine "every Worker-driven KB edit happens on its own branch and merges with `--no-ff`" in
-  `docs/maestro-worker-protocol.md` as a hard rule, or keep it as one option among several?
-- **DuckDB+NetworkX as KB graph layer.** Is this the kind of prototype you want for Phase 2 link analysis, or are you
-  already committed to a heavier graph store (DuckPGQ, Memgraph, Neo4j)?
-- **OpenCode in the harness picture.** Cline, claw-code-local, openclaw, Claude Code — and now, in principle, OpenCode.
-  Is OpenCode worth its own evaluation slot, or has the harness shortlist already closed?
-- **Differentiator confidence.** I'm calling branch-per-session and the DuckDB linker the differentiators vs the other
-  six LLM-Wiki siblings, but I haven't read those repos yet. Worth flagging whether any sibling already does the same so
-  the comparison holds up.
+1. **Provenance model.** Is `git blame` provenance enough for KnowledgeBase, or does Phase 2 need explicit
+   paper-id-to-claim back-references because PDFs get rewritten and reflowed across ingest runs?
+2. **Branch-per-session as protocol.** The README's session pattern is essentially `agent/<uuid>/wiki-update`. Want to
+   enshrine "every Worker-driven KB edit happens on its own branch and merges with `--no-ff`" in
+   `docs/maestro-worker-protocol.md` as a hard rule, or keep it as one option among several?
+3. **DuckDB+NetworkX as KB graph layer.** Is this the kind of prototype you want for Phase 2 link analysis, or are you
+   already committed to a heavier graph store (DuckPGQ, Memgraph, Neo4j)?
+4. **OpenCode in the harness picture.** Cline, claw-code-local, openclaw, Claude Code — and now, in principle, OpenCode.
+   Is OpenCode worth its own evaluation slot, or has the harness shortlist already closed?
+5. **Differentiator confidence.** I'm calling branch-per-session and the DuckDB linker the differentiators vs the other
+   six LLM-Wiki siblings, but I haven't read those repos yet. Worth flagging whether any sibling already does the same
+   so the comparison holds up.

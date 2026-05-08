@@ -80,21 +80,27 @@ checkpoints, then in Phase 3 or 6 evaluate whether a port to MLX (NT-500M + Qwen
 is the realistic target) is worth the engineering. The far-better Linus play is "use the BioReason architecture as a
 template for a Linus-native bio-multimodal Worker," not "vendor BioReason's CUDA stack."
 
+The BioReason-Pro follow-up (bioRxiv 2026.03.19.712954) is the more direct Linus prior art: per CLAUDE.md §"Typed
+structured prediction for biology skills" (resolved 2026-05-06, S25), every Linus biology skill that produces a
+predictive output should adopt the BioReason-Pro shape — typed structured result wrapping a free-text `rationale` field.
+Per **DEC-0047** (biosecurity tier policy), BioReason-Pro residue-level outputs sit in Tier A (standard sandbox); only
+gene/whole-genome generation paths escalate to Tier B/C.
+
 ## 7. Questions for Dan
 
-- **KEGG benchmark legitimacy.** The 290-datapoint KEGG disease-pathway set is the headline result. Is that benchmark
-  actually meaningful to a working biochemist — does getting 98% on it imply useful pathway reasoning, or has it been
-  reduced to a multiple-choice exercise where memorization of KEGG itself dominates? Worth a 30-minute look at the
-  curation notebook before adopting it as a Linus eval target.
-- **Evo2 vs NucleotideTransformer.** For Linus's Phase 1 benchmark suite, NT-500M is the M1-Max-tractable choice and
-  Evo2-1B almost certainly is not. But the paper shows Evo2 wins on VEP non-SNV. Are you willing to leave the harder,
-  more interesting variant-effect questions on the table to stay on a portable encoder, or is Evo2 worth the porting
-  fight in Phase 6?
-- **DNA-LLM fusion vs RAG.** BioReason's pitch is that the LLM literally consumes DNA embeddings as context tokens. The
-  obvious Linus alternative is a KnowledgeBase RAG over annotated genomic resources (KEGG, ClinVar, UniProt, Ensembl) +
-  a generic Qwen — no fusion, no fine-tune. Do you have a prior on which path is more promising for Phase 3?
-- **GRPO for reasoning, not alignment.** The repo's `train_grpo.py` uses GRPO to elicit reasoning traces, lifting KEGG
-  from 95.86% to 98.28%. That is a concrete protocol Linus could adopt in Phase 6 for a "reasoning-trained Linus" rather
-  than a generic instruct fine-tune. Worth raising to a Phase 6 candidate experiment now, or premature?
-- **BioReason-Pro relevance.** The follow-up swaps DNA encoder for ESM3 protein embeddings + GO-GPT to predict protein
-  function — closer to wet-lab interpretation. Should this group's "study target" be BioReason or BioReason-Pro?
+1. **KEGG benchmark legitimacy.** The 290-datapoint KEGG disease-pathway set is the headline result. Is that benchmark
+   actually meaningful to a working biochemist — does getting 98% on it imply useful pathway reasoning, or has it been
+   reduced to a multiple-choice exercise where memorization of KEGG itself dominates? Worth a 30-minute look at the
+   curation notebook before adopting it as a Linus eval target.
+2. **Evo2 vs NucleotideTransformer.** For Linus's Phase 1 benchmark suite, NT-500M is the M1-Max-tractable choice and
+   Evo2-1B almost certainly is not. But the paper shows Evo2 wins on VEP non-SNV. Are you willing to leave the harder,
+   more interesting variant-effect questions on the table to stay on a portable encoder, or is Evo2 worth the porting
+   fight in Phase 6?
+3. **DNA-LLM fusion vs RAG.** BioReason's pitch is that the LLM literally consumes DNA embeddings as context tokens. The
+   obvious Linus alternative is a KnowledgeBase RAG over annotated genomic resources (KEGG, ClinVar, UniProt, Ensembl) +
+   a generic Qwen — no fusion, no fine-tune. Do you have a prior on which path is more promising for Phase 3?
+4. **GRPO for reasoning, not alignment.** The repo's `train_grpo.py` uses GRPO to elicit reasoning traces, lifting KEGG
+   from 95.86% to 98.28%. That is a concrete protocol Linus could adopt in Phase 6 for a "reasoning-trained Linus"
+   rather than a generic instruct fine-tune. Worth raising to a Phase 6 candidate experiment now, or premature?
+5. **BioReason-Pro relevance.** The follow-up swaps DNA encoder for ESM3 protein embeddings + GO-GPT to predict protein
+   function — closer to wet-lab interpretation. Should this group's "study target" be BioReason or BioReason-Pro?

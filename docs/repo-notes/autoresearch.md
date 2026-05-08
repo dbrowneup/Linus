@@ -48,13 +48,10 @@ minutes" look quite different. Several README recommendations (switch to TinySto
 to 256, drop `TOTAL_BATCH_SIZE` to 2^14) address exactly this. For Linus's real workflows the budget should probably be
 longer (30 min – 2 hr) and the targets should be Dan-task-suite scores rather than raw val_bpb.
 
-## 6. Recommendation: \*\*Study upstream, integrate the MLX fork
-
-experimentally\*\*
+## 6. Recommendation: **Study upstream, integrate the MLX fork experimentally**
 
 Do not use the upstream repo directly — the CUDA dependency and 5-minute/H100 budget don't match Linus's reality. Do use
 `autoresearch-mlx` (already cloned) as the Phase 6d and Phase 7c prototype. Concretely: in Phase 6, adopt the
 `program.md` + single- edit-file + fixed-budget + keep-or-revert loop as the template for overnight LoRA sweeps (agent
 edits a single `lora_config.py`, runs training, compares to baseline on Dan task suite, keeps or reverts via git). In
 Phase 7c, adopt the same loop for inference experimentation with tok/s-target.
-

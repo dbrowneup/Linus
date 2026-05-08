@@ -72,16 +72,16 @@ Phase 3 fan-out needs a precedent for queued, bounded-concurrency research subta
 
 ## 7. Questions for Dan
 
-- **Multi-agent share vs single-process orchestration.** wikidesk solves "N agents on N machines, one wiki." Linus Phase
-  2 today is "N harnesses, one machine, one orchestration backend." Is the multi-machine case (e.g., M1 Max
-  - Mac Studio, or laptop + desktop) something to plan KB access around now, or YAGNI until Phase 8?
-- **Research-as-tool granularity.** wikidesk's `research` tool dispatches a full agent run that may take 30 minutes.
-  Linus's tool registry has so far been imagined as fast, deterministic functions. Do you want to admit long-running,
-  queued, pollable tools as a first-class category in the Phase 2a registry, or keep that pattern outside the registry
-  and behind a separate "agent fan-out" surface?
-- **Wiki format vs KnowledgeBase schema.** wikidesk assumes `[[wikilink]]`-style markdown. Your KnowledgeBase has its
-  own schema (papers, notes, a knowledge graph). Is there interest in maintaining a parallel `wiki/`
-  human-and-agent-readable view of the KB, or does the existing query/RAG surface stay the only access path?
-- **Sandboxing the worker on macOS.** wikidesk explicitly punts to Docker/bubblewrap. If Linus ever runs an autonomous
-  research-agent loop on the M1 Max, what's the macOS-native sandbox plan (Seatbelt profiles? app-sandbox? confined
-  launchd jobs?), and is that a Phase 7 concern or do we want a sketch in SAFETY.md sooner?
+1. **Multi-agent share vs single-process orchestration.** wikidesk solves "N agents on N machines, one wiki." Linus
+   Phase 2 today is "N harnesses, one machine, one orchestration backend." Is the multi-machine case (e.g., M1 Max
+   - Mac Studio, or laptop + desktop) something to plan KB access around now, or YAGNI until Phase 8?
+2. **Research-as-tool granularity.** wikidesk's `research` tool dispatches a full agent run that may take 30 minutes.
+   Linus's tool registry has so far been imagined as fast, deterministic functions. Do you want to admit long-running,
+   queued, pollable tools as a first-class category in the Phase 2a registry, or keep that pattern outside the registry
+   and behind a separate "agent fan-out" surface?
+3. **Wiki format vs KnowledgeBase schema.** wikidesk assumes `[[wikilink]]`-style markdown. Your KnowledgeBase has its
+   own schema (papers, notes, a knowledge graph). Is there interest in maintaining a parallel `wiki/`
+   human-and-agent-readable view of the KB, or does the existing query/RAG surface stay the only access path?
+4. **Sandboxing the worker on macOS.** wikidesk explicitly punts to Docker/bubblewrap. If Linus ever runs an autonomous
+   research-agent loop on the M1 Max, what's the macOS-native sandbox plan (Seatbelt profiles? app-sandbox? confined
+   launchd jobs?), and is that a Phase 7 concern or do we want a sketch in SAFETY.md sooner?

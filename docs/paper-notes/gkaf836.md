@@ -147,7 +147,7 @@ reproducible because the SRA accession lists are in supplementary tables.
 structural-property regression + classification head) generalizes beyond DNA. Any future Linus-specific encoder over
 Dan's domain corpora (chemical SMILES, mass-spec, scientific text fragments) could borrow the same template.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 **Resolution ceiling.** REBEAN classifies only the **seven first-level EC classes**, not the 4-level EC hierarchy
 practitioners actually want (e.g., 1.14.13.1, "salicylate 1-monooxygenase"). For most bench-biology and

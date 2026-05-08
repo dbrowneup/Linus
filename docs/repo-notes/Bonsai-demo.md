@@ -55,9 +55,9 @@ in ~2.5 GB, it meaningfully reframes what "local worker model" means on 32 GB.
 
 ## 7. Questions for Dan
 
-- **PrismML's `llama-server` as the interim OpenAI-compatible endpoint for the Phase 1e Maestro/Worker loop?**
-  _Partially resolved (DEC-0049, see [answered-questions.md](../questions/answered-questions.md)): pmetal vs. PrismML
-  fork deferred to Phase 1b verdict; llama-server interim use remains open pending that verdict._
-- **PrismML's llama.cpp and MLX forks as upstream-tracking dependencies.** They've committed to upstreaming; do we track
-  their forks as study references and adopt the upstreamed kernels once merged, or pin a specific fork commit as a Linus
-  dependency?
+1. **PrismML's `llama-server` as the interim OpenAI-compatible endpoint for the Phase 1e Maestro/Worker loop?**
+   _Partially resolved (DEC-0049, see [answered-questions.md](../questions/answered-questions.md)): pmetal vs. PrismML
+   fork deferred to Phase 1b verdict; llama-server interim use remains open pending that verdict._
+2. **PrismML's llama.cpp and MLX forks as upstream-tracking dependencies.** They've committed to upstreaming; do we
+   track their forks as study references and adopt the upstreamed kernels once merged, or pin a specific fork commit as
+   a Linus dependency?

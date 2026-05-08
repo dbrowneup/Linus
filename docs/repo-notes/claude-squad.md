@@ -90,20 +90,20 @@ but should be re-implemented inside Linus where it can consult SAFETY.md policy 
 
 ## 7. Questions for Dan
 
-- **Phase 1f verdict shape.** The spec frames this as Task-Master vs claude-squad vs custom vs pmetal-MCP. After reading
-  both, my read is they solve different layers (decomposition vs runtime isolation). Want the Phase 1f ADR to recommend
-  using both as off-the-shelf today, with Linus's custom layer scoped to "the glue between them," or hold the line that
-  Linus owns orchestration end-to-end and they remain study-only?
-- **Worktree-per-Worker as the canonical primitive.** Adopting `~/.linus/worktrees/<branch>_<nanoseconds>` matches
-  BRANCHING.md cleanly but means every Worker run touches disk and consumes inodes. For short-lived stateless Workers (a
-  one-shot test-generation call) this is overkill. Two-tier model — durable worktrees for `agent/<task-id>` branches,
-  in-memory `git diff`-only for one-shots — or always-worktree for uniformity?
-- **tmux dependency.** Claude-squad assumes tmux. If Linus inherits this, openclaw / native-app front-ends inherit it
-  too. Acceptable now (Dan uses tmux daily) or a smell to design out via `creack/pty` directly?
-- **AutoYes meets SAFETY.md.** Claude-squad's `-y` is "press Enter on every prompt." Linus's autonomy graduation expects
-  `-y` to mean "press Enter on prompts that match the current tier's allowlist, deny otherwise." Should the Phase 1f ADR
-  explicitly call out that any adopted runner must hand off prompt-arbitration to Linus's policy engine?
-- **Screen-scraping vs structured I/O.** Claude-squad detects "agent waiting" by reading the tmux pane. Local Workers
-  speaking OpenAI-compat give Linus structured turn boundaries for free. Do we want the orchestration layer to support
-  both modalities (spawned-CLI + API-Worker), or commit to API-Worker as the only Linus-native pattern and treat
-  CLI-spawning as a third-party concern?
+1. **Phase 1f verdict shape.** The spec frames this as Task-Master vs claude-squad vs custom vs pmetal-MCP. After
+   reading both, my read is they solve different layers (decomposition vs runtime isolation). Want the Phase 1f ADR to
+   recommend using both as off-the-shelf today, with Linus's custom layer scoped to "the glue between them," or hold the
+   line that Linus owns orchestration end-to-end and they remain study-only?
+2. **Worktree-per-Worker as the canonical primitive.** Adopting `~/.linus/worktrees/<branch>_<nanoseconds>` matches
+   BRANCHING.md cleanly but means every Worker run touches disk and consumes inodes. For short-lived stateless Workers
+   (a one-shot test-generation call) this is overkill. Two-tier model — durable worktrees for `agent/<task-id>`
+   branches, in-memory `git diff`-only for one-shots — or always-worktree for uniformity?
+3. **tmux dependency.** Claude-squad assumes tmux. If Linus inherits this, openclaw / native-app front-ends inherit it
+   too. Acceptable now (Dan uses tmux daily) or a smell to design out via `creack/pty` directly?
+4. **AutoYes meets SAFETY.md.** Claude-squad's `-y` is "press Enter on every prompt." Linus's autonomy graduation
+   expects `-y` to mean "press Enter on prompts that match the current tier's allowlist, deny otherwise." Should the
+   Phase 1f ADR explicitly call out that any adopted runner must hand off prompt-arbitration to Linus's policy engine?
+5. **Screen-scraping vs structured I/O.** Claude-squad detects "agent waiting" by reading the tmux pane. Local Workers
+   speaking OpenAI-compat give Linus structured turn boundaries for free. Do we want the orchestration layer to support
+   both modalities (spawned-CLI + API-Worker), or commit to API-Worker as the only Linus-native pattern and treat
+   CLI-spawning as a third-party concern?

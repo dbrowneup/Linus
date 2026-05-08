@@ -167,7 +167,7 @@ and pacing; this paper shows that individual development has a sweet spot of mul
 depth. Together the wave argues that Linus should value variety, breadth, and rest as design properties rather than
 treating raw throughput as the only axis to optimize.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 Nearly nothing in this paper transfers to model training, inference, quantization, RAG, or any other technical layer of
 Linus. There is no mechanism here to translate "multidisciplinary practice" into a regime for fine-tuning a 7B model —

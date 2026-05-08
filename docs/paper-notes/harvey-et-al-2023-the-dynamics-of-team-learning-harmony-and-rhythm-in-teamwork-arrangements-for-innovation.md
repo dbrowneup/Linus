@@ -170,7 +170,7 @@ top-performing teams have non-monotonic within-project arcs (alternating reflexi
 _structure of practice_ dominates _intensity of practice_ across at least two very different time scales. For Linus:
 scheduling matters more than throughput maximization.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 This is a study of humans in 102 corporate innovation teams and 61 MBA student teams. The participants are people with
 motivation, fatigue, social dynamics, status concerns, and psychological safety. None of these constructs apply directly

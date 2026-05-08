@@ -2,8 +2,8 @@
 
 ## 1. Purpose and scope
 
-Huginn is a self-hosted, event-driven automation platform — a private, Ruby-on-Rails IFTTT/Zapier alternative that
-runs on your own server. Users compose DAGs of interconnected "Agents" that read the web, watch for events, and trigger
+Huginn is a self-hosted, event-driven automation platform — a private, Ruby-on-Rails IFTTT/Zapier alternative that runs
+on your own server. Users compose DAGs of interconnected "Agents" that read the web, watch for events, and trigger
 actions: scrape websites, track weather/Twitter trends, send email digests, integrate Slack/Twilio/JIRA, run Bash
 commands, and chain Amazon Mechanical Turk workflows. For Linus, Huginn is a reference implementation of orchestration
 patterns and trigger/action architecture, relevant for understanding how a local tool-composition backend might chain
@@ -39,8 +39,8 @@ log is a lighter alternative).
 
 Huginn is Ruby; Linus is Python. Neither language choice is portable to the other without a rewrite. Huginn's reliance
 on a full database (MySQL/PostgreSQL) is heavier than Linus Phase 2a needs; see CLAUDE.md's recommendation for workgraph
-JSONL session store. The user-facing workflow builder UI is out of scope for Linus (which assumes Dan codes his own
-task specs in Python or YAML).
+JSONL session store. The user-facing workflow builder UI is out of scope for Linus (which assumes Dan codes his own task
+specs in Python or YAML).
 
 ## 6. Recommendation: **Study (before Phase 2a orchestration design)**
 
@@ -50,13 +50,16 @@ CLAUDE.md (Python-specific version of the Huginn-style pattern).
 
 ## 7. Questions for Dan
 
-- **Multi-agent workflows as first-class.** Huginn treats agent DAGs as first-class objects with a UI for composition.
-  Should Linus Phase 2a assume multi-step task specs from the start, or is single-agent-per-task adequate until Phase 3
-  demands parallelism?
-- **Event schema design.** Huginn's events are bare JSON; type safety is implicit. When Linus chains multiple workers,
-  should event types be schema-defined (Pydantic models, Protocol Buffers) or duck-typed?
-- **Persistent state for long-running workflows.** Huginn uses the database; Linus Phase 2a uses a JSONL DAG log. How
-  many intermediate states should Linus log per workflow to enable debugging and resume-after-crash? _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): Workgraph JSONL append-only DAG is the committed Phase 2a session-store shape; leaf + summary hybrid schema per DEC-0039; exact per-workflow log granularity not yet specified._
+1. **Multi-agent workflows as first-class.** Huginn treats agent DAGs as first-class objects with a UI for composition.
+   Should Linus Phase 2a assume multi-step task specs from the start, or is single-agent-per-task adequate until Phase 3
+   demands parallelism?
+2. **Event schema design.** Huginn's events are bare JSON; type safety is implicit. When Linus chains multiple workers,
+   should event types be schema-defined (Pydantic models, Protocol Buffers) or duck-typed?
+3. **Persistent state for long-running workflows.** Huginn uses the database; Linus Phase 2a uses a JSONL DAG log. How
+   many intermediate states should Linus log per workflow to enable debugging and resume-after-crash? _Partially
+   resolved (see [answered-questions.md](../questions/answered-questions.md)): Workgraph JSONL append-only DAG is the
+   committed Phase 2a session-store shape; leaf + summary hybrid schema per DEC-0039; exact per-workflow log granularity
+   not yet specified._
 
 ---
 

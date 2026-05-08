@@ -79,16 +79,16 @@ story (BM25, embeddings, claim-typing) with comparable simplicity, prefer that o
 
 ## 7. Questions for Dan
 
-- **Substrate choice for KnowledgeBase write layer.** Link bets on plain markdown in a directory, no DB. KnowledgeBase
-  today uses SQLite for metadata and a vector store for embeddings. Should Phase 2's wiki-style synthesis layer sit on
-  top of KnowledgeBase's existing storage, or should it adopt Link's directory-of-markdown substrate (with KB continuing
-  to handle papers and embeddings)?
-- **Confidence tags vs. claim-typing.** The security synthesis argues for typed claims with content-hashed identifiers;
-  Link uses inline `[confidence: high/medium/low]` strings in prose. Are those compatible — confidence as a field on a
-  typed claim — or does adopting claim-typing mean abandoning Link's prose-friendly tagging?
-- **Wiki maintenance as a Worker job.** The Link model is "agent ingests, agent compiles, agent maintains." On Linus
-  that's a Worker loop running on Qwen2.5-Coder or a future fine-tuned Linus. Is wiki maintenance a good first
-  long-running Worker task to design around in Phase 3, or does it belong later?
-- **Sibling sweep verdict.** Of the eleven Group-2 engines, only the rest of the sweep will tell us whether Link's
-  stdlib-only / markdown-only minimalism is the right baseline or whether a sibling with embeddings + BM25 + graph
-  re-ranking is closer to what Phase 3 needs. Hold the integration decision until the full Group 2 read is in?
+1. **Substrate choice for KnowledgeBase write layer.** Link bets on plain markdown in a directory, no DB. KnowledgeBase
+   today uses SQLite for metadata and a vector store for embeddings. Should Phase 2's wiki-style synthesis layer sit on
+   top of KnowledgeBase's existing storage, or should it adopt Link's directory-of-markdown substrate (with KB
+   continuing to handle papers and embeddings)?
+2. **Confidence tags vs. claim-typing.** The security synthesis argues for typed claims with content-hashed identifiers;
+   Link uses inline `[confidence: high/medium/low]` strings in prose. Are those compatible — confidence as a field on a
+   typed claim — or does adopting claim-typing mean abandoning Link's prose-friendly tagging?
+3. **Wiki maintenance as a Worker job.** The Link model is "agent ingests, agent compiles, agent maintains." On Linus
+   that's a Worker loop running on Qwen2.5-Coder or a future fine-tuned Linus. Is wiki maintenance a good first
+   long-running Worker task to design around in Phase 3, or does it belong later?
+4. **Sibling sweep verdict.** Of the eleven Group-2 engines, only the rest of the sweep will tell us whether Link's
+   stdlib-only / markdown-only minimalism is the right baseline or whether a sibling with embeddings + BM25 + graph
+   re-ranking is closer to what Phase 3 needs. Hold the integration decision until the full Group 2 read is in?

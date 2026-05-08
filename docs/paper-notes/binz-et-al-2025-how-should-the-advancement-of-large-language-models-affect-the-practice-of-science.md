@@ -140,7 +140,7 @@ open-source, Bender on bespoke domain tools, Marelli on attribution, and Botvini
 stronger anchor than the current language, immediately legible to a future contributor or to hosted Claude in a future
 session.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 The paper's audience is scientists publishing in PNAS — it discusses authorship, peer review, manuscript fabrication,
 journal policy. Linus is not a publishing system; publication-bound prescriptions (CRediT updates, dedicated

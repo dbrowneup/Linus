@@ -127,7 +127,7 @@ form, and use it as a Maestro-class evaluation in `benchmarks/dan_tasks/`. Run i
 then against the strongest local Worker (gap measurement). The gap is the per-token Maestro premium; the trajectory
 length is the memory-architecture stress test.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 **Not a recipe for Workers.** Nothing in this paper transfers to local 7B–14B inference. Claude Opus 4.6 is the frontier
 model of its release window; the closest Linus Workers (Qwen2.5-Coder-7B, Mistral-7B, future LoRA-tuned 8B) will not

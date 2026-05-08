@@ -65,16 +65,17 @@ copy-paste reference for the ~50 lines of `jwalk::WalkDirGeneric` setup and the 
 
 ## 7. Questions for Dan
 
-- **Does the KnowledgeBase indexer need a fast parallel walker?** If KB ingestion is currently slow because of
-  single-threaded directory traversal, the jwalk pattern in `gravityfile-scan/src/scanner.rs` is worth lifting. If KB
-  walks are already fast enough or bound by PDF parsing and embedding, this is a non-issue and gravityfile becomes pure
-  ignore.
-- **Native TUI for Linus — yes or no?** ROADMAP Phase 5 points at openclaw as the front-end and Phase 8 at a native app.
-  Is there an in-between phase where a Ratatui TUI for "talk to local Linus from any terminal without a browser" would
-  be valuable? If yes, gravityfile-tui and pmetal's TUI become joint references. If no, this question closes the file.
-- **Multi-runtime plugin embedding (Lua + Rhai + WASM) — relevant to Phase 7 skills?** gravityfile embeds three
-  scripting runtimes in one binary. For Linus's skills/tools system, is in-process scripting on the table, or is the
-  plan strictly subprocess + MCP?
-- **Outlier honesty check.** The brief flagged this as Group 7's outlier and I confirm it: the only meaningful
-  Linus-side angle is the scanner, and even that is a 200-line copy-paste candidate, not an integration. Should outlier
-  repos like this get full notes in future curation passes, or a one-liner in the log?
+1. **Does the KnowledgeBase indexer need a fast parallel walker?** If KB ingestion is currently slow because of
+   single-threaded directory traversal, the jwalk pattern in `gravityfile-scan/src/scanner.rs` is worth lifting. If KB
+   walks are already fast enough or bound by PDF parsing and embedding, this is a non-issue and gravityfile becomes pure
+   ignore.
+2. **Native TUI for Linus — yes or no?** ROADMAP Phase 5 points at openclaw as the front-end and Phase 8 at a native
+   app. Is there an in-between phase where a Ratatui TUI for "talk to local Linus from any terminal without a browser"
+   would be valuable? If yes, gravityfile-tui and pmetal's TUI become joint references. If no, this question closes the
+   file.
+3. **Multi-runtime plugin embedding (Lua + Rhai + WASM) — relevant to Phase 7 skills?** gravityfile embeds three
+   scripting runtimes in one binary. For Linus's skills/tools system, is in-process scripting on the table, or is the
+   plan strictly subprocess + MCP?
+4. **Outlier honesty check.** The brief flagged this as Group 7's outlier and I confirm it: the only meaningful
+   Linus-side angle is the scanner, and even that is a 200-line copy-paste candidate, not an integration. Should outlier
+   repos like this get full notes in future curation passes, or a one-liner in the log?

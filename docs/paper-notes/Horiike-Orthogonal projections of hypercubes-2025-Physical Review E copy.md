@@ -104,7 +104,7 @@ about a regulatory network, say), this paper gives a visualization recipe.
 outward). Knowing _what_ PCA captures and _what it distorts_ (distance near origin) is a transferable insight whenever
 PCA is used in any Linus pipeline.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 - **Not about AI/LLMs**. The paper makes no claims about neural networks; the connection to BitNet is my own
   speculation.

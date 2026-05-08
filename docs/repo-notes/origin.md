@@ -94,12 +94,12 @@ workspace in the collection.
 
 ## 7. Questions for Dan
 
-- **AGPL hygiene.** Origin is the second AGPL repo encountered (after a few others in earlier groups). Do we want a
-  written rule in SAFETY.md or DECISIONS.md that AGPL code is allowed as an out-of-process dependency but never
-  vendored, with the Apache-2.0 boundary types as the integration surface?
-- **Eval-harness pattern.** Origin's three-variant benchmark structure (base / reranked / expanded) on LongMemEval and
-  LoCoMo is the most disciplined RAG eval in the collection. Worth porting the shape to `benchmarks/dan_tasks/` for
-  KnowledgeBase RAG, or premature?
-- **macOS Tahoe stability.** Origin documents real Tahoe 26.x pain (`ggml_metal_init` failures, C++17 release-build fix,
-  CoreGraphics quirks). Is your dev MacBook on Tahoe yet, and if so, has Linus's own llama.cpp/MLX path hit the same
-  Metal init failure mode?
+1. **AGPL hygiene.** Origin is the second AGPL repo encountered (after a few others in earlier groups). Do we want a
+   written rule in SAFETY.md or DECISIONS.md that AGPL code is allowed as an out-of-process dependency but never
+   vendored, with the Apache-2.0 boundary types as the integration surface?
+2. **Eval-harness pattern.** Origin's three-variant benchmark structure (base / reranked / expanded) on LongMemEval and
+   LoCoMo is the most disciplined RAG eval in the collection. Worth porting the shape to `benchmarks/dan_tasks/` for
+   KnowledgeBase RAG, or premature?
+3. **macOS Tahoe stability.** Origin documents real Tahoe 26.x pain (`ggml_metal_init` failures, C++17 release-build
+   fix, CoreGraphics quirks). Is your dev MacBook on Tahoe yet, and if so, has Linus's own llama.cpp/MLX path hit the
+   same Metal init failure mode?

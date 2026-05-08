@@ -52,7 +52,7 @@ without retuning the L2 distance threshold and the resolution prompt.
 
 ## 5. What's incompatible or out of scope
 
-The architectural direction is the **opposite** of Linus's KB roadmap. DEC-0026/27 commit to dual RDF + property graph
+The architectural direction is the **opposite** of Linus's KB roadmap. DEC-0015 commits to dual RDF + property graph
 with markdown-style claim write-back as the human-readable surface; `llm-wikidata` commits to neither — there is no
 triple store, no property graph, no claim structure, no schema beyond `name`/`description`. ChromaDB as the sole entity
 registry would not satisfy Linus's need for typed relations, provenance chains, or SPARQL-ish querying. The repo also
@@ -70,16 +70,17 @@ KB design toward a flat name-only entity store. The 50-line dedup pattern is the
 
 ## 7. Questions for Dan
 
-- **Entity resolution as a Phase 2 KB tool.** Worth carving out a `linus.kb.entity_resolver` module that wraps the
-  recall-then-resolve pattern (vector top-k + LLM pick-or-create with conservative/granular emission), independent of
-  whatever store DEC-0026/27 land on? It's small enough to write from scratch in an afternoon.
-- **Distance threshold tuning.** This repo uses L2 ≤ 1.2 against `all-MiniLM-L6-v2` on Chinese tech-blog text. For Dan's
-  biomedical corpus that threshold and embedder are both wrong. Is there appetite for a Phase 1/2 micro-bench that picks
-  an embedder + threshold against a labelled set of "should-merge / should-not-merge" entity pairs from the paper
-  corpus?
-- **Conservative/granular split vs single canonical entity.** The dual-emission idea trades one entity for up to two; in
-  an RDF setting you'd model the granular as a sub-class or `skos:narrower` of the conservative. Is that the intended
-  downstream shape, or do you want a single canonical entity per keyword with the granular treated as a label/alias?
-- **Differentiator confidence.** The README sells this as a knowledge-graph project, but the actual KG is a one-line
-  dict and the visualisation is bipartite. The genuine differentiator vs the markdown-wiki siblings is the ChromaDB
-  entity-recall step, full stop. Agreed, or do you see another piece worth lifting?
+1. **Entity resolution as a Phase 2 KB tool.** Worth carving out a `linus.kb.entity_resolver` module that wraps the
+   recall-then-resolve pattern (vector top-k + LLM pick-or-create with conservative/granular emission), independent of
+   whatever store DEC-0015 lands on? It's small enough to write from scratch in an afternoon.
+2. **Distance threshold tuning.** This repo uses L2 ≤ 1.2 against `all-MiniLM-L6-v2` on Chinese tech-blog text. For
+   Dan's biomedical corpus that threshold and embedder are both wrong. Is there appetite for a Phase 1/2 micro-bench
+   that picks an embedder + threshold against a labelled set of "should-merge / should-not-merge" entity pairs from the
+   paper corpus?
+3. **Conservative/granular split vs single canonical entity.** The dual-emission idea trades one entity for up to two;
+   in an RDF setting you'd model the granular as a sub-class or `skos:narrower` of the conservative. Is that the
+   intended downstream shape, or do you want a single canonical entity per keyword with the granular treated as a
+   label/alias?
+4. **Differentiator confidence.** The README sells this as a knowledge-graph project, but the actual KG is a one-line
+   dict and the visualisation is bipartite. The genuine differentiator vs the markdown-wiki siblings is the ChromaDB
+   entity-recall step, full stop. Agreed, or do you see another piece worth lifting?

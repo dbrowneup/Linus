@@ -90,20 +90,20 @@ hallucination drift I've seen in this cohort.
 
 ## 7. Questions for Dan
 
-- **NotebookLM-shaped slot in Linus.** TheKnowledge treats NotebookLM as "the heavy-synthesis service behind the
-  gateway." Linus has a directly analogous slot: a heavy-synthesis worker that's not the chat-loop model. Should that
-  slot in Phase 3 be a larger MLX model running locally, hosted Claude under explicit user invocation, or both behind a
-  `synthesis-backend` ADR?
-- **Citation-as-hard-invariant.** TheKnowledge's validator rejects any claim lacking `[[sources/<id>]]`. Worth porting
-  as a Phase 2 KB invariant on Linus-authored synthesis pages, or kept as a lint warning so Workers can produce
-  exploratory drafts cheaply?
-- **Converter scope for Phase 2.** TheKnowledge ships 13 source-type converters. Dan's `context/` today is mostly PDFs
-  and notes — is the right Phase 2 scope just `pdf` + `note` + `web`, with audiobook/voice/image deferred to Phase 4
-  data sovereignty, or does the breadth matter from day one?
-- **Gateway pattern vs. KnowledgeBase APIs.** KnowledgeBase already exposes Python APIs. Should Linus's KB tools call
-  KnowledgeBase directly, or wrap KnowledgeBase behind a TheKnowledge-style gateway so MCP, validator, and audit log are
-  uniform across all writers?
-- **Differentiator confidence.** I read TheKnowledge's code in depth and only the group framing for nine of the ten
-  siblings (plus `llmwiki` from the prior note). The "NotebookLM behind a gateway" angle reads as genuinely unique in
-  the cohort, but it's worth confirming once `OmegaWiki`, `wikiloom`, `wikimind`, and the others have notes — none of
-  them sound like they share that bet, but I haven't verified.
+1. **NotebookLM-shaped slot in Linus.** TheKnowledge treats NotebookLM as "the heavy-synthesis service behind the
+   gateway." Linus has a directly analogous slot: a heavy-synthesis worker that's not the chat-loop model. Should that
+   slot in Phase 3 be a larger MLX model running locally, hosted Claude under explicit user invocation, or both behind a
+   `synthesis-backend` ADR?
+2. **Citation-as-hard-invariant.** TheKnowledge's validator rejects any claim lacking `[[sources/<id>]]`. Worth porting
+   as a Phase 2 KB invariant on Linus-authored synthesis pages, or kept as a lint warning so Workers can produce
+   exploratory drafts cheaply?
+3. **Converter scope for Phase 2.** TheKnowledge ships 13 source-type converters. Dan's `context/` today is mostly PDFs
+   and notes — is the right Phase 2 scope just `pdf` + `note` + `web`, with audiobook/voice/image deferred to Phase 4
+   data sovereignty, or does the breadth matter from day one?
+4. **Gateway pattern vs. KnowledgeBase APIs.** KnowledgeBase already exposes Python APIs. Should Linus's KB tools call
+   KnowledgeBase directly, or wrap KnowledgeBase behind a TheKnowledge-style gateway so MCP, validator, and audit log
+   are uniform across all writers?
+5. **Differentiator confidence.** I read TheKnowledge's code in depth and only the group framing for nine of the ten
+   siblings (plus `llmwiki` from the prior note). The "NotebookLM behind a gateway" angle reads as genuinely unique in
+   the cohort, but it's worth confirming once `OmegaWiki`, `wikiloom`, `wikimind`, and the others have notes — none of
+   them sound like they share that bet, but I haven't verified.

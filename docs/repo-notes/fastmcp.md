@@ -75,18 +75,19 @@ Maestro/Worker concurrency — record it and reconsider; otherwise commit. Do no
 
 ## 7. Questions for Dan
 
-- **Stdio vs streamable-http for Phase 2.** Local-only Maestro/Worker calls are fine over stdio, but the moment a second
-  harness wants the same KB tools (Cline + Claude Code + openclaw simultaneously), HTTP becomes simpler than spawning N
-  stdio children. Default to `streamable-http` on `localhost:<port>` from day one, or start stdio and migrate?
-- **Tool granularity.** FastMCP encourages many small typed tools. KnowledgeBase has natural verbs (semantic_search,
-  hybrid_search, get_paper, walk_citations, run_cypher) — does each become its own `@mcp.tool`, or does Linus expose one
-  parameterized `kb_query` and dispatch internally? The first is more legible to harnesses; the second is closer to how
-  DEC-0029 frames the registry.
-- **Auth posture.** Phase 2 is single-user localhost; auth is unneeded. Phase 5b openclaw might expose Linus on the LAN
-  for Dan's iPad. Plan to enable FastMCP's JWT/OAuth subsystem then, or stay localhost-only and tunnel via SSH?
-- **Proxy/composition.** If pmetal-mcp's 45 tools are useful, `FastMCP.as_proxy(pmetal_server)` lets Linus re-expose
-  them under its own endpoint with Linus middleware applied. Worth pursuing in Phase 3, or keep pmetal-mcp as a separate
-  endpoint Maestro picks explicitly?
-- **Dependency weight.** FastMCP pulls ~20 runtime deps including `authlib`, `opentelemetry`, `griffelib`, `watchfiles`.
-  Acceptable for the Linus env, or do we want a thinner alternative (the bare `mcp` SDK) for a minimal-deps profile in
-  case of shipping a packaged Linus binary later?
+1. **Stdio vs streamable-http for Phase 2.** Local-only Maestro/Worker calls are fine over stdio, but the moment a
+   second harness wants the same KB tools (Cline + Claude Code + openclaw simultaneously), HTTP becomes simpler than
+   spawning N stdio children. Default to `streamable-http` on `localhost:<port>` from day one, or start stdio and
+   migrate?
+2. **Tool granularity.** FastMCP encourages many small typed tools. KnowledgeBase has natural verbs (semantic_search,
+   hybrid_search, get_paper, walk_citations, run_cypher) — does each become its own `@mcp.tool`, or does Linus expose
+   one parameterized `kb_query` and dispatch internally? The first is more legible to harnesses; the second is closer to
+   how DEC-0029 frames the registry.
+3. **Auth posture.** Phase 2 is single-user localhost; auth is unneeded. Phase 5b openclaw might expose Linus on the LAN
+   for Dan's iPad. Plan to enable FastMCP's JWT/OAuth subsystem then, or stay localhost-only and tunnel via SSH?
+4. **Proxy/composition.** If pmetal-mcp's 45 tools are useful, `FastMCP.as_proxy(pmetal_server)` lets Linus re-expose
+   them under its own endpoint with Linus middleware applied. Worth pursuing in Phase 3, or keep pmetal-mcp as a
+   separate endpoint Maestro picks explicitly?
+5. **Dependency weight.** FastMCP pulls ~20 runtime deps including `authlib`, `opentelemetry`, `griffelib`,
+   `watchfiles`. Acceptable for the Linus env, or do we want a thinner alternative (the bare `mcp` SDK) for a
+   minimal-deps profile in case of shipping a packaged Linus binary later?

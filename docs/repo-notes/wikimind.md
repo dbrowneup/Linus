@@ -49,11 +49,9 @@ Compose with Postgres + Redis + ARQ worker + docling-serve sidecar, OAuth2, JWT-
 is exactly what a hosted multi-tenant SaaS needs and exactly the opposite of what Linus needs. Linus runs on Dan's
 MacBook for Dan, period; Phase 2 uses SQLite, no Redis, no Postgres, no Fly. The React + Electron + browser-extension
 trifecta is also not Linus's UX surface — Streamlit and eventually openclaw cover the front-end. The interesting
-takeaway is methodological: wikimind shows what a serious one-person open- source project's quality bar looks like (ruff
-with ~30 rule families, mypy + basedpyright + pylint + pydocstyle
-
-- bandit + vulture + deptry + interrogate, 80% coverage floor, doc-sync rule engine), worth borrowing piecemeal without
-  adopting wholesale.
+takeaway is methodological: wikimind shows what a serious one-person open-source project's quality bar looks like (ruff
+with ~30 rule families, mypy + basedpyright + pylint + pydocstyle + bandit + vulture + deptry + interrogate, 80%
+coverage floor, doc-sync rule engine), worth borrowing piecemeal without adopting wholesale.
 
 ## 5. What's incompatible or out of scope
 
@@ -75,18 +73,18 @@ abstraction, prefer that one. Do not vendor wikimind whole; do not run its serve
 
 ## 7. Questions for Dan
 
-- **Wiki-as-product vs RAG-as-product.** Karpathy's pattern is "LLM compiles consumed sources into a persistent wiki."
-  KnowledgeBase today is RAG-as-product. Is there appetite for a wiki-compilation layer on top of KnowledgeBase in Phase
-  3, or does the corpus stay query-only with provenance via citation rather than via compiled articles?
-- **YouTube transcripts.** Is YouTube-as-source actually a Linus use case (lectures, conference talks, podcast
-  interviews on biochem topics)? If yes, wikimind's `youtube-transcript-api` adapter is a 1-day lift; if not, drop it
-  from the shortlist.
-- **docling-serve sidecar.** KnowledgeBase currently uses pypdf (with the `sys.maxsize` quirk in CLAUDE.md). Is
-  upgrading PDF extraction to docling-serve worth a Docker dependency, or stay native with pymupdf/pypdf?
-- **Provider router placement.** wikimind's `llm_router.py` is per-app; Linus's orchestration layer will need the same
-  logic at a higher level (one router, many tools and harnesses). Should Linus copy this shape or wait until Phase 2a's
-  tool-registry design forces the decision?
-- **Sibling differentiation visibility.** I called out wikimind's YouTube + multi-source ingest + Fly deploy story as
-  differentiators against the other ten LLM-Wiki repos, but only on README evidence — the other ten notes don't exist
-  yet. Should the curation pass produce a comparison matrix at the end of the group, or trust the per-repo notes to
-  converge?
+1. **Wiki-as-product vs RAG-as-product.** Karpathy's pattern is "LLM compiles consumed sources into a persistent wiki."
+   KnowledgeBase today is RAG-as-product. Is there appetite for a wiki-compilation layer on top of KnowledgeBase in
+   Phase 3, or does the corpus stay query-only with provenance via citation rather than via compiled articles?
+2. **YouTube transcripts.** Is YouTube-as-source actually a Linus use case (lectures, conference talks, podcast
+   interviews on biochem topics)? If yes, wikimind's `youtube-transcript-api` adapter is a 1-day lift; if not, drop it
+   from the shortlist.
+3. **docling-serve sidecar.** KnowledgeBase currently uses pypdf (with the `sys.maxsize` quirk in CLAUDE.md). Is
+   upgrading PDF extraction to docling-serve worth a Docker dependency, or stay native with pymupdf/pypdf?
+4. **Provider router placement.** wikimind's `llm_router.py` is per-app; Linus's orchestration layer will need the same
+   logic at a higher level (one router, many tools and harnesses). Should Linus copy this shape or wait until Phase 2a's
+   tool-registry design forces the decision?
+5. **Sibling differentiation visibility.** I called out wikimind's YouTube + multi-source ingest + Fly deploy story as
+   differentiators against the other ten LLM-Wiki repos, but only on README evidence — the other ten notes don't exist
+   yet. Should the curation pass produce a comparison matrix at the end of the group, or trust the per-repo notes to
+   converge?

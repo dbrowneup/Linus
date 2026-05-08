@@ -83,16 +83,17 @@ internals.
 
 ## 7. Questions for Dan
 
-- **Type taxonomy.** OMEGA has ~30 event types with weights from 0.05 (file_summary) to 3.0 (constraint, reminder).
-  DEC-0029 leaves the type/weight question open. Do we want to seed Linus's episodic store with an OMEGA-style typed
-  taxonomy from day one, or stay schema-flat and let types emerge from usage?
-- **sqlite-vec vs separate vector store.** OMEGA proves you can do 384-dim cosine search inside SQLite with no separate
-  service. DEC-0029 doesn't pin a vector substrate. Adopt `sqlite-vec` as the v0 vector layer (matches the "one file,
-  one process" aesthetic), or stand up Qdrant in Docker for the same workload?
-- **Hook collision risk.** OMEGA writes into `~/.claude/settings.json`, `~/.claude.json`, and `~/.claude/CLAUDE.md`.
-  Linus will eventually want to write into the same files for its own session hooks. Should Linus's settings model
-  reserve a namespaced block from the start to avoid collision with tools like OMEGA, or treat it as a Phase 5b problem?
-- **Cross-model handoff in practice.** OMEGA's "cross-model" claim reduces to "every client points its MCP config at the
-  same SQLite file." That is real but modest. Is that the cross-model story Linus wants too (Linus is the one server,
-  every harness points at it), or is there a more ambitious handoff — say, transcript-replay across model families —
-  worth specifying for Phase 5+?
+1. **Type taxonomy.** OMEGA has ~30 event types with weights from 0.05 (file_summary) to 3.0 (constraint, reminder).
+   DEC-0029 leaves the type/weight question open. Do we want to seed Linus's episodic store with an OMEGA-style typed
+   taxonomy from day one, or stay schema-flat and let types emerge from usage?
+2. **sqlite-vec vs separate vector store.** OMEGA proves you can do 384-dim cosine search inside SQLite with no separate
+   service. DEC-0029 doesn't pin a vector substrate. Adopt `sqlite-vec` as the v0 vector layer (matches the "one file,
+   one process" aesthetic), or stand up Qdrant in Docker for the same workload?
+3. **Hook collision risk.** OMEGA writes into `~/.claude/settings.json`, `~/.claude.json`, and `~/.claude/CLAUDE.md`.
+   Linus will eventually want to write into the same files for its own session hooks. Should Linus's settings model
+   reserve a namespaced block from the start to avoid collision with tools like OMEGA, or treat it as a Phase 5b
+   problem?
+4. **Cross-model handoff in practice.** OMEGA's "cross-model" claim reduces to "every client points its MCP config at
+   the same SQLite file." That is real but modest. Is that the cross-model story Linus wants too (Linus is the one
+   server, every harness points at it), or is there a more ambitious handoff — say, transcript-replay across model
+   families — worth specifying for Phase 5+?

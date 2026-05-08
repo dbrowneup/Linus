@@ -163,7 +163,7 @@ warmth in technical contexts) would make the dependency visible and testable.
 signal — is a template for Linus's audit-log monitoring. If a Worker starts expressing values it normally does not (a
 coder model producing "dominance" outputs), that is a tripwire worth logging.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 The data is **consumer Claude.ai**, Free and Pro, in a chat product. Linus uses hosted Claude through Claude Code and
 the API in a fundamentally different mode: longer context, tool-using, more technical, less subjective, fewer

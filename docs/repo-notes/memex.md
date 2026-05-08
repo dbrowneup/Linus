@@ -11,8 +11,9 @@ with seven Python/shell scripts and six procedure docs), and a _knowledge-graph 
 Bush namesake is honored literally: the architecture is a small-world network of cross-referenced threads ("trails"),
 not a hierarchical index, and navigation is by following annotated links from any entry node. For Linus this is the
 strongest entry in the eight-repo memory survey on the question "what does the _human-facing surface_ of cross-session
-memory look like before any retrieval substrate is involved" — directly relevant to the Layer C / Layer D conversation
-in the memory-architecture spec, and to the "claim-typing" rule from the security/llm-wiki synthesis.
+memory look like before any retrieval substrate is involved" — directly relevant to the Layer C / Layer E conversation
+in the memory-architecture spec (Layer E = semantic / KnowledgeBase, renamed from Layer D per DEC-0052 when
+investigation memory took the Layer D slot), and to the "claim-typing" rule from the security/llm-wiki synthesis.
 
 ## 2. Architecture summary
 
@@ -39,25 +40,25 @@ Dependencies are exactly four: `networkx`, `matplotlib`, `anthropic`, `python-do
 
 ## 3. What's reusable in Linus
 
-The constitution-as-prompt + lint-as-verifier pattern is directly transferable to Linus's Layer D shared memory
-substrate (DEC-0029, DEC-0034). Where `agentmemory` and `engram` ship a Python API, and where `anamnesis` ships a
-PostgreSQL+pgvector server, memex ships a _contract_ — and the contract is what Linus's memory architecture spec already
-commits to (markdown-backed, git-versioned, content-hashed, schema-validated externally). The thread schema (Summary as
-the documentation-extractable surface, Connections as annotated edges, Next Up as forward intent) is a better-developed
-answer to the same question DEC-0033's `tags` and `parent_turn_id` columns are answering at a lower level. The
-cross-vendor enforcer pattern — Codex audits Claude's writes, never the same model that wrote — maps directly onto the
-security/llm-wiki synthesis's claim-typing rule and onto the Maestro/Worker discipline in CLAUDE.md (Maestro plans,
-Worker implements, neither audits itself). The 400-line always-loaded budget is the same context hygiene argument that
-motivates DEC-0036's KV-cache continuity requirement, but expressed at the file-organization layer where Linus does not
-yet have a position. **Sibling differentiator vs `openaugi`** (the other markdown knowledge structure): `openaugi` is a
-viewer/parser of an existing Obsidian vault (consumes graphs the human curates), whereas memex is a _write-side
-discipline_ with mechanical compliance checks — the human writes nothing; the agent maintains the graph as a side effect
-of conversation, and the lint script tells you when it stopped following the rules. **Sibling differentiator vs
-`remember`** (the other entity-typed memory): `remember` types memories as entities with an SDK enforcing the typing,
-while memex types threads by `category:` frontmatter with a shell script enforcing it — same goal, opposite philosophy
-on where the rules live. Memex's bet is that constitution-as-prompt scales further because it is portable across vendors
-(proven: same files run on Claude, Codex, Gemini), where SDK-enforced typing locks you into whichever client implements
-the SDK.
+The constitution-as-prompt + lint-as-verifier pattern is directly transferable to Linus's Layer E shared memory
+substrate (semantic / KnowledgeBase, renumbered from Layer D per DEC-0052; cross-references DEC-0029, DEC-0034). Where
+`agentmemory` and `engram` ship a Python API, and where `anamnesis` ships a PostgreSQL+pgvector server, memex ships a
+_contract_ — and the contract is what Linus's memory architecture spec already commits to (markdown-backed,
+git-versioned, content-hashed, schema-validated externally). The thread schema (Summary as the documentation-extractable
+surface, Connections as annotated edges, Next Up as forward intent) is a better-developed answer to the same question
+DEC-0033's `tags` and `parent_turn_id` columns are answering at a lower level. The cross-vendor enforcer pattern — Codex
+audits Claude's writes, never the same model that wrote — maps directly onto the security/llm-wiki synthesis's
+claim-typing rule and onto the Maestro/Worker discipline in CLAUDE.md (Maestro plans, Worker implements, neither audits
+itself). The 400-line always-loaded budget is the same context hygiene argument that motivates DEC-0036's KV-cache
+continuity requirement, but expressed at the file-organization layer where Linus does not yet have a position. **Sibling
+differentiator vs `openaugi`** (the other markdown knowledge structure): `openaugi` is a viewer/parser of an existing
+Obsidian vault (consumes graphs the human curates), whereas memex is a _write-side discipline_ with mechanical
+compliance checks — the human writes nothing; the agent maintains the graph as a side effect of conversation, and the
+lint script tells you when it stopped following the rules. **Sibling differentiator vs `remember`** (the other
+entity-typed memory): `remember` types memories as entities with an SDK enforcing the typing, while memex types threads
+by `category:` frontmatter with a shell script enforcing it — same goal, opposite philosophy on where the rules live.
+Memex's bet is that constitution-as-prompt scales further because it is portable across vendors (proven: same files run
+on Claude, Codex, Gemini), where SDK-enforced typing locks you into whichever client implements the SDK.
 
 ## 4. What's inspiration only
 
@@ -92,29 +93,29 @@ group. It does not ship a substrate Linus would adopt (DEC-0029 already commits 
 memex commits to git alone). What it ships is a _constitution_ and a _lint script_ — both of which Linus needs and
 neither of which is currently specified beyond the memory-architecture spec's API contracts. The right move is to
 extract three artifacts from memex during Phase 2 memory pillar implementation: (a) the thread schema and frontmatter
-contract as the model for Linus's Layer D record format, (b) the lint-script discipline as the model for an
-orchestration-layer integrity check that runs on every commit to the memory store, (c) the cross-vendor enforcer pattern
-as the model for Phase 3+ multi-Worker memory audits. Do not vendor the code; do not adopt the directory layout; do read
-`constitution-core.md`, `thread-lifecycle.md`, `enforcer-audit.md`, and `memex-lint.sh` before drafting the Linus
-memory-store schema and CI.
+contract as the model for Linus's Layer E record format (Layer E = semantic / KnowledgeBase per DEC-0052), (b) the
+lint-script discipline as the model for an orchestration-layer integrity check that runs on every commit to the memory
+store, (c) the cross-vendor enforcer pattern as the model for Phase 3+ multi-Worker memory audits. Do not vendor the
+code; do not adopt the directory layout; do read `constitution-core.md`, `thread-lifecycle.md`, `enforcer-audit.md`, and
+`memex-lint.sh` before drafting the Linus memory-store schema and CI.
 
 ## 7. Questions for Dan
 
-- **Constitution-as-prompt vs schema-as-API.** Memex bets governance lives in markdown the agent reads each session; the
-  memory-architecture spec bets governance lives in `linus.memory.*` API shape and SQLite constraints. These are not
-  exclusive — Linus could ship both — but if we ship both, which is canonical when they disagree? My read is the API
-  contract wins (Workers cannot opt out of column constraints) and the constitution becomes a Maestro-only prompt layer;
-  confirm or push back.
-- **Cross-vendor enforcer for a local-only stack.** Memex's enforcer pattern depends on a _different vendor's_ model
-  catching what the writer's model missed. Linus's local-first commitment means the enforcer would be a different
-  _local_ model. Is that adversarial enough to do real work, or does the enforcer role need to escalate to hosted Claude
-  (i.e., Maestro) on a periodic cadence to be trustworthy?
-- **Lint-as-CI for the memory store.** Memex runs `memex-lint.sh` manually. Linus could run the equivalent as a git
-  pre-commit hook on the memory-store directory or as a Phase 2a orchestration-layer health check. Which is the right
-  tier — pre-commit (prevents bad writes) or background sweep (catches drift after the fact)?
-- **Category vocabulary.** Memex enforces a six-value enum. The Linus equivalent would be the `tags` field in DEC-0033 —
-  but is a controlled vocabulary an asset (lint can verify it) or a liability (you discover the seventh category
-  mid-Phase-3 and have to migrate)? Memex's answer is enum-with-lint; Dan's instinct?
-- **`openaugi` vs `memex` vs `remember` as the markdown/entity reference.** All three live in this group — write-side
-  discipline, read-side viewer, SDK-enforced typing. Worth a comparison artifact in `docs/syntheses/` once all eight
-  repo-notes are in, or is the memory-synthesis already carrying that load?
+1. **Constitution-as-prompt vs schema-as-API.** Memex bets governance lives in markdown the agent reads each session;
+   the memory-architecture spec bets governance lives in `linus.memory.*` API shape and SQLite constraints. These are
+   not exclusive — Linus could ship both — but if we ship both, which is canonical when they disagree? My read is the
+   API contract wins (Workers cannot opt out of column constraints) and the constitution becomes a Maestro-only prompt
+   layer; confirm or push back.
+2. **Cross-vendor enforcer for a local-only stack.** Memex's enforcer pattern depends on a _different vendor's_ model
+   catching what the writer's model missed. Linus's local-first commitment means the enforcer would be a different
+   _local_ model. Is that adversarial enough to do real work, or does the enforcer role need to escalate to hosted
+   Claude (i.e., Maestro) on a periodic cadence to be trustworthy?
+3. **Lint-as-CI for the memory store.** Memex runs `memex-lint.sh` manually. Linus could run the equivalent as a git
+   pre-commit hook on the memory-store directory or as a Phase 2a orchestration-layer health check. Which is the right
+   tier — pre-commit (prevents bad writes) or background sweep (catches drift after the fact)?
+4. **Category vocabulary.** Memex enforces a six-value enum. The Linus equivalent would be the `tags` field in DEC-0033
+   — but is a controlled vocabulary an asset (lint can verify it) or a liability (you discover the seventh category
+   mid-Phase-3 and have to migrate)? Memex's answer is enum-with-lint; Dan's instinct?
+5. **`openaugi` vs `memex` vs `remember` as the markdown/entity reference.** All three live in this group — write-side
+   discipline, read-side viewer, SDK-enforced typing. Worth a comparison artifact in `docs/syntheses/` once all eight
+   repo-notes are in, or is the memory-synthesis already carrying that load?

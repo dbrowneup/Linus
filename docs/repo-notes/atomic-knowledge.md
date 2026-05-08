@@ -10,7 +10,7 @@ Knowledge contributes a maintained markdown layer that survives session resets a
 expected to follow. Versioned at `v0.2.0`, MIT licensed, inspired directly by Karpathy's LLM Wiki gist plus a Vannevar
 Bush nod.
 
-## 2. Content overview
+## 2. Architecture summary
 
 The repository ships a knowledge model in `schemas/` covering seven page types — `concept`, `entity`, `project`,
 `procedure`, `insight`, `candidate`, and `lint-report`. The `knowledge-base-template/` and `example-kb/` directories
@@ -76,18 +76,19 @@ focused half-day read with the example KB open beside the schemas.
 
 ## 7. Questions for Dan
 
-- **Procedure as a first-class page type.** Atomic Knowledge promotes `procedure` to peer status with `concept` and
-  `insight`. For your wet-lab/SOP corpus this seems obviously right, but it adds a page type that llm-research-wiki and
-  AgenticResearchWiki do not have. Do you want the Phase 2 KB v1 schema to include `procedure` from day one, or start
-  with concept/entity/insight and add procedure once it has corpus to back it?
-- **Retrieval-hint frontmatter (`search_anchors`, `key_entities`).** These are an embedding-free way to bias a small
-  worker's read set. Worth standardizing across Linus KB pages as required frontmatter, or leave them optional like the
-  upstream protocol does?
-- **Differentiator strength vs llm-research-wiki.** I'm calling "platform-neutral protocol stance" plus
-  "procedures-as-first-class" plus "the MCP-wrapped `get_context` runtime" as the three differentiators vs the other six
-  LLM-Wiki siblings. With the protocol-first framing being the loudest. Does that match what you noticed reading them,
-  or is there a fourth angle (the candidate-lifecycle state machine? the `evals/` acceptance scripts?) that landed
-  harder for you?
-- **Autonomy-tier alignment.** AGENT.md says "ask before deletes, archives, bulk cleanup, large restructures." SAFETY.md
-  is going to want a more graduated tier model. Do we want to write the mapping (Atomic Knowledge's prompt rules →
-  Linus's autonomy tiers) as an explicit ADR, or treat the AK defaults as Tier-0 and graduate from there in Phase 7?
+1. **Procedure as a first-class page type.** Atomic Knowledge promotes `procedure` to peer status with `concept` and
+   `insight`. For your wet-lab/SOP corpus this seems obviously right, but it adds a page type that llm-research-wiki and
+   AgenticResearchWiki do not have. Do you want the Phase 2 KB v1 schema to include `procedure` from day one, or start
+   with concept/entity/insight and add procedure once it has corpus to back it?
+2. **Retrieval-hint frontmatter (`search_anchors`, `key_entities`).** These are an embedding-free way to bias a small
+   worker's read set. Worth standardizing across Linus KB pages as required frontmatter, or leave them optional like the
+   upstream protocol does?
+3. **Differentiator strength vs llm-research-wiki.** I'm calling "platform-neutral protocol stance" plus
+   "procedures-as-first-class" plus "the MCP-wrapped `get_context` runtime" as the three differentiators vs the other
+   six LLM-Wiki siblings. With the protocol-first framing being the loudest. Does that match what you noticed reading
+   them, or is there a fourth angle (the candidate-lifecycle state machine? the `evals/` acceptance scripts?) that
+   landed harder for you?
+4. **Autonomy-tier alignment.** AGENT.md says "ask before deletes, archives, bulk cleanup, large restructures."
+   SAFETY.md is going to want a more graduated tier model. Do we want to write the mapping (Atomic Knowledge's prompt
+   rules → Linus's autonomy tiers) as an explicit ADR, or treat the AK defaults as Tier-0 and graduate from there in
+   Phase 7?

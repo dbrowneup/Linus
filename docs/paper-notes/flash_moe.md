@@ -121,7 +121,7 @@ author_, with Dan Woods directing the research over 24 hours of continuous colla
 operating model CLAUDE.md describes for Linus. Worth studying not just for the technical content but as an existence
 proof of what disciplined Maestro-Worker collaboration can produce.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 - **Hardware specifics**: M3 Max NVMe at 17.5 GB/s is 3× M1 Max's 6 GiB/s. Linus' actual numbers will be substantially
   lower; the technique is what transfers, not the throughput.

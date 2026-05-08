@@ -151,7 +151,7 @@ internally.
 supply-chain risk but treats the model as a black box. Activation-level inspection adds a third defensive axis:
 behavioral monitoring from inside the model.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 **Hosted Maestro is opaque to all of this.** The technique fundamentally requires read/write access to per-block
 activations during the forward pass. Linus's Maestro path (Anthropic API, Claude.ai) does not expose this and never
