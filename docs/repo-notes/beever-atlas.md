@@ -5,13 +5,12 @@
 Beever Atlas is an "LLM-first wiki knowledge base" whose unique source of truth is **team chat** — Slack, Discord,
 Microsoft Teams, and Mattermost — rather than papers, PDFs, URLs, or files on disk. It pulls a workspace's channel
 history through a TypeScript bot service, runs a six-stage Google-ADK ingestion pipeline that distils raw messages into
-atomic facts, entities, and relationships, persists them into a dual semantic-plus-graph memory (Weaviate + Neo4j
-
-- MongoDB + Redis), and continuously rebuilds a per-channel auto-maintained wiki on top. Two consumer surfaces hang off
-  that memory: a React dashboard with a streaming QA agent and a `fastmcp`-served MCP endpoint exposing 16 tools to
-  Claude Code / Cursor. The README is explicit that the design quotes Karpathy's "LLMs read wikis, not chat logs"
-  observation — making this a Group 3 sibling of agentic-wiki-builder, AgenticResearchWiki, llm-research-wiki,
-  llm-wikidata, atomic-knowledge, and obsidian-llm-wiki-local — but the chat-as-source axis sets it apart from every
+atomic facts, entities, and relationships, persists them into a dual semantic-plus-graph memory (Weaviate + Neo4j +
+MongoDB + Redis), and continuously rebuilds a per-channel auto-maintained wiki on top. Two consumer surfaces hang off
+that memory: a React dashboard with a streaming QA agent and a `fastmcp`-served MCP endpoint exposing 16 tools to
+Claude Code / Cursor. The README is explicit that the design quotes Karpathy's "LLMs read wikis, not chat logs"
+observation — making this a Group 3 sibling of agentic-wiki-builder, AgenticResearchWiki, llm-research-wiki,
+llm-wikidata, atomic-knowledge, and obsidian-llm-wiki-local — but the chat-as-source axis sets it apart from every
   other repo in that group, which all assume a document/file/URL ingest pattern. It is also the only repo in the group
   that ships as a multi-service Docker Compose product (backend + bot + web + four datastores) targeted at small teams.
 
@@ -44,11 +43,10 @@ demonstrates it at production scale with a real graph store and a real query rou
 `gather → compile → cache` shape with per-resource async locks (`wiki/builder.py`) is a clean pattern Linus's
 KnowledgeBase wiki layer can copy outright. The 6-stage ADK pipeline shows a concrete way to express "preprocess →
 (extract facts ‖ extract entities) → (embed ‖ validate) → persist" as a typed pipeline, including the ParallelAgent
-placement — Linus's Phase 3 parallel-agents design can lift this skeleton directly. The dual semantic
-
-- graph memory with a smart router is the strongest answer in the Group 3 cohort to the "vector RAG can't do relational
-  questions" problem; KnowledgeBase v2 likely wants this shape. The `fastmcp` 16-tool MCP surface is a good reference
-  for the eventual Linus MCP server.
+placement — Linus's Phase 3 parallel-agents design can lift this skeleton directly. The dual semantic + graph memory
+with a smart router is the strongest answer in the Group 3 cohort to the "vector RAG can't do relational questions"
+problem; KnowledgeBase v2 likely wants this shape. The `fastmcp` 16-tool MCP surface is a good reference for the
+eventual Linus MCP server.
 
 The chat-as-source axis is what differentiates beever-atlas from every Group 3 sibling: agentic-wiki-builder ingests
 single source files, llm-research-wiki and AgenticResearchWiki ingest research outputs, llm-wikidata targets the

@@ -49,11 +49,9 @@ Compose with Postgres + Redis + ARQ worker + docling-serve sidecar, OAuth2, JWT-
 is exactly what a hosted multi-tenant SaaS needs and exactly the opposite of what Linus needs. Linus runs on Dan's
 MacBook for Dan, period; Phase 2 uses SQLite, no Redis, no Postgres, no Fly. The React + Electron + browser-extension
 trifecta is also not Linus's UX surface — Streamlit and eventually openclaw cover the front-end. The interesting
-takeaway is methodological: wikimind shows what a serious one-person open- source project's quality bar looks like (ruff
-with ~30 rule families, mypy + basedpyright + pylint + pydocstyle
-
-- bandit + vulture + deptry + interrogate, 80% coverage floor, doc-sync rule engine), worth borrowing piecemeal without
-  adopting wholesale.
+takeaway is methodological: wikimind shows what a serious one-person open-source project's quality bar looks like (ruff
+with ~30 rule families, mypy + basedpyright + pylint + pydocstyle + bandit + vulture + deptry + interrogate, 80%
+coverage floor, doc-sync rule engine), worth borrowing piecemeal without adopting wholesale.
 
 ## 5. What's incompatible or out of scope
 
