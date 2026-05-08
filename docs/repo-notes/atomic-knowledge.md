@@ -10,7 +10,7 @@ Knowledge contributes a maintained markdown layer that survives session resets a
 expected to follow. Versioned at `v0.2.0`, MIT licensed, inspired directly by Karpathy's LLM Wiki gist plus a Vannevar
 Bush nod.
 
-## 2. Content overview
+## 2. Architecture summary
 
 The repository ships a knowledge model in `schemas/` covering seven page types — `concept`, `entity`, `project`,
 `procedure`, `insight`, `candidate`, and `lint-report`. The `knowledge-base-template/` and `example-kb/` directories

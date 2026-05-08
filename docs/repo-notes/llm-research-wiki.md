@@ -10,7 +10,7 @@ the **schema in `CLAUDE.md`** that turns Claude Code into a domain-specialist re
 first ingest produced 38 wiki pages in a single pass, which is the kind of throughput Linus's Phase 2 KnowledgeBase work
 needs to match for Dan's paper backlog.
 
-## 2. Content overview
+## 2. Architecture summary
 
 The repo is a folder skeleton plus three governing files. `CLAUDE.md` (475 lines) defines the agent's identity
 ("dedicated research intelligence system, not a general assistant"), folder conventions for `raw/` and `wiki/`, six page

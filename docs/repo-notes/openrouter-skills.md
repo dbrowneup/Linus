@@ -12,7 +12,7 @@ direct tension with Linus's "no paid APIs required for operation" north star (se
 not subscription, so it's a softer tension than Anthropic-direct usage, but it still means none of these skills could
 run in a fully offline Linus deployment.
 
-## 2. Content overview
+## 2. Architecture summary
 
 The eight shipped skills divide cleanly into three groups. **Scaffolding skills** generate full TypeScript/Bun project
 trees: `create-agent-tui` builds a terminal UI agent ("create-react-app for terminal agents") with 14 built-in tools,

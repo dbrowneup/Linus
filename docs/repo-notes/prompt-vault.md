@@ -13,7 +13,7 @@ executable footprint: one weekly GitHub Action (`update-claude-md.yml`) that run
 prompt against the repo it lives in and opens a PR with the resulting CLAUDE.md edit. Everything else is text intended
 to be pasted into a chat or dropped into a `.claude/commands/` folder.
 
-## 2. Content overview
+## 2. Architecture summary
 
 `claude-md-memory-workflow` is the most operational artifact: a weekly cron-triggered Action that uses
 `anthropics/claude-code-action@beta` with `mode: agent`, hands Claude a long structured prompt covering 12 review

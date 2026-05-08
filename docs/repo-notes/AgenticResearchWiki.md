@@ -11,7 +11,7 @@ the agent writes its own results back into the wiki** so the next session inheri
 Phase-3-relevant artifact: it is one of the cleanest worked examples of "agent-native project memory via a Markdown
 graph," and it sits next to the KnowledgeBase pillar and the still-open Memory Architecture spec.
 
-## 2. Content overview
+## 2. Architecture summary
 
 The skeleton is small and deliberate. At the root: `Overview.md` (the single entry point — project goal, current
 main-line method, code/data/output paths, task navigation, "investigated, not adopted"), `CLAUDE.md` and an identical
