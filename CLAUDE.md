@@ -564,6 +564,57 @@ Prose over bullet-heavy dumps for anything a human will read. Markdown files in 
 just facts. Lists where they clarify; paragraphs where they reason. Claude Code: when generating docs, follow this
 style.
 
+### Doc-type conventions
+
+The corpus has matured into recognizable per-document-type shapes. Until they graduate to dedicated guides under
+`docs/skills/notes/` (or similar) the inline definitions below are the source of truth. Fan-out agents and future
+note authors should match them exactly. Fixed section order matters because cross-doc grep and fan-out agents rely
+on it; don't reorder sections without surfacing the change as a convention update.
+
+**Paper-note** — `docs/paper-notes/<paper-id>.md`. YAML frontmatter (`title`, `source`, `authors`,
+`affiliation`, `date`, `pdf`, `tags`). H1 = paper title. Eight H2 sections in fixed order: `## TL;DR` ·
+`## The problem (in plain language)` · `## What they propose` · `## Key results` · `## What's reusable in Linus` ·
+`## What's NOT applicable / hype filter` · `## Connections` · `## Open questions for Dan`. The "Reusable in
+Linus" section maps each point to a phase (Phase 1..8) and references a DEC or spec where applicable.
+"Connections" uses relative markdown links. Open questions are numbered sequentially with no gaps;
+partial-resolved items use
+`_Partially resolved (DEC-NNNN, see [answered-questions.md](../questions/answered-questions.md)): nuance._`.
+
+**Repo-note** — `docs/repo-notes/<repo-name>.md`. No frontmatter. H1 = `# <repo-name> (\`<owner/repo>\`)`. Seven
+numbered H2 sections in fixed order: `## 1. Purpose and scope` · `## 2. Architecture summary` ·
+`## 3. What's reusable in Linus` · `## 4. What's inspiration only` · `## 5. What's incompatible or out of scope` ·
+`## 6. Recommendation: **<verdict>**` · `## 7. Questions for Dan`. Recommendation verdicts come from a fixed
+vocabulary: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore** (single primary verdict; modifiers like
+"with a high prior on later Integrate-as-service" are allowed). Same Reusable / Connections / Open-questions
+discipline as paper-notes.
+
+**Audit** — `docs/audits/<batch-name>/<source>-audit.md`. H1 = audit subject. Sections: `## Summary` ·
+`## Findings` (with H3 sub-categories grouped by severity or class) ·
+`## Remediation recommendations (priority order)` · `## Confidence assessment`.
+
+**Session summary** — `docs/session-summaries/<YYYY-MM-DD>-<slug>-session-summary.md`. Filename always
+date-prefixed with ISO date. Structure: `## Pre-execution context`, then numbered `## Step N — <name>` sections in
+chronological order, then `## Lessons learned (write-back candidates)` with H3 sub-items naming each lesson's
+destination doc, then `## Outstanding items for next session`, then `## Suggested next steps`. The date prefix
+and lessons-learned sub-structure are required; step structure is recommended. Per the "Measure, don't just
+estimate" convention below, every session summary records "estimated wall time vs actual" in its closing section.
+
+### Measure, don't just estimate
+
+Time and resource estimates degrade quickly when not measured. Convention: every multi-step task and every
+fan-out logs start time, end time, and a short variance note whenever actual diverges from estimate by more than
+~20%. Two implementation paths:
+
+- **Per-session summaries** — every entry in `docs/session-summaries/` records "estimated wall time vs actual"
+  in its closing section. This is the durable measurement record.
+- **Per-fan-out reports** — each Worker agent records bin-level start/end timestamps in its summary report;
+  Maestro records wall-time delta vs the planned estimate in the spec's status line at consolidation.
+
+Use the accumulated record to refine future estimates. If session-summary measurements show that
+"spec-first + canary + parallel fan-out + consolidate + PR" consistently overruns 2-hour estimates by 50%, the
+next plan starts from the empirical 3-hour anchor, not the optimistic 2-hour one. This is the flash-moe pattern
+(DEC-0027) applied to time itself: measurement wins over intuition, even on workflow estimates.
+
 ### Branch discipline
 
 All changes to `main` require a pull request reviewed by Dan before merge. Branches are the unit of parallel work. See
