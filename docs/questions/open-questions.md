@@ -280,7 +280,7 @@ _See [`../paper-notes/2502.11880v1.md`](../paper-notes/2502.11880v1.md) for curr
 1. _Partially resolved (DEC-0049, see [answered-questions.md](answered-questions.md)): pmetal vs. PrismML fork decision
    deferred to Phase 1b verdict; the CPU-only bitnet.cpp path vs. ANE/pmetal path remains open pending Phase 1b data._
 
-3. Bitnet.cpp ships from the same GitHub repo as the BitNet model code. Do you want me to verify the
+2. Bitnet.cpp ships from the same GitHub repo as the BitNet model code. Do you want me to verify the
    [repos/BitNet/](../../repos/BitNet/) clone has the bitnet.cpp tree, or is that a "Phase 1 to-do" item?
 
 ---
@@ -523,7 +523,7 @@ _See [`../paper-notes/PIIS0896627324008080.md`](../paper-notes/PIIS0896627324008
    total structured knowledge a person can acquire in a lifetime. Does this change how you think about the scope and
    completeness goals for the KnowledgeBase, and what it would mean to make it a genuinely useful external memory?
 
-5. The paper closes by calling for new experiments studying the inner brain under naturalistic, high-dimensional
+4. The paper closes by calling for new experiments studying the inner brain under naturalistic, high-dimensional
    conditions, with rapid switching between many distinct microtasks. Your genomics and bioinformatics experience
    involves exactly this kind of high-dimensionality, rapid-context-switching cognitive work (interpreting pipeline
    outputs, cross-referencing databases, designing experiments). Could your own scientific workflow be instrumented as a
@@ -1765,10 +1765,6 @@ until someone actually misses it"?
 
 ## Group 6 — MCP Servers & Code/Document Context Tools
 
-# Group 6 — MCP Servers & Code/Document Context Tools
-
-### Questions for Dan (Extracted)
-
 ### fastmcp
 
 _See [`docs/repo-notes/fastmcp.md`](../repo-notes/fastmcp.md) for current open questions; resolved items moved to
@@ -1921,8 +1917,6 @@ than building it in.
 ---
 
 ## Group 7 — Agent Harnesses, Orchestration, Model Routing
-
-# Group 7 Questions for Dan — Extracted
 
 ### claude-squad
 
