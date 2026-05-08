@@ -90,7 +90,17 @@ Cross-bin consistency is Maestro's job at consolidation, not the agent's.
 ## Per-note rubric
 
 For each note in the bin, the agent verifies and minimally edits to match the canonical shape per
-[`CLAUDE.md`](../../CLAUDE.md) §Doc-type conventions. Concretely:
+[`CLAUDE.md`](../../CLAUDE.md) §Doc-type conventions.
+
+**First action: batch section-heading rename.** Before per-note work, scan all assigned bin files for the
+legacy heading `## What's NOT applicable` (without ` / hype filter` suffix) — this was found across all 17
+paper-notes in the canary (B13). Variants to normalize: `## What's NOT applicable`, `## What's not applicable`,
+or any case-variant. Apply the rename to canonical `## What's NOT applicable / hype filter` across every file
+needing it, then make a single batch commit:
+`[notes-consistency] B<N>: canonical 'NOT applicable / hype filter' rename across <count> notes`. Then proceed
+to per-note rubric work below.
+
+Then for each note, in order of the rubric:
 
 1. **Frontmatter (paper-notes only).** Ensure YAML frontmatter contains `title`, `source`, `authors`,
    `affiliation`, `date`, `pdf`, `tags`. Add missing fields where derivable from existing prose. Don't fabricate.
@@ -101,14 +111,35 @@ For each note in the bin, the agent verifies and minimally edits to match the ca
    cannot verify a phase or DEC mapping from `docs/adr/`, leave the prose as-is and flag the note in the report.
 5. **"Connections"** — relative markdown links only. Verify each link's target exists (Glob/Read on the path).
    Fix broken links if the target moved within the agent's allowed paths; flag if the target moved outside.
+   **Report ALL broken or missing cross-references** to other paper-notes / repo-notes in the
+   `broken_or_missing_cross_references` field of the report — even ones the surrounding prose acknowledges as
+   conditional. These often point Dan to interesting follow-up papers/repos to add to the corpus.
 6. **"Open questions for Dan"** — numbered sequentially with no gaps. Renumber to close gaps left by prior
-   Policy A deletions. Partial-resolved items use the canonical format
-   `_Partially resolved (DEC-NNNN, see [answered-questions.md](../questions/answered-questions.md)): nuance._`.
+   Policy A deletions. Partial-resolved items use canonical citation format per CLAUDE.md (DEC-NNNN preferred;
+   S-NN / E-NN / M-NN tolerated and left as-is). Repo-notes with bulleted (not numbered) items in Section 7:
+   leave bullets as-is and flag in `cross_bin_observations` — Maestro normalizes at consolidation per
+   CLAUDE.md.
 7. **Repo-note recommendation verdict** — one of: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore**.
    If a note uses different vocabulary (e.g. "evaluate", "consider"), normalize to the closest canonical verdict.
 8. **Prose style** — per CLAUDE.md §Writing style for docs: prose over bullet dumps. Don't rewrite prose for
    style alone; only adjust if a section is bullet-heavy where it should reason.
 9. **No vestigial headers** (`# Group N Questions for Dan — Extract` etc.) — delete if present.
+
+**Missing canonical sections — diagnostic flag.** If a paper-note lacks `## Connections` and/or
+`## Open questions for Dan`, do NOT invent content (Hard Constraint #1). Instead, briefly diagnose: was the
+omission likely **accidental** (the source material's scope and the rest of the note's prose would clearly
+support such content if written), or **intentional/justified** (source is genuinely sparse, the paper or repo
+is narrowly scoped, or the existing prose explicitly addresses the absence)? One sentence per flagged note.
+Maestro uses this triage to commission section-creation passes targeted at accidental omissions only.
+
+**Framing-mismatch / unrelated flag.** If a note characterizes its source as out-of-scope, irrelevant to Linus,
+unreusable, or not applicable — and that framing seems strong relative to what the source actually contains
+(reading the PDF or repo briefly to check) — flag it in `framing_mismatch_flags`. The original note may have
+been written without full understanding of why Dan included this source. Dan has noted, e.g., that the WHAM
+paper was included specifically because world models are an interesting alternative to LLMs, but the note
+characterizes the WHAM triple as "deferred / not lifted wholesale." This kind of categorization should be the
+exception, not the rule. One sentence per flagged note: what the note says + why it might warrant
+re-evaluation. Don't edit the note's framing; only flag.
 
 ## Hard constraints
 
@@ -116,8 +147,11 @@ For each note in the bin, the agent verifies and minimally edits to match the ca
   (paper PDF or repo code), flag the note for Maestro and leave the prose untouched.
 - **No semantic-meaning changes** to any reusable claim. Restructure / standardize / link-fix only.
 - **Stay strictly inside the assigned bin's file set** plus the permitted source material.
-- **Atomic per-note commits** within the worktree branch. One commit per note touched. Commit message:
-  `[notes-consistency] <note-stem>: <what changed>`.
+- **Commit shape (revised post-canary).** ONE batch commit for the canonical heading rename across all bin
+  files needing it (first action). Then atomic per-note commits for substantive per-note rubric work, with
+  message `[notes-consistency] <note-stem>: <what changed>`. Notes touched only by the batch rename get one
+  commit (the batch); they do NOT also get an individual commit. Notes needing additional substantive edits
+  beyond the rename get one additional commit.
 - **Emit the standardized summary report verbatim** at the end of the agent's response.
 
 ## Standardized summary report
@@ -151,10 +185,36 @@ per_note:
     flag_reason: <empty if not flagged; one-sentence reason if flagged>
   # ... one entry per note in the bin
 
+missing_sections_diagnosis:
+  # One entry per note flagged for missing Connections or Open-questions section.
+  # Skip this list if no notes were flagged for missing sections.
+  - path: docs/paper-notes/<id>.md
+    missing: ["Connections", "Open questions for Dan"]   # one or both
+    diagnosis: accidental | intentional-justified
+    one_sentence: <terse rationale, e.g. "Source PDF clearly supports both
+                   sections; existing prose has cross-references in narrative
+                   but not as Connections list" (accidental) or "Single-page
+                   commentary; no other Linus-relevant work to connect to"
+                   (intentional-justified)>
+
+framing_mismatch_flags:
+  # One entry per note that frames its source as out-of-scope / irrelevant /
+  # unreusable in a way that may warrant Dan's re-evaluation. Skip if none.
+  - path: docs/paper-notes/<id>.md
+    note_says: <one phrase from the note's framing>
+    one_sentence: <why this might be a misread of why Dan included the source>
+
+broken_or_missing_cross_references:
+  # Every broken link to another note in docs/paper-notes/ or docs/repo-notes/.
+  # Include even if surrounding prose acknowledges conditional existence —
+  # these are leads for Dan's follow-up curation. Skip if none.
+  - in_note: docs/paper-notes/<id>.md
+    broken_link_target: docs/paper-notes/<missing-id>.md
+    surrounding_context: <one short clause from the prose around the link>
+
 cross_bin_observations: |
-  Free-text section. Things this agent noticed that aren't in scope for this bin
-  but Maestro should know about (broken links pointing outside bin, stale
-  references in adjacent files, etc.). Keep terse. Empty string if nothing.
+  Free-text section. Things not captured by the structured fields above.
+  Keep terse. Empty string if nothing.
 
 estimate_vs_actual: |
   Estimated: <maestro estimate in minutes from spec>
@@ -186,17 +246,19 @@ When PR #24 (the prior `agent/notes-cleanup-fanout` content) merges to main, thi
 
 Per the new "Measure, don't just estimate" CLAUDE.md convention:
 
-- **Maestro estimate.** ~3 hours wall time total: spec ~30 min (already drafted), canary ~30 min, parallel
-  fan-out ~60-90 min bounded by slowest bin (parallel max), consolidation ~30 min, PR ~15 min. Anchored
-  conservatively given the 195-file scope and L4 lessons from the prior fan-out.
-- **Per-bin estimate carried in agent prompt.** ~10 minutes per bin for B3/B4/B6/B7/B9/B11/B12 (≤12 files);
-  ~15-20 minutes for B1/B2/B5/B8/B10/B13 (≥14 files).
+- **Maestro estimate (revised post-canary).** Canary B13 took 5 min vs 20 min estimate (75% under). Revised
+  per-bin anchors: 5 min for ≤12-file bins (B3/B4/B6/B7/B9/B11/B12), 8-10 min for 14-19 file bins
+  (B1/B5/B8/B12/B13), 12-15 min for the largest bins (B2 at 25 files, B10 at 27). Wall time for parallel
+  fan-out is bounded by the slowest bin (~15 min). Total revised estimate: spec ~done, canary ~done,
+  parallel fan-out ~15 min wall, consolidation ~20 min, PR ~10 min → ~45 min remaining.
 - **Maestro fills the Status section below at consolidation** with measured wall time and variance note.
 
 ## Status (filled at execution)
 
-- 2026-05-08: spec authored.
-- 2026-05-08: canary on B13 — _pending_.
+- 2026-05-08 17:00 ish: spec authored.
+- 2026-05-08 17:08 UTC: canary on B13 complete (5 min wall, 18 commits, 8 notes flagged). Spec refined with
+  canary-driven §First-action batch rename, missing-sections diagnostic flag, framing-mismatch flag,
+  broken-cross-reference reporting.
 - 2026-05-08: parallel fan-out on B1-B12 — _pending_.
 - 2026-05-08: consolidation + PR — _pending_.
 - 2026-05-08: measured wall time — _pending_.

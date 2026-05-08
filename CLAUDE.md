@@ -585,8 +585,16 @@ numbered H2 sections in fixed order: `## 1. Purpose and scope` · `## 2. Archite
 `## 3. What's reusable in Linus` · `## 4. What's inspiration only` · `## 5. What's incompatible or out of scope` ·
 `## 6. Recommendation: **<verdict>**` · `## 7. Questions for Dan`. Recommendation verdicts come from a fixed
 vocabulary: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore** (single primary verdict; modifiers like
-"with a high prior on later Integrate-as-service" are allowed). Same Reusable / Connections / Open-questions
-discipline as paper-notes.
+"with a high prior on later Integrate-as-service" are allowed). Section 7 uses numbered sequential items (no
+bullets), matching paper-notes; legacy bulleted items in repo-notes are tolerated and converted to numbered by
+Maestro at consolidation, not by per-note authors during normal work — to avoid drift. Same Reusable /
+Connections / Open-questions discipline as paper-notes.
+
+**Partial-resolved citation format.** Items use `_Partially resolved (DEC-NNNN, see [answered-questions.md](...)):
+nuance._` where DEC-NNNN points to the resolving ADR. Where no ADR exists but a sweep / entrepreneurship / memory
+ID does (S-NN / E-NN / M-NN from the planning-update arc), the form `_Partially resolved (S-NN, see
+[answered-questions.md](...)): nuance._` is accepted; agents should not normalize S/E/M IDs to DEC-NNNN unless
+the mapping is verifiable from `docs/adr/` alone (Maestro handles cross-referencing through `docs/questions/`).
 
 **Audit** — `docs/audits/<batch-name>/<source>-audit.md`. H1 = audit subject. Sections: `## Summary` ·
 `## Findings` (with H3 sub-categories grouped by severity or class) ·
