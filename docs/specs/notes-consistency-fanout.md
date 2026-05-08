@@ -255,13 +255,82 @@ Per the new "Measure, don't just estimate" CLAUDE.md convention:
 
 ## Status (filled at execution)
 
-- 2026-05-08 17:00 ish: spec authored.
+- 2026-05-08 17:00 ish UTC: spec authored.
 - 2026-05-08 17:08 UTC: canary on B13 complete (5 min wall, 18 commits, 8 notes flagged). Spec refined with
   canary-driven §First-action batch rename, missing-sections diagnostic flag, framing-mismatch flag,
   broken-cross-reference reporting.
-- 2026-05-08: parallel fan-out on B1-B12 — _pending_.
-- 2026-05-08: consolidation + PR — _pending_.
-- 2026-05-08: measured wall time — _pending_.
+- 2026-05-08 17:42-18:18 UTC: parallel fan-out on B1-B12 complete. 12 worktree agents dispatched in
+  parallel; all returned. Per-bin wall times ranged 19-36 min; parallel max ~36 min (B2). Two worktrees
+  (B6, B11) had their commits land on the base branch directly via the harness rather than on per-worktree
+  branches; the rest were cherry-picked at consolidation.
+- 2026-05-08 18:30 UTC: Maestro consolidation complete. 32 commits cherry-picked from 10 worktree branches
+  + 7 commits already on base (B6 + B11 + B11's substantive fixes). 2 cherry-pick conflicts resolved
+  manually (engram.md and remember.md — both cases where worktree commits tried to update Layer D→E
+  references on questions that had already been deleted by Policy A; resolution kept HEAD's deletion in
+  engram and merged HEAD's partial-resolved annotation with the worktree's Layer E rename in remember).
+- 2026-05-08 18:30 UTC: measured wall time. Total: ~1.5h (canary 5 min + parallel fan-out 36 min wall + spec
+  refinement 5 min + consolidation 25 min + PR 0 min — already open). Vs ~3h estimate, came in 50% under.
+  Per-bin: parallel agents averaged 22 min vs 5-15 min estimates (~2-3x over). Estimates need recalibration:
+  per-bin work is dominated by full-read time even when edit count is small, and worktree-vs-main path
+  resolution adds ~5-10 min of debugging overhead on average. Future estimates: 15-25 min per bin regardless
+  of file count, parallel max ~30 min for 200-file scope.
+
+## Aggregate flag inventory
+
+Across all 13 bins (canary B13 + fan-out B1-B12), per the standardized summary reports:
+
+**Notes touched / unchanged / flagged.** 195 total; ~120 touched (mostly the canonical heading rename);
+~70 unchanged; ~25 flagged for Maestro consolidation review.
+
+**Missing canonical sections — for follow-up commission pass.** ~14 paper-notes lack `## Connections` and/or
+`## Open questions for Dan` sections. Diagnostic split: ~6 accidental (clear support in source for both
+sections) and ~8 intentional/justified (blog-post variants in B2 use `## Cross-references` as a parallel
+canonical convention; sparse-coverage long-tail papers in B13 / B4 / B9 / B11 legitimately have no obvious
+connections or questions). Maestro to commission a section-creation pass on the ~6 accidental cases as
+follow-up work.
+
+**Framing-mismatch flags (potential outliers in Dan's intent).** 2 explicit flags from B9: `2511.20100v1`
+("GPU-specific... Linus runs on Apple Silicon") and the QuantAgent repo-note's "Ignore" verdict on a clean
+multi-agent template — both potentially undervaluing transferable orchestration patterns. The earlier
+WHAM example (s41586-025-08600-3) framing-mismatch was implicit in B13's flags (note characterizes WHAM
+triple as "deferred / not lifted wholesale" but Dan's interest is world-models-as-LLM-alternative). For
+Dan to re-evaluate at consolidation review.
+
+**Broken / missing cross-references — potential follow-up reading.** ~12 broken or missing cross-references
+flagged; most are pointers to papers that were never filed (e.g., 2210.02747v1 Lipman flow matching;
+LucaOne under bioRxiv stem rather than Nature DOI; Evo 2 under earlier bioRxiv stem; placeholder `(.)`
+links in 2412.20138v7 for Boiko/Gomes, Kosmos, BioGuider, Sketch2Simulation, "Fundamentals of LLM Agents",
+"Practical Guide for LLM Eval"). Several are leads for Dan's follow-up curation pass.
+
+**Mis-binned files.** 2 papers (`2511.20099v4` QiMeng-CRUX Verilog code-gen, `2511.20100v1` QiMeng-Kernel
+GPU kernel generation) classified into B9 by alphabetical-ID adjacency to QuantAgent rather than topic.
+They belong in a code-gen / fine-tuning / orchestration cluster (likely a future B14, or merge into B10).
+Both also lack Connections + Open-questions sections.
+
+**Bulleted Section 7 in repo-notes — Maestro normalization pending.** ~80 of 97 repo-notes use bulleted
+items in Section 7 instead of canonical numbered. Per CLAUDE.md §Doc-type conventions, Maestro normalizes
+this at consolidation; per-note authors during normal work do not. Single corpus-wide Maestro pass to
+convert can be queued as a follow-up.
+
+**Stale cross-references caught.** B5 caught a `DEC-0026/27` → `DEC-0015` correction (KB dual-graph
+substrate — DEC-0026/27 are unrelated). B11 propagated the same correction across `infranodus`,
+`infranodus-skills`, `py3plex`. Total 11 token-level swaps across 4 files.
+
+**Layer D → Layer E renumbering caught.** B3 caught 3 stale `Layer D = semantic` references in `engram`,
+`memex`, `remember` that hadn't propagated after DEC-0052 renamed Layer D (semantic) to Layer E (when
+investigation memory took the Layer D slot). These were updated with explanatory `(per DEC-0052)`
+parentheticals. Other bins may have similar drift; recommend a corpus-wide grep at follow-up:
+`grep -rn "Layer D" docs/repo-notes/ docs/paper-notes/`.
+
+**Pre-existing prettier corruption flagged.** B5 spotted in-prose `+` characters that prettier had
+rewritten to `-` list markers in `beever-atlas.md` and `wikimind.md` (a documented Known Library Quirk in
+CLAUDE.md). Left unedited per Hard Constraint #2; Maestro to schedule a corpus-wide grep + rejoin pass.
+
+**Edit-tool reliability concerns.** B2, B4, B8, B12 reported worktree-vs-main path-resolution issues
+where Edit tool calls landed in the main worktree instead of the agent's worktree, requiring revert +
+redo via Bash sed-equivalents. This added ~5-15 min per affected bin. Worth flagging to the harness
+provider; for now, future fan-out agents should prefer in-worktree `cd` + sed/awk via Bash for any
+multi-file mechanical operation.
 
 ---
 
