@@ -240,6 +240,14 @@ Single base branch `agent/notes-consistency-sweep` off the current branch
 cherry-picking each worktree's per-note commits onto the base branch in deterministic bin order
 (B1, B2, …, B13) at the end. **Single PR** with per-bin commit groups inside.
 
+**Worktree base requirement (lesson from this fan-out).** Every parallel worktree must branch from the **same
+commit** — specifically, the head of the base branch at the moment the fan-out is dispatched. In this fan-out,
+some worktrees branched off `origin/main` and some off other intermediate commits, which forced several agents
+to merge `agent/notes-consistency-sweep` mid-task to obtain the spec doc and prior canary state, and produced
+two cherry-pick conflicts during consolidation (engram.md and remember.md, where worktrees tried to update
+sections that had already been deleted by Policy A on the base). Future fan-outs MUST specify the base commit
+SHA in the agent prompt and verify each worktree starts from that SHA before any work.
+
 When PR #24 (the prior `agent/notes-cleanup-fanout` content) merges to main, this branch will rebase cleanly.
 
 ## Estimates and time tracking
@@ -274,6 +282,15 @@ Per the new "Measure, don't just estimate" CLAUDE.md convention:
   per-bin work is dominated by full-read time even when edit count is small, and worktree-vs-main path
   resolution adds ~5-10 min of debugging overhead on average. Future estimates: 15-25 min per bin regardless
   of file count, parallel max ~30 min for 200-file scope.
+- 2026-05-08 19:30 UTC: post-consolidation follow-up pass executed (spot-check, reframe, QiMeng promotion,
+  bullet→numbered normalization, prettier corruption fix, section-creation commission). 20-file random
+  spot-check found 1 minor sub-heading variant (now fixed). 3 notes reframed per Dan's intent
+  (s41586-025-08600-3 WHAM, 2511.20100v1 QiMeng-Kernel, QuantAgent repo). QiMeng promoted out of
+  g1-apple-silicon and infra-foundations into a new LLM-hardware-design category seeded at
+  `docs/specs/qimeng-category-promotion.md`. Bullet→numbered normalization across 95 repo-notes Section 7.
+  Prettier `+`→`-` corruption fixed in beever-atlas + wikimind. Section-creation commission pass added
+  Connections + Open-questions to 12 paper-notes and Section 7 to BitNet repo-note (1 paper-note —
+  2511.09057v3 PAN — diagnosed intentional-justified, no edits).
 
 ## Aggregate flag inventory
 

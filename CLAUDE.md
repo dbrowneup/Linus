@@ -671,11 +671,18 @@ For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 - Write/edit files under `src/`, `benchmarks/`, `experiments/`, `docs/`
 - Run `pytest`, `ruff`, `prettier --write|--check` (Linus tree only), `mdlint check` (Linus tree only — but see Known
   Library Quirks; mdlint mutates), `python` (in linus env), `git add`, `git commit`
-- Read-only git: `git status`, `git log`, `git diff`, `git branch`, `git show`
+- Read-only git: `git status`, `git log`, `git diff`, `git branch`, `git show`, `git worktree list`,
+  `git for-each-ref`, `git reflog`, `git rev-parse`, `git cherry-pick` (within Linus tree, agent branches only)
 - Branch creation and pushing: `git switch -c <branch>`, `git push -u origin <branch>`
 - Pull request creation and interaction: `gh pr create`, `gh pr view`, `gh pr list`, `gh pr comment`, `gh pr merge`
   (with Dan approval for merge)
-- `ls`, `cat`, `grep`, `tree`, `wc`, `head`, `tail`
+- `ls`, `cat`, `grep`, `tree`, `wc`, `head`, `tail`, `find`, `awk`, `sed` (read-only `-n`), `sort`, `uniq`, `xargs`
+- **Compound shell statements** that wrap allowlisted commands: `for X in ...; do <allowlisted-cmd>; done`,
+  `while read X; do <allowlisted-cmd>; done`, pipelines among allowlisted commands (`grep | sort | uniq`,
+  `git worktree list | awk | while ...`), and `python3 <<'EOF' ... EOF` heredocs that run scripts containing only
+  allowlisted operations. The compound is allowlisted iff every command and side-effect inside it is allowlisted.
+- **Worktree management**: `git worktree unlock`, `git worktree remove --force` (within `.claude/worktrees/` only),
+  `git branch -D worktree-agent-*` (only branches matching that pattern).
 
 ### Require confirmation (show command, wait for OK)
 
