@@ -80,6 +80,12 @@ checkpoints, then in Phase 3 or 6 evaluate whether a port to MLX (NT-500M + Qwen
 is the realistic target) is worth the engineering. The far-better Linus play is "use the BioReason architecture as a
 template for a Linus-native bio-multimodal Worker," not "vendor BioReason's CUDA stack."
 
+The BioReason-Pro follow-up (bioRxiv 2026.03.19.712954) is the more direct Linus prior art: per CLAUDE.md §"Typed
+structured prediction for biology skills" (resolved 2026-05-06, S25), every Linus biology skill that produces a
+predictive output should adopt the BioReason-Pro shape — typed structured result wrapping a free-text `rationale`
+field. Per **DEC-0047** (biosecurity tier policy), BioReason-Pro residue-level outputs sit in Tier A (standard
+sandbox); only gene/whole-genome generation paths escalate to Tier B/C.
+
 ## 7. Questions for Dan
 
 - **KEGG benchmark legitimacy.** The 290-datapoint KEGG disease-pathway set is the headline result. Is that benchmark

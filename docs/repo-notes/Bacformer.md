@@ -76,6 +76,12 @@ practical speeds (PAO1-sized genome in single-digit minutes is the bar), Bacform
 that takes a GenBank path or an NCBI accession and returns contextual embeddings + downstream task outputs to either Dan
 or a Worker LLM. If MPS inference is unworkable, demote to study material until Linus has a remote-GPU offload story.
 
+Biosecurity note: per **DEC-0047** (SAFETY.md three-tier policy, accepted 2026-05-06), the
+`bacformer-causal-protein-family-modeling-complete-genomes` checkpoint's gene-level / family-token generation is
+explicitly Tier B — explicit Dan sign-off per invocation, logged in the audit trail, not agentic-executable without
+approval. Read-only embedding / clustering / zero-shot-operon use of the masked checkpoints stays Tier A (standard
+sandbox).
+
 ## 7. Questions for Dan
 
 - **Which downstream task carries the most weight for you?** The eight checkpoints cover masked vs causal vs

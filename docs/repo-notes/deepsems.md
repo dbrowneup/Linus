@@ -70,6 +70,11 @@ schedule a Phase 3 task: download checkpoints + Pfam from Figshare, port `predic
 KnowledgeBase-linked outputs (structure → linkable to ChEMBL/PubChem if those land in KB). Keep it Study-level until the
 MPS port and reproducibility check succeed; promote to Integrate once a worker-callable tool exists.
 
+Biosecurity note: per **DEC-0047** (SAFETY.md three-tier policy, accepted 2026-05-06), DeepSeMS BGC→SMILES generation
+is explicitly classified as Tier B — explicit Dan sign-off per invocation, logged in the audit trail, not
+agentic-executable without approval. The Phase 3 wrapper must surface the proposed SMILES to Dan and wait for approval
+before any downstream action (e.g., KnowledgeBase indexing of the generated structure).
+
 ## 7. Questions for Dan
 
 - **Cryptic-BGC reality check.** The headline (41.1% structure recovery vs. 8.9% / 0.0% for PRISM 4 / antiSMASH 7) is
