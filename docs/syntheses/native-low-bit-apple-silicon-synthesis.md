@@ -478,8 +478,6 @@ rewritten to reflect that. Fine-tuned models that genuinely exceed RAM (Linus-br
 30B+ from PrismML) remain the proper streaming targets. The Bonsai existence proof has shifted Phase 6d's center of
 gravity, not removed its motivation.
 
-**8. CPU-only inference as a hardware contrast.** QiMeng-cpu-v1 ([repo-note](../repo-notes/QiMeng-cpu-v1.md)) was added to Group 1 in May 2026 as a CPU-optimized inference reference. It is a Monitor verdict — not an Apple Silicon GPU/ANE target — but provides useful contrast for understanding what hardware-agnostic inference requires vs. Metal-specific optimization. The lessons about parallelization and structural learning from the CPU-design case study inform Linus's broader synthesis methodology even if the QiMeng inference path itself is out of scope.
-
 ---
 
 ## Where this synthesis fits

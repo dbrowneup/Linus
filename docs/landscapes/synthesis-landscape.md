@@ -52,7 +52,7 @@ in `top-questions.md`; refer back as decisions land. (Updated 2026-05-05 to refl
 
 | Synthesis | One-line characterization |
 | --- | --- |
-| [`g1-apple-silicon`](../syntheses/repo-clusters/g1-apple-silicon.md) | 9 repos; autoresearch-mlx as the runnable methodology substrate; trust the OS page cache. QiMeng-cpu-v1 added as behavioral-synthesis methodology reference (Monitor). |
+| [`g1-apple-silicon`](../syntheses/repo-clusters/g1-apple-silicon.md) | 8 repos; autoresearch-mlx as the runnable methodology substrate; trust the OS page cache. QiMeng-cpu-v1 promoted out of g1 into a forthcoming LLM-hardware-design category (see `docs/specs/qimeng-category-promotion.md`). |
 | [`g2-wiki-engines`](../syntheses/repo-clusters/g2-wiki-engines.md) | 11 LLM Wiki implementations; high pattern convergence, no drop-in winner; wikiloom + llmbase + wikidesk + OmegaWiki most liftable. |
 | [`g3-wiki-patterns`](../syntheses/repo-clusters/g3-wiki-patterns.md) | 7 agent-driven wiki build patterns; obsidian-llm-wiki-local 3-tier JSON fallback for Ollama; llm-research-wiki LINT workflow. |
 | [`g4-memory`](../syntheses/repo-clusters/g4-memory.md) | 9 agent-memory systems; openaugi as closest match to DEC-0029 v0; agentmemory primitives for parallel-write coordination. k-dense-byok added as Study. |
