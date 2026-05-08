@@ -77,16 +77,16 @@ roadmap.
 
 ## 7. Questions for Dan
 
-- **Provider abstraction now or later.** WeKnora's strongest reusable idea is the unified LLM provider interface — same
-  shape regardless of OpenAI vs Ollama vs Hunyuan. Does Linus want to design that abstraction in Phase 2a (when there
-  are only Ollama and pmetal candidates), or wait until a third backend forces it?
-- **Per-KB indexing strategy toggle.** Should KnowledgeBase v1 commit to one retrieval mode (e.g., dense-only) for
-  simplicity, or design from day one for hybrid + GraphRAG with per-corpus toggles like WeKnora does?
-- **Parser-as-sidecar.** The `docreader` Python gRPC sidecar pattern keeps the Go core clean of every PDF/OCR
-  dependency. Worth considering for KnowledgeBase ingestion if the dependency surface grows, or premature for a Python
-  monolith?
-- **Langfuse for agent tracing.** When Linus gets to multi-step ReAct loops in Phase 3, do you want LLM-native
-  observability (Langfuse, Phoenix, Helicone) in scope, or is OpenTelemetry + structured logs sufficient?
-- **Differentiation gap.** Is there any meaningful overlap between WeKnora's Wiki Mode (auto-distill documents into
-  interlinked markdown + knowledge graph) and the KnowledgeBase submodule's own roadmap, or are these solving different
-  problems for different users?
+1. **Provider abstraction now or later.** WeKnora's strongest reusable idea is the unified LLM provider interface — same
+   shape regardless of OpenAI vs Ollama vs Hunyuan. Does Linus want to design that abstraction in Phase 2a (when there
+   are only Ollama and pmetal candidates), or wait until a third backend forces it?
+2. **Per-KB indexing strategy toggle.** Should KnowledgeBase v1 commit to one retrieval mode (e.g., dense-only) for
+   simplicity, or design from day one for hybrid + GraphRAG with per-corpus toggles like WeKnora does?
+3. **Parser-as-sidecar.** The `docreader` Python gRPC sidecar pattern keeps the Go core clean of every PDF/OCR
+   dependency. Worth considering for KnowledgeBase ingestion if the dependency surface grows, or premature for a Python
+   monolith?
+4. **Langfuse for agent tracing.** When Linus gets to multi-step ReAct loops in Phase 3, do you want LLM-native
+   observability (Langfuse, Phoenix, Helicone) in scope, or is OpenTelemetry + structured logs sufficient?
+5. **Differentiation gap.** Is there any meaningful overlap between WeKnora's Wiki Mode (auto-distill documents into
+   interlinked markdown + knowledge graph) and the KnowledgeBase submodule's own roadmap, or are these solving different
+   problems for different users?

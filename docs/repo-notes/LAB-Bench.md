@@ -92,17 +92,17 @@ accidentally train or fine-tune on a leaked LAB-Bench record.
 
 ## 7. Questions for Dan
 
-- **ProtocolQA failure-mode coverage.** The repo's protocols are realistic (PBMC isolation, QIAprep miniprep, etc.) and
-  the questions inject deliberate errors for the model to catch. Spend an hour reading 20 ProtocolQA questions across
-  subsets — do the injected mistakes match the kinds of mistakes you actually saw burn experiments in the lab (buffer
-  swaps, centrifuge speeds, missing cofactors), or are they too cosmetic / too obvious to be a real wet-lab signal?
-- **SeqQA as a Linus smoke test.** SeqQA is closed-form and largely procedural (count restriction-enzyme fragments,
-  design PCR primers, compute GC%). Many of these have deterministic right answers a small Python tool could solve
-  outright. Is SeqQA more interesting as a test of (a) raw model reasoning over sequence text or (b) Linus's tool-
-  routing — i.e., the right answer is "call the `restriction_digest` skill, here's the result"?
-- **LitQA2 vs paper-qa loop.** LitQA2 provides DOIs / URLs for ~80% of questions but the public scoring path is closed-
-  book MCQ. Does running LitQA2 with KnowledgeBase + paper-qa retrieval (open-book) and reporting the lift over closed-
-  book make sense as an early Phase 2 milestone, or do we keep closed-book to stay comparable to the arXiv baselines?
-- **DbQA as a Phase 7 skill driver.** The 9 DbQA subtasks each correspond to a different biological database (GTRD,
-  miRNA targets, oncogenic signatures, viral PPI, etc.). Do you want Linus's Phase 7 skill set to track this list — one
-  domain tool per database — or is this too narrow vs. the actual queries you run day-to-day in your own work?
+1. **ProtocolQA failure-mode coverage.** The repo's protocols are realistic (PBMC isolation, QIAprep miniprep, etc.) and
+   the questions inject deliberate errors for the model to catch. Spend an hour reading 20 ProtocolQA questions across
+   subsets — do the injected mistakes match the kinds of mistakes you actually saw burn experiments in the lab (buffer
+   swaps, centrifuge speeds, missing cofactors), or are they too cosmetic / too obvious to be a real wet-lab signal?
+2. **SeqQA as a Linus smoke test.** SeqQA is closed-form and largely procedural (count restriction-enzyme fragments,
+   design PCR primers, compute GC%). Many of these have deterministic right answers a small Python tool could solve
+   outright. Is SeqQA more interesting as a test of (a) raw model reasoning over sequence text or (b) Linus's tool-
+   routing — i.e., the right answer is "call the `restriction_digest` skill, here's the result"?
+3. **LitQA2 vs paper-qa loop.** LitQA2 provides DOIs / URLs for ~80% of questions but the public scoring path is closed-
+   book MCQ. Does running LitQA2 with KnowledgeBase + paper-qa retrieval (open-book) and reporting the lift over closed-
+   book make sense as an early Phase 2 milestone, or do we keep closed-book to stay comparable to the arXiv baselines?
+4. **DbQA as a Phase 7 skill driver.** The 9 DbQA subtasks each correspond to a different biological database (GTRD,
+   miRNA targets, oncogenic signatures, viral PPI, etc.). Do you want Linus's Phase 7 skill set to track this list — one
+   domain tool per database — or is this too narrow vs. the actual queries you run day-to-day in your own work?

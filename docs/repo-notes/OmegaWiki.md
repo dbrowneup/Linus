@@ -75,16 +75,16 @@ surface.
 
 ## 7. Questions for Dan
 
-- **Claim / experiment / idea entities in KnowledgeBase v1.** OmegaWiki's wiki schema treats `claims`, `experiments`,
-  `ideas`, and `failure_reason` as first-class. Should Phase 2 KB adopt that vocabulary now (cheap while the schema is
-  still soft) or stay paper-centric until a real research workflow forces the question?
-- **Adversarial-review MCP pattern.** The `mcp-servers/llm-review/` model — a second LLM as an MCP-exposed reviewer for
-  novelty / refinement / draft critique — is the cleanest "two-model adversarial loop" template in the cluster. Worth
-  building an analogous Linus MCP that exposes a worker model to Claude Code as a reviewer? Phase 3 fits.
-- **Differentiator confidence.** The "24 skills, full lifecycle" claim is real (counted: 24 skill directories under
-  `.claude/skills/`, plus `shared-references/`). Sibling-by-sibling I haven't yet confirmed whether `wikiloom` or
-  `TheKnowledge` reach into experiment design or paper drafting; if any of them do, OmegaWiki's "most ambitious" framing
-  softens. Want me to flag that as a follow-up audit before drawing Phase 7 conclusions?
-- **Hosted-Claude dependency as a benchmark control.** Because OmegaWiki only works under Claude Code, it is also a
-  natural Maestro-side benchmark target — "what does the lifecycle look like with frontier models, against which Linus's
-  local-worker version is measured." Worth designating as a Phase 1b / Phase 7 reference baseline?
+1. **Claim / experiment / idea entities in KnowledgeBase v1.** OmegaWiki's wiki schema treats `claims`, `experiments`,
+   `ideas`, and `failure_reason` as first-class. Should Phase 2 KB adopt that vocabulary now (cheap while the schema is
+   still soft) or stay paper-centric until a real research workflow forces the question?
+2. **Adversarial-review MCP pattern.** The `mcp-servers/llm-review/` model — a second LLM as an MCP-exposed reviewer for
+   novelty / refinement / draft critique — is the cleanest "two-model adversarial loop" template in the cluster. Worth
+   building an analogous Linus MCP that exposes a worker model to Claude Code as a reviewer? Phase 3 fits.
+3. **Differentiator confidence.** The "24 skills, full lifecycle" claim is real (counted: 24 skill directories under
+   `.claude/skills/`, plus `shared-references/`). Sibling-by-sibling I haven't yet confirmed whether `wikiloom` or
+   `TheKnowledge` reach into experiment design or paper drafting; if any of them do, OmegaWiki's "most ambitious"
+   framing softens. Want me to flag that as a follow-up audit before drawing Phase 7 conclusions?
+4. **Hosted-Claude dependency as a benchmark control.** Because OmegaWiki only works under Claude Code, it is also a
+   natural Maestro-side benchmark target — "what does the lifecycle look like with frontier models, against which
+   Linus's local-worker version is measured." Worth designating as a Phase 1b / Phase 7 reference baseline?

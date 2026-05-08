@@ -78,27 +78,29 @@ are complementary (planner vs. runner), not finalists for the same slot.
 
 ## 7. Questions for Dan
 
-- **Phase 1f framing.** The brief treats claude-squad and claude-task-master as competing candidates, but they target
-  different stages (decompose vs. parallel-execute). Is the Phase 1f deliverable better written as "adopt both patterns,
-  neither product," or do you want a single winner declared?
-- **Three model roles, or more?** Taskmaster pins three: main / research / fallback. Linus's worker layer plausibly
-  needs at least four — main (Qwen2.5-Coder), research (an external API or Perplexity for facts), fallback, and a
-  cheap/fast triage model (Mistral-7B or Bonsai). Codify three roles or design for N from the start?
-- **Task-state location.** Taskmaster centralizes everything in `.taskmaster/`. Should Linus's PRD-to-tasks skill output
-  to `experiments/<task-id>/`, to a SQLite-backed session store (per ARCHITECTURE.md), or to git-tracked JSON next to
-  the spec — and which of those plays best with the agent-branch workflow in BRANCHING.md?
+1. **Phase 1f framing.** The brief treats claude-squad and claude-task-master as competing candidates, but they target
+   different stages (decompose vs. parallel-execute). Is the Phase 1f deliverable better written as "adopt both
+   patterns, neither product," or do you want a single winner declared?
+2. **Three model roles, or more?** Taskmaster pins three: main / research / fallback. Linus's worker layer plausibly
+   needs at least four — main (Qwen2.5-Coder), research (an external API or Perplexity for facts), fallback, and a
+   cheap/fast triage model (Mistral-7B or Bonsai). Codify three roles or design for N from the start?
+3. **Task-state location.** Taskmaster centralizes everything in `.taskmaster/`. Should Linus's PRD-to-tasks skill
+   output to `experiments/<task-id>/`, to a SQLite-backed session store (per ARCHITECTURE.md), or to git-tracked JSON
+   next to the spec — and which of those plays best with the agent-branch workflow in BRANCHING.md?
 
-  _Partially resolved (DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): SQLite is the
-  session-store substrate; workgraph JSONL is the recommended Phase 2a session-store shape; exact PRD-to-tasks output
-  path TBD at skill implementation._
-- **MCP tool count discipline.** Taskmaster's `core` tier is 7 tools at ~5k tokens; their default of 36 already costs
-  ~21k tokens. For Linus's eventual MCP surface, do we adopt a hard cap (say, 10 tools per worker session) and force
-  composition, or accept higher token cost in exchange for breadth?
+   _Partially resolved (DEC-0029, see [answered-questions.md](../questions/answered-questions.md)): SQLite is the
+   session-store substrate; workgraph JSONL is the recommended Phase 2a session-store shape; exact PRD-to-tasks output
+   path TBD at skill implementation._
 
-  _Partially resolved (DEC-0032, see [answered-questions.md](../questions/answered-questions.md)): 16K token in-context
-  cap for Phase 2 Workers; tool-count hard cap not set; tiered loading pattern (core/standard/all) noted as useful
-  prior art._
-- **Differentiator gap.** I could not identify a meaningful technical differentiator that argues for Taskmaster _over_
-  reimplementing the pattern in Linus — every reusable idea (schema, three roles, complexity-then-expand) is small
-  enough to lift in a day. Is there a Taskmaster feature you specifically want that I should re-evaluate before closing
-  the ADR?
+4. **MCP tool count discipline.** Taskmaster's `core` tier is 7 tools at ~5k tokens; their default of 36 already costs
+   ~21k tokens. For Linus's eventual MCP surface, do we adopt a hard cap (say, 10 tools per worker session) and force
+   composition, or accept higher token cost in exchange for breadth?
+
+   _Partially resolved (DEC-0032, see [answered-questions.md](../questions/answered-questions.md)): 16K token in-context
+   cap for Phase 2 Workers; tool-count hard cap not set; tiered loading pattern (core/standard/all) noted as useful
+   prior art._
+
+5. **Differentiator gap.** I could not identify a meaningful technical differentiator that argues for Taskmaster _over_
+   reimplementing the pattern in Linus — every reusable idea (schema, three roles, complexity-then-expand) is small
+   enough to lift in a day. Is there a Taskmaster feature you specifically want that I should re-evaluate before closing
+   the ADR?

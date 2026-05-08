@@ -70,34 +70,34 @@ order" is a single API-key swap.
 
 ## 6. Recommendation: **Study** (the multi-agent decomposition pattern; financial domain is off-mission)
 
-QuantAgent is the cleanest minimal multi-agent template in the corpus — a four-role linear pipeline
-(measurer → recognizer → contextualizer → decider) coordinated by a single LangGraph `StateGraph` over a shared state
-dict, ~30 lines of orchestration glue plus role-specific tool bindings. That decomposition shape is the load-bearing
-reusable artifact for Linus and warrants real study even though the financial domain itself is off-mission. The
-sibling [TradingAgents](TradingAgents.md) shows how to scale deliberation with debate-style multi-team rosters;
-QuantAgent shows how thin a useful pipeline can be — the two together bracket the orchestration design space at its
-minimal and maximal ends, and Linus needs both ends visible when the agent-spawner spec (DEC-0050) is fleshed out.
-The financial domain itself is off-mission and the trade-decision specifics are inspiration only; the
-prompt-engineering choices and the vision-LLM-on-rendered-chart pattern are general-purpose techniques worth lifting.
-No code to vendor, no submodule to add — read the four-agent wiring, copy the template shape into Phase 2/3
-orchestration design, leave the financial layer behind.
+QuantAgent is the cleanest minimal multi-agent template in the corpus — a four-role linear pipeline (measurer →
+recognizer → contextualizer → decider) coordinated by a single LangGraph `StateGraph` over a shared state dict, ~30
+lines of orchestration glue plus role-specific tool bindings. That decomposition shape is the load-bearing reusable
+artifact for Linus and warrants real study even though the financial domain itself is off-mission. The sibling
+[TradingAgents](TradingAgents.md) shows how to scale deliberation with debate-style multi-team rosters; QuantAgent shows
+how thin a useful pipeline can be — the two together bracket the orchestration design space at its minimal and maximal
+ends, and Linus needs both ends visible when the agent-spawner spec (DEC-0050) is fleshed out. The financial domain
+itself is off-mission and the trade-decision specifics are inspiration only; the prompt-engineering choices and the
+vision-LLM-on-rendered-chart pattern are general-purpose techniques worth lifting. No code to vendor, no submodule to
+add — read the four-agent wiring, copy the template shape into Phase 2/3 orchestration design, leave the financial layer
+behind.
 
 ## 7. Questions for Dan
 
-- **Multi-agent decomposition pattern transferability.** The four-role linear pipeline (measurer → recognizer →
-  contextualizer → decider) is generic. Worth prototyping a non-financial Linus skill on this template — say, a
-  paper-triage skill (extract → classify → contextualize-against-KB → recommend) — to see whether LangGraph adds value
-  versus a hand-rolled sequence in Phase 2's orchestration layer?
-- **LangGraph as orchestration substrate.** QuantAgent, TradingAgents, and several other agentic repos in the collection
-  use LangGraph. ARCHITECTURE.md leaves the orchestration runtime open. Want to do a Phase 2a spike that evaluates
-  LangGraph vs. a custom Linus orchestrator on one or two skills, with a written verdict ADR?
-- **Vision-LLM-on-rendered-chart pattern for science.** QuantAgent demonstrates "render → ask multimodal model" as a way
-  to summarize numerical data. For genomics (coverage tracks, variant call plots, phylogeny figures) this could be
-  useful with a local Qwen2.5-VL. Worth a Phase 1 experiment, or wait until local vision models are stronger?
-- **Differentiation from TradingAgents.** QuantAgent and TradingAgents are sibling repos solving overlapping problems
-  with very different architectures (linear-4-agent vision pipeline vs. debate-style multi-team roster). Is the
-  financial-knowledge adjacency Dan wants better served by one over the other, or do we treat both as study material and
-  revisit only if a concrete Phase 7 skill needs them?
-- **Real-money safety boundary.** SAFETY.md doesn't currently address financial-execution autonomy. If Linus ever grows
-  a financial skill, do we want an explicit SAFETY.md tier that forbids execution endpoints (broker APIs, wallet
-  signing) regardless of harness? Worth pre-committing now, before the temptation appears.
+1. **Multi-agent decomposition pattern transferability.** The four-role linear pipeline (measurer → recognizer →
+   contextualizer → decider) is generic. Worth prototyping a non-financial Linus skill on this template — say, a
+   paper-triage skill (extract → classify → contextualize-against-KB → recommend) — to see whether LangGraph adds value
+   versus a hand-rolled sequence in Phase 2's orchestration layer?
+2. **LangGraph as orchestration substrate.** QuantAgent, TradingAgents, and several other agentic repos in the
+   collection use LangGraph. ARCHITECTURE.md leaves the orchestration runtime open. Want to do a Phase 2a spike that
+   evaluates LangGraph vs. a custom Linus orchestrator on one or two skills, with a written verdict ADR?
+3. **Vision-LLM-on-rendered-chart pattern for science.** QuantAgent demonstrates "render → ask multimodal model" as a
+   way to summarize numerical data. For genomics (coverage tracks, variant call plots, phylogeny figures) this could be
+   useful with a local Qwen2.5-VL. Worth a Phase 1 experiment, or wait until local vision models are stronger?
+4. **Differentiation from TradingAgents.** QuantAgent and TradingAgents are sibling repos solving overlapping problems
+   with very different architectures (linear-4-agent vision pipeline vs. debate-style multi-team roster). Is the
+   financial-knowledge adjacency Dan wants better served by one over the other, or do we treat both as study material
+   and revisit only if a concrete Phase 7 skill needs them?
+5. **Real-money safety boundary.** SAFETY.md doesn't currently address financial-execution autonomy. If Linus ever grows
+   a financial skill, do we want an explicit SAFETY.md tier that forbids execution endpoints (broker APIs, wallet
+   signing) regardless of harness? Worth pre-committing now, before the temptation appears.

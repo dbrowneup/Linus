@@ -82,15 +82,15 @@ complementary, not competing.
 
 ## 7. Questions for Dan
 
-- **Per-repo vs global install.** `npx codesight` resolves the package every invocation (the README warns about Codex
-  hitting a 30s timeout because of this). Globally installing inside the linus conda env is faster but means a Node
-  package lives in our env. Acceptable, or do we wait until there's a second reason to take that dependency?
-- **Wiki artifacts in git.** codesight's value compounds when `.codesight/wiki/` is committed and consulted at session
-  start (Karpathy-style). Are we willing to commit AI-context artifacts into the Linus repo, or treat them as
-  per-session ephemera?
-- **Codesight on non-web Python.** The detectors are tuned for web frameworks (routes, ORMs, components). On a pure
-  numerical/scientific Python repo with no routes and no ORM, the output may be mostly the dependency graph and env
-  vars. Is that still worth the tool slot, or should we bake a science-flavored variant later?
-- **Differentiator I could not pin down.** I can distinguish codesight from ontomics confidently, but the line between
-  codesight's wiki-mode and a vectorless/WeKnora retrieval pass is fuzzy when the source is markdown rather than code.
-  Worth comparing those three explicitly in a follow-up note before Phase 3 retrieval design lands.
+1. **Per-repo vs global install.** `npx codesight` resolves the package every invocation (the README warns about Codex
+   hitting a 30s timeout because of this). Globally installing inside the linus conda env is faster but means a Node
+   package lives in our env. Acceptable, or do we wait until there's a second reason to take that dependency?
+2. **Wiki artifacts in git.** codesight's value compounds when `.codesight/wiki/` is committed and consulted at session
+   start (Karpathy-style). Are we willing to commit AI-context artifacts into the Linus repo, or treat them as
+   per-session ephemera?
+3. **Codesight on non-web Python.** The detectors are tuned for web frameworks (routes, ORMs, components). On a pure
+   numerical/scientific Python repo with no routes and no ORM, the output may be mostly the dependency graph and env
+   vars. Is that still worth the tool slot, or should we bake a science-flavored variant later?
+4. **Differentiator I could not pin down.** I can distinguish codesight from ontomics confidently, but the line between
+   codesight's wiki-mode and a vectorless/WeKnora retrieval pass is fuzzy when the source is markdown rather than code.
+   Worth comparing those three explicitly in a follow-up note before Phase 3 retrieval design lands.

@@ -70,26 +70,26 @@ schedule a Phase 3 task: download checkpoints + Pfam from Figshare, port `predic
 KnowledgeBase-linked outputs (structure → linkable to ChEMBL/PubChem if those land in KB). Keep it Study-level until the
 MPS port and reproducibility check succeed; promote to Integrate once a worker-callable tool exists.
 
-Biosecurity note: per **DEC-0047** (SAFETY.md three-tier policy, accepted 2026-05-06), DeepSeMS BGC→SMILES generation
-is explicitly classified as Tier B — explicit Dan sign-off per invocation, logged in the audit trail, not
+Biosecurity note: per **DEC-0047** (SAFETY.md three-tier policy, accepted 2026-05-06), DeepSeMS BGC→SMILES generation is
+explicitly classified as Tier B — explicit Dan sign-off per invocation, logged in the audit trail, not
 agentic-executable without approval. The Phase 3 wrapper must surface the proposed SMILES to Dan and wait for approval
 before any downstream action (e.g., KnowledgeBase indexing of the generated structure).
 
 ## 7. Questions for Dan
 
-- **Cryptic-BGC reality check.** The headline (41.1% structure recovery vs. 8.9% / 0.0% for PRISM 4 / antiSMASH 7) is
-  large enough to be either field-changing or a benchmark-construction artifact. Worth a careful read of the paper's
-  test-set design before promising a Linus tool — do you want to do that read, or have it queued for a Worker?
-- **Scope of "molecular properties" in your work.** `calculate_molecular_properties.py` covers LogP / MW / TPSA / QED /
-  SAscore via RDKit — drug-likeness flavored. Your biochemistry interest is genomic/regulatory, not drug-discovery. Is
-  downstream filtering on these properties useful to you, or is the SMILES alone the deliverable?
-- **MPS port effort budget.** Porting `predict.py` to `torch.device("mps")` is probably an afternoon (model is 50M
-  params, no custom CUDA kernels visible). Is that worth a Phase-3 spike, or hold off until the broader KnowledgeBase +
-  worker-tool plumbing is up?
-- **Pfam dependency.** Running DeepSeMS requires HMMER + Pfam-A.hmm (~1.5 GB) installed and indexed. Is bundling Pfam
-  inside KnowledgeBase acceptable, or should the BGC-prediction tool assume Pfam is a separately-managed KnowledgeBase
-  artifact?
-- **Sibling comparison priority.** Of {DeepSeMS, Bacformer, BioReason, bioSkills}, DeepSeMS is the most _packaged_
-  (paper, weights, web server, Docker, ensemble). Should it be the G9 entry that gets promoted to a Phase 3 tool first
-  as a forcing function for the whole "biology-domain Linus tool" pattern, or is one of the others a better leading
-  example?
+1. **Cryptic-BGC reality check.** The headline (41.1% structure recovery vs. 8.9% / 0.0% for PRISM 4 / antiSMASH 7) is
+   large enough to be either field-changing or a benchmark-construction artifact. Worth a careful read of the paper's
+   test-set design before promising a Linus tool — do you want to do that read, or have it queued for a Worker?
+2. **Scope of "molecular properties" in your work.** `calculate_molecular_properties.py` covers LogP / MW / TPSA / QED /
+   SAscore via RDKit — drug-likeness flavored. Your biochemistry interest is genomic/regulatory, not drug-discovery. Is
+   downstream filtering on these properties useful to you, or is the SMILES alone the deliverable?
+3. **MPS port effort budget.** Porting `predict.py` to `torch.device("mps")` is probably an afternoon (model is 50M
+   params, no custom CUDA kernels visible). Is that worth a Phase-3 spike, or hold off until the broader KnowledgeBase +
+   worker-tool plumbing is up?
+4. **Pfam dependency.** Running DeepSeMS requires HMMER + Pfam-A.hmm (~1.5 GB) installed and indexed. Is bundling Pfam
+   inside KnowledgeBase acceptable, or should the BGC-prediction tool assume Pfam is a separately-managed KnowledgeBase
+   artifact?
+5. **Sibling comparison priority.** Of {DeepSeMS, Bacformer, BioReason, bioSkills}, DeepSeMS is the most _packaged_
+   (paper, weights, web server, Docker, ensemble). Should it be the G9 entry that gets promoted to a Phase 3 tool first
+   as a forcing function for the whole "biology-domain Linus tool" pattern, or is one of the others a better leading
+   example?

@@ -36,9 +36,9 @@ matters for any vendor decision in Linus.
 
 The directly reusable pieces are conceptual rather than code-level. The **co-occurrence-window + Louvain + betweenness +
 structural-gap-detection** pipeline is exactly the "second view" Linus's KnowledgeBase needs on top of the
-RDF-and-property-graph spine from DEC-0015 — a way to look at a corpus of papers/notes and ask "what concepts
-co-occur, what communities of ideas are in here, where are the bridges, where are the gaps?" — and the algorithms are
-all standard enough that a Python re-implementation against `networkx` or `graph-tool` (or the existing Python port,
+RDF-and-property-graph spine from DEC-0015 — a way to look at a corpus of papers/notes and ask "what concepts co-occur,
+what communities of ideas are in here, where are the bridges, where are the gaps?" — and the algorithms are all standard
+enough that a Python re-implementation against `networkx` or `graph-tool` (or the existing Python port,
 `DiscourseDiversity` on GitLab) would land in a single Phase 2 or Phase 3 sprint. The five-label cognitive data model
 (`Concept`/`Statement`/`Context`/`User`/`Narrative` with `Statement` as a hyperedge) is genuinely novel prior art for
 Phase 3 hybrid retrieval — it captures provenance ("who said this where") in the graph topology itself rather than as
@@ -63,9 +63,9 @@ the SaaS layers a GPT-3 "idea generation" step on top of it that is explicitly P
 **AGPL-3.0** is the dominant constraint. Vendoring any non-trivial portion of `lib/entry.js` or `lib/db/neo4j.js` into
 Linus would force AGPL on the touching code, and AGPL's network-use clause means even a local-only Linus exposing an
 HTTP endpoint that surfaces InfraNodus-derived output is arguably a covered "use over a network." Re-implementing the
-algorithm from the WWW'19 paper avoids this. The hard Neo4j dependency is also out of scope — DEC-0015 picks a
-different graph substrate (RDF + property graph in a dual-substrate adapter, not Neo4j Community), so the Cypher in
-`lib/db/` isn't directly portable. Node.js as the runtime for an analytics module is fine in principle but adds a process boundary
+algorithm from the WWW'19 paper avoids this. The hard Neo4j dependency is also out of scope — DEC-0015 picks a different
+graph substrate (RDF + property graph in a dual-substrate adapter, not Neo4j Community), so the Cypher in `lib/db/`
+isn't directly portable. Node.js as the runtime for an analytics module is fine in principle but adds a process boundary
 Linus doesn't otherwise need; the Python port is a better starting point.
 
 ## 6. Recommendation: **Study**
@@ -79,19 +79,18 @@ against the existing KnowledgeBase store (or fork `DiscourseDiversity`), and tre
 
 ## 7. Questions for Dan
 
-- **AGPL avoidance.** The cognitive-variability _idea_ is unencumbered (it's in a published paper); the _code_ is AGPL.
-  Confirm the policy is "re-implement from the paper, never copy" — and that this also applies to the Python port on
-  GitLab, which is MIT but derives from AGPL upstream.
-- **Cognitive variability as a first-class KB metric.** Worth surfacing biased/focused/diversified/dispersed as a
-  first-class quality signal on KnowledgeBase contexts in Phase 3 (e.g., "this paper cluster is dispersed — bridge it"),
-  or is that a Phase 7 skills-layer concern after the substrate is solid?
-- **Statement-as-hyperedge in the data model.** Linus's memory architecture has episodic events that are naturally
-  hyperedges over multiple concepts. Adopt InfraNodus's `:Statement`/`:OF`/`:IN` pattern explicitly in the
-  property-graph half of DEC-0015, or stick with binary edges + reified statement nodes only when needed?
-- **Relationship to `infranodus-skills`.** That sibling repo assumes a hosted MCP server. If Linus re-implements the
-  engine locally, do we also stand up an MCP server façade so the same skill prompts work unchanged against local data,
-  or is that scope creep before Phase 3?
+1. **AGPL avoidance.** The cognitive-variability _idea_ is unencumbered (it's in a published paper); the _code_ is AGPL.
+   Confirm the policy is "re-implement from the paper, never copy" — and that this also applies to the Python port on
+   GitLab, which is MIT but derives from AGPL upstream.
+2. **Cognitive variability as a first-class KB metric.** Worth surfacing biased/focused/diversified/dispersed as a
+   first-class quality signal on KnowledgeBase contexts in Phase 3 (e.g., "this paper cluster is dispersed — bridge
+   it"), or is that a Phase 7 skills-layer concern after the substrate is solid?
+3. **Statement-as-hyperedge in the data model.** Linus's memory architecture has episodic events that are naturally
+   hyperedges over multiple concepts. Adopt InfraNodus's `:Statement`/`:OF`/`:IN` pattern explicitly in the
+   property-graph half of DEC-0015, or stick with binary edges + reified statement nodes only when needed?
+4. **Relationship to `infranodus-skills`.** That sibling repo assumes a hosted MCP server. If Linus re-implements the
+   engine locally, do we also stand up an MCP server façade so the same skill prompts work unchanged against local data,
+   or is that scope creep before Phase 3?
 
-  _Partially resolved (DEC-0018, DEC-0045): MCP adopted as extensibility substrate and fastmcp as the in-house MCP
-  framework default — a local infranodus façade would follow the same pattern when Phase 3 arrives._
-
+   _Partially resolved (DEC-0018, DEC-0045): MCP adopted as extensibility substrate and fastmcp as the in-house MCP
+   framework default — a local infranodus façade would follow the same pattern when Phase 3 arrives._

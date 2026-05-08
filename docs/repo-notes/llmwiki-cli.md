@@ -70,17 +70,17 @@ real need for a separate "personal notes wiki" distinct from the paper-corpus Kn
 
 ## 7. Questions for Dan
 
-- **Tool-surface minimalism for KB.** llmwiki-cli's full agent surface is ~14 commands, two of which (`read`, `write`)
-  do most of the work. Is that the right ceiling for the Phase 2 KnowledgeBase tool registry, or do you expect Linus
-  tools to be richer (chunked retrieval, citation, structured-query) from day one?
-- **Full-rewrite vs patch semantics.** The "always rewrite the full page from JSON" contract trades efficiency for agent
-  reliability. For KnowledgeBase paper summaries this is probably fine; for synthesis notes that grow over time it gets
-  expensive. Want Linus's KB write tool to follow this contract or support an append/patch variant?
-- **Personal wiki as a separate pillar.** Is there a Dan-personal-notes wiki use case that should be served by
-  `llmwiki-cli` as a third-party tool alongside KnowledgeBase, or does everything funnel through the KnowledgeBase
-  pillar?
-- **Karpathy-pattern convergence.** With eleven implementations of the same idea in `repos/`, do you want a single
-  Maestro-authored synthesis ADR that picks one shape (this CLI, llmwiki's full stack, swarmvault's monorepo, a
-  workflow-pattern from Group 3) as the Linus reference, or stay agnostic until Phase 2a forces a choice?
-- **d3-force graph viz.** The interactive graph is the most user-visible artifact in this repo. Worth extracting as a
-  standalone KnowledgeBase visualization in Phase 2, or noise relative to Streamlit + future openclaw front-ends?
+1. **Tool-surface minimalism for KB.** llmwiki-cli's full agent surface is ~14 commands, two of which (`read`, `write`)
+   do most of the work. Is that the right ceiling for the Phase 2 KnowledgeBase tool registry, or do you expect Linus
+   tools to be richer (chunked retrieval, citation, structured-query) from day one?
+2. **Full-rewrite vs patch semantics.** The "always rewrite the full page from JSON" contract trades efficiency for
+   agent reliability. For KnowledgeBase paper summaries this is probably fine; for synthesis notes that grow over time
+   it gets expensive. Want Linus's KB write tool to follow this contract or support an append/patch variant?
+3. **Personal wiki as a separate pillar.** Is there a Dan-personal-notes wiki use case that should be served by
+   `llmwiki-cli` as a third-party tool alongside KnowledgeBase, or does everything funnel through the KnowledgeBase
+   pillar?
+4. **Karpathy-pattern convergence.** With eleven implementations of the same idea in `repos/`, do you want a single
+   Maestro-authored synthesis ADR that picks one shape (this CLI, llmwiki's full stack, swarmvault's monorepo, a
+   workflow-pattern from Group 3) as the Linus reference, or stay agnostic until Phase 2a forces a choice?
+5. **d3-force graph viz.** The interactive graph is the most user-visible artifact in this repo. Worth extracting as a
+   standalone KnowledgeBase visualization in Phase 2, or noise relative to Streamlit + future openclaw front-ends?

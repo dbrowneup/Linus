@@ -82,10 +82,10 @@ string) is the right shape for Linus's KB tools, or whether a native Linus tool 
 
 ## 7. Questions for Dan
 
-- **KB graph schema parity.** Keppi's edge types are vault-author-shaped (`wikilink`, `embed`, `related_to`,
-  `tag_overlap`, `folder_proximity`). The KnowledgeBase corpus is paper-shaped (`cites`, `cited_by`, `co_author`,
-  `shared_topic`, `shared_doi`). Should we define the Phase 2 KB edge schema explicitly before borrowing Keppi's
-  weighting scheme, or pick weights empirically once the graph is built?
-- **Hybrid retrieval order.** Keppi's MCP server hard-codes `semantic_search → keyword_search → graph traversal`. For
-  paper retrieval the natural order may invert (citation-graph expansion from a known paper, then semantic re-rank). Do
-  we want a single canonical retrieval recipe in Phase 3, or pluggable strategies per task type?
+1. **KB graph schema parity.** Keppi's edge types are vault-author-shaped (`wikilink`, `embed`, `related_to`,
+   `tag_overlap`, `folder_proximity`). The KnowledgeBase corpus is paper-shaped (`cites`, `cited_by`, `co_author`,
+   `shared_topic`, `shared_doi`). Should we define the Phase 2 KB edge schema explicitly before borrowing Keppi's
+   weighting scheme, or pick weights empirically once the graph is built?
+2. **Hybrid retrieval order.** Keppi's MCP server hard-codes `semantic_search → keyword_search → graph traversal`. For
+   paper retrieval the natural order may invert (citation-graph expansion from a known paper, then semantic re-rank). Do
+   we want a single canonical retrieval recipe in Phase 3, or pluggable strategies per task type?

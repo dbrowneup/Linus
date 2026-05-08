@@ -67,12 +67,12 @@ write our own in `.github/workflows/` rather than vendor or fork this repo.
 
 ## 7. Questions for Dan
 
-- **Auto-ADR cron.** The `auto-document-agent.md` pattern (run `git diff main` on a branch, emit an ADR if the change is
-  architectural) would pair well with this repo's own DEC-NNNN discipline. Worth a small Phase 1c experiment to bolt
-  onto our existing `.claude/settings.json` hooks, or premature?
-- **Self-updating CLAUDE.md.** Would you want the weekly cron to keep CLAUDE.md honest against the repo, given how often
-  we are amending it as the architecture decisions land? The risk is that an automated PR overwrites the careful prose
-  style for a more mechanical bullet-style summary.
-- **Obsidian playbook relevance.** Do you maintain (or plan to maintain) an Obsidian vault for `context/notes/` or the
-  paper corpus? If yes, the `vault_connectivity_agent.md` and `transcript_processing_agent.md` prompts are concretely
-  useful; if no, the entire `obisidian-knowledge-graph/` subdirectory is dead weight for Linus's purposes.
+1. **Auto-ADR cron.** The `auto-document-agent.md` pattern (run `git diff main` on a branch, emit an ADR if the change
+   is architectural) would pair well with this repo's own DEC-NNNN discipline. Worth a small Phase 1c experiment to bolt
+   onto our existing `.claude/settings.json` hooks, or premature?
+2. **Self-updating CLAUDE.md.** Would you want the weekly cron to keep CLAUDE.md honest against the repo, given how
+   often we are amending it as the architecture decisions land? The risk is that an automated PR overwrites the careful
+   prose style for a more mechanical bullet-style summary.
+3. **Obsidian playbook relevance.** Do you maintain (or plan to maintain) an Obsidian vault for `context/notes/` or the
+   paper corpus? If yes, the `vault_connectivity_agent.md` and `transcript_processing_agent.md` prompts are concretely
+   useful; if no, the entire `obisidian-knowledge-graph/` subdirectory is dead weight for Linus's purposes.

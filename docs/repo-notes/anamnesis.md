@@ -82,22 +82,22 @@ stack except to sanity-check behaviour against a small seeded bank.
 
 ## 7. Questions for Dan
 
-- **Strategic envelope columns on the DEC-0029 schema.** Anamnesis's `reasoning`, `authority`, `confidence`,
-  `decay_condition`, `supersedes`, `depends_on` are mostly orthogonal to DEC-0030's two-segment record. Worth adding any
-  of them to the `~/.linus/episodic.db` schema before Phase 2a starts writing migrations, or defer until use cases
-  demand them?
-- **4D recall over SQLite.** The RRF-fused four-channel retrieval is implementable on sqlite-vec + FTS5 + a recency
-  index + a small entity table without leaving SQLite. Is this a Phase 2 v1 target, a Phase 3 enhancement, or out of
-  scope until a real retrieval-quality complaint surfaces?
-- **Authority caps for Worker-generated memories.** Linus's Worker fan-out will write mostly `inferred`-authority
-  records. Anamnesis caps these at 1.0 (initial) / 4.0 (reweighted) to prevent agent noise drowning user-stated facts.
-  Is that discipline the right default for Linus's episodic store, or does it need different calibration when the writes
-  are mostly automated?
-- **`reflect` as a Linus primitive.** Anamnesis distinguishes `recall` (retrieval) from `reflect` (LLM-synthesised
-  directives over mission + directives + top memories). DEC-0031's `memory_mode` router primitive is closer to `recall`.
-  Worth adding a separate `reflect`-style operation for boot-time strategic briefing, or is the dispatch-layer prefix
-  loader sufficient?
-- **Single sibling worth comparing in depth.** This group has eight implementations. Anamnesis sits at the heaviest
-  substrate end; `agentmemory` is plausibly at the SQLite-native end most aligned with DEC-0029. Want me to flag this
-  comparison explicitly in the `agentmemory` note when it's written, or do the eight notes plus a synthesis pass at the
-  end?
+1. **Strategic envelope columns on the DEC-0029 schema.** Anamnesis's `reasoning`, `authority`, `confidence`,
+   `decay_condition`, `supersedes`, `depends_on` are mostly orthogonal to DEC-0030's two-segment record. Worth adding
+   any of them to the `~/.linus/episodic.db` schema before Phase 2a starts writing migrations, or defer until use cases
+   demand them?
+2. **4D recall over SQLite.** The RRF-fused four-channel retrieval is implementable on sqlite-vec + FTS5 + a recency
+   index + a small entity table without leaving SQLite. Is this a Phase 2 v1 target, a Phase 3 enhancement, or out of
+   scope until a real retrieval-quality complaint surfaces?
+3. **Authority caps for Worker-generated memories.** Linus's Worker fan-out will write mostly `inferred`-authority
+   records. Anamnesis caps these at 1.0 (initial) / 4.0 (reweighted) to prevent agent noise drowning user-stated facts.
+   Is that discipline the right default for Linus's episodic store, or does it need different calibration when the
+   writes are mostly automated?
+4. **`reflect` as a Linus primitive.** Anamnesis distinguishes `recall` (retrieval) from `reflect` (LLM-synthesised
+   directives over mission + directives + top memories). DEC-0031's `memory_mode` router primitive is closer to
+   `recall`. Worth adding a separate `reflect`-style operation for boot-time strategic briefing, or is the
+   dispatch-layer prefix loader sufficient?
+5. **Single sibling worth comparing in depth.** This group has eight implementations. Anamnesis sits at the heaviest
+   substrate end; `agentmemory` is plausibly at the SQLite-native end most aligned with DEC-0029. Want me to flag this
+   comparison explicitly in the `agentmemory` note when it's written, or do the eight notes plus a synthesis pass at the
+   end?

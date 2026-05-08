@@ -88,18 +88,18 @@ the assistant-development workflow (vs the chat workflow openclaw covers) clearl
 
 ## 7. Questions for Dan
 
-- **Assistant-as-HTTP-service or assistant-as-in-process?** Semanticworkbench commits hard to the first; pmetal's
-  `pmetal-mcp` and Linus's current assumed shape lean toward in-process tool calls plus an OpenAI-compatible serving
-  endpoint. Is the right Phase 2a model a hybrid — Workers run in-process, but the orchestrator exposes an HTTP
-  registration surface so external services (a future Linus fine-tune on a Mac Studio, or a Worker on the Vision Pro)
-  can register the same way?
-- **Multi-participant conversations vs fan-out-and-collect.** The workbench treats N assistants in one conversation as
-  peers that the user @-mentions; Linus today implies a Maestro-orchestrated fan-out. Is the multi-participant peer
-  model interesting for any specific workflow (paper review, debate-style synthesis), or is fan-out enough through Phase
-  3?
-- **Frontend posture.** This repo is the strongest argument I've seen that an assistant-development UI is a separate
-  artifact from a chat UI. Streamlit for Phase 2 and openclaw for Phase 5 cover the chat side; do you want a Phase 5+
-  assistant-dev surface (skill authoring, prompt iteration, conversation replay), or is that always Claude Code +
-  files-on-disk?
-- **Pydantic config that auto-renders UI.** Worth lifting for Phase 7 skill definitions — declare once, get both
-  validation and a form. Adopt that pattern in the Linus tool registry, or stay closer to MCP's tool-schema convention?
+1. **Assistant-as-HTTP-service or assistant-as-in-process?** Semanticworkbench commits hard to the first; pmetal's
+   `pmetal-mcp` and Linus's current assumed shape lean toward in-process tool calls plus an OpenAI-compatible serving
+   endpoint. Is the right Phase 2a model a hybrid — Workers run in-process, but the orchestrator exposes an HTTP
+   registration surface so external services (a future Linus fine-tune on a Mac Studio, or a Worker on the Vision Pro)
+   can register the same way?
+2. **Multi-participant conversations vs fan-out-and-collect.** The workbench treats N assistants in one conversation as
+   peers that the user @-mentions; Linus today implies a Maestro-orchestrated fan-out. Is the multi-participant peer
+   model interesting for any specific workflow (paper review, debate-style synthesis), or is fan-out enough through
+   Phase 3?
+3. **Frontend posture.** This repo is the strongest argument I've seen that an assistant-development UI is a separate
+   artifact from a chat UI. Streamlit for Phase 2 and openclaw for Phase 5 cover the chat side; do you want a Phase 5+
+   assistant-dev surface (skill authoring, prompt iteration, conversation replay), or is that always Claude Code +
+   files-on-disk?
+4. **Pydantic config that auto-renders UI.** Worth lifting for Phase 7 skill definitions — declare once, get both
+   validation and a form. Adopt that pattern in the Linus tool registry, or stay closer to MCP's tool-schema convention?

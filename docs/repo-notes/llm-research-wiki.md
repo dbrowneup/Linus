@@ -79,19 +79,19 @@ done its job for Linus.
 
 ## 7. Questions for Dan
 
-- **Page-type translation.** The six humanities page-types map to biochemistry roughly as paper / pathway-or-protein /
-  author / contested-mechanism / synthesis / project. Is that the right mapping, or do you want a separate page-type for
-  **method/protocol** (which Paulo treats as a lighter sibling of concept, but in wet-lab work is arguably the central
-  artifact)?
-- **Cascade vs. embeddings.** The cluster→synthesis→`related:` cascade is an embedding-free way to keep query cost
-  bounded. KnowledgeBase already has a Qdrant vector store. Run both in parallel with the cascade as the navigation
-  surface and embeddings as fallback for unknown terms, or pick one?
-- **LINT autonomy.** Paulo's schema says "never auto-fix." For a 1000+ paper corpus, mechanical fixes (arXiv-vs-
-  published dedup, author-name normalization, DOI canonicalization) are the bulk of the work. Want a `--apply` mode
-  behind a confirmation, or strictly report-only like the original?
-- **Domain-context block.** Paulo's `CLAUDE.md` ends with a named list of his thinkers, concepts, and debates that the
-  agent uses for cross-referencing. Do you want to author the equivalent for your research areas now, or have Linus
-  extract it from the first 20–30 ingested papers and propose it back?
-- **Differentiator confidence.** I can distinguish llm-research-wiki from AgenticResearchWiki and atomic-knowledge on
-  workflow framing (reading vs. training-ops vs. platform-neutral protocol). Is that distinction the one you'd draw, or
-  do you read the three siblings differently after seeing them in practice?
+1. **Page-type translation.** The six humanities page-types map to biochemistry roughly as paper / pathway-or-protein /
+   author / contested-mechanism / synthesis / project. Is that the right mapping, or do you want a separate page-type
+   for **method/protocol** (which Paulo treats as a lighter sibling of concept, but in wet-lab work is arguably the
+   central artifact)?
+2. **Cascade vs. embeddings.** The cluster→synthesis→`related:` cascade is an embedding-free way to keep query cost
+   bounded. KnowledgeBase already has a Qdrant vector store. Run both in parallel with the cascade as the navigation
+   surface and embeddings as fallback for unknown terms, or pick one?
+3. **LINT autonomy.** Paulo's schema says "never auto-fix." For a 1000+ paper corpus, mechanical fixes (arXiv-vs-
+   published dedup, author-name normalization, DOI canonicalization) are the bulk of the work. Want a `--apply` mode
+   behind a confirmation, or strictly report-only like the original?
+4. **Domain-context block.** Paulo's `CLAUDE.md` ends with a named list of his thinkers, concepts, and debates that the
+   agent uses for cross-referencing. Do you want to author the equivalent for your research areas now, or have Linus
+   extract it from the first 20–30 ingested papers and propose it back?
+5. **Differentiator confidence.** I can distinguish llm-research-wiki from AgenticResearchWiki and atomic-knowledge on
+   workflow framing (reading vs. training-ops vs. platform-neutral protocol). Is that distinction the one you'd draw, or
+   do you read the three siblings differently after seeing them in practice?

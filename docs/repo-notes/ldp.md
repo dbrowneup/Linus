@@ -88,20 +88,20 @@ of the paper-qa retrieval layer; the recommendation here is consistent with that
 
 ## 7. Questions for Dan
 
-- **Adopt the `(action, state, value)` contract for Linus Workers?** The shape is clean and gives us value-estimate
-  optionality for free. Cost is a small departure from the bare OpenAI chat-completions shape that Cline and openclaw
-  send today. Worth standardizing in Phase 2a, or leave it as Phase 3 work?
-- **MemoryAgent + MemoryOpt as Phase 3's first multi-agent template.** A KnowledgeBase-backed agent that records its own
-  successful trajectories and retrieves them on future invocations is exactly the "learn-from-use" loop you've sketched.
-  Is this the right first agent to build, or do you want a simpler ReAct-over-KnowledgeBase as the v1?
-- **Pair ldp with aviary, or unify behind a single Linus-native abstraction?** Both are FutureHouse, both are Apache,
-  but they are two packages with two install footprints. Phase 2 could vendor the parts we need into `src/linus/agents/`
-  and skip the dependency. Acceptable, or worth the dep? _Partially resolved (DEC-0044, see
-  [answered-questions.md](../questions/answered-questions.md)): paper-qa adopted as Phase 2c engine without requiring
-  ldp or aviary; revisit ldp/aviary only if Phase 6 fine-tunes a domain-specific tool-selection policy._
-- **SCG: yes or no for Phase 6.** The SCG buys gradient flow through the agent for end-to-end training. It also buys ~1k
-  lines of compute-graph machinery to maintain. Do you anticipate Phase 6 doing gradient-based agent training (in which
-  case SCG earns its keep), or is Phase 6 scoped to LoRA-on-trajectories (in which case SCG is pure overhead)?
-- **fhlmi vs. direct Ollama/pmetal-serve clients.** fhlmi is yet another LiteLLM wrapper. Linus will already have
-  OpenAI-compatible clients for its own backends. Worth taking on fhlmi as the shared LLM-interface layer (and
-  inheriting its caching, retries, embedding API), or build a thin Linus-native client and skip it?
+1. **Adopt the `(action, state, value)` contract for Linus Workers?** The shape is clean and gives us value-estimate
+   optionality for free. Cost is a small departure from the bare OpenAI chat-completions shape that Cline and openclaw
+   send today. Worth standardizing in Phase 2a, or leave it as Phase 3 work?
+2. **MemoryAgent + MemoryOpt as Phase 3's first multi-agent template.** A KnowledgeBase-backed agent that records its
+   own successful trajectories and retrieves them on future invocations is exactly the "learn-from-use" loop you've
+   sketched. Is this the right first agent to build, or do you want a simpler ReAct-over-KnowledgeBase as the v1?
+3. **Pair ldp with aviary, or unify behind a single Linus-native abstraction?** Both are FutureHouse, both are Apache,
+   but they are two packages with two install footprints. Phase 2 could vendor the parts we need into
+   `src/linus/agents/` and skip the dependency. Acceptable, or worth the dep? _Partially resolved (DEC-0044, see
+   [answered-questions.md](../questions/answered-questions.md)): paper-qa adopted as Phase 2c engine without requiring
+   ldp or aviary; revisit ldp/aviary only if Phase 6 fine-tunes a domain-specific tool-selection policy._
+4. **SCG: yes or no for Phase 6.** The SCG buys gradient flow through the agent for end-to-end training. It also buys
+   ~1k lines of compute-graph machinery to maintain. Do you anticipate Phase 6 doing gradient-based agent training (in
+   which case SCG earns its keep), or is Phase 6 scoped to LoRA-on-trajectories (in which case SCG is pure overhead)?
+5. **fhlmi vs. direct Ollama/pmetal-serve clients.** fhlmi is yet another LiteLLM wrapper. Linus will already have
+   OpenAI-compatible clients for its own backends. Worth taking on fhlmi as the shared LLM-interface layer (and
+   inheriting its caching, retries, embedding API), or build a thin Linus-native client and skip it?

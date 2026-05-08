@@ -70,24 +70,23 @@ Optionally, copy the two pure-prompt skills (`critical-perspective`, `cognitive-
 for personal use during Maestro work — they're harmless prompt content and the variability framework is genuinely
 interesting. Do not adopt the InfraNodus-MCP-dependent skills inside Linus until and unless an InfraNodus-equivalent (or
 InfraNodus-compatible) graph backend can be self-hosted on Apple Silicon — which is a non-trivial build, not a checkbox.
-Revisit during Phase 7 if a local text-network-analysis component lands as part of the Phase 2 KB graph work
-(DEC-0015).
+Revisit during Phase 7 if a local text-network-analysis component lands as part of the Phase 2 KB graph work (DEC-0015).
 
 ## 7. Questions for Dan
 
-- **Skills format as the Phase 7 contract.** Both this repo and `OmegaWiki` use the Anthropic SKILL.md format with
-  frontmatter `name`/`description`/optional `allowed-tools`. Should Linus commit to that exact format for its Phase 7
-  domain skills, or define a Linus-specific superset (e.g., adding hardware/budget hints, mandatory smoke-test stubs)?
-- **Cognitive-variability framework — useful or noise?** The four-state model (biased/focused/diversified/dispersed)
-  maps interestingly onto Maestro/Worker review loops: a Worker stuck in BIASED could be nudged toward DIVERSIFIED by
-  loading `critical-perspective`. Worth a Phase 1e experiment, or filed under "interesting but not load-bearing"?
-- **Self-hostable text-network analysis.** If we want the MCP-dependent skills to work standalone, we'd need to
-  reimplement InfraNodus's modularity/centrality/gap-detection over our own KB graph (Phase 2 DEC-0015 surface).
-  That's a meaningful build. Worth scoping into Phase 3, or accept that this repo stays study-only?
-- **OmegaWiki comparison.** [`OmegaWiki.md`](OmegaWiki.md) now exists in `docs/repo-notes/` — a head-to-head between
-  the two skill collections (this repo's 15 InfraNodus-flavored skills vs OmegaWiki's 24 wiki-curation skills) is worth
-  doing when Phase 7 design starts.
-- **`llm-wiki` skill vs Karpathy's autoresearch.** The `llm-wiki` skill operationalizes Karpathy's LLM Wiki proposal as
-  a setup workflow, which is a near-cousin of the autoresearch loop already cloned in `repos/autoresearch/`. Is there
-  appetite to consolidate these into a single Linus "build a wiki from your sources" skill backed by KnowledgeBase, or
-  do they stay separate study artifacts?
+1. **Skills format as the Phase 7 contract.** Both this repo and `OmegaWiki` use the Anthropic SKILL.md format with
+   frontmatter `name`/`description`/optional `allowed-tools`. Should Linus commit to that exact format for its Phase 7
+   domain skills, or define a Linus-specific superset (e.g., adding hardware/budget hints, mandatory smoke-test stubs)?
+2. **Cognitive-variability framework — useful or noise?** The four-state model (biased/focused/diversified/dispersed)
+   maps interestingly onto Maestro/Worker review loops: a Worker stuck in BIASED could be nudged toward DIVERSIFIED by
+   loading `critical-perspective`. Worth a Phase 1e experiment, or filed under "interesting but not load-bearing"?
+3. **Self-hostable text-network analysis.** If we want the MCP-dependent skills to work standalone, we'd need to
+   reimplement InfraNodus's modularity/centrality/gap-detection over our own KB graph (Phase 2 DEC-0015 surface). That's
+   a meaningful build. Worth scoping into Phase 3, or accept that this repo stays study-only?
+4. **OmegaWiki comparison.** [`OmegaWiki.md`](OmegaWiki.md) now exists in `docs/repo-notes/` — a head-to-head between
+   the two skill collections (this repo's 15 InfraNodus-flavored skills vs OmegaWiki's 24 wiki-curation skills) is worth
+   doing when Phase 7 design starts.
+5. **`llm-wiki` skill vs Karpathy's autoresearch.** The `llm-wiki` skill operationalizes Karpathy's LLM Wiki proposal as
+   a setup workflow, which is a near-cousin of the autoresearch loop already cloned in `repos/autoresearch/`. Is there
+   appetite to consolidate these into a single Linus "build a wiki from your sources" skill backed by KnowledgeBase, or
+   do they stay separate study artifacts?

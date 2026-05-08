@@ -80,17 +80,17 @@ noticeably under active edit, fall back to grep + LSP and revisit when codesight
 
 ## 7. Questions for Dan
 
-- **MCP-as-substrate decision timing.** Cline, openclaw, pmetal, and ontomics all speak MCP. Adopting ontomics in Phase
-  2a effectively forces Linus to stand up an MCP client/registry earlier than ROADMAP currently has it. Do we want to
-  pull that decision forward to Phase 2a explicitly, or run ontomics out-of-band (registered per-front-end) until Phase
-  3?
-- **Benchmark on a real Dan project.** The README's 20× claim is on voxelmorph and ScribblePrompt — clean ML repos.
-  Should the Phase 1 benchmark suite include an "ontomics on KnowledgeBase" test (Python, mixed domain) to confirm the
-  ratio holds on something messier?
-- **Behavioral clustering on bioinformatics code.** CodeRankEmbed was trained on general code; how well does it cluster
-  numerical/bioinformatics function bodies (lots of array math, similar shapes, different intents)? Worth a quick
-  ablation before committing.
-- **Sibling comparison gap.** This note can't yet differentiate ontomics from codesight beyond the README pitch. Do you
-  want me to write the codesight note next so the head-to-head decision is made on facts rather than marketing?
-- **Domain-pack export as a Linus artifact.** ontomics's YAML `export_domain_pack` could be checked into Dan's projects
-  as a portable convention spec. Is that a workflow you'd actually use, or is it a "neat feature, never opened" risk?
+1. **MCP-as-substrate decision timing.** Cline, openclaw, pmetal, and ontomics all speak MCP. Adopting ontomics in Phase
+   2a effectively forces Linus to stand up an MCP client/registry earlier than ROADMAP currently has it. Do we want to
+   pull that decision forward to Phase 2a explicitly, or run ontomics out-of-band (registered per-front-end) until Phase
+   3?
+2. **Benchmark on a real Dan project.** The README's 20× claim is on voxelmorph and ScribblePrompt — clean ML repos.
+   Should the Phase 1 benchmark suite include an "ontomics on KnowledgeBase" test (Python, mixed domain) to confirm the
+   ratio holds on something messier?
+3. **Behavioral clustering on bioinformatics code.** CodeRankEmbed was trained on general code; how well does it cluster
+   numerical/bioinformatics function bodies (lots of array math, similar shapes, different intents)? Worth a quick
+   ablation before committing.
+4. **Sibling comparison gap.** This note can't yet differentiate ontomics from codesight beyond the README pitch. Do you
+   want me to write the codesight note next so the head-to-head decision is made on facts rather than marketing?
+5. **Domain-pack export as a Linus artifact.** ontomics's YAML `export_domain_pack` could be checked into Dan's projects
+   as a portable convention spec. Is that a workflow you'd actually use, or is it a "neat feature, never opened" risk?

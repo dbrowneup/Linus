@@ -52,7 +52,7 @@ Rust agent harness can be.
 
 ## 7. Questions for Dan
 
-- **ACP/Zed as a Linus surface.** claw-code's ACP ambitions overlap with any future Linus-in-Zed idea. Not a
-  2026-current path, but worth flagging if you care about the Zed ecosystem.
-- **Read `PHILOSOPHY.md` now or defer?** It's short; likely contains framing worth lifting into Linus's own docs if
-  relevant. I can pull excerpts into VISION.md if useful.
+1. **ACP/Zed as a Linus surface.** claw-code's ACP ambitions overlap with any future Linus-in-Zed idea. Not a
+   2026-current path, but worth flagging if you care about the Zed ecosystem.
+2. **Read `PHILOSOPHY.md` now or defer?** It's short; likely contains framing worth lifting into Linus's own docs if
+   relevant. I can pull excerpts into VISION.md if useful.

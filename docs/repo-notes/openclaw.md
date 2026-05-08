@@ -57,16 +57,17 @@ and upgrade manually. Keep Linus's skills under `src/linus/skills/*/SKILL.md` an
 
 ## 7. Questions for Dan
 
-- **Which openclaw surfaces actually matter?** Full channel sprawl isn't the goal. A reasonable minimum is macOS menu
-  bar + voice wake + Canvas + WebChat; iOS node if you want phone access. Am I reading your priorities right, or do you
-  want any specific messenger channel wired up?
-- **Voice wake as a Phase 5 feature.** openclaw supports macOS/iOS voice wake and Android continuous voice. Is voice a
-  Phase 5 requirement, or defer to Phase 8 native app? Voice changes the usability story substantially.
-- **Canvas as a KnowledgeBase surface.** openclaw's Canvas is agent-driven visual workspace. Plausible Phase 5
-  experiment: have Linus render paper clusters, cluster labels, or knowledge-graph subgraphs in Canvas. Is that the kind
-  of interaction you want, or is text/Streamlit sufficient?
-- **Skill symlink strategy.** Keeping Linus skills in `src/linus/ skills/` and symlinking into openclaw's workspace is
-  one option; copying is another; putting skills only in openclaw and having Linus read from openclaw's workspace is a
-  third. Preference?
-- **Private-API / local-model first-class support.** openclaw's model config assumes a subscription. Confirming it works
-  cleanly against an OpenAI-compat local endpoint with no rate-limit drama is a Phase 5 smoke-test worth budgeting for.
+1. **Which openclaw surfaces actually matter?** Full channel sprawl isn't the goal. A reasonable minimum is macOS menu
+   bar + voice wake + Canvas + WebChat; iOS node if you want phone access. Am I reading your priorities right, or do you
+   want any specific messenger channel wired up?
+2. **Voice wake as a Phase 5 feature.** openclaw supports macOS/iOS voice wake and Android continuous voice. Is voice a
+   Phase 5 requirement, or defer to Phase 8 native app? Voice changes the usability story substantially.
+3. **Canvas as a KnowledgeBase surface.** openclaw's Canvas is agent-driven visual workspace. Plausible Phase 5
+   experiment: have Linus render paper clusters, cluster labels, or knowledge-graph subgraphs in Canvas. Is that the
+   kind of interaction you want, or is text/Streamlit sufficient?
+4. **Skill symlink strategy.** Keeping Linus skills in `src/linus/ skills/` and symlinking into openclaw's workspace is
+   one option; copying is another; putting skills only in openclaw and having Linus read from openclaw's workspace is a
+   third. Preference?
+5. **Private-API / local-model first-class support.** openclaw's model config assumes a subscription. Confirming it
+   works cleanly against an OpenAI-compat local endpoint with no rate-limit drama is a Phase 5 smoke-test worth
+   budgeting for.

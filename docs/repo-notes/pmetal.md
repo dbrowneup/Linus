@@ -62,18 +62,18 @@ If it wobbles, fall back to Ollama + mlx-lm-ft and revisit pmetal at a later rel
 
 ## 7. Questions for Dan
 
-- **Scope of Phase 1b.** The roadmap calls for a 5-concurrent throughput test; is that the right concurrency target, or
-  would single-request tok/s + memory-footprint be enough to make the adopt/defer call?
-- **Feature-flag strategy.** Default pmetal build includes ANE + MLX + serve + Trainer + data + distill — about 15 
-  active features on the critical path. Do we build the full default for Phase 1b and let compile times hurt, or strip
-  to `--features serve` for the first pass and layer training in when Phase 6 approaches?
-- **pmetal-mcp as Linus's tool registry path.** pmetal already ships 45 tools via MCP. Is that a serious candidate for
-  the Phase 2a tool registry (Linus wraps pmetal-mcp + adds KnowledgeBase tools), or should Linus own tool definitions
-  entirely and pmetal-mcp is study material?
-  _Partially resolved (DEC-0045, see [answered-questions.md](../questions/answered-questions.md)): Linus owns in-house
-  tool definitions via fastmcp; pmetal-mcp consumed as external server, not the registry foundation._
-- **Dependency risk.** pmetal is one developer's project. It's impressive and signed, but single-maintainer risk is
-  real. If adopted deeply, what's the fallback plan — pin a commit and accept no updates, or maintain readiness to
-  migrate to mlx-lm + Ollama if pmetal goes stale?
-- **Manifold-Constrained Hyper-Connections (`pmetal-mhc`).** This maps directly onto the JPmHC paper (`2602.18308`) in
-  the context folder. Are you interested in running mhc as a Phase 6 training experiment, or does it stay a curiosity?
+1. **Scope of Phase 1b.** The roadmap calls for a 5-concurrent throughput test; is that the right concurrency target, or
+   would single-request tok/s + memory-footprint be enough to make the adopt/defer call?
+2. **Feature-flag strategy.** Default pmetal build includes ANE + MLX + serve + Trainer + data + distill — about 15
+   active features on the critical path. Do we build the full default for Phase 1b and let compile times hurt, or strip
+   to `--features serve` for the first pass and layer training in when Phase 6 approaches?
+3. **pmetal-mcp as Linus's tool registry path.** pmetal already ships 45 tools via MCP. Is that a serious candidate for
+   the Phase 2a tool registry (Linus wraps pmetal-mcp + adds KnowledgeBase tools), or should Linus own tool definitions
+   entirely and pmetal-mcp is study material? _Partially resolved (DEC-0045, see
+   [answered-questions.md](../questions/answered-questions.md)): Linus owns in-house tool definitions via fastmcp;
+   pmetal-mcp consumed as external server, not the registry foundation._
+4. **Dependency risk.** pmetal is one developer's project. It's impressive and signed, but single-maintainer risk is
+   real. If adopted deeply, what's the fallback plan — pin a commit and accept no updates, or maintain readiness to
+   migrate to mlx-lm + Ollama if pmetal goes stale?
+5. **Manifold-Constrained Hyper-Connections (`pmetal-mhc`).** This maps directly onto the JPmHC paper (`2602.18308`) in
+   the context folder. Are you interested in running mhc as a Phase 6 training experiment, or does it stay a curiosity?

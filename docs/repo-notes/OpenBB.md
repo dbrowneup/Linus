@@ -100,20 +100,20 @@ curated extras set. The AGPL question doesn't bite until Phase 8.
 
 ## 7. Questions for Dan
 
-- **AGPL stance.** Are you comfortable with AGPL-licensed components inside Linus during Phases 2–7 (personal use, no
-  network exposure to others), with the explicit ADR that Phase 8 multi-user scenarios trigger a re-architecture to a
-  process-boundary call or a license replacement? Or do you want a hard "permissive-only" rule from the start?
-- **Provider key budget.** The free-tier providers (yfinance, SEC, FRED, federal_reserve, ECB, OECD, IMF, BLS) cover
-  macro, equity historicals, and filings. Paid providers (FMP, Intrinio, Tiingo) add fundamentals depth, real-time
-  quotes, and broader coverage. Are you planning to subscribe to any, or should the Phase 7 skill be scoped to the free
-  set?
-- **MCP-first or SDK-first.** Two integration paths: (a) `openbb-mcp` runs as its own local daemon and Linus tools are
-  MCP-discovered; (b) Linus imports `openbb` directly and exposes hand-picked endpoints as Linus-native tools. Path (a)
-  is cleaner architecturally and aligns with the openclaw / cline MCP question; path (b) gives tighter control and
-  avoids running an extra process. Preference?
-- **Pairing with nixtla.** The natural workflow is OpenBB pulls the series, nixtla forecasts. Worth specing a small
-  end-to-end Phase 7 demo task ("forecast next 30 days of AAPL close with confidence intervals") that exercises both as
-  one combined skill?
-- **Adjacent vs core.** You've said finance is "useful adjacent capability," not core. Should this skill ride along with
-  the same Phase 7 sandbox tier as scientific tools, or sit in a more restricted tier given that financial workflows can
-  shade into trading-decision territory you may not want a worker model recommending on?
+1. **AGPL stance.** Are you comfortable with AGPL-licensed components inside Linus during Phases 2–7 (personal use, no
+   network exposure to others), with the explicit ADR that Phase 8 multi-user scenarios trigger a re-architecture to a
+   process-boundary call or a license replacement? Or do you want a hard "permissive-only" rule from the start?
+2. **Provider key budget.** The free-tier providers (yfinance, SEC, FRED, federal_reserve, ECB, OECD, IMF, BLS) cover
+   macro, equity historicals, and filings. Paid providers (FMP, Intrinio, Tiingo) add fundamentals depth, real-time
+   quotes, and broader coverage. Are you planning to subscribe to any, or should the Phase 7 skill be scoped to the free
+   set?
+3. **MCP-first or SDK-first.** Two integration paths: (a) `openbb-mcp` runs as its own local daemon and Linus tools are
+   MCP-discovered; (b) Linus imports `openbb` directly and exposes hand-picked endpoints as Linus-native tools. Path (a)
+   is cleaner architecturally and aligns with the openclaw / cline MCP question; path (b) gives tighter control and
+   avoids running an extra process. Preference?
+4. **Pairing with nixtla.** The natural workflow is OpenBB pulls the series, nixtla forecasts. Worth specing a small
+   end-to-end Phase 7 demo task ("forecast next 30 days of AAPL close with confidence intervals") that exercises both as
+   one combined skill?
+5. **Adjacent vs core.** You've said finance is "useful adjacent capability," not core. Should this skill ride along
+   with the same Phase 7 sandbox tier as scientific tools, or sit in a more restricted tier given that financial
+   workflows can shade into trading-decision territory you may not want a worker model recommending on?

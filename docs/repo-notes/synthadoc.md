@@ -89,19 +89,19 @@ template for the audit/queue/scheduler/cost layer specifically.
 
 ## 7. Questions for Dan
 
-- **AGPL boundary.** Synthadoc's engine is AGPL-3.0 with Apache-2.0 only on the `BaseSkill` and `LLMProvider` extension
-  classes. Are you comfortable with "read and reimplement the patterns" being the only path, or is there a world where
-  Linus tolerates an AGPL submodule for a self-hosted, never-distributed engine?
-- **Multi-wiki vs. single-KB cardinality.** Synthadoc's whole UX assumes one wiki = one domain on its own port; the same
-  question came up against `llmwiki`. Do you want Linus's KB to be one endpoint over all of `context/`, or one per
-  subcorpus (papers / notes / threads / books) so the agent's scope is explicit?
-- **Cost-guard relevance.** Synthadoc's `cost_guard.py` exists because its target users hit paid APIs. Linus's
-  philosophy is local-first with no paid APIs in the steady state. Is there still a reason to port a soft-warn / hard-
-  gate layer (for guarding ANE/GPU minutes, token-budget per task, or future hosted-model spillover), or is this
-  inspector-only?
-- **Skill hot-load model.** Synthadoc's `BaseSkill` + folder-scan + `entry_points` approach is more dynamic than
-  `llmbase`'s `register()` decorator. For Phase 7, do you want Linus skills to be hot-loadable from a directory without
-  a server restart, or is restart-on-skill-change acceptable and simpler?
-- **Decomposition as a Phase 3 default.** Synthadoc decomposes both queries and web searches into parallel sub-tasks
-  with a graceful fallback. Should Phase 3's agent fan-out adopt this as the default execution shape (decompose →
-  parallel workers → merge), or is that overkill for the worker-orchestra Linus is initially aiming at?
+1. **AGPL boundary.** Synthadoc's engine is AGPL-3.0 with Apache-2.0 only on the `BaseSkill` and `LLMProvider` extension
+   classes. Are you comfortable with "read and reimplement the patterns" being the only path, or is there a world where
+   Linus tolerates an AGPL submodule for a self-hosted, never-distributed engine?
+2. **Multi-wiki vs. single-KB cardinality.** Synthadoc's whole UX assumes one wiki = one domain on its own port; the
+   same question came up against `llmwiki`. Do you want Linus's KB to be one endpoint over all of `context/`, or one per
+   subcorpus (papers / notes / threads / books) so the agent's scope is explicit?
+3. **Cost-guard relevance.** Synthadoc's `cost_guard.py` exists because its target users hit paid APIs. Linus's
+   philosophy is local-first with no paid APIs in the steady state. Is there still a reason to port a soft-warn / hard-
+   gate layer (for guarding ANE/GPU minutes, token-budget per task, or future hosted-model spillover), or is this
+   inspector-only?
+4. **Skill hot-load model.** Synthadoc's `BaseSkill` + folder-scan + `entry_points` approach is more dynamic than
+   `llmbase`'s `register()` decorator. For Phase 7, do you want Linus skills to be hot-loadable from a directory without
+   a server restart, or is restart-on-skill-change acceptable and simpler?
+5. **Decomposition as a Phase 3 default.** Synthadoc decomposes both queries and web searches into parallel sub-tasks
+   with a graceful fallback. Should Phase 3's agent fan-out adopt this as the default execution shape (decompose →
+   parallel workers → merge), or is that overkill for the worker-orchestra Linus is initially aiming at?

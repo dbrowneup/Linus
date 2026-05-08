@@ -55,4 +55,3 @@ Do not use the upstream repo directly — the CUDA dependency and 5-minute/H100 
 `program.md` + single- edit-file + fixed-budget + keep-or-revert loop as the template for overnight LoRA sweeps (agent
 edits a single `lora_config.py`, runs training, compares to baseline on Dan task suite, keeps or reverts via git). In
 Phase 7c, adopt the same loop for inference experimentation with tok/s-target.
-

@@ -85,19 +85,19 @@ this is ever attempted, ether0's reward-taxonomy and reason-enum design should b
 
 ## 7. Questions for Dan
 
-- **Biology verifier candidates.** The ether0 trick is that chemistry has cheap rule-based and simulator-based oracles
-  (RDKit, MolTrans, KDESol, molbloom). Which biology subdomains do you think have analogously cheap verifiers — BLAST
-  identity for sequence design, ESMFold pLDDT for protein design, tissue-eQTL direction-of-effect for variant reasoning?
-  A short list would shape Phase 6 materially.
-- **Mistral-Small-24B as base.** Ether0 chose Mistral-Small-24B specifically. For a Linus bio reasoner, is 24B the right
-  starting size given the 32 GB constraint, or do we deliberately go smaller (Qwen2.5-7B / Mistral-7B) to keep RLVR
-  experiments cheap and trade specialist quality for cycle time?
-- **Specialist-then-generalist pattern.** The ether0 paper's RL loop runs specialists per task group, rejection-samples
-  their traces, and re-SFTs into a generalist. Worth replicating verbatim for a Linus domain model, or is the multi-pass
-  orchestration overhead prohibitive on M1 Max — i.e. should we collapse to single-stage RLVR?
-- **Reward-function design discipline.** Most of ether0's verifiers return strict 0/1, with `soft` Tanimoto only as a
-  fallback. Do you agree with the design bet that strict binary rewards beat dense shaped rewards for RLVR, or do you
-  want partial-credit shaped rewards as the default for early bio experiments where the verifier itself is noisier?
-- **Adopting `ether0.rewards` in KnowledgeBase.** Some KnowledgeBase chemistry tooling could use `valid_mol_eval` and
-  `is_reasonable_molecule` as guardrails for any LLM-generated SMILES today — worth a small dependency, or keep
-  KnowledgeBase free of FH-stack imports for now?
+1. **Biology verifier candidates.** The ether0 trick is that chemistry has cheap rule-based and simulator-based oracles
+   (RDKit, MolTrans, KDESol, molbloom). Which biology subdomains do you think have analogously cheap verifiers — BLAST
+   identity for sequence design, ESMFold pLDDT for protein design, tissue-eQTL direction-of-effect for variant
+   reasoning? A short list would shape Phase 6 materially.
+2. **Mistral-Small-24B as base.** Ether0 chose Mistral-Small-24B specifically. For a Linus bio reasoner, is 24B the
+   right starting size given the 32 GB constraint, or do we deliberately go smaller (Qwen2.5-7B / Mistral-7B) to keep
+   RLVR experiments cheap and trade specialist quality for cycle time?
+3. **Specialist-then-generalist pattern.** The ether0 paper's RL loop runs specialists per task group, rejection-samples
+   their traces, and re-SFTs into a generalist. Worth replicating verbatim for a Linus domain model, or is the
+   multi-pass orchestration overhead prohibitive on M1 Max — i.e. should we collapse to single-stage RLVR?
+4. **Reward-function design discipline.** Most of ether0's verifiers return strict 0/1, with `soft` Tanimoto only as a
+   fallback. Do you agree with the design bet that strict binary rewards beat dense shaped rewards for RLVR, or do you
+   want partial-credit shaped rewards as the default for early bio experiments where the verifier itself is noisier?
+5. **Adopting `ether0.rewards` in KnowledgeBase.** Some KnowledgeBase chemistry tooling could use `valid_mol_eval` and
+   `is_reasonable_molecule` as guardrails for any LLM-generated SMILES today — worth a small dependency, or keep
+   KnowledgeBase free of FH-stack imports for now?

@@ -74,18 +74,18 @@ as a target pattern) and during Phase 3 when KnowledgeBase project workspaces ge
 
 ## 7. Questions for Dan
 
-- **Page templates for `docs/`.** Want to lift the `Overview.md` template + `{{...}}` placeholder convention into
-  Linus's `docs/` page-template kit, or keep `docs/` informal and reserve this only for per-project workspaces under
-  `context/`?
+1. **Page templates for `docs/`.** Want to lift the `Overview.md` template + `{{...}}` placeholder convention into
+   Linus's `docs/` page-template kit, or keep `docs/` informal and reserve this only for per-project workspaces under
+   `context/`?
 
-- **Install the two Skills.** `import-notes` and `project-doc-update` are user-level installable today
-  (`cp -r skills/* ~/.claude/skills/`). Worth doing as a Phase 1 quality-of-life experiment on `context/notes/`, or
-  defer until Memory Architecture lands?
+2. **Install the two Skills.** `import-notes` and `project-doc-update` are user-level installable today
+   (`cp -r skills/* ~/.claude/skills/`). Worth doing as a Phase 1 quality-of-life experiment on `context/notes/`, or
+   defer until Memory Architecture lands?
 
-- **Differentiator check vs. siblings.** I distinguished AgenticResearchWiki from `llm-research-wiki` (research-of-LLMs
-  vs. research-via-LLMs) and `agentic-wiki-builder` (agent-maintained vs. agent-constructed) on README evidence alone.
-  Once the other two notes land, want me to revisit and tighten the contrast?
+3. **Differentiator check vs. siblings.** I distinguished AgenticResearchWiki from `llm-research-wiki` (research-of-LLMs
+   vs. research-via-LLMs) and `agentic-wiki-builder` (agent-maintained vs. agent-constructed) on README evidence alone.
+   Once the other two notes land, want me to revisit and tighten the contrast?
 
-- **Per-experiment wikis.** Tencent's framing is one wiki per project. Linus has many concurrent experiments under
-  `experiments/`. Does each experiment get a mini-wiki, or does this convention only kick in for multi-month efforts
-  (Phase 6 fine-tuning, Phase 4 data-sovereignty datasets)?
+4. **Per-experiment wikis.** Tencent's framing is one wiki per project. Linus has many concurrent experiments under
+   `experiments/`. Does each experiment get a mini-wiki, or does this convention only kick in for multi-month efforts
+   (Phase 6 fine-tuning, Phase 4 data-sovereignty datasets)?

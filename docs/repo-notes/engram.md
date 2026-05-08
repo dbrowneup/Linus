@@ -61,13 +61,13 @@ recall patterns Linus actually needs.
 ## 5. What's incompatible or out of scope
 
 Linus's KnowledgeBase is the Layer E substrate (DEC-0042; renumbered from Layer D per DEC-0052) and already has a
-NetworkX + Qdrant pipeline; engram's
-flat-files-plus-keyword approach is a step backward in retrieval power, and it has no notion of the KB's paper-corpus
-structure. The compress-by-tag merge is destructive at the article level — fine when the wiki is the source of truth,
-not fine when the wiki is a derived view over canonical sources, which is Linus's situation. The `lint`-the-whole-corpus
-operation is O(corpus) per call and bounded at 40k chars — does not scale to KnowledgeBase volume. No MCP server yet (on
-roadmap). Per-project `.engram/` directories overlap awkwardly with per-project tagging in DEC-0029's episodic schema —
-two storage conventions for the same project axis is exactly the kind of thing The Algorithm says to delete one of.
+NetworkX + Qdrant pipeline; engram's flat-files-plus-keyword approach is a step backward in retrieval power, and it has
+no notion of the KB's paper-corpus structure. The compress-by-tag merge is destructive at the article level — fine when
+the wiki is the source of truth, not fine when the wiki is a derived view over canonical sources, which is Linus's
+situation. The `lint`-the-whole-corpus operation is O(corpus) per call and bounded at 40k chars — does not scale to
+KnowledgeBase volume. No MCP server yet (on roadmap). Per-project `.engram/` directories overlap awkwardly with
+per-project tagging in DEC-0029's episodic schema — two storage conventions for the same project axis is exactly the
+kind of thing The Algorithm says to delete one of.
 
 ## 6. Recommendation: **Study**
 
@@ -78,13 +78,13 @@ wrong scale ceiling. The 1-2 hours spent reading it pay off as KB-spec input, no
 
 ## 7. Questions for Dan
 
-- **Lint as a Layer C verb.** Engram's `lint` finds contradictions, stale entries, orphans across the corpus. The
-  episodic spec has consolidation (DEC-0039) but no integrity pass. Is a periodic LLM-mediated "audit your own episodic
-  store for contradictions" worth a DEC slot, or premature?
-- **Write-time-synthesis vs. write-time-raw.** DEC-0029 stores raw turns + content hashes (write-time-raw). Engram does
-  write-time-synthesis (LLM rewrites the corpus on every save). For the KB write side specifically — does Linus want
-  ingestion to do engram-style synthesis into the KB, or stay raw-ingest with retrieval-time synthesis?
-- **Differentiator confidence.** Within Group 4, engram is the clearest "wiki, not memory" outlier; the others
-  (agentmemory, anamnesis, omega-memory, remember, prompt-vault, openaugi, memex) are presumably more episodic-shaped.
-  Worth deferring final layer-C-substrate ADR refinements until the rest of the group is noted, in case one of them has
-  a recall pattern that obsoletes part of DEC-0029?
+1. **Lint as a Layer C verb.** Engram's `lint` finds contradictions, stale entries, orphans across the corpus. The
+   episodic spec has consolidation (DEC-0039) but no integrity pass. Is a periodic LLM-mediated "audit your own episodic
+   store for contradictions" worth a DEC slot, or premature?
+2. **Write-time-synthesis vs. write-time-raw.** DEC-0029 stores raw turns + content hashes (write-time-raw). Engram does
+   write-time-synthesis (LLM rewrites the corpus on every save). For the KB write side specifically — does Linus want
+   ingestion to do engram-style synthesis into the KB, or stay raw-ingest with retrieval-time synthesis?
+3. **Differentiator confidence.** Within Group 4, engram is the clearest "wiki, not memory" outlier; the others
+   (agentmemory, anamnesis, omega-memory, remember, prompt-vault, openaugi, memex) are presumably more episodic-shaped.
+   Worth deferring final layer-C-substrate ADR refinements until the rest of the group is noted, in case one of them has
+   a recall pattern that obsoletes part of DEC-0029?

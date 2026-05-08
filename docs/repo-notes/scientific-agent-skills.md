@@ -100,18 +100,18 @@ hundreds of pre-documented entry points without writing any of them from scratch
 
 ## 7. Questions for Dan
 
-- **bioSkills vs. scientific-agent-skills overlap policy.** Both will install — bioSkills covers ~438 workflow skills,
-  scientific-agent-skills covers 135 tool/database skills, and their bio-database surfaces overlap. Do we install both
-  with namespacing (`bio/atac-seq`, `sci/scanpy`) and let agent skill-selection resolve, or do we curate a merged
-  whitelist and drop duplicates manually before Phase 7 ships?
-  _Partially resolved (see [answered-questions.md](../questions/answered-questions.md)): both adopted as Phase 7
-  inaugural bundle (~573 total); overlap policy and namespacing TBD in Phase 7a ADR (S30)._
-- **Cloud-platform skills.** Benchling, DNAnexus, LatchBio, OMERO, Modal, Adaptyv, Ginkgo Cloud Lab, Protocols.io,
-  LabArchives — none of these match Dan's current workflow. Prune them at vendor time, or keep them installed in case
-  future Dan needs them and let agent skill-selection ignore them?
-- **K-Dense BYOK desktop app.** It's a free open-source AI co-scientist that consumes these same skills with a chat UI
-  bolted on. Worth a one-hour smoke-test as a reference implementation for what a "skills + chat" front-end looks like
-  before Phase 5 (openclaw)? Or treat as competitive intel only?
-- **Security scanning.** scientific-agent-skills runs Cisco AI Defense's Skill Scanner weekly. Should Linus run the same
-  scanner on every installed skill (vendored or otherwise) as part of CI, or trust the upstream scan results recorded in
-  SECURITY.md?
+1. **bioSkills vs. scientific-agent-skills overlap policy.** Both will install — bioSkills covers ~438 workflow skills,
+   scientific-agent-skills covers 135 tool/database skills, and their bio-database surfaces overlap. Do we install both
+   with namespacing (`bio/atac-seq`, `sci/scanpy`) and let agent skill-selection resolve, or do we curate a merged
+   whitelist and drop duplicates manually before Phase 7 ships? _Partially resolved (see
+   [answered-questions.md](../questions/answered-questions.md)): both adopted as Phase 7 inaugural bundle (~573 total);
+   overlap policy and namespacing TBD in Phase 7a ADR (S30)._
+2. **Cloud-platform skills.** Benchling, DNAnexus, LatchBio, OMERO, Modal, Adaptyv, Ginkgo Cloud Lab, Protocols.io,
+   LabArchives — none of these match Dan's current workflow. Prune them at vendor time, or keep them installed in case
+   future Dan needs them and let agent skill-selection ignore them?
+3. **K-Dense BYOK desktop app.** It's a free open-source AI co-scientist that consumes these same skills with a chat UI
+   bolted on. Worth a one-hour smoke-test as a reference implementation for what a "skills + chat" front-end looks like
+   before Phase 5 (openclaw)? Or treat as competitive intel only?
+4. **Security scanning.** scientific-agent-skills runs Cisco AI Defense's Skill Scanner weekly. Should Linus run the
+   same scanner on every installed skill (vendored or otherwise) as part of CI, or trust the upstream scan results
+   recorded in SECURITY.md?

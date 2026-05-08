@@ -86,21 +86,21 @@ the cohort.
 
 ## 7. Questions for Dan
 
-- **Context packs as the Maestro/Worker artifact.** SwarmVault's
-  `context build "<goal>" --target <path> --budget <tokens>` is essentially the spec format
-  `docs/maestro-worker-protocol.md` is reaching for, but with citations and provenance baked in. Should Phase 2's spec
-  format be Linus-native or a thin wrapper over a swarmvault-style bounded-context-pack tool?
-- **Task ledger vs. git history.** SwarmVault's `task start|update|finish` writes a parallel ledger under
-  `state/memory/tasks/` and folds it into the knowledge graph. Linus already has git for atomic commits and branches for
-  agent work (BRANCHING.md). Is a separate task ledger redundant, complementary (commits are artifacts, ledger is
-  intent), or actively confusing?
-- **i18n in the cohort.** SwarmVault is the only sibling shipping Chinese and Japanese READMEs. That suggests the author
-  is courting an international user base that the English-only siblings (`llmwiki`, `llmwiki-cli`, `wikidesk`) are not.
-  Useful signal for "which of the eleven engines has real users," or noise?
-- **Contradiction detection as a KB feature.** SwarmVault tags every edge as `extracted` / `inferred` / `ambiguous` and
-  runs `lint --conflicts`. The security synthesis recommends typed claims + content hashing for KB entries — is the
-  swarmvault edge-typing taxonomy the right vocabulary to adopt for Linus, or is it too coarse for scientific claims?
-- **Differentiator confidence.** I depth-read swarmvault and only spot-checked `llmwiki-cli`'s `package.json` for the
-  comparison. Before committing the Study verdict, would you want me to do the same depth on `wikiloom`, `wikimind`, and
-  `TheKnowledge` to confirm context-packs + task-ledger really are unique to swarmvault and not also present in a leaner
-  sibling?
+1. **Context packs as the Maestro/Worker artifact.** SwarmVault's
+   `context build "<goal>" --target <path> --budget <tokens>` is essentially the spec format
+   `docs/maestro-worker-protocol.md` is reaching for, but with citations and provenance baked in. Should Phase 2's spec
+   format be Linus-native or a thin wrapper over a swarmvault-style bounded-context-pack tool?
+2. **Task ledger vs. git history.** SwarmVault's `task start|update|finish` writes a parallel ledger under
+   `state/memory/tasks/` and folds it into the knowledge graph. Linus already has git for atomic commits and branches
+   for agent work (BRANCHING.md). Is a separate task ledger redundant, complementary (commits are artifacts, ledger is
+   intent), or actively confusing?
+3. **i18n in the cohort.** SwarmVault is the only sibling shipping Chinese and Japanese READMEs. That suggests the
+   author is courting an international user base that the English-only siblings (`llmwiki`, `llmwiki-cli`, `wikidesk`)
+   are not. Useful signal for "which of the eleven engines has real users," or noise?
+4. **Contradiction detection as a KB feature.** SwarmVault tags every edge as `extracted` / `inferred` / `ambiguous` and
+   runs `lint --conflicts`. The security synthesis recommends typed claims + content hashing for KB entries — is the
+   swarmvault edge-typing taxonomy the right vocabulary to adopt for Linus, or is it too coarse for scientific claims?
+5. **Differentiator confidence.** I depth-read swarmvault and only spot-checked `llmwiki-cli`'s `package.json` for the
+   comparison. Before committing the Study verdict, would you want me to do the same depth on `wikiloom`, `wikimind`,
+   and `TheKnowledge` to confirm context-packs + task-ledger really are unique to swarmvault and not also present in a
+   leaner sibling?
