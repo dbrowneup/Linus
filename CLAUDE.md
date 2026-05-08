@@ -558,6 +558,44 @@ a branch, write a file, commit, push, open a PR") and confirm the agent complete
 the full fan-out will be blocked too — and Maestro will end up doing the work serially anyway, having paid the
 fan-out tax for no parallelism gain. The canary costs a minute; debugging six stuck agents costs much more.
 
+### Worktree fan-out discipline
+
+Worktrees enable genuine parallel agent work but carry non-obvious failure modes. Apply these rules for any
+`isolation: "worktree"` agent dispatch or manual `git worktree add` fan-out.
+
+**Branch preservation.** `git worktree remove` deletes the working directory but leaves the branch pointer in git.
+This is the desired behavior — preserve it. Do NOT immediately `git branch -D` agent branches after removing their
+worktrees. Retain agent branches in git history for at least as long as the consolidated PR is open; they are the
+per-agent audit trail and can be re-cherry-picked if a conflict was resolved incorrectly. Only delete agent branches
+after their commits are confirmed present in the merged target branch.
+
+**Base-SHA pinning.** All parallel worktrees in one fan-out must branch from the same commit. Before dispatching,
+record the base SHA (`git rev-parse HEAD`) and include it verbatim in each agent's prompt. If Maestro commits to the
+base branch between dispatching individual agents, later agents get a different base — cherry-picks at consolidation
+produce false conflicts or silently miss commits. Verify with `git log <agent-branch>..<base-branch>` before
+beginning cherry-pick consolidation.
+
+**Edit-tool path resolution.** Inside a worktree, Edit/Write tool calls using absolute paths sometimes resolve to the
+primary checkout rather than the worktree path — the Edit tool's path resolver anchors to the repo's registered
+primary worktree. Agents inside worktrees should use Bash with `git -C <worktree-path>` for git operations, and
+prefer `Bash(cd <worktree-path> && <cmd>)` over direct Edit calls for mechanical bulk file edits. When an agent
+reports "file already has this content" or edits appear in the wrong checkout, the root cause is almost always
+absolute-path resolution.
+
+**When not to use worktrees.** Worktrees earn their complexity only when per-agent isolation is a hard requirement —
+e.g., each agent opens its own PR for independent review, or commits must be cherry-picked selectively. For fan-outs
+where agents write non-overlapping files on a shared branch (filling out N notes, running N analyses), the simpler
+pattern is sequential agent dispatch with file-level partitioning: Maestro reviews and commits each agent's output
+without the worktree overhead (base-SHA drift, path-resolution quirks, manual cleanup, cherry-pick conflicts). When
+in doubt, start with the simpler pattern.
+
+**Worktree cleanup sequence.** After all agent commits are cherry-picked and confirmed:
+
+1. `git worktree unlock <path>` — release any stale process lock
+2. `git worktree remove --force <path>` — removes directory; branch pointer persists
+3. Verify: `git branch | grep agent/` — branches should still appear
+4. Delete branches only after the consolidated PR is merged: `git branch -D agent/<name>`
+
 ### Writing style for docs
 
 Prose over bullet-heavy dumps for anything a human will read. Markdown files in this repo communicate reasoning, not
