@@ -81,7 +81,10 @@ ldp is the right _abstraction_ to inform Linus's agent contract and Phase 3 mult
 _runtime_ to embed wholesale. Pull the `Agent.get_asv()` interface, the `Trajectory`/`Transition` schema, and the
 MemoryOpt pattern into Linus's own module. Defer the SCG and the `nn/` training stack until Phase 6 has a concrete
 fine-tuning plan; if at that point we want RL on collected trajectories rather than supervised LoRA, revisit ldp as a
-dependency. Keep the clone for Phase 3 design discussions and as a reference for the Aviary-paper formalism.
+dependency. Keep the clone for Phase 3 design discussions and as a reference for the Aviary-paper formalism. DEC-0044
+explicitly names ldp as "the obvious Phase 6 candidate" for fine-tuning a domain-specific tool-selection policy on top
+of the paper-qa retrieval layer; the recommendation here is consistent with that — Phase 2c uses paper-qa's bundled
+`ToolSelector` agent, Phase 6 revisits ldp.
 
 ## 7. Questions for Dan
 

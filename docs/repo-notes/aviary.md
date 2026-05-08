@@ -50,12 +50,10 @@ The functional `fenv` API is cute but the class-based `Environment` subclass is 
 repo actually uses; Linus should mirror the class-based pattern. Aviary's `Renderer`, `dataset_server`, and `cli`
 (`aviary tools <env>` browser) are useful only for demos/debugging. Within the FutureHouse stack the division of labour
 is clean: **aviary** = env + tool + message + dataset; **ldp** = agent, policy, rollout, training; **paper-qa** = a
-heavy retrieval
-
-- QA environment plugged into aviary via the `labbench` package; **LAB-Bench** = the dataset and grading rubric.
-  Differentiator within the siblings: aviary is the _only_ one of the FutureHouse trio that is small, self-contained,
-  and interesting on its own — `paper-qa` only matters with a corpus, `ldp` only matters once you're committed to RL
-  training, but aviary's Tool/Environment abstractions are valuable to Linus even if RL never happens.
+heavy retrieval-QA environment plugged into aviary via the `labbench` package; **LAB-Bench** = the dataset and grading
+rubric. Differentiator within the siblings: aviary is the _only_ one of the FutureHouse trio that is small,
+self-contained, and interesting on its own — `paper-qa` only matters with a corpus, `ldp` only matters once you're
+committed to RL training, but aviary's Tool/Environment abstractions are valuable to Linus even if RL never happens.
 
 ## 5. What's incompatible or out of scope
 
@@ -68,6 +66,10 @@ rewritten — aviary returns `(obs, reward, done, truncated)` tuples, which any 
 task, not an incompatibility. Python 3.11+ requirement is satisfied by the `linus` conda env (3.12).
 
 ## 6. Recommendation: **Study (with a Phase 6 path to Integrate)**
+
+Note that aviary is already an indirect runtime dependency via paper-qa (DEC-0044, accepted 2026-05-06): `paper-qa`
+imports `fhaviary` as a hard dep, so when Linus adopts paper-qa as the Phase 2c KnowledgeBase retrieval engine, aviary
+ships in the linus env as a transitive install whether or not Linus uses its `Environment` abstractions directly.
 
 Phase 1: read the paper, run the GSM8K and Counter tutorial notebooks against an Ollama-hosted worker via LiteLLM to
 verify the API ergonomics on Apple Silicon. Phase 6: when the RL/fine-tuning question becomes concrete, decide whether

@@ -84,9 +84,11 @@ in a chemistry-bench package that is overkill for our use, but it's pip-installa
 Pip-install `labbench` into the Linus env once Phase 1 benchmark scaffolding lands. Write one
 `linus.eval.OllamaAgent(BaseZeroShotAgent)` that talks to whatever Phase 2a serving endpoint we adopt (Ollama, then
 pmetal serve once Phase 1b verdict is in). Run LitQA2 + ProtocolQA + SeqQA + DbQA as the standing biology axis of the
-Dan-task-suite, with results dropped into `benchmarks/results/lab-bench-<date>-<model>.json`. Hold off on FigQA /
-TableQA until a usable local VLM exists. Add the canary string to the KB ingestion blocklist so we never accidentally
-train or fine-tune on a leaked LAB-Bench record.
+Dan-task-suite, with results dropped into `benchmarks/results/lab-bench-<date>-<model>.json` — note that **DEC-0044**
+(paper-qa as KB retrieval engine, accepted 2026-05-06) explicitly requires LAB-Bench JSONL files to live in
+`benchmarks/`, not in the KnowledgeBase corpus, to keep benchmark items out of the retrieval substrate. Hold off on
+FigQA / TableQA until a usable local VLM exists. Add the canary string to the KB ingestion blocklist so we never
+accidentally train or fine-tune on a leaked LAB-Bench record.
 
 ## 7. Questions for Dan
 

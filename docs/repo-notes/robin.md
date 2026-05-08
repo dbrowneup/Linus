@@ -78,8 +78,10 @@ specifically to monetise FutureHouse research. But the patterns are worth liftin
 the `choix`-based pairwise tournament ranker into a Linus utility for Phase 3 candidate-selection use cases; (2) adopt
 the `Prompts.validate_all_prompts` regex+expectations pattern when Linus grows a prompt registry in Phase 2b or 3; (3)
 use Robin's pipeline as the design template for a future Linus "drug-repurposing" or "hypothesis-generation" skill in
-Phase 7, with KnowledgeBase + a local paper-qa replacing Crow/Falcon. Re-evaluate if FutureHouse open-sources weights
-for Crow/Falcon or if a credible local literature-QA stack (paper-qa against KnowledgeBase) reaches parity.
+Phase 7, with KnowledgeBase + a local paper-qa replacing Crow/Falcon. The "paper-qa locally against KnowledgeBase"
+half of that substitution is now resolved per **DEC-0044** (paper-qa as KB retrieval engine, accepted 2026-05-06), so
+the Phase 7 Robin-style skill substrate is no longer hypothetical — only the orchestration layer on top remains a
+design question. Re-evaluate if FutureHouse open-sources weights for Crow/Falcon.
 
 ## 7. Questions for Dan
 

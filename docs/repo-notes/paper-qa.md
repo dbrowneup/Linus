@@ -71,7 +71,8 @@ defer until needed. License is Apache 2.0 across the workspace, no surprises.
 
 ## 6. Recommendation: **Integrate**
 
-Adopt paper-qa as the Phase 2c KnowledgeBase retrieval-and-synthesis engine. The integration plan: smoke-test
+Adopt paper-qa as the Phase 2c KnowledgeBase retrieval-and-synthesis engine (resolved as **DEC-0044**, accepted
+2026-05-06; closes question S1). The integration plan: smoke-test
 `pip install paper-qa[local]`, point it at a 10-paper sample from `context/papers/`, configure
 `embedding="st-multi-qa-MiniLM-L6-cos-v1"` and `llm="ollama/qwen2.5:14b"` via LiteLLM config, run a `pqa ask` against a
 known biochem question, log tok/s and answer quality. If acceptable, expose it as a Linus tool in Phase 2c and add it to
