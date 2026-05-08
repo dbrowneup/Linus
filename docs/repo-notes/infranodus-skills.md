@@ -10,7 +10,7 @@ supporting the Skills standard (Claude Web, Claude Code, Cursor, OpenClaw) can l
 prompt-engineering and run standalone; others reach back to the hosted **InfraNodus MCP server** (`mcp.infranodus.com`,
 authed via `INFRANODUS_API_KEY` Bearer token) for actual graph analysis, content-gap detection, GraphRAG retrieval, and
 SEO/SERP import. For Linus this sits at the intersection of Group 5 (KG/network tooling, relevant to Phase 2 KB graph
-DEC-0026/27 and Phase 3 hybrid retrieval) and Phase 7 Skills graduation.
+DEC-0015 and Phase 3 hybrid retrieval) and Phase 7 Skills graduation.
 
 ## 2. Content overview
 
@@ -71,7 +71,7 @@ for personal use during Maestro work — they're harmless prompt content and the
 interesting. Do not adopt the InfraNodus-MCP-dependent skills inside Linus until and unless an InfraNodus-equivalent (or
 InfraNodus-compatible) graph backend can be self-hosted on Apple Silicon — which is a non-trivial build, not a checkbox.
 Revisit during Phase 7 if a local text-network-analysis component lands as part of the Phase 2 KB graph work
-(DEC-0026/27).
+(DEC-0015).
 
 ## 7. Questions for Dan
 
@@ -82,11 +82,11 @@ Revisit during Phase 7 if a local text-network-analysis component lands as part 
   maps interestingly onto Maestro/Worker review loops: a Worker stuck in BIASED could be nudged toward DIVERSIFIED by
   loading `critical-perspective`. Worth a Phase 1e experiment, or filed under "interesting but not load-bearing"?
 - **Self-hostable text-network analysis.** If we want the MCP-dependent skills to work standalone, we'd need to
-  reimplement InfraNodus's modularity/centrality/gap-detection over our own KB graph (Phase 2 DEC-0026/27 surface).
+  reimplement InfraNodus's modularity/centrality/gap-detection over our own KB graph (Phase 2 DEC-0015 surface).
   That's a meaningful build. Worth scoping into Phase 3, or accept that this repo stays study-only?
-- **OmegaWiki comparison.** I could not find an `OmegaWiki.md` repo note in `docs/repo-notes/` (only the twelve listed
-  there) — was it intended to be authored separately, or is the comparison expected to live here in absentia? If the
-  former, the head-to-head should probably be revisited once both notes exist.
+- **OmegaWiki comparison.** [`OmegaWiki.md`](OmegaWiki.md) now exists in `docs/repo-notes/` — a head-to-head between
+  the two skill collections (this repo's 15 InfraNodus-flavored skills vs OmegaWiki's 24 wiki-curation skills) is worth
+  doing when Phase 7 design starts.
 - **`llm-wiki` skill vs Karpathy's autoresearch.** The `llm-wiki` skill operationalizes Karpathy's LLM Wiki proposal as
   a setup workflow, which is a near-cousin of the autoresearch loop already cloned in `repos/autoresearch/`. Is there
   appetite to consolidate these into a single Linus "build a wiki from your sources" skill backed by KnowledgeBase, or
