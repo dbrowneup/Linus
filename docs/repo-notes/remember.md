@@ -35,8 +35,8 @@ is plain markdown files; persistence is the user's git repo or filesystem, and t
 ## 3. What's reusable in Linus
 
 The **Persona.md pattern** — a single small file injected into every session that captures evolving user preferences,
-naming conventions, and code style — is directly reusable as Layer D (long-term semantic memory in the
-memory-architecture spec). It is the simplest, most legible implementation of "the model learns how I work" that any of
+naming conventions, and code style — is directly reusable as Layer E (long-term semantic memory in the
+memory-architecture spec; renamed from Layer D per DEC-0052, when investigation memory took the Layer D slot). It is the simplest, most legible implementation of "the model learns how I work" that any of
 the eight memory repos in this survey offers, and it would slot into Linus's `linus.memory.persona.read()` contract with
 very little adaptation. The **REMEMBER.md cascading rulebook** (global rules, per-project overrides, named sections that
 either append-to or `Override:`-replace defaults) is a clean precedent for how Linus's tool registry might let users
@@ -74,8 +74,8 @@ the same vault could be regenerated from Linus's SQLite store if a markdown expo
 
 Read `index.js`, `scripts/extract.js`, and the `REMEMBER.md` rulebook before finalising the Phase 2a
 `linus.memory.persona` and `linus.memory.episodic.recall_session` implementations. Borrow the Persona.md
-single-file-injection pattern explicitly (note it as prior art in the relevant ADR; the relationship to Layer D is the
-load-bearing one). Borrow the `extract.js` Claude-Code-transcript walker as reference for the eventual
+single-file-injection pattern explicitly (note it as prior art in the relevant ADR; the relationship to Layer E
+(semantic, renumbered from Layer D per DEC-0052) is the load-bearing one). Borrow the `extract.js` Claude-Code-transcript walker as reference for the eventual
 backfill-from-history tool. Do **not** vendor the package, do **not** install the plugin alongside Linus during Phase 2
 (it would race Linus on memory writes), and revisit only if Phase 5 OpenClaw integration surfaces a need for a
 markdown-vault export of Linus's episodic store — at which point the routing-rulebook concept is a candidate for the
@@ -84,9 +84,9 @@ export's organisational schema.
 ## 7. Questions for Dan
 
 - **Persona vs trust-level scratchpad.** Remember's `Persona.md` is unbounded — every observation gets appended as an
-  "evidence line" with no provenance. DEC-0030 mandates trust levels on scratchpad segments. Should Linus's Layer D
-  persona inherit the same trust-level tagging, or is Persona-class data (style preferences, naming conventions) always
-  trust=high by definition?
+  "evidence line" with no provenance. DEC-0030 mandates trust levels on scratchpad segments. Should Linus's Layer E
+  persona (semantic; renumbered from Layer D per DEC-0052) inherit the same trust-level tagging, or is Persona-class
+  data (style preferences, naming conventions) always trust=high by definition?
   _Partially resolved (DEC-0030, see [answered-questions.md](../questions/answered-questions.md)): DEC-0030 mandates
   trust-level tagging on scratchpad segments; persona-class data trust policy TBD in Phase 2a memory spec._
 - **Markdown vault as Layer C export.** SQLite is the source of truth for episodic memory (DEC-0029), but a read-only

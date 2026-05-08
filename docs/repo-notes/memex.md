@@ -11,8 +11,9 @@ with seven Python/shell scripts and six procedure docs), and a _knowledge-graph 
 Bush namesake is honored literally: the architecture is a small-world network of cross-referenced threads ("trails"),
 not a hierarchical index, and navigation is by following annotated links from any entry node. For Linus this is the
 strongest entry in the eight-repo memory survey on the question "what does the _human-facing surface_ of cross-session
-memory look like before any retrieval substrate is involved" — directly relevant to the Layer C / Layer D conversation
-in the memory-architecture spec, and to the "claim-typing" rule from the security/llm-wiki synthesis.
+memory look like before any retrieval substrate is involved" — directly relevant to the Layer C / Layer E conversation
+in the memory-architecture spec (Layer E = semantic / KnowledgeBase, renamed from Layer D per DEC-0052 when
+investigation memory took the Layer D slot), and to the "claim-typing" rule from the security/llm-wiki synthesis.
 
 ## 2. Architecture summary
 
@@ -39,8 +40,8 @@ Dependencies are exactly four: `networkx`, `matplotlib`, `anthropic`, `python-do
 
 ## 3. What's reusable in Linus
 
-The constitution-as-prompt + lint-as-verifier pattern is directly transferable to Linus's Layer D shared memory
-substrate (DEC-0029, DEC-0034). Where `agentmemory` and `engram` ship a Python API, and where `anamnesis` ships a
+The constitution-as-prompt + lint-as-verifier pattern is directly transferable to Linus's Layer E shared memory
+substrate (semantic / KnowledgeBase, renumbered from Layer D per DEC-0052; cross-references DEC-0029, DEC-0034). Where `agentmemory` and `engram` ship a Python API, and where `anamnesis` ships a
 PostgreSQL+pgvector server, memex ships a _contract_ — and the contract is what Linus's memory architecture spec already
 commits to (markdown-backed, git-versioned, content-hashed, schema-validated externally). The thread schema (Summary as
 the documentation-extractable surface, Connections as annotated edges, Next Up as forward intent) is a better-developed
@@ -92,7 +93,8 @@ group. It does not ship a substrate Linus would adopt (DEC-0029 already commits 
 memex commits to git alone). What it ships is a _constitution_ and a _lint script_ — both of which Linus needs and
 neither of which is currently specified beyond the memory-architecture spec's API contracts. The right move is to
 extract three artifacts from memex during Phase 2 memory pillar implementation: (a) the thread schema and frontmatter
-contract as the model for Linus's Layer D record format, (b) the lint-script discipline as the model for an
+contract as the model for Linus's Layer E record format (Layer E = semantic / KnowledgeBase per DEC-0052), (b) the
+lint-script discipline as the model for an
 orchestration-layer integrity check that runs on every commit to the memory store, (c) the cross-vendor enforcer pattern
 as the model for Phase 3+ multi-Worker memory audits. Do not vendor the code; do not adopt the directory layout; do read
 `constitution-core.md`, `thread-lifecycle.md`, `enforcer-audit.md`, and `memex-lint.sh` before drafting the Linus

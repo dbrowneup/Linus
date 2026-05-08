@@ -32,9 +32,10 @@ containment check. The whole codebase is small, ~300 LOC of core, ~700 LOC total
 ## 3. What's reusable in Linus
 
 The shape that matters for Linus is **write-time synthesis**: the LLM does the work on `save`, not on every `query`.
-That maps onto Layer D (semantic / KnowledgeBase) of the Garrison decomposition in
+That maps onto Layer E (semantic / KnowledgeBase) of the Garrison decomposition in
 [memory-architecture.md](../specs/memory-architecture.md), not Layer C (episodic) where DEC-0029's SQLite + content
-hashes substrate lives. As prior art for the KB-spec items, three patterns are worth lifting: (a) the strict-Pydantic
+hashes substrate lives. (Note: this layer was renamed from Layer D to Layer E per DEC-0052, when investigation memory
+took the Layer D slot.) As prior art for the KB-spec items, three patterns are worth lifting: (a) the strict-Pydantic
 LLM-response contract in `parse_article_response`/`parse_lint_response` — Linus's own LLM-mediated tools should validate
 LLM output before acting on it, full stop; (b) the `compress` design — backup before destructive merge, group-by-tag,
 guard against undersized LLM responses (`len < 20` skip, `len > 200_000` truncate) — the audit-log + git-as-persistence
@@ -59,7 +60,8 @@ recall patterns Linus actually needs.
 
 ## 5. What's incompatible or out of scope
 
-Linus's KnowledgeBase is the Layer D substrate (DEC-0042) and already has a NetworkX + Qdrant pipeline; engram's
+Linus's KnowledgeBase is the Layer E substrate (DEC-0042; renumbered from Layer D per DEC-0052) and already has a
+NetworkX + Qdrant pipeline; engram's
 flat-files-plus-keyword approach is a step backward in retrieval power, and it has no notion of the KB's paper-corpus
 structure. The compress-by-tag merge is destructive at the article level — fine when the wiki is the source of truth,
 not fine when the wiki is a derived view over canonical sources, which is Linus's situation. The `lint`-the-whole-corpus
