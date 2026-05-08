@@ -10,7 +10,7 @@ in a management UI ("Command Center") at `localhost:8080`. Tagline: "Knowledge T
 is **inspiration only** — a bill of materials showing which third-party components a data-sovereignty layer can be built
 from, not code to adopt.
 
-## 2. Content overview (not architecture)
+## 2. Architecture summary
 
 NOMAD is a distribution, not a framework. Its real contribution is the _curated list_: Kiwix (ZIMs for Wikipedia,
 medical references, survival guides, ebooks), Kolibri (Khan Academy), ProtoMaps (offline PMTiles), CyberChef (offline
