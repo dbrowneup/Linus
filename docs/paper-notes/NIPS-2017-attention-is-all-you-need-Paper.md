@@ -122,7 +122,7 @@ Concrete load-bearing implications for Linus design:
 Phase relevance: foundational reference, not phase-gated. Cite from Phases 1, 2, 6, 7. Re-read sections 3.2 and 4 before
 any quantization, fine-tuning, or KV-cache work.
 
-## What's NOT applicable
+## What's NOT applicable / hype filter
 
 The specific 2017 numbers are dead. d_model=512, h=8, N=6, d_ff=2048 are toy sizes by 2025 standards (Llama-3-8B is
 N=32, d_model=4096, d_ff=14336, h=32 with 8 KV heads via GQA). The base/big distinction is gone — modern models have a
