@@ -99,7 +99,7 @@ paper cold is a prerequisite for reading anything else in the corpus.
 Concrete load-bearing implications for Linus design:
 
 - **Quantization (BitNet thread).** The BitNet papers ([2310.11453v1](2310.11453v1.md), [2402.17764v1](2402.17764v1.md),
-  [2504.18415v2](2504.18415v2.md), [2504.12285v1](2504.12285v1.md)) replace the FP linear projections inside attention
+  [2504.18415v2](2504.18415v2.md), [2504.12285v2](2504.12285v2.md)) replace the FP linear projections inside attention
   and FFN with 1-bit / 1.58-bit weights. The architecture they replace is exactly this one. Understanding which tensors
   are quantized (the WiQ/WiK/WiV/WO and FFN W1/W2 matrices) requires Section 3 of this paper as the reference.
 - **Memory-pillar complexity (Garrison thread).** The TC0 / hard-attention / soft-attention expressivity bounds in
@@ -149,7 +149,7 @@ other paper in the corpus assumes you know it.
 ## Connections
 
 The BitNet thread ([2310.11453v1](2310.11453v1.md), [2402.17764v1](2402.17764v1.md), [2504.18415v2](2504.18415v2.md),
-[2504.12285v1](2504.12285v1.md)) modifies the linear projections inside this architecture. Read Section 3.2 of this
+[2504.12285v2](2504.12285v2.md)) modifies the linear projections inside this architecture. Read Section 3.2 of this
 paper before any of those.
 
 The memory-pillar / expressivity thread ([2305.15408v5](2305.15408v5.md), [2310.07923v5](2310.07923v5.md), and the rest
