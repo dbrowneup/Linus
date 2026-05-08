@@ -38,7 +38,7 @@ executing workfows). The single-file export is valuable only for static analysis
 a proper repo browsing UI or IDE integration. The CXML format is Claude-specific; Linus may eventually need support for
 other AI models that use different context formats (e.g. `<document>` for smaller APIs).
 
-## 6. Recommendation: **Monitor (Phase 5+ as a repo-analysis tool)**
+## 6. Recommendation: **Watch (Phase 5+ as a repo-analysis tool)**
 
 Integrate rendergit in Phase 5+ if Linus needs to analyze external repos or package Linus's own codebase for remote
 Claude review. For Phase 1-4, skip it; direct GitHub/git access and Claude Code's file reading are sufficient. If

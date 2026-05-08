@@ -68,9 +68,7 @@ Real-money trading is explicitly out of scope and explicitly dangerous — the R
 Linus exposure to this code must stay in research/backtest mode; the line between "analyzes a chart" and "places an
 order" is a single API-key swap.
 
-## 6. Recommendation: **Ignore** (for the scientific-computing core; Study if Dan wants the financial-knowledge
-
-adjacency)
+## 6. Recommendation: **Ignore** (for the scientific-computing core; Study if Dan wants the financial-knowledge adjacency)
 
 QuantAgent is a clean, small, readable example of LangGraph multi-agent decomposition, but the domain is off-mission and
 the architectural lessons are subsumed by **TradingAgents** (richer decomposition) for the multi-agent pattern and by

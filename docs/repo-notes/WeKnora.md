@@ -1,4 +1,4 @@
-## WeKnora (`Tencent/WeKnora`)
+# WeKnora (`Tencent/WeKnora`)
 
 ## 1. Purpose and scope
 

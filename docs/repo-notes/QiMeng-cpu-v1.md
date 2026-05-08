@@ -20,7 +20,7 @@ The BSD algorithm itself is specialized to Boolean function synthesis and not di
 
 Linux-only (tested on CentOS); requires GCC 9.3.0+, Python 3.6.8+. Synopsys Design Compiler is optional but needed for GTECH conversion and verification. Slurm is needed for distributed execution; single-machine execution of the full CPU is tractable but slow (3,500 hours). The algorithm is deterministic and resource-constrained, not designed for GPU/Metal acceleration. Not relevant to Linus's inference or RAG tasks directly; more relevant as a case study in automated design methodology.
 
-## 6. Recommendation: **Monitor (Phase 6+)**
+## 6. Recommendation: **Watch (Phase 6+)**
 
 Not for direct adoption, but important conceptually for Phase 6 (Fine-Tuning) and Phase 7 (Skills & Autonomy). If Dan decides to pursue automated fine-tuning or learned synthesis of Linus components (e.g., learning a custom tokenizer from I/O examples), the BSD learner's methodology and the CPU design case study become highly relevant. For now, archive this and revisit once Phase 6 planning begins.
 
