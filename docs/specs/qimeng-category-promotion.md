@@ -1,6 +1,8 @@
 # QiMeng Category Promotion + LLM-Hardware-Design Synthesis Seed
 
-**Date:** 2026-05-08 **Status:** seed; execution deferred until additional QiMeng material lands.
+**Date:** 2026-05-08 (seeded), 2026-05-09 (additional material landed). **Status:** active; ten new
+QiMeng-family papers and three repos have landed. Next gate: paper-note + repo-note authoring (Worker fan-out),
+followed by the cluster + thematic syntheses.
 **Owner:** Maestro (Dan + Claude Code).
 
 **Related:** [`docs/specs/notes-consistency-fanout.md`](notes-consistency-fanout.md) (the fan-out that surfaced the
@@ -59,41 +61,95 @@ foreground this design-and-build lens rather than the narrower hardware-design f
 - **Reframed [`2511.20100v1.md`](../paper-notes/2511.20100v1.md)** with the LLM-hardware-design + Apple-Silicon
   transferability + Sketch2Simulation-as-sibling lens (the original note was a thin GPU-only framing).
 
-## What remains to be done (deferred until Dan's additional material lands)
+## What landed 2026-05-09
 
-1. **Stage Dan's additional QiMeng repos and papers.** ~4 repos + ~8 papers planned. As they land, place them in
-   `docs/repo-notes/` and `docs/paper-notes/` with full canonical structure per CLAUDE.md §Doc-type conventions, and
-   update [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md) and
-   [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md) to assign them to the new category.
-2. **Author the new repo-cluster synthesis** as `docs/syntheses/repo-clusters/g12-llm-hardware-design.md` (or
-   numbered as appropriate when it lands). Anchor the cluster around the QiMeng family. Treat Sketch2Simulation as
-   a cross-thread reference exemplar from the agentic-systems / process-engineering side of the same dream rather
-   than as a cluster member, since its repo is in g8 (sci-agents) and its paper is in B4.
-3. **Author the new thematic synthesis** as `docs/syntheses/llm-hardware-design-synthesis.md`. Frame it around
-   the **idea → reality** spine (per Dan's stated intent above): LLMs producing artifacts that downstream actors
-   accept and realize. QiMeng = hardware/kernels; Sketch2Simulation = process/flowsheets; future Linus skills =
-   schematics, designs, build instructions for Dan's tangible-things workflow. Cite as cross-thread exemplars where
-   appropriate without re-binning them.
-4. **Add the new bin to the next notes-consistency fan-out spec.** When a follow-up sweep runs, add B14 with the
-   QiMeng family as its primary content, plus 0549 and 2306.12456v2 as adjacent papers. Re-bin
+Dan added ten new QiMeng-family papers and three new QiMeng repos. The papers/repos pair up as follows; the family
+identifier comes from the ICT/CAS Yunji Chen / Qi Guo group's authorship overlap.
+
+**Papers (10) — all without paper-notes yet:**
+
+| Paper PDF | Short title | Repo pair | Notes |
+| --- | --- | --- | --- |
+| `13337-ZhouQ.pdf` | QiMeng-GEMM (AAAI-25) | — | LLM-generated high-perf GEMM code |
+| `2407.10424v5.pdf` | CodeV (Verilog gen via multi-level summarization) | `repos/CodeV` | Direct paper↔repo pair |
+| `2505.06302v1.pdf` | QiMeng-TensorOp | — | Tensor operators with hardware primitives |
+| `2505.24183v5.pdf` | QiMeng-CodeV-R1 (reasoning-enhanced Verilog via RLVR) | (extends `repos/CodeV`) | RLVR follow-up to CodeV |
+| `2506.11153v2.pdf` | QiMeng-MuPa (sequential→parallel CUDA) | `repos/QiMeng-MuPa` | Direct paper↔repo pair |
+| `2506.12355v1.pdf` | QiMeng-Attention (SOTA FlashAttention via SOTA algorithm) | — | LLM-generated attention kernels |
+| `2510.19296v4.pdf` | QiMeng-SALV (signal-aware Verilog gen) | `repos/QiMeng-SALV` | Direct paper↔repo pair |
+| `3696443.3708931.pdf` | VEGA (compiler back-end gen via pre-trained transformer) | — | Adjacent — same group, compiler back-ends |
+| `9546_AutoOS_Make_Your_OS_More_.pdf` | AutoOS (LLM-driven OS kernel config tuning) | — | OS-level adaptation, same group |
+| `osdi25-dong.pdf` | QiMeng-Xpiler (OSDI'25, neural-symbolic transcompilation) | — | Tensor-program transcompiler |
+
+**Repos (3) — all without repo-notes yet:**
+
+- `repos/CodeV` — pairs with `2407.10424v5.pdf`; covers `2505.24183v5.pdf` as the CodeV-R1 RL extension.
+- `repos/QiMeng-MuPa` — pairs with `2506.11153v2.pdf`.
+- `repos/QiMeng-SALV` — pairs with `2510.19296v4.pdf`.
+
+**Already-in-corpus QiMeng material (refresher):**
+
+- Paper-notes: `0549.md` (superscalar processor design), `2306.12456v2.md` (Push the Limits CPU design),
+  `2506.05007v1.md` (QiMeng: Fully Automated HW+SW Design — newly landed paper-note),
+  `2511.20099v4.md` (QiMeng-CRUX), `2511.20100v1.md` (QiMeng-Kernel).
+- Repo-note: `QiMeng-cpu-v1.md`.
+- Cross-thread exemplar (not a QiMeng member but the same idea→reality spine): paper `2603.24629v1.md`
+  (Sketch2Simulation) + repo `Sketch2Simulation` (in g8-sci-agents).
+
+After this batch lands, the QiMeng family will comprise **15 paper-notes + 4 repo-notes** worth of material,
+with five additional already-existing paper-notes (0549, 2306.12456v2, 2506.05007v1, 2511.20099v4, 2511.20100v1)
+that should be re-Connected to the new synthesis when it lands.
+
+## What remains to be done
+
+1. **Author paper-notes for the 10 new papers** (Worker fan-out). Match canonical paper-note structure per CLAUDE.md
+   §Doc-type conventions: YAML frontmatter, eight H2 sections (TL;DR through Open questions for Dan), Reusable-in-Linus
+   mapped to phases (Phase 1..8) with DEC/spec refs where applicable, Connections via relative links, sequentially
+   numbered open questions. Each note's "What's reusable in Linus" section should explicitly map to the **idea → reality**
+   spine — what artifact does the LLM produce, what downstream actor accepts it, and what must be true for Linus to
+   replicate the discipline locally. CodeV / CodeV-R1 should be authored together since they share a repo.
+2. **Author repo-notes for the 3 new repos** (Worker fan-out). Match canonical repo-note structure: H1 = `# <repo>
+   (\`<owner/repo>\`)`, seven numbered H2 sections, fixed-vocabulary verdict, sequentially numbered Section-7 questions.
+   Each repo-note links its paired paper-note(s).
+3. **Update the INDEX files** ([`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md) and
+   [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md)). For the new entries, mark them `_Pending llm-hardware-design_`
+   in the synthesis column until the new synthesis is authored. Same convention for the 5 already-in-corpus QiMeng
+   paper-notes whose current synthesis cell shows `_Uncovered_`.
+4. **Author the new repo-cluster synthesis** as `docs/syntheses/repo-clusters/g12-llm-hardware-design.md`. Anchor it
+   around the QiMeng family (4 repos), with Sketch2Simulation cited as a cross-thread reference exemplar (not a member
+   — its repo is in g8). Document the within-cluster pattern: the planner/coder discipline, the multi-level
+   summarization approach (CodeV), the signal-aware verification approach (SALV), the macro-thinking/micro-coding
+   paradigm (Kernel), and the RLVR feedback loop (CodeV-R1).
+5. **Author the new thematic synthesis** as `docs/syntheses/llm-hardware-design-synthesis.md`. Frame around the
+   **idea → reality** spine: QiMeng = hardware/kernels; Sketch2Simulation = process/flowsheets; future Linus skills
+   = schematics, designs, build instructions for Dan's tangible-things workflow. The thematic synthesis should
+   explicitly anchor on Dan's stated framing (Section "Dan's stated framing" above) and identify which QiMeng
+   patterns generalize beyond hardware.
+6. **Add the new bin to the next notes-consistency fan-out spec.** When a follow-up sweep runs, add B14 with the
+   full QiMeng family as primary content, plus 0549 and 2306.12456v2 as adjacent papers. Re-bin
    `2511.20099v4.md` and `2511.20100v1.md` from B9 (where the previous fan-out mis-binned them) into B14.
-5. **Author ADRs as needed.** When the new synthesis converges on architectural commitments (e.g., MTMC pipeline as a
-   Linus-internal pattern, idea→reality as a Phase 7 skill class), capture them under `docs/adr/` with new DEC-NNNN
-   slots.
-6. **Update existing notes' Connections.** Once the new syntheses exist, sweep the QiMeng papers + repo +
-   Sketch2Simulation paper + repo to add Connections-section pointers to the new syntheses. Currently those notes
-   reference each other and the old infra-foundations footnote; refresh the link targets.
+7. **Author ADRs as needed.** Candidates: (a) MTMC pipeline (Macro-Thinking Micro-Coding) as a Linus-internal pattern;
+   (b) idea→reality as a Phase 7 skill class; (c) CodeV-R1's RLVR loop as a Worker self-improvement substrate; (d) the
+   typed-structured-prediction-wrapping-rationale convention from CLAUDE.md applied to hardware design specifications.
+8. **Update existing notes' Connections.** Sweep `0549.md`, `2306.12456v2.md`, `2506.05007v1.md`, `2511.20099v4.md`,
+   `2511.20100v1.md`, `QiMeng-cpu-v1.md`, plus `2603.24629v1.md` and `Sketch2Simulation.md` to add Connections-section
+   pointers to the new syntheses once they exist.
 
 ## Out of scope today
 
-- Writing the new synthesis text. Dan's additional ~12 items must land first or the synthesis will need substantial
-  rewriting.
+- Writing the new synthesis text **before paper-notes and repo-notes for the new batch are authored**. The
+  fan-out should land first, then the synthesis can quote the canonical-structure note bodies.
 - Re-running the notes-consistency fan-out on B14 alone.
-- Creating any new ADRs preemptively.
+- Creating any new ADRs preemptively. Phase 6/7 ADR seeds can be drafted but committed only after the synthesis
+  reveals the durable architectural commitments.
 
 ## Status
 
 - 2026-05-08: seed authored. QiMeng prose removed from existing syntheses; landscape index updated;
   `2511.20100v1.md` reframed.
-- _Pending: Dan's additional QiMeng repos and papers land._
-- _Pending: synthesis authoring + ADRs + notes-consistency fan-out re-run on the new bin._
+- 2026-05-09: additional material landed (10 papers + 3 repos enumerated above). Active; next gate is paper-note +
+  repo-note authoring fan-out.
+- _Pending: paper-note authoring (10 notes), repo-note authoring (3 notes), INDEX updates._
+- _Pending: cluster synthesis (`g12-llm-hardware-design.md`) + thematic synthesis (`llm-hardware-design-synthesis.md`)._
+- _Pending: ADRs (MTMC pattern, idea→reality skill class, RLVR loop)._
+- _Pending: notes-consistency fan-out re-run on the new bin (B14)._
