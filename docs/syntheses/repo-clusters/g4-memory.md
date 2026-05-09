@@ -1,20 +1,26 @@
 # Group 4 Synthesis — Agent Persistent Memory
 
-**Date:** 2026-05-04 **Repos surveyed:** agentmemory, anamnesis, omega-memory, engram, remember, prompt-vault, openaugi,
+**Date:** 2026-05-08 **Repos surveyed:** agentmemory, anamnesis, omega-memory, engram, remember, prompt-vault, openaugi,
 memex, k-dense-byok (late addition) **Verdicts:** 8 × Study, 1 × Ignore (prompt-vault)
 
 ---
 
 ## What this document is
 
-A cross-cutting synthesis of eight repositories surveyed as part of the Phase 1 recon run, collectively constituting the
+A cross-cutting synthesis of nine repositories surveyed as part of the Phase 1 recon run, collectively constituting the
 "agent persistent memory" cluster. These repos are working reference implementations of what the memory architecture
 spec calls Layer C — cross-session episodic memory, the substrate that satisfies Garrison's reliable-history-access
 requirement across sessions, projects, and restarts. The theoretical case for this layer lives in
 [`docs/syntheses/memory-synthesis.md`](../memory-synthesis.md); the implementation contract lives in
-[`docs/specs/memory-architecture.md`](../../specs/memory-architecture.md) (DEC-0028 through DEC-0043). This document is
-the empirical layer beneath both: what have practitioners actually shipped, what design decisions did they make, and
-which of those decisions Linus can lift, steal, or avoid.
+[`docs/specs/memory-architecture.md`](../../specs/memory-architecture.md) (DEC-0028 through DEC-0043, plus DEC-0052).
+This document is the empirical layer beneath both: what have practitioners actually shipped, what design decisions did
+they make, and which of those decisions Linus can lift, steal, or avoid.
+
+**Layer numbering note (DEC-0052, 2026-05-06).** DEC-0052 inserted investigation memory as a fifth layer (Layer D)
+between cross-session episodic (Layer C) and semantic knowledge. The former Layer D (KnowledgeBase / semantic knowledge)
+is now Layer E throughout all specifications and code. This synthesis predates DEC-0052; references below to "Layer D"
+in the context of user-preference records, the KnowledgeBase, or semantic memory should be read as Layer E. Layer C
+(cross-session episodic) is still Layer C and is the primary subject of this document.
 
 ---
 
@@ -96,7 +102,10 @@ as an urgent question when parallel Workers begin writing to the same episodic s
 13 lifecycle hooks from SessionStart through TaskCompleted — is a fully worked answer to which Claude Code lifecycle
 events a Layer C implementation should subscribe to and what each one writes. The four-tier consolidation logic (Working
 → Episodic → Semantic → Procedural) is implementable in Python against a plain SQLite file without adopting iii-engine.
-The RRF triple-stream search in `src/state/hybrid-search.ts` is small, well-factored, and directly portable.
+The RRF triple-stream search in `src/state/hybrid-search.ts` is small, well-factored, and directly portable. _Partially
+resolved (DEC-0022, see [answered-questions.md](../../questions/answered-questions.md)): parallel Worker KB write
+coordination resolved as serialized writes + write-time contradiction surfacing; the lease/signal/checkpoint vocabulary
+for Phase 3 episodic-store coordination remains open._
 
 **remember's `scripts/extract.js` transcript walker is a ready reference for backfilling Layer C from existing session
 history.** Dan has months of Claude Code transcripts in `~/.claude/projects/*.jsonl`. The memory-architecture spec notes
@@ -145,12 +154,12 @@ researchers. The orchestrator/expert split directly mirrors Linus's Maestro/Work
 Phase 2's orchestration backend design. The skill routing logic — JSON-encoded skill summaries, model-driven selection,
 pass-through to the expert via tool calling — is directly portable to Linus's Phase 2 tool registry and Phase 3's
 multi-agent skill dispatch. K-Dense's multi-tab architecture with shared file-system sandboxes is an elegant pattern for
-session isolation; whether Dan adopts it for Linus depends on Phase 2's session-store design and whether parallel Workers
-need to coordinate file I/O. The cost tracking — especially the backfill logic from OpenRouter's generation API — solves
-the production problem of post-streaming cost attribution and is reusable patterns for any multi-model infrastructure.
-K-Dense runs against external APIs (OpenRouter, Exa, Modal) and is thus outside Linus's sovereignty mandate, but the
-routing, selection, and expert-dispatch patterns are orthogonal to the storage substrate and transfer directly to local
-infrastructure.
+session isolation; whether Dan adopts it for Linus depends on Phase 2's session-store design and whether parallel
+Workers need to coordinate file I/O. The cost tracking — especially the backfill logic from OpenRouter's generation API
+— solves the production problem of post-streaming cost attribution and is reusable patterns for any multi-model
+infrastructure. K-Dense runs against external APIs (OpenRouter, Exa, Modal) and is thus outside Linus's sovereignty
+mandate, but the routing, selection, and expert-dispatch patterns are orthogonal to the storage substrate and transfer
+directly to local infrastructure.
 
 ---
 
@@ -199,10 +208,11 @@ memory pillar implementation should produce a `docs/specs/memory-constitution.md
 not a separate runtime artifact; it is the human- and Maestro-facing description of the same rules the SQLite schema
 encodes. Memex has proved the pattern is portable across Claude, Codex, and Gemini.
 
-**The remember Persona.md pattern as the Layer D user-preference record.** A single small file capturing evolving user
+**The remember Persona.md pattern as the Layer E user-preference record.** A single small file capturing evolving user
 preferences, naming conventions, and working-style observations, injected into every session start, is the simplest
-implementation of Layer D's persistent user context. `linus.memory.persona.read()` wraps a read of this file; the file
-is maintained by the orchestration layer as a side effect of observations marked `trust_level=high`. The risk remember
+implementation of Layer E's persistent user context (semantic / KnowledgeBase layer; renamed from Layer D per DEC-0052
+when investigation memory took the Layer D slot). `linus.memory.persona.read()` wraps a read of this file; the file is
+maintained by the orchestration layer as a side effect of observations marked `trust_level=high`. The risk remember
 demonstrates — every observation gets appended with no provenance, including hallucinated ones — is the exact failure
 mode DEC-0030's trust-level field prevents.
 
@@ -225,9 +235,11 @@ lease/signal/checkpoint primitives.
 The LLM Wiki synthesis (G2/G3 clusters) surfaced many of the same repos from a different angle — agentmemory and
 openaugi appear in that synthesis as retrieval and memory reference implementations. This group extends that reading by
 examining the full episodic substrate, not just the retrieval shape. K-dense-byok appears here as well, contributing
-maestro/expert dispatch and skill routing patterns that bridge memory infrastructure to the orchestration layer discussed
-in the G7 harnesses synthesis. The G6 paper-qa cluster (if surveyed) would connect to Layer D (KnowledgeBase), which this
-group treats as already specified by DEC-0015 and the KnowledgeBase submodule.
+maestro/expert dispatch and skill routing patterns that bridge memory infrastructure to the orchestration layer
+discussed in the G7 harnesses synthesis. The g8-sci-agents cluster's paper-qa integration (DEC-0044) connects to Layer E
+(KnowledgeBase / semantic knowledge, renamed from Layer D per DEC-0052), which this group treats as already specified by
+DEC-0015 and the KnowledgeBase submodule. Paper-qa's adoption as Phase 2c KB retrieval engine is resolved; the
+connection is now concrete rather than conditional.
 
 The security synthesis's trust-tier separation pattern connects directly to anamnesis's authority-weighted hierarchy and
 to memex's cross-vendor enforcer. Both are answers to the same question: when Workers write to the memory store, how do
@@ -239,14 +251,14 @@ architecture adds a third dimension: session isolation and inter-tab visibility 
 
 ## Phase-tagged implications
 
-**Phase 2a (episodic store v0 substrate and orchestration routing):** Lift the openaugi two-table schema as the
-starting migration. Implement the agentmemory hook taxonomy as the lifecycle write contract. Adopt sqlite-vec + FTS5
-inside the same file; delete the Qdrant requirement from v0 scope. Add `supersedes_id` and `depends_on_id` columns now —
-zero-cost at definition time, expensive to add later. Write the `linus.memory.persona.read()` Layer D primitive using a
-Persona.md pattern from remember. Concurrently, lift k-dense-byok's skill-routing patterns (skill summary JSON encoding,
-model-driven selection logic, pass-through to Workers) into the Phase 2a tool-registry design. K-dense's 170-skill
-scale is overkill; a minimal 10–20-skill set (bioinformatics, document analysis, knowledge-base tools) is Phase 2a scope,
-with expansion deferred to Phase 3.
+**Phase 2a (episodic store v0 substrate and orchestration routing):** Lift the openaugi two-table schema as the starting
+migration. Implement the agentmemory hook taxonomy as the lifecycle write contract. Adopt sqlite-vec + FTS5 inside the
+same file; delete the Qdrant requirement from v0 scope. Add `supersedes_id` and `depends_on_id` columns now — zero-cost
+at definition time, expensive to add later. Write the `linus.memory.persona.read()` Layer E primitive (semantic layer,
+formerly Layer D; renamed per DEC-0052) using a Persona.md pattern from remember. Concurrently, lift k-dense-byok's
+skill-routing patterns (skill summary JSON encoding, model-driven selection logic, pass-through to Workers) into the
+Phase 2a tool-registry design. K-dense's 170-skill scale is overkill; a minimal 10–20-skill set (bioinformatics,
+document analysis, knowledge-base tools) is Phase 2a scope, with expansion deferred to Phase 3.
 
 **Phase 2b (backfill, retrieval, and session isolation):** Use `remember/scripts/extract.js` as the reference for a
 Python `linus.memory.episodic.backfill_from_history()` tool that walks `~/.claude/projects/*.jsonl` transcripts and
@@ -271,38 +283,44 @@ routing, with cost tracking backfill from each source.
 **Schema lift: verbatim or extended?** The openaugi `(blocks, links)` schema satisfies DEC-0029's requirements with
 almost no friction. The decision is whether to adopt the column names verbatim and add Linus-specific columns, or to
 rename to `(episodes, episode_links)` to signal ownership boundary from the first migration. Both are defensible; the
-choice should be made before Phase 2a opens the first migration file.
+choice should be made before Phase 2a opens the first migration file. _Open: promoted to
+[top-questions.md](../../questions/top-questions.md) as R2-09 (Tier 2)._
 
 **sqlite-vec vs Qdrant for v0.** Omega-memory and openaugi both prove that 384-dim cosine search inside the same SQLite
 file satisfies Phase 2 recall requirements with no separate service. DEC-0029 does not pin a vector substrate. The
 Algorithm says to delete the Qdrant service from v0 scope and add it back if sqlite-vec proves insufficient. Is the
 Qdrant choice already locked for reasons orthogonal to substrate count (HNSW performance, multi-tenant scoping), or is
-this an active deletion candidate?
+this an active deletion candidate? _Partially resolved (DEC-0029): DEC-0029 commits SQLite to Layer C; Qdrant stays as
+KB vector store (Layer E) — different layers. Episodic sqlite-vec question open as R2-10 (Tier 2)._
 
 **Does openaugi's schema get lifted verbatim?** This is the Phase 2 scoping question this cluster surfaces that the
 memory-synthesis does not address. The two-table schema is close enough to deployable that the question is not "design
 or reference?" but "lift or study?" The difference is whether the DEC-0029 migration file starts from the openaugi DDL
 or from a clean-room design informed by it. Lifting saves time and inherits battle-tested column choices; clean-room
-design preserves full alignment with Linus's naming conventions and avoids inheriting alpha-software debt. Given the
-spec's DEC-0029 column set is already specified
-(`session_id, turn_id, parent_turn_id, timestamp, role, segment, content_hash, content, trust_level, tags`), the
-clean-room path diverges from openaugi primarily at the `blocks` vs `episodes` naming level. This is worth resolving
-explicitly before Phase 2a implementation begins.
+design preserves full alignment with Linus's naming conventions and avoids inheriting alpha-software debt. DEC-0029's
+canonical column set is
+`(session_id, turn_id, parent_turn_id, timestamp, role, content_hash, content, trust_level, tags)`; the clean-room path
+diverges from openaugi primarily at the `blocks` vs `episodes` naming level. _Partially resolved (DEC-0029, see
+[answered-questions.md](../../questions/answered-questions.md)): SQLite + content hashes + git confirmed as v0
+substrate; detailed schema columns and naming deferred to Phase 2a memory-architecture.md spec. See R2-09 in
+top-questions.md._
 
 **Authority caps for Worker-generated memories.** Anamnesis calibrates AI-derived records at weight 1.0 (initial),
 earning up to 4.0 via reweight cycles, to prevent agent noise from drowning user-stated facts in retrieval. DEC-0029's
 `trust_level` field carries the same concept at the binary level. Should Linus's episodic retrieval apply an
 anamnesis-style continuous weight that Worker-generated records must earn, or is the binary trust-level field sufficient
-for Phase 2?
+for Phase 2? _Open: promoted to [top-questions.md](../../questions/top-questions.md) as R2-11 (Tier 2)._
 
 **Cross-vendor enforcer with local-only models.** Memex's enforcer depends on a genuinely different vendor catching what
 the writer missed. For Linus, the closest analogue is a different local model family auditing the episodic store.
 Whether that is adversarially strong enough to catch real inconsistencies is untested. Should the enforcer role escalate
 to hosted Claude (Maestro) on a periodic cadence, or is a local-model enforcer the right design even if it is weaker?
+_Open: tracked as R2-28 (Tier 3) in [top-questions.md](../../questions/top-questions.md)._
 
 ---
 
-_Inputs: `docs/repo-notes/{agentmemory,anamnesis,omega-memory,engram,remember,prompt-vault,openaugi,memex}.md`. Primary
-cross-references: `docs/syntheses/memory-synthesis.md`, `docs/specs/memory-architecture.md` (DEC-0028 through DEC-0043),
-`docs/syntheses/llm-wiki-synthesis.md`, `docs/landscapes/total-landscape.md` Crossing 5. Review trigger: when Phase 2a
-episodic store implementation begins; when Phase 3 parallel-Worker coordination spec is drafted._
+_Inputs:
+`docs/repo-notes/{agentmemory,anamnesis,omega-memory,engram,remember,prompt-vault,openaugi,memex,k-dense-byok}.md`.
+Primary cross-references: `docs/syntheses/memory-synthesis.md`, `docs/specs/memory-architecture.md` (DEC-0028 through
+DEC-0043, DEC-0052), `docs/syntheses/llm-wiki-synthesis.md`, `docs/landscapes/total-landscape.md` Crossing 5. Review
+trigger: when Phase 2a episodic store implementation begins; when Phase 3 parallel-Worker coordination spec is drafted._

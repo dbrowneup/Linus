@@ -1,6 +1,6 @@
 # Group 1 Synthesis — Apple Silicon Inference & Training
 
-**Date:** 2026-05-04 **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne) **Trigger:** G1 fan-out
+**Date:** 2026-05-08 **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne) **Trigger:** G1 fan-out
 synthesis pass; autoresearch-mlx repo note added as the new Group 1 entry.
 
 ---
@@ -57,15 +57,19 @@ Linus occupies.
 
 **pmetal is the load-bearing center of the cluster.** It is the only repo that covers both the inference path (Phase 2a
 OpenAI-compatible serving) and the training path (Phase 6 LoRA, preference optimization, distillation), and it ships
-production ANE integration using the same engineering patterns documented in the ANE repo. The cluster's other repos
-either feed into pmetal as context (ANE, BitNet, flash-moe as methodology reference) or extend it for specific use cases
-(mlx-flash for >RAM dense models, Bonsai for 1-bit endpoint coverage during Phase 1b evaluation). The Phase 1b pmetal
-verdict is the single decision that collapses the most open questions.
+production ANE integration using the same engineering patterns documented in the ANE repo. The repo has expanded
+substantially since the initial recon pass: `pmetal-models` now covers 18+ architectures including Qwen3 MoE, Llama 4
+Scout/Maverick, DeepSeek V3, NemotronH, and Jamba; hardware auto-detection has been extended to M5's NAX accelerator;
+training methods include GRPO and DAPO alongside the original DPO suite. The cluster's other repos either feed into
+pmetal as context (ANE, BitNet, flash-moe as methodology reference) or extend it for specific use cases (mlx-flash for
+
+> RAM dense models, Bonsai for 1-bit endpoint coverage during Phase 1b evaluation). The Phase 1b pmetal verdict is the
+> single decision that collapses the most open questions.
 
 **autoresearch-mlx makes the research loop executable, not just aspirational.** The upstream autoresearch repo required
 an NVIDIA GPU, making it study material with a mental note to adapt later. autoresearch-mlx closes that gap: the
 identical keep-or-revert loop, with `program.md` as the skill sheet and branch-per-run as the branch discipline, runs
-today on M1 Max via a single `uv sync && uv run`. More importantly, it surface a hardware-conditional finding that
+today on M1 Max via a single `uv sync && uv run`. More importantly, it surfaces a hardware-conditional finding that
 matters for Linus's Phase 6 planning: the winner optimizer and architecture on M4 Max is different from what wins on M4
 Mac Mini. Transferring training recipes from someone else's results table is not safe. The autoloop has to run on Dan's
 actual machine.
@@ -119,10 +123,12 @@ while the GPU works on layer N, and uses a token-bucket actuator to pace reads v
 under 5% GPU degradation from streaming overhead. This is not a library Linus imports; it is the reference design for
 "how do you stream weights without thrashing the GPU?" and the answer shapes every future >RAM inference decision.
 
-The `pmetal-mcp` crate, which ships 45 MCP tools for Claude Desktop, deserves a decision in Phase 2a planning: is it a
-serious candidate for part of the Linus tool registry (Linus wraps pmetal-mcp and adds KnowledgeBase tools on top), or
-does Linus own all tool definitions independently and treat pmetal-mcp as study material? This is not a Phase 1 question
-but it needs to appear in Phase 2a design documents before the tool registry is built.
+The `pmetal-mcp` crate, which ships 45 MCP tools for Claude Desktop, is resolved as a Phase 2a design question: Linus
+owns all in-house tool definitions via fastmcp; `pmetal-mcp` is consumed as an external server, not the registry
+foundation (DEC-0018, DEC-0045, ARCHITECTURE.md C.1). The crate remains worth understanding as a reference for what a
+well-scoped inference-layer MCP surface looks like, and the pmetal-mhc crate (Manifold-Constrained Hyper-Connections,
+linked to the JPmHC paper `2602.18308` in the context folder) is a potential Phase 6 training experiment worth
+revisiting when the LoRA pipeline matures.
 
 The IOSurface zero-copy pipeline from the ANE repo — GPU prefill feeding the ANE decode stage with shared memory, no
 copy, synchronization via GCD dispatch — is the engineering pattern that makes ANE + GPU hybrid inference fast rather
@@ -170,9 +176,12 @@ downstream in this cluster is gated on that verdict.
 **Phase 1c (benchmark sweep):** Four model families should run against Dan task suite: `qwen2.5-coder:7b` and
 `mistral:7b-instruct` as the baselines; `bitnet-b1.58-2B-4T` and `llama3-8b-1.58` via Ollama as the 1-bit quality-cost
 measurement; Bonsai-8B-mlx-1bit and Ternary-Bonsai-8B-mlx-2bit via the Bonsai setup script as the Apple-Silicon-native
-1-bit path. The question "how much quality does 1.58-bit actually cost on Dan's task suite?" is answerable in a day and
-informs every Phase 6 fine-tuning lane decision. The autoresearch-mlx smoke run (verbatim 5-minute loop, reproduce a few
-rows of `results.tsv`) should happen alongside Phase 1c to establish a hardware-local baseline before Phase 6d needs it.
+1-bit path. The Bonsai Ternary 8B (released April 2026, 1.75 GB on disk) now represents the strongest available native-
+low-bit Worker — its published 75.5 benchmark average (95% of FP16 Qwen3-8B) frames the baseline quality gap; Dan's task
+suite will test whether that gap holds on domain-specific work. The question "how much quality does 1.58-bit actually
+cost on Dan's task suite?" is answerable in a day and informs every Phase 6 fine-tuning lane decision. The
+autoresearch-mlx smoke run (verbatim 5-minute loop, reproduce a few rows of `results.tsv`) should happen alongside Phase
+1c to establish a hardware-local baseline before Phase 6d needs it.
 
 **Phase 1d / Phase 1f (memory-related spikes from DEC-0033, DEC-0034, DEC-0037, DEC-0038):** The per-Worker CoT-gap
 fingerprint spike (DEC-0033) and worker-size-versus-CoT-length comparison (DEC-0034) run against the same Phase 1c model
@@ -181,8 +190,10 @@ Phase 1f) is a direct output of the memory synthesis's substrate alternative ana
 through the "recurrent backends as a first-class inference option" claim.
 
 **Phase 2a (orchestration layer and serving backend):** If Phase 1b is favorable, pmetal-serve slots in as the
-OpenAI-compatible endpoint. The pmetal-mcp tool registry question needs a decision here. Bonsai's `llama-server` is the
-fallback 1-bit endpoint during transition. mlx-flash is not Phase 2a work; it enters at Phase 5+.
+OpenAI-compatible endpoint. The pmetal-mcp tool registry question is resolved (DEC-0018, DEC-0045): Linus owns in-house
+tool definitions via fastmcp; pmetal-mcp is consumed as an external server. Bonsai's `llama-server` is the fallback
+1-bit endpoint during transition pending the Phase 1b verdict (DEC-0049). mlx-flash is not Phase 2a work; it enters at
+Phase 5+.
 
 **Phase 5+ (>RAM dense inference):** mlx-flash enters here as the "any fine-tuned model that exceeds RAM runs via
 streaming at native precision" path. The Phase 1c native-precision throughput benchmark on M1 Max (what tok/s does
@@ -197,16 +208,16 @@ running unsupervised overnight on its own agent branch) needs a corresponding SA
 run fully unattended — that graduation step should be planned in Phase 6's setup rather than discovered mid-run.
 
 **Phase 8 (beyond MacBook):** The minGRU × BitNet × mlx-flash research direction (recurrent + 1-bit + streamed) is the
-long-horizon G1 target for inference. No Phase 6 or Phase 7 work is gated on either
-direction, but together they describe the direction the cluster collectively points at when its components are combined
-rather than considered individually.
+long-horizon G1 target for inference. No Phase 6 or Phase 7 work is gated on either direction, but together they
+describe the direction the cluster collectively points at when its components are combined rather than considered
+individually.
 
 ---
 
 ## Open questions for Dan
 
-_Resolved (DEC-0027, [answered-questions.md](../../questions/answered-questions.md)): "Trust the OS page cache" is now both a named
-Engineering Convention and a Known Library Quirk in CLAUDE.md._
+_Resolved (DEC-0027, [answered-questions.md](../../questions/answered-questions.md)): "Trust the OS page cache" is now
+both a named Engineering Convention and a Known Library Quirk in CLAUDE.md._
 
 **Does the ANE prefill + GPU decode configuration belong in Phase 1b's explicit benchmark matrix?** The ANE repo
 confirms it is real on M4 and pmetal ships the implementation. Dan's M1 Max is the hardware the benchmark must run on.
@@ -226,8 +237,8 @@ minute/experiment cycle on this chip before Phase 6d planning needs those number
 infrastructure that isn't Phase 1's critical path. The case for doing it now is that it takes less time to run the
 experiment than to estimate it.
 
-_Resolved (DEC-0018, DEC-0045, ARCHITECTURE.md C.1): Linus's tool registry is MCP-shape from Phase 2 onwards, built
-on fastmcp. pmetal-mcp is the first **external** MCP server consumed via client adapter — not the registry foundation
+_Resolved (DEC-0018, DEC-0045, ARCHITECTURE.md C.1): Linus's tool registry is MCP-shape from Phase 2 onwards, built on
+fastmcp. pmetal-mcp is the first **external** MCP server consumed via client adapter — not the registry foundation
 itself. The decision is captured in ARCHITECTURE.md's Tool registry section._
 
 ---

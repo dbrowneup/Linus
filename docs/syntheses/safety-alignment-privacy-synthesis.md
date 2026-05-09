@@ -108,20 +108,22 @@ that defeats the Maestro/Worker architecture, which intentionally relies on host
 implication is that _which workflows sit on which side of the boundary_ is a safety property, not an efficiency one. The
 KnowledgeBase routing question is the sharpest case: KB content includes Dan's annotations, his voice, his unpublished
 writing — exactly the substance the deanonymization paper exploits. Routing KB retrieval through a hosted-Maestro prompt
-is the worst-case version of the threat model. Default: KB content is local-Worker-only unless explicitly overridden per
-request, with the tool registry carrying a `privacy_tier` field that makes the default enforceable rather than
-aspirational.
+is the worst-case version of the threat model. DEC-0053 resolves this policy: KB content is tagged at ingest time with a
+`hosted-ok` / `hosted-forbidden` binary (defaulting to `hosted-forbidden`); the retrieval layer enforces the tag
+automatically at query time with no runtime override. Dan's personal notes, draft writing, and LanzaTech proprietary
+data are architecturally excluded from hosted-model exposure, not by caller discipline.
 
 ### Activation observability as an orchestration primitive
 
 The deeper architectural lesson from Beaglehole is that activations should be a real observation surface for the
 orchestration layer, not an opaque model-internal blob. When Linus runs a Worker through pmetal-serve, mlx-lm, or
 llama.cpp via Ollama, the inference layer is _ours_ and can in principle expose hooks for reading and perturbing block
-outputs. Today Ollama does not; mlx-lm could; pmetal is open. Put a stub `linus.observability.activations.*` API into
-ARCHITECTURE.md _now_, before mlx-lm integration solidifies — naming the surface lets later phases plug things in
-without re-architecting; leaving it implicit defaults to the cheaper-to-ship option. The cost on M1 Max is real and
-worth a Phase 1 spike: instrument Llama-3.1-8B-4bit through mlx-lm, measure latency and memory hit of one attached
-probe, calibrate whether real-time activation monitoring is a viable Phase 7 primitive or deferred-to-bigger-hardware.
+outputs. DEC-0054 accepts this commitment: an `ActivationHooks` stub class now lives in `src/linus/` (Phase 1, no-op
+implementation), and a Phase 2 feasibility spike against Llama-3.1-8B-4bit or Qwen3-7B via mlx-lm is committed — with an
+explicit decision rule: if mlx-lm exposes hooks with <5ms per-token overhead, implement real hooks in Phase 2; otherwise
+defer to Phase 6 and note the upstream dependency. The stub surface (`register_hook`, `get_activation`, `clear_hooks`,
+`list_registered`) is stable enough for Phase 2–4 callers to be authored against it before the implementation exists,
+which prevents the pattern where interpretability tooling gets indefinitely deferred.
 
 ### Maestro-as-empirical-object
 
@@ -130,12 +132,12 @@ that resists "rule-breaking" and "moral nihilism" with explicit ethical articula
 currently has, and Linus depends on specific parts. Linus relies on the Maestro's _epistemic_ values for synthesis
 (transparency, thoroughness, clarity, accuracy) and on its _prosocial_ defaults for safe-by-default behavior. Linus
 actively _counters_ the Maestro's mirroring tendency in code review (Dan wants skepticism, not affirmation), its
-over-hedging in technical advice, and its default warmth in technical contexts. Making these dependencies explicit in a
-short `docs/maestro-protocol.md` (or a section of VISION.md) lets Linus react to version changes that shift the
-relied-on behaviors. "Claude 4.7 mirrors more than 4.6" should be actionable; today there is nowhere to put the finding.
-The context-dependence finding implies the orchestration layer's task-spec template needs a mandatory `value_frame`
-field whose default for technical tasks is "terse, skeptical, non-mirroring" rather than letting the Maestro's
-deployment-mode defaults leak in.
+over-hedging in technical advice, and its default warmth in technical contexts. Making these dependencies explicit in
+`docs/maestro-protocol.md` lets Linus react to version changes that shift the relied-on behaviors. "Claude 4.7 mirrors
+more than 4.6" should be actionable. That document now exists (Phase 2a deliverable per S57 / planning-update-spec.md),
+closing the "nowhere to put the finding" gap this synthesis identified. The context-dependence finding implies the
+orchestration layer's task-spec template needs a mandatory `value_frame` field whose default for technical tasks is
+"terse, skeptical, non-mirroring" rather than letting the Maestro's deployment-mode defaults leak in.
 
 ### Privacy through local execution
 
@@ -175,51 +177,51 @@ in Phase 3.
 ### Each paper implies a SAFETY.md addition
 
 Each paper implies a specific concrete addition; the four form a coherent revision plan filling gaps the current
-document explicitly leaves open. SAFETY.md is well-designed for OS/filesystem safety but does not address
-content-leakage policy (deanonymization), domain- specific refusal categories (dual-use), the instrument-able interior
-of local Workers (Beaglehole), or the dependencies Linus has on specific Maestro behaviors (Values). The next section
-makes the four additions concrete.
+document explicitly leaves open. Two of the four additions have now landed: the three-tier biosecurity policy (DEC-0047,
+from Soice et al.) and the KB → hosted-Maestro flow policy (DEC-0053, from the deanonymization paper) are in SAFETY.md
+as of 2026-05-07 (PR #16). The remaining two — stylometric/identity-leakage content-tiering and Maestro-values
+dependency declarations — are scoped as Phase 2a additions. The next section records all four for completeness.
 
 ---
 
 ## Implications for SAFETY.md
 
-The four proposed additions can ship as a single coherent revision PR, each a section of a few paragraphs.
+Two of the four additions are now in SAFETY.md (PR #16, 2026-05-07); two remain Phase 2a scope.
 
-**"Stylometric and identity leakage to hosted models"** (from [deanonymization](../paper-notes/2602.16800v2.md)). A new
-section alongside "Network safety". SAFETY.md currently restricts _which destinations_ outbound connections may reach
-but does not address _what content_ may be sent to permitted destinations. Establish a content- tiering policy: code
-excerpts and abstract architecture discussion are low-risk for hosted dispatch; KB snippets and personal notes are
-high-risk and require explicit per-request consent. The audit log gains `destination`, `content-class`, and `bytes-sent`
-per request, so aggregate disclosure is inspectable. KB-sourced content defaults to `local-only`, with hosted dispatch
-explicitly opt-in per request.
+**"Stylometric and identity leakage to hosted models"** _(Phase 2a, pending)_ (from
+[deanonymization](../paper-notes/2602.16800v2.md)). A new section alongside "Network safety". SAFETY.md currently
+restricts _which destinations_ outbound connections may reach but does not address _what content_ may be sent to
+permitted destinations. Establish a content-tiering policy: code excerpts and abstract architecture discussion are
+low-risk for hosted dispatch; KB snippets and personal notes are high-risk and require explicit per-request consent. The
+audit log gains `destination`, `content-class`, and `bytes-sent` per request, so aggregate disclosure is inspectable.
+Note: the KB → hosted boundary is now enforced structurally via DEC-0053 (`hosted-ok / hosted-forbidden` binary at
+ingest); what remains is the per-request content audit-log policy and the "redact-before-paste" tooling.
 
-**"Biological dual-use"** (from [Soice et al.](../paper-notes/2306.03809v1.md)). A new section establishing
-orchestration-layer hard refusal on certain biology queries regardless of caller or intent framing. Refusal categories
-follow the paper's exploited surface: pandemic-pathogen synthesis, enhancement-mutation lookup for the named agents,
-reverse-genetics protocol surfacing, vendor-screening status lookups, BLAST-evasion methodology, CRO/cloud- lab routing
-for organism construction. Linus commits to _not building_ tools that look up vendor screening status or interface with
-CRO APIs. Biology-skill autonomy-tier graduation requires passing a dual-use red-team probe set; the KnowledgeBase is
-audited once against hazard categories before any biology-skill RAG goes live. The caller-invariant framing holds for
-Dan because the audit log is otherwise an exfiltration risk if the machine is compromised, the discipline only
-generalizes to a future multi-user Linus if it holds today, and Dan's PhD-biochem expertise _raises_ salience rather
-than lowering it.
+**"Biological dual-use"** _(landed, SAFETY.md PR #16, 2026-05-07; DEC-0047)_ (from
+[Soice et al.](../paper-notes/2306.03809v1.md)). The three-tier biosecurity policy is now in SAFETY.md: Tier A
+(residue-level, no gate), Tier B (gene-level, per-invocation Dan sign-off), Tier C (whole-genome, sign-off plus
+out-of-band review). Tool registry entries carry a `biosecurity_tier` field; Workers enforce the gate at dispatch time.
+The caller-invariant framing holds: refusal is at the orchestration layer regardless of intent framing or caller
+identity. The dual-use red-team probe set (20–40 prompts from the paper's exploited categories) remains a Phase 1
+benchmark deliverable gating any biology Worker or fine-tune.
 
-**"Supervised activation steering and monitoring as a Phase 7 sandbox primitive"** (from
-[Beaglehole et al.](../paper-notes/science.aea6792.md)). The sandbox eventually includes behavioral observation from
-inside the model, not just policy gates around it. Commits Linus to a stub `linus.observability.activations.*` API in
-ARCHITECTURE.md _now_ (no-op for Ollama, real hooks for mlx-lm in Phase 6/7), to a Phase 1 M1 Max viability spike on
-activation-capture latency, and to "steering before fine-tuning" ordering in Phase 6 — try RFM steering first, escalate
-to LoRA only if insufficient. First concept worth probing is _hallucination_ (general, immediate KB-RAG payoff); the
-most load- bearing for safety is a probe firing on dual-use biology content, operationalizing the dual-use refusal
-policy above. The two additions compose.
+**"Supervised activation steering and monitoring as a Phase 7 sandbox primitive"** _(stub landed, DEC-0054; feasibility
+spike Phase 2)_ (from [Beaglehole et al.](../paper-notes/science.aea6792.md)). The `ActivationHooks` stub is now in
+`src/linus/` (Phase 1, no-op implementation per DEC-0054). The Phase 2 feasibility spike against Llama-3.1-8B-4bit or
+Qwen3-7B via mlx-lm is committed; the decision rule (hooks with <5ms per-token overhead → real implementation in Phase
+2; otherwise → Phase 6 with upstream dependency note) is codified. Phase 6 "steering before fine-tuning" ordering — try
+RFM steering first, escalate to LoRA only if insufficient — is deferred to Phase 6 planning after the Phase 2 spike
+result (per the partial-resolution in the Beaglehole note, Q2). First concept worth probing remains _hallucination_
+(most general, immediate KB-RAG payoff); the highest-safety probe is dual-use biology content, operationalizing the
+biosecurity tier above. The two additions compose.
 
-**"Maestro-values dependency declarations"** (from [Values](../paper-notes/Values_Paper__camera_ready_COLM_.md)). A
-short section, possibly cross-referencing a `docs/maestro-protocol.md` companion, listing the hosted-Claude values Linus
-relies on (epistemic honesty, transparency, thoroughness) and the values Linus actively counters (sycophantic mirroring,
-over-hedging, default warmth in technical contexts). Making the dependency explicit is what lets Linus react to Maestro
-version changes — without it, "Claude 4.7 mirrors more than 4.6" is folklore rather than actionable. Commits the
-task-spec template to a mandatory `value_frame` field with per-task-class defaults.
+**"Maestro-values dependency declarations"** _(Phase 2a, pending)_ (from
+[Values](../paper-notes/Values_Paper__camera_ready_COLM_.md)). A short section cross-referencing
+`docs/maestro-protocol.md` (which now exists per S57), listing the hosted-Claude values Linus relies on (epistemic
+honesty, transparency, thoroughness) and the values Linus actively counters (sycophantic mirroring, over-hedging,
+default warmth in technical contexts). Making the dependency explicit is what lets Linus react to Maestro version
+changes — without it, "Claude 4.7 mirrors more than 4.6" is folklore rather than actionable. Commits the task-spec
+template to a mandatory `value_frame` field with per-task-class defaults.
 
 ---
 
@@ -227,13 +229,14 @@ task-spec template to a mandatory `value_frame` field with per-task-class defaul
 
 Beyond SAFETY.md, the four papers imply architectural commitments to be wired in as the system is built.
 
-The activation-observability stub `linus.observability.activations.*` needs to be named in ARCHITECTURE.md before mlx-lm
-integration solidifies. Shape: `read`, `monitor`, `steer` over `(model, layer, …)`. Naming the contract now lets later
-phases plug in real implementations behind a stable interface.
+The `ActivationHooks` stub (`register_hook`, `get_activation`, `clear_hooks`, `list_registered`) is now in `src/linus/`
+per DEC-0054. ARCHITECTURE.md should surface this as a named observation interface before the mlx-lm integration
+solidifies; callers can be written against the stub API in Phase 2–4 regardless of whether the implementation exists.
 
-The tool registry schema needs a `privacy_tier` field on every tool and skill (`local-only`, `hosted-allowed`,
-`hosted-warn`). The router refuses by default to chain a `hosted-allowed` tool onto `local-only` data without explicit
-per-request consent. KB retrieval defaults to `local-only`. Phase 2 design commitment.
+The tool registry schema needs a `biosecurity_tier` field (landed, DEC-0047) and a KB content `flow_category` field
+(`hosted-ok` / `hosted-forbidden`, landed, DEC-0053). The remaining registry field — a per-skill privacy annotation
+governing whether a skill may be chained onto personal or proprietary data for hosted dispatch — is a Phase 2a design
+commitment. KB retrieval defaults to `hosted-forbidden`.
 
 A "redact-before-paste" CLI utility surfaces identity signal in snippets about to be sent to hosted Claude. Worth
 building in Phase 1 as a standalone tool, so the discipline is in muscle memory by the time the Phase 2 substrate
@@ -280,22 +283,23 @@ unexpectedly? Phase 6/7 capability, but scoping it now lets the audit log preser
 
 ## Tensions and open questions
 
-**Should Linus's local Worker inference layer expose activation hooks, and on what schedule?** Binary decision:
-black-box inference (faster to ship) or per-block hooks (more engineering, enables steering, monitoring, future
-tooling). Recommend stubbing the API in Phase 1, feasibility spike in Phase 2 against Llama-3.1-8B-4bit on mlx-lm,
-commit to Phase 6 or 7 deliverable based on the spike result.
+**Should Linus's local Worker inference layer expose activation hooks, and on what schedule?** _Resolved (DEC-0054, see
+[answered-questions.md](../questions/answered-questions.md)): Phase 1 stub committed; Phase 2 feasibility spike against
+Llama-3.1-8B-4bit or Qwen3-7B via mlx-lm committed with decision rule; Phase 6 steering ADR conditional on spike
+result._
 
-**Should KnowledgeBase content ever flow to hosted Maestro?** Conservative answer: forbidden by default, opt-in per
-request. Open question is whether even the opt-in path is safe for genuinely sensitive content (Dan's notes, draft
-writing), or whether a category should be marked `hosted-forbidden` with no override at all.
+**Should KnowledgeBase content ever flow to hosted Maestro?** _Resolved (DEC-0053, see
+[answered-questions.md](../questions/answered-questions.md)): `hosted-ok` / `hosted-forbidden` binary tag at ingest;
+conservative default `hosted-forbidden`; no runtime override. Dan's notes, drafts, and proprietary data are
+architecturally excluded._
 
-**Should there be a `docs/maestro-protocol.md`?** The Values paper argues the Maestro is not a black box and Linus
-depends on specific characterized behaviors. A new document seems cleaner than extending VISION.md because the
-dependencies are operational rather than aspirational.
+**Should there be a `docs/maestro-protocol.md`?** _Resolved (S57, see
+[answered-questions.md](../questions/answered-questions.md)): scheduled for Phase 2a; document now exists._
 
-**Should the four SAFETY.md additions ship as a single PR or staged?** Synthesis-internal answer: single PR — the four
-form a coherent posture and are each small enough. Pragmatic counter: four substantive policy changes at once gives Dan
-less time to think about each in isolation. Recommend single PR with explicit per-section Dan review.
+**Should the four SAFETY.md additions ship as a single PR or staged?** _Resolved (S58, see
+[answered-questions.md](../questions/answered-questions.md)): single PR, per-section Dan review; PR #16 shipped
+2026-05-07 landing the biosecurity tier and KB flow policy. Stylometric leakage and Maestro-values additions remain
+Phase 2a._
 
 **Is supervised activation steering a viable cheaper alternative to LoRA fine-tuning?** Cost case is strong. Open
 question: does it generalize to the modulations Linus actually wants (terseness, domain terminology, hallucination
@@ -331,8 +335,8 @@ instrument. A Phase 6 spike combining the two — continuous-state preservation 
 vectors applied to that preserved state — is worth flagging now.
 
 It connects to Group D agentic systems via the sandbox-and-audit-log shared substrate: the orchestration layer additions
-proposed here (`privacy_tier` on tools, query-screening as a control category, provenance fields in the audit log)
-extend the same infrastructure Group D already requires.
+here (`biosecurity_tier` and `flow_category` on tools, query-screening as a control category, provenance fields in the
+audit log) extend the same infrastructure Group D already requires.
 
 It connects to Group E (LLMs in science) via two threads. The Marelli attribution position from Binz et al. — that AI
 contributions should be attributable in scientific work — gains operational footing from the Values paper: if model
@@ -348,8 +352,8 @@ pick up the tensions surfaced above.
 
 ---
 
-_This synthesis is a point-in-time reading as of 2026-05-03. It should be revisited when SAFETY.md is revised against
-the four proposed additions, when the activation-observability stub lands in ARCHITECTURE.md, when the first
-activation-monitoring spike runs on M1 Max, when a biology Worker is first considered for the skill registry, and
-whenever a new paper in the steering / monitoring / deanonymization / dual-use / values-characterization line lands in
-`context/papers/`._
+_This synthesis was written 2026-05-03; updated 2026-05-08 to reflect resolved decisions (DEC-0053 KB flow policy,
+DEC-0054 activation hooks stub, DEC-0047 biosecurity tier, S57 maestro-protocol.md, S58 SAFETY.md PR #16). Next revisit
+triggers: Phase 2 activation-hooks feasibility spike result; stylometric-leakage and Maestro-values SAFETY.md additions
+landing; Phase 6 steering-before-fine-tuning ADR; biology Worker first considered for the skill registry; new paper in
+the steering / monitoring / deanonymization / dual-use / values-characterization line in `context/papers/`._

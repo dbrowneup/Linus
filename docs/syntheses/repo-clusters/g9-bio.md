@@ -1,6 +1,6 @@
 # Group 9 Synthesis — Bioinformatics & Domain-Specific Science Models
 
-**Date:** 2026-05-04 **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne) **Trigger:** G9 fan-out
+**Date:** 2026-05-08 **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne) **Trigger:** G9 fan-out
 synthesis pass; four new repos evaluated: Bacformer, BioReason, bioSkills, deepsems.
 
 ---
@@ -65,7 +65,9 @@ install is plain `torch>=2.5.1` plus `transformers` — no flash-attn required f
 Phase 1 evaluation spike: stand up Bacformer Large in a dedicated conda env, run the operon-prediction and
 strain-clustering tutorials end-to-end on MPS, capture wall-clock and memory in `benchmarks/results/`, and let that
 number determine whether this becomes a Phase 7 skill or stays study material. No other bio FM in the collection offers
-a comparable path to practical M1 Max deployment.
+a comparable path to practical M1 Max deployment. Biosecurity note: per DEC-0047 (SAFETY.md three-tier policy), the
+causal protein-family-modeling checkpoint is Tier B — explicit Dan sign-off per invocation, not agentic-executable;
+read-only embedding and clustering use of the masked checkpoints stays Tier A.
 
 **BioReason is architecturally important but operationally blocked.** The paper (arXiv 2505.23579) describes a working
 DNA-encoder-plus-LLM fusion that achieves 98.28% on a 290-datapoint KEGG disease-pathway benchmark versus 86–90% for
@@ -76,11 +78,18 @@ reasoning trace. No cross-attention, no custom layers, no exotic bridging — th
 to genomics. But the code is CUDA-locked at the seams: `device_map='cuda'` is hard-coded in the model load, DeepSpeed
 Stage 2 is required for training, vLLM is the inference backend, and the Evo2 path depends on NVIDIA Triton kernels.
 Checkpoints are not yet released. This is Study for Phase 1 and potentially Phase 3, with a Phase 6 aspiration: once
-MLX-native training infrastructure is established, the BioReason recipe (tokenizer extension
+MLX-native training infrastructure is established, the BioReason recipe (tokenizer extension + linear projection + GRPO)
+is small enough to re-implement with NucleotideTransformer-500M and Qwen3-1.7B as the components that have working MLX
+ports. The re-implementation is more interesting than vendoring the upstream code would have been.
 
-- linear projection + GRPO) is small enough to re-implement with NucleotideTransformer-500M and Qwen3-1.7B as the
-  components that have working MLX ports. The re-implementation is more interesting than vendoring the upstream code
-  would have been.
+The BioReason-Pro follow-up (bioRxiv 2026.03.19.712954) swaps the DNA encoder for ESM3 protein embeddings and adds
+GO-GPT + RL to generate protein-function annotations preferred over UniProt at 79%. It is the more direct Linus prior
+art: per CLAUDE.md §"Typed structured prediction for biology skills" (resolved S25, 2026-05-06), every Linus biology
+skill producing a predictive output adopts the BioReason-Pro shape — typed structured result wrapping a free-text
+`rationale` field (e.g.,
+`{gene: "BRCA1", predicted_function: "...", confidence: 0.87, evidence: [...], rationale: "..."}`). Residue-level
+BioReason-Pro outputs sit in Tier A of the DEC-0047 biosecurity policy (standard sandbox); only gene/whole-genome
+generation paths escalate to Tier B/C.
 
 **deepsems is a narrow, validated, wrappable capability.** The DeepSeMS transformer (6+6 encoder-decoder, 512 hidden,
 eight heads, ~80 LOC of model code) predicts SMILES structures for natural products from biosynthetic gene clusters
@@ -93,6 +102,8 @@ sequence-to-sequence transformer from 2017 — but in the curated MIBiG-derived 
 `predict_bgc_product(genbank_or_fasta)` that calls all 10 checkpoints, ranks SMILES by consensus count, and links output
 to ChEMBL/PubChem records in KnowledgeBase. Phase 3 is gated on a reproducibility check of the headline numbers —
 dataset leakage at 290 evaluation examples is a real risk — which belongs to Dan or a Worker with the paper in context.
+Biosecurity note: per DEC-0047, DeepSeMS BGC→SMILES generation is Tier B — the Phase 3 wrapper must surface proposed
+SMILES to Dan and await approval before any downstream action (e.g., KnowledgeBase indexing).
 
 ---
 
@@ -105,12 +116,15 @@ separate transformer — is applicable anywhere Linus encounters a sequence of t
 structure. Chunks of papers embedded by a sentence encoder and then processed by a longer-context model is the direct
 information-retrieval analog. This is a transferable design idea, not just a bio trick.
 
-**Tokenizer extension via special tokens and linear projection (BioReason).** The three-token contract (`<|dna_start|>`,
-`<|dna_pad|>`, `<|dna_end|>`) plus a single `nn.Linear` projection from encoder hidden size to LLM hidden size is a
-minimal and portable recipe for adding a new modality to an existing instruct-tuned LLM without retraining the base. The
-Linus Phase 6 bio-multimodal design should start from this pattern. The fact that it achieves near-parity with much more
-elaborate fusion approaches (cross-attention bridges, full fine-tuning of both encoders) while remaining simple enough
-to re-implement in a week is important evidence for the "delete before building" principle.
+**Tokenizer extension via special tokens and linear projection (BioReason / BioReason-Pro).** The three-token contract
+(`<|dna_start|>`, `<|dna_pad|>`, `<|dna_end|>`) plus a single `nn.Linear` projection from encoder hidden size to LLM
+hidden size is a minimal and portable recipe for adding a new modality to an existing instruct-tuned LLM without
+retraining the base. The Linus Phase 6 bio-multimodal design should start from this pattern. BioReason-Pro extends it to
+protein embeddings (ESM3 + GO-GPT), demonstrating the same recipe transfers across biological modalities. Both produce
+typed structured outputs with a free-text `rationale` field — the shape now codified in CLAUDE.md §"Typed structured
+prediction for biology skills" (S25, DEC-0047 Tier A). The fact that this achieves near-parity with much more elaborate
+fusion approaches while remaining simple enough to re-implement in a week is important evidence for the "delete before
+building" principle.
 
 **GRPO for reasoning elicitation, not alignment (BioReason).** The KEGG result — LoRA SFT reaches 95.86%, GRPO lifts it
 to 98.28% on the same backbone — demonstrates that reinforcement learning with verifiable rewards is a distinct training
@@ -155,11 +169,12 @@ molecular graphs and SMILES; BioReason does it for DNA sequences. They are the s
 sciences, which is a useful convergence signal. When Linus considers a Phase 6 bio-multimodal training run, these two
 repos together define the template.
 
-**Memory synthesis (scratchpad retention and episodic store).** The BioReason GRPO loop produces explicit reasoning
-traces as training targets. If Linus ever trains on its own session transcripts, those traces — grounded in genomics
-reasoning steps — are exactly the "durably recorded intermediate artifacts" the memory synthesis argues should be
-first-class citizens. The two syntheses reinforce each other: the memory layer is what makes it possible to accumulate
-bio-domain reasoning traces across sessions; BioReason is what those traces should look like.
+**Memory synthesis (Layer B scratchpad, Layer C episodic, Layer D investigation memory per DEC-0052).** The BioReason
+GRPO loop produces explicit reasoning traces as training targets. If Linus ever trains on its own session transcripts,
+those traces — grounded in genomics reasoning steps — are exactly the "durably recorded intermediate artifacts" the
+memory synthesis argues should be first-class citizens. The two syntheses reinforce each other: the five-layer memory
+pillar (A–E) is what makes it possible to accumulate bio-domain reasoning traces across sessions and across multi-agent
+investigations; BioReason is what those traces should look like.
 
 ---
 
@@ -218,32 +233,37 @@ the Intermediate tasks genuinely require multi-step biological judgment that in-
 skills help on the wrong axis at Intermediate difficulty (API recall instead of reasoning). Which explanation you find
 most credible changes how aggressively Linus should invest in the skills layer as an autonomy-graduation mechanism
 versus investing in the reasoning-trace training path (BioReason GRPO template). Worth a 30-minute look at five
-representative Intermediate tasks before deciding.
+representative Intermediate tasks before deciding. _(Promoted to top-questions.md as R2-16; live Tier 2 item.)_
 
 **Bacformer versus your existing operon callers.** You have 13 years of genomics pipelines. Where does a 300M
 protein-context-aware encoder land relative to whatever you currently use for operon calling, MAG QC, or strain
 clustering — replacement, ensemble member, or "interesting embedding signal to graft onto existing scoring"? The answer
 determines whether Bacformer is a Phase 7 skill that surfaces results to Dan directly or a Phase 7 capability that feeds
-upstream of Dan's own analyses.
+upstream of Dan's own analyses. _(Promoted to top-questions.md as R2-17; live Tier 2 item.)_
 
 **BioReason benchmark legitimacy.** The KEGG disease-pathway set covers 290 datapoints curated from KEGG relation
 annotations. Is that benchmark actually meaningful to a working biochemist — does 98% accuracy imply genuine multi-step
 pathway reasoning, or has the task been reduced to a pattern-matching exercise where memorization of KEGG annotation
 structure dominates? A 30-minute read of the curation notebook in `data/` would resolve this before adopting the dataset
-as a Linus evaluation target.
+as a Linus evaluation target. _(Promoted to top-questions.md as R2-42; live Tier 3 item.)_
 
 **deepsems cryptic-BGC reproducibility.** The 41.1% versus 8.9% headline is large enough to be either field-changing or
 a test-set construction artifact. Do you want to read the _Nat. Comp. Sci._ paper critically yourself, or route that
-review to a Worker with the paper in context and a structured rubric for checking train/test overlap?
+review to a Worker with the paper in context and a structured rubric for checking train/test overlap? _(Promoted to
+top-questions.md as R2-43; live Tier 3 item.)_
 
-_Resolved (ROADMAP.md Phase 7a, `docs/specs/biology-phase7-roadmap.md`): the bioSkills + scientific-agent-skills
-pairing (~573 total) is the committed Phase 7 inaugural skills bundle. Pre-launch A/B gate on 5 tasks decides
-whether the bundle launches default-on or opt-in. The overlap-confusion concern is the empirical question for the
-A/B test._
+_Resolved (ROADMAP.md Phase 7a, `docs/specs/biology-phase7-roadmap.md`): the bioSkills + scientific-agent-skills pairing
+(~573 total) is the committed Phase 7 inaugural skills bundle. Pre-launch A/B gate on 5 tasks decides whether the bundle
+launches default-on or opt-in. The overlap-confusion concern is the empirical question for the A/B test._
 
 ---
 
 _Cross-references: G8 synthesis (paper-qa, LAB-Bench, scientific-agent-skills, ether0); skills-and-practices synthesis
-(entrepreneurial surface, section 5); memory synthesis (scratchpad retention, episodic store); ROADMAP.md Phase 7
-(Skills & Autonomy Graduation). Revisit when the Bacformer MPS benchmark lands in `benchmarks/results/`, when BioReason
-checkpoints are released, and when the Phase 6 MLX training infrastructure is established._
+(entrepreneurial surface, section 5); memory synthesis (scratchpad retention, episodic store); entrepreneurship
+synthesis (biotech literature-intelligence stack as commercial surface); function-annotation-discovery synthesis
+(BioReason-Pro as first protein-function skill, S24 resolution); ROADMAP.md Phase 7 (Skills & Autonomy Graduation);
+[`docs/specs/biology-phase7-roadmap.md`](../../specs/biology-phase7-roadmap.md) (Phase 7 sub-roadmap, FM-pairing
+sequencing, BioReason-Pro eval shape, LAB-Bench canary obligations); DEC-0047 (biosecurity tier control — Bacformer Tier
+B for causal checkpoint, deepsems Tier B for BGC→SMILES generation); DEC-0048 (model_prediction edges for KB
+write-back). Revisit when the Bacformer MPS benchmark lands in `benchmarks/results/`, when BioReason checkpoints are
+released, and when the Phase 6 MLX training infrastructure is established._

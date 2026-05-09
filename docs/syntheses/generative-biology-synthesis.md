@@ -38,7 +38,8 @@ Qwen3-style Transformer with a 6,000-token cross-modal BPE vocabulary, prompted 
 
 [**DISCO**](../paper-notes/2604.05181v1.md) (Rector-Brooks et al., arXiv 2026, Caltech/Mila/Arnold lab) — joint
 masked-discrete + continuous diffusion for sequence-and-structure co-design conditioned on arbitrary biomolecular
-context; produced de novo carbene-transfer enzymes that exceed evolved P450 variants in TTN ([2604.05181v1](../paper-notes/2604.05181v1.md)).
+context; produced de novo carbene-transfer enzymes that exceed evolved P450 variants in TTN
+([2604.05181v1](../paper-notes/2604.05181v1.md)).
 
 [**DeepSeMS**](../paper-notes/2025.03.02.641084v1.md) (Xu et al., bioRxiv 2025) — ~100M Pfam-domain → SMILES Transformer
 encoder-decoder; mined 27,139 ocean MAGs to produce 65,868 unique novel candidate metabolites including 8,783 antibiotic
@@ -98,9 +99,10 @@ validation does not.
 eleven densely-overlapping ORFs and a viability surface that decades of rational engineering have struggled to navigate.
 The substrate is Evo 1 (7B/131K) and Evo 2 (7B/8K) fine-tuned on ~15K Microviridae genomes; the recipe is a six-stage
 pipeline (host → template family → SFT → conserved-prefix prompt → tiered inference-time scoring → wet-lab); the
-validation is the strongest in the corpus because **16 of 302 designs produced viable phages ([King et al., 2025](../paper-notes/2025.09.12.675911v1.md))**, several outcompeting
-ΦX174 itself, and a cocktail broke through LPS-mediated resistance that ΦX174 alone never could. This is also the paper
-that crosses the line into dual-use territory.
+validation is the strongest in the corpus because **16 of 302 designs produced viable phages
+([King et al., 2025](../paper-notes/2025.09.12.675911v1.md))**, several outcompeting ΦX174 itself, and a cocktail broke
+through LPS-mediated resistance that ΦX174 alone never could. This is also the paper that crosses the line into dual-use
+territory.
 
 The ladder is not just descriptive. Every cross-cutting thread — local deployability, validation cost, dual-use weight,
 foundation model dependence, KG schema choice — shifts monotonically along the scale axis. Bigger artefacts cost more to
@@ -182,9 +184,9 @@ backing it but only on one published benchmark.** The Linus tool wrappers should
 propagates into the KnowledgeBase.
 
 The DISCO + error-prone PCR pattern is worth singling out: DISCO-designed dCT-H11 produced ~35 improved variants under
-one round of random mutagenesis ([2604.05181v1](../paper-notes/2604.05181v1.md)) with substitutions scattered across the protein, confirming the designs occupy fitness
-regions accessible to evolution. This is the strongest validation pattern in the corpus — not just "it worked once" but
-"it occupies a navigable fitness landscape."
+one round of random mutagenesis ([2604.05181v1](../paper-notes/2604.05181v1.md)) with substitutions scattered across the
+protein, confirming the designs occupy fitness regions accessible to evolution. This is the strongest validation pattern
+in the corpus — not just "it worked once" but "it occupies a navigable fitness landscape."
 
 ### Inference-time guidance and prompting
 
@@ -192,8 +194,8 @@ A pattern repeated across four of six papers: control over the generative artefa
 on the target task but from inference-time conditioning. **GenNA's four-field prompt** is a free-form English channel;
 **Trias's species tag** is a categorical channel that shapes 640 codon-usage regimes from one set of weights; **the
 generative-phage recipe** uses a conserved 4–9 nt prefix prompt plus three tiers of inference-time scoring; **DISCO**
-uses Feynman-Kac correctors ([2604.05181v1](../paper-notes/2604.05181v1.md)) to tilt sampling toward joint sequence+structure rewards and toward on-target ligand binding
-while penalising off-target decoys.
+uses Feynman-Kac correctors ([2604.05181v1](../paper-notes/2604.05181v1.md)) to tilt sampling toward joint
+sequence+structure rewards and toward on-target ligand binding while penalising off-target decoys.
 
 This is the same thread the [memory synthesis](memory-synthesis.md) followed in the text-LLM space: the right answer to
 "make the model better at X" is increasingly "spend inference-time compute through the right scoring function" rather
@@ -228,11 +230,12 @@ BGCs (no novel biosynthesis); GenNA generates eukaryotic sequences within natura
 The connection to [2306.03809v1](../paper-notes/2306.03809v1.md) is direct. That paper's threat model was that LLMs
 collapse the tacit-knowledge moat around pandemic biology by acting as patient expert tutors over the literature.
 **Generative phages does the analogous collapse for whole-genome design**: it removes the generative-design moat that
-decades of rational phage engineering struggled to navigate. SAFETY.md needs an explicit "generative whole-genome
-design" tier that is not the same as the existing OS/filesystem autonomy tiers. Linus does not run Evo 2 locally and is
-unlikely to before Phase 8, but the relevant question is not "can Linus do this" — it is "should Linus assist with
-workflows that are doing this elsewhere," and the answer needs a written policy before any biology Worker arrives that
-could plausibly chain into one.
+decades of rational phage engineering struggled to navigate. SAFETY.md now has an explicit "generative whole-genome
+design" tier — Tier C under the three-tier biosecurity policy (DEC-0047, 2026-05-06) — that is distinct from the
+existing OS/filesystem autonomy tiers. Linus does not run Evo 2 locally and is unlikely to before Phase 8, but the
+relevant question is not "can Linus do this" — it is "should Linus assist with workflows that are doing this elsewhere,"
+and the policy answer is codified: Tier C requires explicit Dan sign-off plus out-of-band review; it is not
+agentic-executable.
 
 ### Architectural pattern repetition
 
@@ -250,10 +253,14 @@ generalises to any setting where two modalities want to coexist (protein + UniPr
 heaviest by far. mCSM-metal is the corpus's only hybrid neuro-symbolic predictor — pLM embeddings as prior, structural
 graph features as quantification, ion-specific penalty matrices as deterministic correction; no end-to-end training at
 all. Each is the lone instance of its archetype here but each archetype is generally important: diffusion is the
-dominant class for sequence-and- structure co-design across the field; hybrid neuro-symbolic is the dominant pattern for
+dominant class for sequence-and-structure co-design across the field; hybrid neuro-symbolic is the dominant pattern for
 narrow-task protein-engineering tools where data is scarce. Both deserve named-archetype entries in `docs/syntheses/`
 once a second instance lands. The mCSM-metal note already proposed the **PLM+graph+rules archetype** by name; this
-synthesis seconds it.
+synthesis seconds it. For the DISCO archetype specifically ("joint discrete-sequence + continuous-structure diffusion"),
+the Flow Matching textbook (`paper-notes/2506.02070v3.md`) is the mathematical on-ramp: continuous diffusion over
+coordinates, masked discrete diffusion over sequences, the "Diffuse Everything" decomposition theorem, Karras noisy
+guidance, and the Feynman-Kac corrector framework are all covered there — worth reading before any DISCO-class Wave 3
+architecture work.
 
 ### The generate→score→filter→wet-lab workflow
 
@@ -275,6 +282,10 @@ paper-note as the canonical worked example.
 ---
 
 ## Implications for Linus skills (Phase 7)
+
+Canonical sequencing record: [`docs/specs/biology-phase7-roadmap.md`](../specs/biology-phase7-roadmap.md). The
+recommendation below is the synthesis-time framing; the roadmap spec is the source of truth on Phase 7 vs Phase 8
+placement.
 
 Recommended sequence: **Trias first, then DeepSeMS as a wrapped local Worker, then mCSM-metal as an external HTTP tool,
 then GenNA in the 0.36B variant, with DISCO and the Evo 2 / generative-phage pipeline deferred as remote-Worker-tier
@@ -326,12 +337,13 @@ synthesis recommended: validity domains, output types, and failure modes are mod
 
 Group B forces three concrete tool-registry decisions.
 
-**An `external_api_tool` registry class.** Both syntheses now recommend this — Group A flagged AlphaGenome's hybrid
-release; Group B adds mCSM-metal as a pure-webserver case and DISCO / Evo 2 as future remote-GPU cases. The class needs
-auth, rate-limiting, async job-ID + polling support, result caching with TTL aligned to the upstream's retention policy,
-graceful offline-fallback, trust-tier tagging, and provenance recording. The registry should treat these as _first-class
-Workers_, not as a degraded path — orchestration patterns that work for local Workers (KG persistence, scratchpad
-retention, session memory) need to work for remote ones too. **Recommend an ADR before any biology skill ships.**
+**An `external_api_tool` registry class.** _Resolved (DEC-0046, 2026-05-06)._ Both syntheses recommended this — Group A
+flagged AlphaGenome's hybrid release; Group B adds mCSM-metal as a pure-webserver case and DISCO / Evo 2 as future
+remote-GPU cases. DEC-0046 adds a `deployment` field (`"local" | "mcp" | "external_api"`) to the tool registry data
+model from Phase 2a. The execution path for `"external_api"` (HTTP + auth + polling + result caching with TTL aligned to
+upstream retention policy + graceful offline-fallback) is a named stub that activates when the first Phase 7 biology
+skill needs it. The registry treats external tools as _first-class Workers_ — orchestration patterns that work for local
+Workers (KG persistence, scratchpad retention, session memory) are expected to work for remote ones too.
 
 **A "candidate generator + scorer + filter" pipeline pattern.** The shape is intrinsic to four of six Group B papers.
 The orchestration layer should expose a typed pipeline abstraction: a generative Worker, a list of scoring Workers (each
@@ -357,33 +369,33 @@ SAFETY.md policy, even if Linus never runs the highest-risk tools locally. Exist
 The [2306.03809v1](../paper-notes/2306.03809v1.md) note already argued for a "biological dual-use" section before any
 biology Worker arrives; Group B sharpens the case from a hypothetical to a specific, published recipe.
 
-**The recommended SAFETY.md addendum** should name three tiers along the artefact-scale gradient.
+**The SAFETY.md three-tier biosecurity addendum is resolved (DEC-0047, 2026-05-06; PR #16, 2026-05-07).** The resolved
+policy names three tiers along the artefact-scale gradient using Tier A/B/C nomenclature (note: the synthesis's earlier
+draft used Tier 1/2/3; the ADR adopts A/B/C for clarity against OS-tier numbering):
 
-_Tier 1 (low-risk generative-biology tools):_ Trias, DeepSeMS, mCSM-metal, GenNA within natural functional classes.
-Allowed by default within Linus's autonomy envelope; provenance and validation-tier tagging required; no special gating.
+_Tier A (residue-level, low-risk):_ Trias, DeepSeMS, mCSM-metal, GenNA within natural functional classes. Standard
+sandbox policy applies; no pre-authorization required per invocation. Provenance and `validation_tier` tagging required.
 
-_Tier 2 (designer-protein / designer-enzyme generation):_ DISCO and any future de novo protein-design tool. Allowed but
-flagged: the orchestration layer should refuse to surface designer-enzyme proposals for explicit controlled / precursor
-/ weaponisable chemistry classes (a deny-list maintained against published illicit precursor and chemical weapons
-convention schedules), and should require Dan-explicit confirmation before dispatch when the prompt context contains
-those classes.
+_Tier B (gene-level, designer-protein / designer-enzyme generation):_ DISCO and any future de novo protein-design tool,
+BGC→SMILES calls (DeepSeMS when generating novel BGC routes), codon-optimization of novel sequences. Requires explicit
+Dan sign-off per invocation, logged in the audit trail. Workers surface the proposed sequence and wait for approval
+before any downstream action.
 
-_Tier 3 (whole-genome generative design):_ the Evo 2 / generative-phage pipeline and any successor. Forbidden as a
-default capability; requires an explicit per-session opt-in plus a written research justification that lands in the
-audit log; the orchestration layer enforces this _before_ any Worker is invoked, because once a Worker has produced a
-viable genome design even a discarded output has been generated, logged, and potentially leaked.
+_Tier C (whole-genome, highest-risk):_ the Evo 2 / generative-phage pipeline and any successor. Requires explicit Dan
+sign-off plus out-of-band review (re-reading the proposed output in a separate session). Not agentic-executable; must be
+Maestro-reviewed and manually approved per invocation. Evo 2 nucleotide generation above 100 kb is Tier C by default.
 
 The asymmetry between Dan's expertise and the threat model is unchanged from the dual-use synthesis: Dan is a PhD
 biochemist with genomics specialisation, so the contract is not about denying him knowledge he already has but about
 ensuring the _system's_ behaviour is caller-invariant, audit-clean, and would generalise to a future multi-user Linus or
-a compromised-machine scenario. **The explicit SAFETY.md update** should reference both this synthesis and
-[2306.03809v1](../paper-notes/2306.03809v1.md) directly, name the six Group B papers and the artefact-scale gradient,
-and commit to the three-tier policy as a Phase 1 deliverable rather than a Phase 7 retrofit.
+a compromised-machine scenario. The `biosecurity_tier` field (null for non-biology tools) is a named property in every
+tool registry entry; the audit log records the tier for every Tier B or C invocation.
 
-A second SAFETY.md hook worth adding, motivated by the generative- phage paper specifically: the _training-data curation
-property_ that King et al. relied on (Evo 2's deliberate exclusion of eukaryotic viruses including pathogenic human
-viruses) is a model-level safeguard that propagates into downstream tools. Linus should **prefer substrate FMs that
-publicly document their hazard-curation posture**, and should record curation status as a tool registry property.
+One SAFETY.md property worth monitoring, motivated by the generative-phage paper specifically: the _training-data
+curation posture_ that King et al. relied on (Evo 2's deliberate exclusion of eukaryotic viruses including pathogenic
+human viruses) is a model-level safeguard that propagates into downstream tools. Linus should **prefer substrate FMs
+that publicly document their hazard-curation posture**, and record curation status as a tool registry property. This is
+not yet codified as an ADR — it is a watch-and-enforce principle for Phase 7 tool onboarding.
 
 ---
 
@@ -420,23 +432,26 @@ exercise to firm up the schema before any Linus-internal generative-biology Work
 ## Tensions and open questions
 
 **Is "generate → score → filter → wet-lab validate" worth naming as a Linus generative-biology archetype now, or wait
-for a second in-corpus instance beyond DISCO and generative phages?** The recommendation above is to write the archetype
-synthesis paired with the Evo 2 paper-note as the canonical worked example. The risk of premature naming is low because
-the shape is intrinsic to the field, not just to this corpus.
+for a second in-corpus instance beyond DISCO and generative phages?** _Partially resolved (S34, see
+[answered-questions.md](../questions/answered-questions.md)): "generative wet-lab loop" is now a named archetype in
+GLOSSARY.md (Evo 2 + phage engineering pipelines as primary examples)._ The synthesis-level
+`docs/syntheses/generative-biology-archetype.md` companion document is still a Wave 3 backlog item; the naming is done,
+the formal worked-example write-up is not.
 
 **Should the Evo 2 + generative-phages pairing be a focused mini- synthesis?** The Group A synthesis already flagged
 this as a Wave 3 deliverable. Group B reading strengthens the recommendation — the paired synthesis would force a sharp
 answer to the local-vs-remote-Evo-2 question, the SAFETY.md tier-3 policy, and the external-Worker-tier infrastructure
 question.
 
-**What is the right pattern for wrapping webserver-only tools like mCSM-metal?** An `external_api_tool` registry class
-plus an ADR. The deeper open question is whether the registry should treat external tools as first-class Workers or as a
-degraded path. The synthesis-level argument is _first-class_: Linus needs the orchestration patterns to work uniformly
-across substrates, not bifurcate by deployment locus.
+**What is the right pattern for wrapping webserver-only tools like mCSM-metal?** _Resolved (DEC-0046, 2026-05-06)._ The
+`deployment` field (`"local" | "mcp" | "external_api"`) in the tool registry data model is the ADR answer; external
+tools are first-class Workers in the schema from Phase 2a, with the execution path added in Phase 7. The synthesis-level
+argument for first-class was correct: Linus's orchestration patterns (KG persistence, scratchpad retention, session
+memory) are expected to work uniformly across local and remote substrates.
 
-**Does generative whole-genome design warrant explicit SAFETY.md tier-control before Phase 7 even starts?** Yes — write
-the three-tier policy as a Phase 1 deliverable. Writing policy now is cheap; retrofitting it under pressure is
-expensive.
+**Does generative whole-genome design warrant explicit SAFETY.md tier-control before Phase 7 even starts?** _Resolved
+(DEC-0047, 2026-05-06; PR #16, 2026-05-07)._ Three-tier (Tier A/B/C) biosecurity policy is codified in SAFETY.md as a
+Phase 1 deliverable. The answer was yes; it shipped before Phase 7 planning pressure arrives.
 
 **Generalist Group A FMs vs specialist Group B generators — which combinations are worth implementing first?** The
 combinations that reinforce most strongly: (1) **Trias + GenNA** for sequence design, with GenNA generating CDSs from
@@ -492,14 +507,14 @@ and (where wet-lab validated) an experimental outcome. The
 `(designed_artefact + design_rationale + experimental_outcome)` triple is a stress test for the KG schema and a worked
 example of the `model_prediction` edge class the Group A synthesis proposed.
 
-This synthesis should produce edits to [paper-landscape.md](../landscapes/paper-landscape.md) (a Group B cluster entry
-mirroring Group A's, organised by the artefact-scale axis),
-[synthesis-landscape.md](../landscapes/synthesis-landscape.md) (the headline claim plus the three-tier SAFETY.md
-recommendation as a quick-reference row), and [total-landscape.md](../landscapes/total-landscape.md) (the four Phase 7
-skill priorities, the `external_api_tool` ADR, the `generate→score→filter` archetype synthesis, the Phase 4 ocean-
-metabolite catalogue mirror, the SAFETY.md three-tier addendum). The Wave 3 Evo 2 + generative-phage mini-synthesis goes
-onto the synthesis backlog with its scope expanded to also serve as the worked example for the generative-biology
-archetype.
+The landscape documents (`paper-landscape.md`, `synthesis-landscape.md`, `total-landscape.md`) have been updated to
+reflect the Group B cluster entry, the biosecurity tier-control policy (DEC-0047), and the `external_api_tool` registry
+decision (DEC-0046). The Phase 7 biology sub-roadmap is now codified at
+[`docs/specs/biology-phase7-roadmap.md`](../specs/biology-phase7-roadmap.md), which carries the generalist × specialist
+FM pairing sequence (Trias+GenNA, REBEAN+DeepSeMS, Bacformer+DeepSeMS as Phase 7-tractable; mCSM-metal+DISCO and
+AlphaGenome+GenNA as Phase 8) and the LAB-Bench canary enforcement obligation. The Wave 3 Evo 2 + generative-phage
+mini-synthesis remains on the synthesis backlog with its scope expanded to also serve as the worked example for the
+"generative wet-lab loop" archetype now named in GLOSSARY.md (S34 resolution).
 
 ---
 

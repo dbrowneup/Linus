@@ -1,7 +1,7 @@
 # Group 10 Synthesis — Finance / Quant Agents
 
-**Date:** 2026-05-04 **Repos surveyed:** dexter, OpenBB, QuantAgent, TradingAgents, nixtla **Verdicts:** 0 × Integrate,
-4 × Study, 1 × Ignore (QuantAgent)
+**Date:** 2026-05-08 **Repos surveyed:** dexter, OpenBB, QuantAgent, TradingAgents, nixtla **Verdicts:** 0 × Integrate,
+5 × Study
 
 ---
 
@@ -30,8 +30,10 @@ contributions from this group are not financial. They are: a two-tier context-co
 dynamic-tool-activation pattern for large MCP surfaces (OpenBB), an adversarial debate with a two-tier LLM split
 (TradingAgents), and a time-series forecasting ecosystem with genuine cross-domain applicability (nixtla).
 
-QuantAgent's Ignore verdict holds for integration, but even it produced one useful idea before being set aside — the
-vision-LLM-on-rendered-chart trick that sidesteps the problem of summarizing numerical data in token space.
+QuantAgent earns a Study verdict for its minimal linear-pipeline architecture — a four-role assembly line (measurer →
+recognizer → contextualizer → decider) expressed in ~30 lines of LangGraph orchestration glue — which brackets the
+design space at the opposite end from TradingAgents' debate-style roster. The vision-LLM-on-rendered-chart trick is a
+domain-agnostic idea that survives the financial-domain filter.
 
 ---
 
@@ -74,8 +76,8 @@ context-manager spec as a tested starting point rather than designing from scrat
 
 Dexter also demonstrates the SKILL.md extensibility pattern: YAML-frontmatter markdown skill definitions exposed to the
 LLM via system-prompt metadata and invoked through a single `skill` tool. The format is identical to Anthropic's own
-Skill convention, which suggests the format is converging toward a de facto standard. Linus's Phase 7 skill catalog
-should use it.
+Skill convention, which suggests the format is converging toward a de facto standard. Linus's Phase 7 skill catalog uses
+it — committed as the Phase 7 standard in ROADMAP.md per E6 resolution (2026-05-06).
 
 ### TradingAgents — two-tier LLM split and the decision-log pattern
 
@@ -122,17 +124,21 @@ memory tractable. A Chronos or TimesFM fine-tuned on Dan's omics-trajectory or e
 plausibly the closest analog to the biological foundation models (Bacformer, BioReason from Group 9) for the
 temporal-data side of his domain. This is a Phase 6 candidate worth flagging alongside the text-model fine-tuning lane.
 
-### QuantAgent — even the Ignore verdict yielded something
+### QuantAgent — the minimal linear-pipeline counterpart
 
 QuantAgent (`Y-Research-SBU/QuantAgent`) is a four-node LangGraph pipeline (Indicator → Pattern → Trend → Decision) in
-which the Pattern and Trend agents render chart images and pass them to a vision LLM for interpretation. The Ignore
-verdict holds: the financial domain is off-core, the multi-agent lessons are subsumed by TradingAgents, and the code
-requires hosted vision LLMs as a mandatory dependency. But one idea survives the ignore: render numerical data as a plot
-and ask a multimodal model to interpret it. When numbers are awkward to summarize in tokens — sparse genomics coverage
-tracks, variant call density plots, long-range epigenomic signal — this pattern bypasses the token-representation
-problem entirely. The catch is that Linus's local vision-model story is immature. The pattern becomes viable when a
-strong local Qwen2.5-VL or equivalent is running reliably on M1 Max. File it as a Phase 3+ idea contingent on local
-vision capability.
+which the Pattern and Trend agents render chart images and pass them to a vision LLM for interpretation. Its Study
+verdict rests on the orchestration architecture, not the financial domain: a four-role linear pipeline (measurer →
+recognizer → contextualizer → decider) coordinated by a single `StateGraph` over a shared state dict is ~30 lines of
+orchestration glue — the cleanest minimal multi-agent template in the corpus. Compared to TradingAgents' debate-style
+multi-team roster, QuantAgent and TradingAgents together bracket the orchestration design space at its minimal and
+maximal ends. Both are visible reference points when the agent-spawner spec (DEC-0050) is fleshed out.
+
+The vision-LLM-on-rendered-chart trick survives the financial-domain filter. When numbers are awkward to summarize in
+tokens — sparse genomics coverage tracks, variant call density plots, long-range epigenomic signal — rendering a plot
+and asking a multimodal model to interpret it bypasses the token-representation problem. The catch is that Linus's local
+vision-model story is immature; the pattern becomes viable when a strong local Qwen2.5-VL or equivalent is running
+reliably on M1 Max. File it as a Phase 3+ idea contingent on local vision capability.
 
 The "high-frequency trading" labeling in QuantAgent's paper title is also a useful cautionary example. The actual system
 makes one decision per multi-second hosted-LLM round-trip — structurally incapable of HFT latency. The framing is
@@ -144,14 +150,15 @@ should reflect actual measured performance, not aspirational framing.
 
 ## Patterns and modules worth lifting
 
-This is the key section. None of the code from this group is vendored into Linus, but five patterns transfer directly to
+This is the key section. None of the code from this group is vendored into Linus, but six patterns transfer directly to
 non-financial domains.
 
 **Two-tier context compaction (dexter).** `microcompact.ts` + `compact.ts` in `src/agent/` implement a tested
-preserve-numbers / summarize-prose compaction loop with an explicit threshold trigger. Lift the compaction prompt
-template as the starting point for the Linus context manager. The two-tier structure — lightweight every-turn pass plus
-full LLM-summarization at threshold — is the right shape regardless of domain. This maps directly onto the DEC-0028
-memory pillar and the Mughal sprint-and-compact pattern.
+preserve-numbers / summarize-prose compaction loop with an explicit threshold trigger. This pattern is now a resolved
+Phase 2 design constraint (E5, accepted 2026-05-06): lift the compaction prompt template verbatim as the starting point
+for the Linus context manager. The two-tier structure — lightweight every-turn pass plus full LLM-summarization at
+threshold — is the right shape regardless of domain. This maps directly onto the DEC-0028 memory pillar and the Mughal
+sprint-and-compact pattern.
 
 **Dynamic per-session MCP tool activation (OpenBB).** The `openbb-mcp` discovery model — a small initial tool surface,
 browse categories, activate on demand — is a concrete answer to the context-window-bloat problem that any large MCP tool
@@ -175,36 +182,56 @@ gives Linus a Phase 7 time-series Worker tool that spans finance, omics-trajecto
 without any API keys or cloud dependencies. The interface design from the `NixtlaClient` API —
 `client.forecast(df, h=24, level=[80, 90])` — is the right ergonomic target regardless of which backend is called.
 
+**Minimal linear multi-agent pipeline (QuantAgent).** A four-role assembly line (measurer → recognizer → contextualizer
+→ decider) coordinated by a single LangGraph `StateGraph` over a shared state dict, ~30 lines of orchestration glue plus
+role-specific tool bindings. This is the clearest minimal multi-agent template in the corpus and brackets the design
+space at the opposite end from TradingAgents' debate-style roster. Together, QuantAgent (minimal) and TradingAgents
+(maximal) give the Phase 3 agent-spawner spec (DEC-0050) the min/max orchestration envelope it needs. Transfer the
+decomposition shape to Linus scientific workflows: measurer → "compute QC metrics", recognizer → "identify variant
+signatures", contextualizer → "compare to reference cohort", decider → "flag for review or pass."
+
 ---
 
 ## Cross-references
 
+**Entrepreneurship synthesis (primary thematic anchor).** G10 is the primary cluster anchor for
+`docs/syntheses/entrepreneurship-synthesis.md` (added 2026-05-05). The entrepreneurship synthesis reads G10's harnesses
+as the context-management pattern library that makes the literature-intelligence offering credible: dexter's two-tier
+compaction, OpenBB's dynamic-tool-activation, and TradingAgents' adversarial-debate shape are the same primitives Linus
+needs internally, surfaced in a domain where structured agent loops have already shipped to a paying audience. The
+transferable patterns are the primary contribution; the financial domain is secondary.
+
 **G6 MCP.** OpenBB's dynamic per-session tool-activation pattern is the most directly applicable finding from G10 to the
 MCP tool-registry design questions that G6 raises. The two groups together provide both the motivating problem (large
-catalogs bloat context) and a working solution (per-session activation with a discovery layer).
+catalogs bloat context) and a working solution (per-session activation with a discovery layer). Dynamic tool activation
+timing is tracked as R2-25 in `top-questions.md`.
 
 **G7 multi-agent.** TradingAgents' role-decomposition-with-debate pattern and the `deep_think_llm`/`quick_think_llm`
 split are the practical complements to whatever orchestration framework G7 evaluates. The bull/bear debate shape
 (analyst fan-out → adversarial researchers → synthesis manager → risk debate) is a template that generalizes to
-literature triage, multi-omics hypothesis evaluation, and experimental-design review.
+literature triage, multi-omics hypothesis evaluation, and experimental-design review. QuantAgent's minimal four-node
+linear pipeline brackets the opposite end of the design space — together they give DEC-0050's agent-spawner spec the
+min/max envelope it needs.
 
-**Memory synthesis (DEC-0028 area).** Dexter's two-tier compaction strategy is direct prior art for the Mughal-style
-context-management primitives the memory pillar commits to. The compaction prompt template should be referenced when
-drafting the orchestration layer's context-manager spec. TradingAgents' decision-log pattern is the simplest viable
-starting point for Layer C cross-session episodic memory before the full SQLite episodic store is operational.
+**Memory synthesis (DEC-0028 area).** Dexter's two-tier compaction strategy is now a confirmed Phase 2 design constraint
+(E5, resolved 2026-05-06): lift the compaction prompt template into the orchestration-layer context-manager spec.
+TradingAgents' decision-log pattern is the simplest viable starting point for Layer C cross-session episodic memory
+before the full SQLite episodic store is operational.
 
 **Entrepreneurial surface (skills synthesis).** OpenBB is the most direct connection between G10 and the entrepreneurial
-opportunities documented in `docs/syntheses/skills-and-practices-synthesis.md`. The financial-data infrastructure it
-provides enables Opportunity 1 (scientific literature intelligence service) and Opportunity 2 (automated pipeline
-auditing) indirectly by making financial-context enrichment a zero-additional-infra addition to those services.
+opportunities documented in `docs/syntheses/entrepreneurship-synthesis.md`. The financial-data infrastructure it
+provides enables literature-intelligence and related commercial surface capabilities indirectly by making
+financial-context enrichment a zero-additional-infra addition to those services.
 
 ---
 
 ## Phase-tagged implications
 
-**Phase 2 — Linus MVP.** Lift dexter's compaction prompt template into the orchestration-layer context-manager spec.
-Adopt the `deep_think_llm`/`quick_think_llm` config convention in ARCHITECTURE.md. Neither requires any code from this
-group — both are design patterns expressed in Linus's own stack.
+**Phase 2 — Linus MVP.** Lift dexter's compaction prompt template into the orchestration-layer context-manager spec —
+the two-tier compaction pattern (dexter's `microcompact` + `compact`) is now a resolved Phase 2 design constraint (E5,
+accepted 2026-05-06): the Linus context-manager spec inherits the preserve-numbers / summarize-prose compaction loop
+with explicit threshold trigger. Adopt the `deep_think_llm`/`quick_think_llm` config convention in ARCHITECTURE.md —
+still open as R2-13 in `top-questions.md`.
 
 **Phase 3 — Knowledge & Parallel Agents.** Stand OpenBB up in a throwaway `uv` env (`experiments/openbb/`) and validate:
 pull AAPL historicals via yfinance, pull FRED 10Y yields, compute correlation, summarize the result. If MCP per-session

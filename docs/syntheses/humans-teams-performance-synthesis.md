@@ -57,7 +57,7 @@ reflexively, explores in the middle, and closes reflexively are doing the same t
 the shape of their work rather than maximizing throughput at any moment.
 
 The cognitive-throughput pair makes the same claim at the third, smallest scale: Zheng-Meister document a roughly
-10-bit/second conscious channel sitting above a massively parallel sensorimotor substrate; Sauerbrei- Pruszynski push
+10-bit/second conscious channel sitting above a massively parallel sensorimotor substrate; Sauerbrei-Pruszynski push
 back on details but do not contest the basic shape — a slow attention-bottlenecked controller orchestrating fast
 parallel pipelines. At the millisecond scale, brute-forcing more bandwidth through the conscious channel is not the
 move; _structure_ — what gets routed through which pathway — is. Three independent literatures, three independent
@@ -75,7 +75,7 @@ At the **intra-second scale**, Zheng-Meister and Sauerbrei-Pruszynski describe a
 above a massively parallel unconscious substrate — the conscious channel selects, plans, and routes, the parallel
 substrate executes. At the **team-episode scale**, Harvey describes reflexive learning as the tonal home — the slow
 integrative activity against which faster exploratory and vicarious activities are interpreted, with reflexive bookends
-creating coordination quality and the exploratory middle doing the parallel generative work. At the **intra- career
+creating coordination quality and the exploratory middle doing the parallel generative work. At the **intra-career
 scale**, Güllich describes early broad acquisition (parallel exploration of multiple disciplines, fast-cycling) feeding
 a later integrative phase (slow, deliberate, deep cross-domain synthesis).
 
@@ -142,19 +142,22 @@ They sit at different scales and compose.
 
 ## Implications for Linus
 
-**VISION.md candidate principle: "Linus aids multidisciplinary synthesis, not narrow execution."** As a design
-constraint, this has downstream consequences for KnowledgeBase queries (favor cross-discipline retrieval over
-single-subfield narrowing), Worker dispatch (surface analogies from neighboring domains, not only most-specific
-matches), and time-allocation defaults (Linus should reduce time on low-value execution _more_ than it expands Dan's
-exposure to new domains). The cleanest single artifact dropping out of Group H; worth promoting in the next VISION.md
-revision.
+**VISION.md design practice: deliberate multidisciplinary time allocation (adopted, S39 resolved 2026-05-06).**
+VISION.md "The long view" section now carries an explicit paragraph: distributing research and tool-building effort
+across biology, computer science, and infrastructure rather than deep-specializing is a design practice, not an
+accident. The cross-domain fluency that Pauling exemplified is a practice Linus should keep pace with because Dan's
+actual work spans domains. Downstream consequences this adoption carries: KnowledgeBase queries should favor
+cross-discipline retrieval over single-subfield narrowing; Worker dispatch should surface analogies from neighboring
+domains, not only the most-specific match; time-allocation defaults should reduce time on low-value execution _more_
+than they expand Dan's exposure to new domains.
 
-**Worker-spec template addition: `goal_orientation` field.** Each Worker spec gains a
-`goal_orientation: [exploit | explore]` tag, with optional
-`learning_type: [reflexive | experimental | vicarious | contextual]` for sessions tracking Harvey's full taxonomy. The
-orchestration layer uses the field for a binary batch-vs-sequence decision: same orientation can share a session,
-opposite orientation must be sequenced with a reflexive checkpoint between. Cheap to implement, reversible, and creates
-the data to validate or falsify Harvey's transfer to LLM orchestration.
+**Worker-spec template: `goal_orientation` field (deferred to Phase 3 spawner spec, S38 resolved 2026-05-06).** The
+field — `goal_orientation: [exploit | explore]` with optional
+`learning_type: [reflexive | experimental | vicarious | contextual]` — is an optional annotation rather than a hard
+requirement at Phase 2. The Phase 3 spawner spec is the right home: a hard requirement at that stage forces every spec
+author to state orientation explicitly, producing the disciplined decomposition Harvey's harmony/rhythm logic calls for.
+At Phase 2 the annotation may be added voluntarily; the orchestration layer does not yet act on it programmatically. The
+data to validate or falsify Harvey's transfer to LLM orchestration will accumulate as annotated specs build up.
 
 **Session-rhythm health metric.** Score each session on whether it opens reflexively, contains an experimental or
 exploratory beat in the middle, and closes with a reflexive bookend (checkpoint summary, ADR check, commit message).
@@ -172,30 +175,31 @@ on AI infrastructure alone, but on the rare stacking of all three.
 
 ## Tensions and open questions
 
-Five questions are worth carrying forward rather than resolving here.
+Three questions remain open; two have been resolved.
 
-First, whether _preserve room for Dan's multidisciplinary work_ should be promoted from paper-note observation to
-explicit Linus design constraint. The Güllich evidence supports the constraint; the question is whether it deserves the
-prominence of going into VISION.md, or whether a softer location (a CLAUDE.md engineering convention, or a ROADMAP.md
-phase note) is the right home.
+_Resolved: multidisciplinary preservation in VISION.md (S39, 2026-05-06)._ The "The long view" paragraph in VISION.md
+now codifies deliberate multidisciplinary time allocation as a design practice. The question of which document was the
+right home — VISION.md, CLAUDE.md, or ROADMAP.md — resolved in favor of VISION.md, with the principle phrased as design
+practice rather than constraint.
 
-Second, whether the Worker-spec template should gain `goal_orientation` as a hard requirement or as an optional
-annotation. A hard requirement forces every spec author to think about orientation explicitly — which is the source of
-most of the value — but adds friction to writing throwaway specs in `experiments/`. An optional annotation captures
-intent but loses much of the discipline.
+_Resolved: `goal_orientation` as hard requirement vs. optional annotation (S38, 2026-05-06)._ Decision: optional
+annotation deferred to the Phase 3 spawner spec. Spec authors may add the tag voluntarily at Phase 2; it becomes a named
+field requirement when the spawner design lands.
 
-Third, whether the skills synthesis should be updated inline now or held until a planned post-Phase-1 revision pass. The
-change is small enough that doing it inline is cheap; the risk is drift across syntheses if the landscape doc is not
-re-read immediately after.
+First open question: whether the skills synthesis should be updated to replace "domain expertise as moat" with
+"cross-domain expertise as moat," citing Güllich as empirical grounding. This change is small, the evidence is specific,
+and the framing matters — the 10,000-hours version of narrow domain depth is replicable; the cross-domain stack is not.
+Still pending as of 2026-05-08.
 
-Fourth, whether a session-rhythm metric is worth tracking, or whether it would degrade into theatre — sessions
-structured to score well on the metric rather than to do work well. The metric is cheap to prototype on existing commit
-history; computing it retrospectively before instrumenting it as a prospective gate is the right move.
+Second open question: whether a session-rhythm metric is worth tracking, or whether it would degrade into theatre —
+sessions structured to score well on the metric rather than to do work well. The metric is cheap to prototype on
+existing commit history; computing it retrospectively before instrumenting it as a prospective gate is the right move.
+Still no prototype; still open.
 
-Fifth, for Dan rather than Linus: whether the Güllich finding actually changes current time allocation. The current
-shape — Linus development, biochemistry work, Rust, agentic systems — already looks like the multidisciplinary mix the
-paper identifies as generative. The implication may not be "change the shape" but "_protect_ the shape": be explicit
-about the budget so that Linus, which is engrossing, does not silently consume it.
+Third question, for Dan rather than Linus: whether the Güllich finding actually changes current time allocation. The
+current shape — Linus development, biochemistry work, Rust, agentic systems — already looks like the multidisciplinary
+mix the paper identifies as generative. The implication may not be "change the shape" but "_protect_ the shape": be
+explicit about the budget so that Linus, which is engrossing, does not silently consume it.
 
 ## Where this synthesis fits
 
@@ -205,18 +209,19 @@ interpretive. It sharpens the [skills-and-practices-synthesis.md](skills-and-pra
 "domain expertise" to "cross-domain expertise." It provides external grounding for the within-session vs. across-session
 distinction that [`docs/specs/memory-architecture.md`](../specs/memory-architecture.md) formalizes as session memory vs.
 episodic memory layers — Harvey's within-episode harmony vs. across-episode rhythm is the human-team analogue. And it
-surfaces a candidate VISION.md principle — _Linus aids multidisciplinary synthesis, not narrow execution_ — that, if
-adopted, would propagate into KnowledgeBase retrieval defaults, Worker dispatch preferences, and time-allocation norms.
+grounded the VISION.md design practice — deliberate multidisciplinary time allocation across biology, CS, and
+infrastructure — which was adopted in VISION.md "The long view" (S39, 2026-05-06), propagating into KnowledgeBase
+retrieval defaults, Worker dispatch preferences, and time-allocation norms.
 
 The Maestro/Worker-at-three-timescales argument is the most original contribution and the one most worth carrying
 forward into [`synthesis-landscape.md`](../landscapes/synthesis-landscape.md) and
 [`total-landscape.md`](../landscapes/total-landscape.md). The metaphor was chosen for practical reasons in Phase 0; what
-Group H and the cognitive- throughput pair together demonstrate is that the same shape — slow integrative controller
+Group H and the cognitive-throughput pair together demonstrate is that the same shape — slow integrative controller
 above fast parallel executor — is the recurring solution to bandwidth-limited high performance across at least three
 independent domains and nine orders of magnitude. That is not proof the metaphor is correct for LLM orchestration; it is
 evidence Linus's commitment to it is consistent with how high performance has historically been achieved when controller
 bandwidth is the binding constraint, which is exactly the constraint Linus is built around.
 
-Revisit when the VISION.md principle is considered for promotion, when the Worker-spec template gains (or rejects) a
-`goal_orientation` field, when the skills synthesis is updated to the cross-domain framing, and whenever a new paper in
-the human-development or team-learning literature lands in `context/papers/`.
+Revisit when the skills synthesis is updated to the cross-domain framing (still pending as of 2026-05-08), when the
+Phase 3 spawner spec lands and the `goal_orientation` field becomes a named requirement, and whenever a new paper in the
+human-development or team-learning literature lands in `context/papers/`.

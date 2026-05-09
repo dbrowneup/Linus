@@ -1,8 +1,9 @@
 # Group 3 Synthesis — LLM Wiki Agent-Driven Build Patterns
 
-_Date: 2026-05-04. Inputs: seven repo notes (agentic-wiki-builder, AgenticResearchWiki, llm-research-wiki, llm-wikidata,
-atomic-knowledge, beever-atlas, obsidian-llm-wiki-local) read alongside the llm-wiki-synthesis, security-synthesis,
-skills-and-practices-synthesis, memory-synthesis, and the Crossing 3 / Crossing 4 sections of total-landscape.md._
+_Date: 2026-05-04 (updated 2026-05-08). Inputs: seven repo notes (agentic-wiki-builder, AgenticResearchWiki,
+llm-research-wiki, llm-wikidata, atomic-knowledge, beever-atlas, obsidian-llm-wiki-local) read alongside the
+llm-wiki-synthesis, security-synthesis, skills-and-practices-synthesis, memory-synthesis, and the Crossing 3 / Crossing
+4 sections of total-landscape.md._
 
 ---
 
@@ -150,7 +151,12 @@ Skills: `import-notes/SKILL.md` (113 lines — classify and file existing notes 
 `project-doc-update/SKILL.md` (64 lines — auto-applied after any agent touch on docs, lands content in the right
 directory with backlinks updated). These are installable via `cp -r skills/* ~/.claude/skills/` and would help Dan
 triage the existing `context/notes/` and `context/threads/` backlog without writing any custom tooling. Worth installing
-as a Phase 1 quality-of-life experiment.
+as a Phase 1 quality-of-life experiment. Separately, obsidian-llm-wiki-local's **reject-and-explain loop** is a second
+lift from this priority tier: when the user runs `olw reject FILE --feedback "..."`, the rejection text is stored in
+SQLite and injected into the next compile prompt under the literal header "PREVIOUS REJECTIONS — address these issues in
+this version:". After five rejections without approval the concept auto-blocks until manually unblocked. This is a
+complete persistent human-in-the-loop critique loop built on no DPO and no training — worth studying as a Phase 7
+prototype for any Linus Skill where Worker output needs iterative human critique rather than one-shot acceptance.
 
 **Seventh priority — Phase 2/3 entity deduplication (50-line pattern, port on demand):** llm-wikidata's
 conservative/granular entity-resolution loop in `src/pipeline.py` — vector-search the existing entity set via ChromaDB,
@@ -160,9 +166,14 @@ English text; the prompt structure is portable. Port as `src/linus/kb/entity_res
 producing duplicate nodes. Not urgent until the first ingest reveals the actual collision rate.
 
 **Architecture reference only — beever-atlas:** The `gather → compile → cache` wiki-builder pattern with per-resource
-async locks, the ADK `SequentialAgent + ParallelAgent` ingestion pipeline shape, and the dual semantic+graph memory with
-a smart query router are all worth keeping in mind as Phase 3 KB v2 design targets. None of the connector or datastore
-code translates; the patterns do.
+async locks, the ADK `SequentialAgent + ParallelAgent` ingestion pipeline shape (stage 1 preprocess → stage 2 fan-out
+fact + entity extraction → stage 3 fan-out embed + contradiction validation → stage 4 persist), and the dual
+semantic+graph memory with a smart query router are all worth keeping in mind as Phase 3 KB v2 design targets. The
+`BaseAdapter` + `NormalizedMessage` abstraction that separates "where bytes come from" from "what the pipeline does with
+them" is also a reusable template if Linus eventually wants a uniform API in front of multiple source types (papers,
+notes, threads, clips). None of the connector or datastore code translates to Dan's single-user local setup; the
+patterns do. (DEC-0015 adopted dual RDF + property graph rather than Weaviate + Neo4j; DEC-0045 adopted fastmcp as the
+MCP framework.)
 
 ---
 
@@ -188,9 +199,12 @@ trust-tier tagging the security synthesis recommends for KB-sourced context (`so
 sanitized) maps directly onto the `[!source]` / `[!analysis]` / `[!unverified]` / `[!gap]` claim types that
 llm-wiki-synthesis recommends and llm-research-wiki's schema partially implements.
 
-G6 (paper-qa cluster) will likely surface retrieval patterns that interact with the Phase 3 hybrid search that G3's
-cascade → embedding fallback design points toward. The cluster→synthesis→ `related:` cascade from llm-research-wiki is
-the embedding-free Phase 2 bridge; Qdrant takes over for unknown terms in Phase 3 when the corpus exceeds 200 nodes.
+G8 (sci-agents cluster) surfaces paper-qa as the first paper-corpus tool to earn an Integrate verdict (DEC-0044), which
+reframes Phase 2 KB substrate from "build" to "adopt + extend." paper-qa's tantivy full-text + vector retrieval pipeline
+is the planned Phase 2c embedding layer that G3's cascade → embedding fallback design points toward. The
+cluster→synthesis→`related:` cascade from llm-research-wiki is the embedding-free Phase 2 bridge; paper-qa takes over
+for unknown terms in Phase 3 when the corpus exceeds 200 nodes and the index-only routing in the cascade becomes
+insufficient.
 
 ---
 
@@ -206,15 +220,19 @@ formalizing as a Phase 2 KB tool.
 llm-research-wiki and atomic-knowledge (source-note, concept, author, debate, synthesis, project, procedure), with
 mandatory YAML frontmatter per type and the `search_anchors` / `key_entities` hint fields from atomic-knowledge as
 optional but encouraged. Implement the `get_context` walker from atomic-knowledge as the first KB read tool. Build the
-ingest pipeline's quality gate as a two-step: discuss-before-writing for the first 20-30 papers, automated scoring
-thereafter. Implement the write-back rule as a mandatory exit step in every Worker KB invocation: every task returns a
-deliverable plus KB page update proposals.
+ingest pipeline's quality gate per DEC-0019: a quality surface, not a hard reject lane — YAML-policy scoring with the
+per-paper quality scorecard surfaced to Maestro at retrieval time, no `FILTERED.md` quarantine. Implement the write-back
+rule as a mandatory exit step in every Worker KB invocation: every task returns a deliverable plus KB page update
+proposals.
 
 **Phase 3 — Hybrid retrieval and lint:** Implement `linus kb lint` using llm-research-wiki's LINT workflow specification
 as the check list and hyalo (G5, Integrate-recommended) as the underlying lint engine. Add `--apply` for mechanical
-fixes. Extend the `get_context` walker with Qdrant fallback for queries outside the cascade. Add the entity-resolution
-loop from llm-wikidata when KB ingestion starts producing duplicate nodes. Promote the DuckDB+NetworkX link graph to a
-formal KB tool if the Phase 1 smoke test validates it.
+fixes. Extend the `get_context` walker with paper-qa's retrieval pipeline (DEC-0044) as the hybrid-search fallback for
+queries outside the cascade. Add the entity-resolution loop from llm-wikidata when KB ingestion starts producing
+duplicate nodes. Promote the DuckDB+NetworkX link graph to a formal KB tool if the Phase 1 smoke test validates it. The
+write-back rule implementation for parallel Workers is tracked as R2-22 in `top-questions.md`; DEC-0022 resolved the
+policy (branch-per-Worker coordination), but the concrete implementation pattern (lease, optimistic-merge, or
+branch-per-Worker flush) is the open Phase 2/3 engineering question.
 
 ---
 
@@ -234,10 +252,12 @@ The `structured_output.py` lift from obsidian-llm-wiki-local is the clearest Pha
 most immediate payoff. The question is whether to vendor it directly (MIT-licensed, ~300 lines, attribution in the file
 header) or rewrite from scratch with the same three-tier logic. Vendoring is faster and keeps the test coverage;
 rewriting removes the Obsidian-vault framing from the variable names and removes any future surprise from upstream
-changes. Which does Dan prefer as the default practice for short MIT-licensed utilities?
+changes. Which does Dan prefer as the default practice for short MIT-licensed utilities? (Tracked as Tier 3 in
+`top-questions.md`.)
 
 ---
 
 _Cross-references: llm-wiki-synthesis.md (canonical practitioner patterns); memory-synthesis.md (Layer D KB integrity
-requirements); security-synthesis.md (trust-tier tagging for KB content). Update this document when the Phase 2 KB
-schema spec lands or when Phase 3 lint design begins._
+requirements); security-synthesis.md (trust-tier tagging for KB content); g8-sci-agents.md (paper-qa as Phase 2c KB
+retrieval engine, DEC-0044). Update this document when the Phase 2 KB schema spec lands or when Phase 3 lint design
+begins._

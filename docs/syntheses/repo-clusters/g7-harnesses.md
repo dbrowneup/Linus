@@ -1,9 +1,11 @@
 # Group 7 Synthesis — Agent Harnesses, Orchestration, Model Routing
 
-**Date:** 2026-05-04 **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne) **Trigger:** G7 fan-out
-synthesis pass; ten new repo notes (claude-squad, claude-task-master, codebuff, workgraph, openrouter-skills,
-python-sdk, origin, gravityfile, semanticworkbench) added alongside four existing harness notes (cline, claw-code,
-claw-code-local, openclaw). Amended 2026-05-05: semanticworkbench expanded with full Key findings subsection.
+**Date:** 2026-05-04 (updated 2026-05-08) **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne)
+**Trigger:** G7 fan-out synthesis pass; ten new repo notes (claude-squad, claude-task-master, codebuff, workgraph,
+openrouter-skills, python-sdk, origin, gravityfile, semanticworkbench) added alongside four existing harness notes
+(cline, claw-code, claw-code-local, openclaw). Amended 2026-05-05: semanticworkbench expanded with full Key findings
+subsection. Refined 2026-05-08: origin benchmark data + macOS Tahoe caveat added; worktree failure modes cross-linked to
+CLAUDE.md engineering convention; R2-12 linkage surfaced in Open questions.
 
 ---
 
@@ -106,10 +108,17 @@ origin (`7xuanlu/origin`) is not a harness in the usual sense — it is a local 
 client shared, durable cross-session memory. What makes it Linus-aligned is not the category but the hardware and
 substrate choices: Apple Silicon only (M1+, no Linux, no Windows), Rust workspace, libSQL with 768-dimensional
 BGE-Base-EN-v1.5-Q embeddings, DiskANN indexing, FTS5 virtual table via triggers, RRF fusion combining vector and
-keyword search, and an LLM rescoring pass using Qwen3-4B-Instruct on Metal via llama-cpp-2. That is almost exactly the
-substrate the Linus memory-architecture spec has been converging on from first principles. The daemon exposes an HTTP
-API on `127.0.0.1:7878` and a launchd plist for persistent background operation — the right operational shape for a
-personal system.
+keyword search, and an LLM rescoring pass using Qwen3-4B-Instruct-2507 on Metal via llama-cpp-2. That is almost exactly
+the substrate the Linus memory-architecture spec has been converging on from first principles. The daemon exposes an
+HTTP API on `127.0.0.1:7878` and a launchd plist for persistent background operation — the right operational shape for a
+personal system. The v0.2.1 benchmarks tighten the case further: 96% fewer tokens per query (168 vs. 4,505 baseline),
+Recall@5 of 88.0% on LongMemEval-oracle, and 67.3% on LoCoMo10 — strong enough that the Integrate-as-service path is
+worth scheduling in Phase 2b rather than continuing to study. Two operational caveats: (a) macOS Tahoe 26.x requires
+`CXXFLAGS="-std=c++17"` at compile time, and `ggml_metal_init` can fail on Tahoe even when native Metal works; the
+daemon auto-degrades to a no-LLM mode in that case, so a `sw_vers` check + `cargo build` smoke test should be the first
+step of the R2-39 evaluation. (b) origin's `Arc<dyn EventEmitter>` trait — passing a capability boundary into the
+business-logic core rather than leaking a UI or storage handle — is precisely the discipline ARCHITECTURE.md wants
+between Linus's orchestration layer and front-ends; worth surfacing as an explicit Phase 2a engineering pattern.
 
 The blocker is license topology. The Tauri desktop app and root frontend are AGPL-3.0-only; the three server crates
 (`origin-types`, `origin-core`, `origin-server`) are Apache-2.0, a split the maintainer made explicitly to let
@@ -192,7 +201,14 @@ flow — resolve repo root, create `~/.linus/worktrees/<branch>_<nanoseconds>`, 
 `git worktree add -b agent/<task-id> <path> <HEAD-SHA>`, capture the base SHA for stable diffs, cleanup with
 branch-delete suppression for pre-existing branches — is ~220 lines that port directly to Python subprocess calls. Adopt
 this as the canonical Worker workspace primitive. Two-tier model makes sense: durable worktrees for `agent/<task-id>`
-branches, in-memory `git diff` only for one-shot stateless Workers.
+branches, in-memory `git diff` only for one-shot stateless Workers. **Failure modes** now captured as a CLAUDE.md
+engineering convention ("Worktree fan-out discipline"): three non-obvious pitfalls are base-SHA drift (all parallel
+worktrees must branch from the same commit), Edit-tool path resolution (Edit/Write calls with absolute paths sometimes
+resolve to the primary checkout rather than the worktree path — prefer `Bash(cd <worktree-path> && …)` inside an agent),
+and branch-delete-before-merge loss (retain agent branches until the consolidated PR is confirmed merged; do NOT
+`git branch -D` immediately after `git worktree remove`). When not to use worktrees: if Workers are writing
+non-overlapping files on a shared branch, sequential agent dispatch with file-level partitioning is simpler and avoids
+the worktree overhead entirely.
 
 **The three-role model split.** Derived from claude-task-master's provider-plugin architecture. Main model does
 decomposition; a research model queries an external or specialized source for fresh context; fallback covers main model
@@ -304,19 +320,26 @@ capture "adopt both patterns, neither product," or should it declare one pattern
 supplementary?
 
 _Partially resolved (CLAUDE.md "Workgraph JSONL as the Phase 2a session-store shape" Engineering Convention): the
-recommended Phase 2a shape is workgraph-style JSONL DAG + dispatch. ARCHITECTURE.md notes the audit log is
-append-only JSONL at `~/.linus/audit.jsonl` (Phase 2). The session-store substrate (JSONL vs SQLite vs JSONL→SQLite
-migration gate at Phase 3) remains an implementation choice but JSONL-first is the default per the convention._
+recommended Phase 2a shape is workgraph-style JSONL DAG + dispatch. ARCHITECTURE.md notes the audit log is append-only
+JSONL at `~/.linus/audit.jsonl` (Phase 2). The session-store substrate (JSONL vs SQLite vs JSONL→SQLite migration gate
+at Phase 3) remains an implementation choice but JSONL-first is the default per the convention. Remaining framing
+question (whether to declare one pattern primary) is live as **R2-12** in
+[`top-questions.md`](../../questions/top-questions.md#tier-2--shape-phase-26-architecture)._
 
 **Open Responses versus Chat Completions.** The serving protocol choice locks in client compatibility. Ollama serves the
 legacy Chat Completions shape; the Open Responses spec adds stateful response threading and the SSE event catalog. Cline
 and openclaw speak both; claw-code-local speaks OpenAI-compat generically. What is the Phase 2a target, and is it worth
-a short spike against the open-responses spec document before committing?
+a short spike against the open-responses spec document before committing? This question is promoted as **R2-05** in
+[`top-questions.md`](../../questions/top-questions.md#tier-1--block-phase-1--phase-2a-architecture), where it is listed
+as a Tier 1 item blocking Phase 2a architecture.
 
 **Origin as memory sidecar.** The memory-architecture spec is fresh at commit `d77e026`. Does Dan want to evaluate
 `origin-server` as a Phase 2b candidate sidecar before the spec hardens, or does the spec get written first and origin
 gets evaluated against the resulting requirements? The order matters because if origin is the candidate, the spec should
-be written in a way that makes the evaluation legible.
+be written in a way that makes the evaluation legible. Now tracked as **R2-39** (Tier 3) in
+[`top-questions.md`](../../questions/top-questions.md#tier-3--documentation-conventions-longer-horizon-scope), with the
+additional caveat that macOS Tahoe compatibility (see origin key findings above) should be verified before scheduling
+the bake-off.
 
 _Resolved (DEC-0018, DEC-0045): MCP adoption is committed for Phase 2 onwards (not Phase 3 kickoff). fastmcp is the
 default framework. DEC-0005's MCP portion is superseded by DEC-0018 per the index in DECISIONS.md._

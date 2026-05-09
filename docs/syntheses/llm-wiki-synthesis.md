@@ -43,11 +43,11 @@ thresholds, and operational conventions. Without a schema the LLM is a generic c
 knowledge worker.
 
 **Memory lifecycle: confidence decay and supersession.** [Rohit's v2](../repo-notes/agentmemory.md) adds the observation
-that knowledge has a lifecycle which the original gist ignores. Every claim should carry a confidence score (source count, recency, contradiction
-status). Claims that haven't been accessed or reinforced in months should deprioritize via Ebbinghaus-style exponential
-decay. When new information contradicts an existing claim, the old claim should be marked stale and linked to the new
-one — preserved but superseded — rather than silently overwritten. For a scientific paper corpus, methods sections go
-stale faster than foundational results; this distinction should be encoded in the schema.
+that knowledge has a lifecycle which the original gist ignores. Every claim should carry a confidence score (source
+count, recency, contradiction status). Claims that haven't been accessed or reinforced in months should deprioritize via
+Ebbinghaus-style exponential decay. When new information contradicts an existing claim, the old claim should be marked
+stale and linked to the new one — preserved but superseded — rather than silently overwritten. For a scientific paper
+corpus, methods sections go stale faster than foundational results; this distinction should be encoded in the schema.
 
 **Consolidation tiers.** Raw observations compress through a pipeline: working memory (recent, unprocessed) → episodic
 memory (session summaries) → semantic memory (cross-session facts) → procedural memory (workflows extracted from
@@ -135,14 +135,16 @@ the same Rust/Tauri stack Linus might eventually use.
 ### Knowledge Graph and Retrieval
 
 **[jgoldfed/keppi](../repo-notes/keppi.md)** — Weighted directed graph built from wikilinks, tags, and frontmatter.
-Blast-radius analysis (what does updating this node affect?), Louvain community detection, gap detection, 20+ MCP tools.
-Tested on 1,471 notes and 267K edges. The blast-radius and gap-detection concepts are directly applicable to the paper
-library in KnowledgeBase. Relevant to Phase 3 (KB/Parallel Agents).
+Blast-radius analysis (what does updating this node affect?), Louvain community detection, gap detection, 19-tool
+FastMCP server. Tested on 1,471 notes and 267K edges. The blast-radius (`build_context_pack` greedy-fill to a token
+budget) and gap-detection concepts are directly applicable to the paper library in KnowledgeBase. Keppi and
+[hyalo](../repo-notes/hyalo.md) together constitute the Phase 3 KB tooling layer (lint + transactional link rewrites +
+bounded-BFS-with-decay retrieval). Relevant to Phase 3 (KB/Parallel Agents).
 
-**[omega-memory/omega-memory](../repo-notes/omega-memory.md)** — Local semantic search: FTS5 plus vector embeddings
-plus cross-encoder reranking, all on-device. 95.4% on LongMemEval at 50ms retrieval. Solves the index.md scaling
-problem without requiring a heavy vector database. Directly relevant to Phase 3 when the KnowledgeBase grows past 200
-nodes and the index-file approach breaks down.
+**[omega-memory/omega-memory](../repo-notes/omega-memory.md)** — Local semantic search: FTS5 plus vector embeddings plus
+cross-encoder reranking, all on-device. 95.4% on LongMemEval at 50ms retrieval. Solves the index.md scaling problem
+without requiring a heavy vector database. Directly relevant to Phase 3 when the KnowledgeBase grows past 200 nodes and
+the index-file approach breaks down.
 
 **[vectorlessflow/vectorless](../repo-notes/vectorless.md)** — Knowledge graph traversal for document retrieval with no
 vector database. Builds a knowledge link graph for contextual retrieval. Relevant to Phase 3 as an alternative retrieval
@@ -150,8 +152,8 @@ architecture for cases where vector DB overhead is undesirable.
 
 **[QipengGuo/llm-wikidata](../repo-notes/llm-wikidata.md)** — Combines LLMs and ChromaDB to recall existing entities
 before inserting new ones, preventing duplicate or hallucinated graph nodes. The entity deduplication approach (checking
-for existing nodes before creating new ones) is a concrete solution to the concept-drift problem the community identified
-as the hardest part of graph construction. Phase 3.
+for existing nodes before creating new ones) is a concrete solution to the concept-drift problem the community
+identified as the hardest part of graph construction. Phase 3.
 
 **[Tencent/WeKnora](../repo-notes/WeKnora.md)** — Auto-built wiki plus typed knowledge graph (Neo4j), wiki-grounded
 retrieval, Chrome extension for ingestion. Apache 2.0. The typed graph architecture and wiki-grounded retrieval pattern
@@ -180,12 +182,18 @@ the raw source. Human-edit protection. Phase 2-3.
 ### Agent Memory and MCP
 
 **[rohitg00/agentmemory](../repo-notes/agentmemory.md)** — BM25 plus vector plus knowledge graph, RRF fusion, 95.2% on
-LongMemEval-S, 43 MCP tools. Knowledge graph extraction optional. This is the production implementation behind the Rohit
-v2 gist. Relevant as a reference architecture for Linus's memory layer. Phase 2-3.
+LongMemEval-S, 51 MCP tools (plus 107 REST endpoints). Knowledge graph extraction optional. This is the production
+implementation behind the Rohit v2 gist. The 13-hook lifecycle taxonomy (`SessionStart` through `TaskCompleted`) is the
+most directly liftable element for the Phase 2 episodic memory layer (DEC-0029) — a worked catalog of which Claude Code
+lifecycle events Layer C needs to subscribe to. Relevant as a reference architecture for Linus's memory layer. Phase
+2-3.
 
 **[bitsofchris/openaugi](../repo-notes/openaugi.md)** — "Links are the whole thing" — treats tags and links as
-first-class graph nodes. One SQLite file, MCP server, write-back from chat conversations. Minimal dependency footprint.
-Relevant to Phase 2 as the simplest possible graph-backed memory architecture that still has MCP integration.
+first-class graph nodes. Two-table SQLite schema (`blocks`, `links`), sqlite-vec + FTS5 in one file, 17-tool MCP server,
+write-back from chat conversations. Minimal dependency footprint. The two-table schema is the closest existing match to
+the DEC-0029 v0 episodic substrate (same `content_hash`-keyed IDs, same WAL mode, same FTS5 + vector in a single file) —
+the g4-memory synthesis identifies it as the candidate to lift almost verbatim for the Phase 2 episodic memory layer.
+Relevant to Phase 2 as both KB substrate reference and simplest graph-backed memory implementation with MCP integration.
 
 **[axoviq-ai/synthadoc](../repo-notes/synthadoc.md)** — Multi-provider including Ollama, contradiction detection,
 confidence thresholds, HITL review queue, audit trail, 6 file format ingesters (PDF, DOCX, PPTX, images, URLs,
@@ -264,8 +272,10 @@ periodically consolidates entries.
 
 **Quality gate at ingest beats retrieval improvements.** A semantic scoring step before any source is compiled into the
 KB — applied against a domain editorial policy — is more impactful than any retrieval optimization downstream. For
-KnowledgeBase this should be a formal, auditable YAML policy file, not implicit human judgment. Sources that fail the
-gate stay in `raw/` with a `FILTERED.md` note explaining why. This makes filtering decisions correctable.
+KnowledgeBase this should be a formal, auditable YAML policy file, not implicit human judgment. DEC-0019 resolved the
+hard-gate framing as a quality surface: no hard reject lane in Phase 2; sources are scored and flagged (preprints marked
+`preprint: true`, quality scorecard surfaced in retrieval context) rather than filtered out, preserving signal Dan has
+already vetted. Sources do not fail the gate — they carry transparent quality metadata.
 
 **Ingest idempotency via content hashing.** Re-ingesting the same source (unchanged) slowly distorts the wiki by
 reinforcing its claims artificially. Every source should have its content hash checked against the ingest log before
@@ -298,8 +308,8 @@ file outgrows the context window.
 ## 5. KB Design Patterns
 
 [KB_DESIGN_PATTERNS.md](../../context/notes/KB_DESIGN_PATTERNS.md) translates the community learnings into twelve
-concrete, actionable patterns with CLAUDE.md rules and directory structures. The document is immediately applicable and should be treated as a design specification for the
-next KnowledgeBase sprint.
+concrete, actionable patterns with CLAUDE.md rules and directory structures. The document is immediately applicable and
+should be treated as a design specification for the next KnowledgeBase sprint.
 
 The patterns that map most directly onto Linus's current KnowledgeBase architecture are:
 
@@ -343,18 +353,19 @@ and each mitigation should appear in the KnowledgeBase CLAUDE.md schema.
 ## 6. Autoresearch and the LLM-in-a-Flash Connection
 
 The "Autoresearching Apple's LLM in a Flash" thread is a first-person account by Dan Woods of running Qwen 3.5 397B on
-an M3 Max MacBook Pro — a 209 GB MoE model producing 5.7 tokens per second sustained, using 5.5 GB resident memory, with
-no Python in the hot path. The paper and code are in [`repos/flash-moe`](../repo-notes/flash-moe.md), which Linus
-already has cloned.
+an M3 Max MacBook Pro — a 209 GB MoE model producing approximately 4.4 tokens per second with production-quality output
+including tool calling, using 5.5 GB resident memory, with no Python in the hot path. The paper and code are in
+[`repos/flash-moe`](../repo-notes/flash-moe.md), which Linus already has cloned.
 
 Several things in the thread connect directly to Linus's current landscape:
 
-The methodology is exactly the autoresearch pattern Karpathy described and that [`repos/autoresearch`](../repo-notes/autoresearch.md)
-and [`repos/autoresearch-mlx`](../repo-notes/autoresearch-mlx.md) implement. Dan Woods gave Claude Opus a metric to optimize (tokens per second), a goal ("never
-stop until you hit this number"), reference materials (the LLM in a Flash paper, Maderix's ANE reverse-engineering work — also in
-[`repos/ANE`](../repo-notes/ANE.md)), and let it run for 24 hours and 90 experiments. 42% of experiments were discarded. The flash-moe
-pattern emerged from that search. This is not inspiration; this is the exact methodology Linus is planning to use for
-its own performance optimization work, and it has a concrete, documented success case.
+The methodology is exactly the autoresearch pattern Karpathy described and that
+[`repos/autoresearch`](../repo-notes/autoresearch.md) and [`repos/autoresearch-mlx`](../repo-notes/autoresearch-mlx.md)
+implement. Dan Woods gave Claude Opus a metric to optimize (tokens per second), a goal ("never stop until you hit this
+number"), reference materials (the LLM in a Flash paper, Maderix's ANE reverse-engineering work — also in
+[`repos/ANE`](../repo-notes/ANE.md)), and let it run for 24 hours and 90 experiments. 42% of experiments were discarded.
+The flash-moe pattern emerged from that search. This is not inspiration; this is the exact methodology Linus is planning
+to use for its own performance optimization work, and it has a concrete, documented success case.
 
 The hardware findings are directly relevant. The M3 Max achieves 17.5 GB/s sequential SSD reads, which is 3x faster than
 the M1 Max that the LLM in a Flash paper benchmarked. The M1 Max in the Linus hardware is at the low end of this
@@ -389,9 +400,11 @@ upgrade before the wall hits matters.
 
 **How should Linus implement the write-back rule across parallel Workers?** The write-back rule (every task produces a
 deliverable plus KB updates) is straightforward for a single agent. For Linus's parallel agent architecture in Phase 3,
-multiple Workers may simultaneously propose updates to the same KB pages. The community has partial answers (git branch
-per ingestion, mesh sync, last-write-wins for most cases), but the right architecture for Linus's specific multi-agent
-pattern is not obvious. What coordination mechanism prevents parallel workers from producing contradictory KB writes?
+multiple Workers may simultaneously propose updates to the same KB pages. DEC-0022 resolved the policy-level question:
+serialized writes through a coordinator, Workers emit JSON diff proposals rather than writing directly, conflicts flag
+for human review before merge. The open implementation question (tracked as R2-22) is the specific coordination
+mechanism — lease, optimistic-merge, or branch-per-Worker — which resolves during Phase 3 implementation rather than
+requiring an advance architectural decision now.
 
 **What is the right confidence decay rate for different claim types in a scientific corpus?** Rohit's v2 proposes
 Ebbinghaus decay — exponential with time, reset on access or confirmation. Methods sections decay faster than
@@ -449,7 +462,8 @@ real KG of 1,471 notes and 267K edges. Clone as `repos/keppi`. The graph travers
 KnowledgeBase. Phase 3 reference.
 
 **rohitg00/agentmemory** — The production implementation behind the Rohit v2 gist: BM25 plus vector plus KG, RRF fusion,
-43 MCP tools. Clone as `repos/agentmemory`. Phase 2-3 reference for the memory/retrieval layer architecture.
+51 MCP tools. Clone as `repos/agentmemory`. Phase 2-3 reference for the memory/retrieval layer architecture and the
+13-hook Claude Code lifecycle taxonomy.
 
 **bitsofchris/openaugi** — The simplest complete implementation of graph-backed memory with MCP and write-back from
 chat. One SQLite file. Clone as `repos/openaugi`. A useful minimal reference before implementing something more complex.

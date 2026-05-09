@@ -31,11 +31,12 @@ framed as collaborator, tool, or hazard.
 Knuth's _Claude's Cycles_ is a narrative. Knuth had a hand-construction for one case of an open
 Hamiltonian-decomposition problem on a 3-regular Cayley digraph; Stappers had numeric solutions through m = 16 but no
 general construction. Stappers handed the problem to Claude Opus 4.6 with one process rule ("after EVERY exploreXX.py
-run, IMMEDIATELY update plan.md"); ~1 hour and 31 explorations later ([claude-cycles.md](../paper-notes/claude-cycles.md)) Claude produced a working construction for all odd
-m as a tiny C program. Knuth wrote a hand proof; a Lean formalization followed within days; the even case was cracked
-shortly after with GPT-5.4 Pro and Claude 4.6 Sonnet. For a mathematician of Knuth's stature to take an LLM-produced
-construction seriously enough to write it up is a non-trivial signal — especially because the report is honest about
-friction (restarts, lost search results, collapse on the even case).
+run, IMMEDIATELY update plan.md"); ~1 hour and 31 explorations later
+([claude-cycles.md](../paper-notes/claude-cycles.md)) Claude produced a working construction for all odd m as a tiny C
+program. Knuth wrote a hand proof; a Lean formalization followed within days; the even case was cracked shortly after
+with GPT-5.4 Pro and Claude 4.6 Sonnet. For a mathematician of Knuth's stature to take an LLM-produced construction
+seriously enough to write it up is a non-trivial signal — especially because the report is honest about friction
+(restarts, lost search results, collapse on the even case).
 
 ---
 
@@ -123,7 +124,10 @@ clean description of the **Maestro ceiling**, not a Worker target. Two consequen
 empirically vindicated: a session that solves an open combinatorial problem in an hour is not extravagant; it is the
 role allocation Linus's architecture already presumes. And the **plan.md forced-documentation pattern** is directly
 portable into the Maestro/Worker protocol — the single instruction turned an unstructured exploration into a recoverable
-trajectory, which is what the memory pillar's "scratchpad as durable artifact" commitment looks like in practice.
+trajectory, which is what the memory pillar's "scratchpad as durable artifact" commitment looks like in practice. The
+episodic memory schema (DEC-0039, hybrid leaf + summary records) is the architectural substrate designed to hold
+trajectories of this kind; the explicit "exploration trajectory" object type was deferred but the per-iteration log
+pattern is already the design target for Layer C of the five-layer memory pillar.
 
 ---
 
@@ -193,13 +197,17 @@ should be stated as such in VISION.md.
 
 ## Tensions and open questions
 
-**Should VISION.md cite Binz et al. and stake out Linus's positions explicitly?** A one-paragraph addition naming the
-four perspectives and Linus's hybrid converts implicit bets into reviewable design philosophy. The sub-question is
-whether to acknowledge tension points (the "Linus joins the Maestro team" line is in slight tension with a strict
-Botvinick/Gershman reading).
+_Resolved (S36, see [answered-questions.md](../questions/answered-questions.md)): VISION.md now explicitly cites Binz et
+al. four-perspectives framework and names Linus's hybrid position (Schulz on open-source Workers, Marelli on audit logs
+and claim provenance, Botvinick/Gershman on Maestro budget discipline). The tension point on the "Linus joins the
+Maestro team" line is acknowledged inline as a Schulz-leaning gesture bounded by the Botvinick/Gershman roadmap-agency
+commitment._
 
-**Should `docs/maestro-worker-protocol.md` gain a "Philosophy" section naming the Schulz/Marelli/Botvinick-Gershman
-blend?** Editorial work, but it makes the connection between Binz-level commitments and Worker-level mechanics legible.
+_Resolved (S37, see [answered-questions.md](../questions/answered-questions.md)):
+`docs/protocols/maestro-worker-protocol.md` now has a "Philosophy" section naming the Schulz / Marelli /
+Botvinick-Gershman blend and their Linus operationalizations. `docs/protocols/maestro-protocol.md` (added as a Phase 2a
+deliverable) independently restates the same three-position framework with explicit CLAUDE.md hooks. Both documents
+cross-reference this synthesis._
 
 **Is there a Linus epistemic standards document analogous to the LLM-wiki claim-typing convention?** Marelli calls for
 clear quality criteria defined before using LLMs. A short `docs/EPISTEMIC-STANDARDS.md` defining the claim categories
@@ -219,30 +227,36 @@ distinction in the benchmark suite itself.
 
 ## Repo-cluster anchor: g8-sci-agents (added 2026-05-05)
 
-The 2026-05-05 landscape remapping made **[g8-sci-agents](../syntheses/repo-clusters/g8-sci-agents.md)** the primary cluster anchor for this synthesis. g8 is the
-scientific-agent prior art cluster — most importantly **paper-qa**, the first paper-corpus tool to earn an Integrate
-verdict, with `PaperSearch`, `GatherEvidence`, `GenerateAnswer`, and `Reset` as the canonical tool surface. paper-qa
-is the operational instantiation of the Schulz frame: an open-source research-assistant-like collaborator with
-citation-grounded outputs and explicit claim typing. Adopting paper-qa as the Phase 2 KB substrate default
-integration target reframes the KB question from "build" to "adopt + extend," and it lands the citation discipline
-this synthesis argues for as code rather than convention.
+The 2026-05-05 landscape remapping made **[g8-sci-agents](../syntheses/repo-clusters/g8-sci-agents.md)** the primary
+cluster anchor for this synthesis. g8 is the scientific-agent prior art cluster — most importantly **paper-qa**, the
+first paper-corpus tool to earn an Integrate verdict, with `PaperSearch`, `GatherEvidence`, `GenerateAnswer`, and
+`Reset` as the canonical tool surface. paper-qa is the operational instantiation of the Schulz frame: an open-source
+research-assistant-like collaborator with citation-grounded outputs and explicit claim typing. Adopting paper-qa as the
+Phase 2 KB substrate default integration target reframes the KB question from "build" to "adopt + extend," and it lands
+the citation discipline this synthesis argues for as code rather than convention.
 
-The Nature feature **Self-Driving Labs Power Up** ([d41586-026-00974-2](../paper-notes/d41586-026-00974-2.md)) documents the shift from human-directed experiments to AI-directed closed-loop discovery: LLM-guided hypothesis generation feeds robotic experimentation, results feed back to the LLM for the next hypothesis. This is the Schulz collaborative frame applied to laboratory automation, and it directly parallels Linus's maestro-worker architecture applied to computational discovery — plan.md discipline plus tool calls plus observed results, looping.
+The Nature feature **Self-Driving Labs Power Up** ([d41586-026-00974-2](../paper-notes/d41586-026-00974-2.md)) documents
+the shift from human-directed experiments to AI-directed closed-loop discovery: LLM-guided hypothesis generation feeds
+robotic experimentation, results feed back to the LLM for the next hypothesis. This is the Schulz collaborative frame
+applied to laboratory automation, and it directly parallels Linus's maestro-worker architecture applied to computational
+discovery — plan.md discipline plus tool calls plus observed results, looping.
 
-The other g8 repos (research agents, scientific multi-step harnesses) supply the **prior art for what
-Maestro-class evaluation actually looks like in practice**. The Knuth case argues categorically for a Maestro-class
-tier in `benchmarks/dan_tasks/`; the g8 cluster argues empirically that the right shape is multi-step research
-loops with citation-grounded intermediate outputs, not single-prompt evaluations. The two arguments converge on the
-same Maestro-class eval recommendation from different directions.
+The other g8 repos (research agents, scientific multi-step harnesses) supply the **prior art for what Maestro-class
+evaluation actually looks like in practice**. The Knuth case argues categorically for a Maestro-class tier in
+`benchmarks/dan_tasks/`; the g8 cluster argues empirically that the right shape is multi-step research loops with
+citation-grounded intermediate outputs, not single-prompt evaluations. The two arguments converge on the same
+Maestro-class eval recommendation from different directions.
 
 A non-trivial implication: **the Schulz frame is the implicit position of the integrate-trio** (paper-qa + bioSkills
-+ scientific-agent-skills). When Linus adopts those repos, it endorses Schulz operationally. The synthesis claim
-that "Linus is a position-taking artifact" tightens — the position is now also embedded in the toolchain, not just
-the architecture. The Marelli citation discipline is the constraint that keeps the Schulz adoption honest:
-paper-qa's claim-typing + LAB-Bench canary blocklist + content-hashing make the Schulz collaboration auditable.
+
+- scientific-agent-skills). When Linus adopts those repos, it endorses Schulz operationally. The synthesis claim that
+  "Linus is a position-taking artifact" tightens — the position is now also embedded in the toolchain, not just the
+  architecture. The Marelli citation discipline is the constraint that keeps the Schulz adoption honest: paper-qa's
+  claim-typing + LAB-Bench canary blocklist + content-hashing make the Schulz collaboration auditable.
 
 The g3-wiki-patterns secondary edge supports the epistemic-standards thread: build patterns for agent-driven wikis
-([obsidian-llm-wiki-local](../repo-notes/obsidian-llm-wiki-local.md), [llm-research-wiki](../repo-notes/llm-research-wiki.md) LINT) operationalize the claim categories Marelli argues for.
+([obsidian-llm-wiki-local](../repo-notes/obsidian-llm-wiki-local.md),
+[llm-research-wiki](../repo-notes/llm-research-wiki.md) LINT) operationalize the claim categories Marelli argues for.
 g2-wiki-engines supports the reproducibility-floor thread: open-source wiki substrates are what the Schulz frame
 requires for science to remain reproducible. g9-bioinformatics supplies the Dan-relevant domain instantiation
 (Bacformer, BioReason, DeepSeMS as scientific agents in metagenomics-adjacent territory).
@@ -264,8 +278,9 @@ Marelli citation in the audit-log and memory-pillar ADRs where it is currently l
 
 ---
 
-_This synthesis is the input to a one-paragraph VISION.md addition naming Linus's implicit position in the Binz debate,
-a possible philosophy section in `docs/maestro-worker-protocol.md`, and a candidate Maestro-class entry for
-`benchmarks/dan_tasks/` derived from the Knuth Hamiltonian-decomposition family. Revisit if Dan publishes papers using
-Linus, if a future Linus model is capable enough to participate in roadmap planning, or when a new paper extends the
-Binz framework._
+_This synthesis is the input to a candidate Maestro-class entry for `benchmarks/dan_tasks/` derived from the Knuth
+Hamiltonian-decomposition family, and to the `docs/EPISTEMIC-STANDARDS.md` Marelli-operationalization deliverable (Phase
+2a, tracked as R2-24 in top-questions.md). The VISION.md addition (S36) and the
+`docs/protocols/maestro-worker-protocol.md` Philosophy section (S37) are both now written and cross-reference this
+synthesis. Revisit if Dan publishes papers using Linus, if a future Linus model is capable enough to participate in
+roadmap planning, or when a new paper extends the Binz framework. (Updated 2026-05-08.)_

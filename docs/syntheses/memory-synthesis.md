@@ -24,12 +24,11 @@ without a memory architecture spec.
 
 ## The unifying thesis
 
-Garrison's two-line argument, distilled from the
-[arXiv proof paper (2412.17794)](../../context/papers/2412.17794v1.pdf): universality requires only **(1) recursive
-state maintenance** (the system can read state, apply an update, and durably keep the new state) and **(2) reliable
-history access** (it can reference any prior state, distinguish states unambiguously, maintain temporal order, and
-guarantee integrity). Theorem 1 of that paper proves any system meeting both simulates a Universal Turing Machine with
-at most logarithmic overhead.
+Garrison's two-line argument, distilled from the [arXiv proof paper (2412.17794)](../paper-notes/2412.17794v1.md):
+universality requires only **(1) recursive state maintenance** (the system can read state, apply an update, and durably
+keep the new state) and **(2) reliable history access** (it can reference any prior state, distinguish states
+unambiguously, maintain temporal order, and guarantee integrity). Theorem 1 of that paper proves any system meeting both
+simulates a Universal Turing Machine with at most logarithmic overhead.
 
 Each of the eleven supporting papers turns out to be a different camera angle on the same statement. The
 complexity-theory papers ([2310.07923](../paper-notes/2310.07923v5.md), [2305.15408](../paper-notes/2305.15408v5.md))
@@ -201,10 +200,10 @@ it stops.
 
 [Hoffmann et al. 2022 (2203.15556)](../paper-notes/2203.15556v1.md) — the Chinchilla paper — sets the optimum _inside_
 the parameter-and-data regime: across 400+ training runs, the compute-optimal scaling law says that for every doubling
-of compute, double both the model and the data (N_opt ∝ C^0.5, D_opt ∝ C^0.5), with the verification model Chinchilla
+of compute, double both the model and the data (N*opt ∝ C^0.5, D_opt ∝ C^0.5), with the verification model Chinchilla
 (70B at 1.4T tokens) beating Gopher (280B at 300B tokens) at the same compute budget. The corollary the field
 internalised: most pre-2022 large LMs were significantly undertrained. Read against Garrison's framing, this is what
-_optimal_ looks like inside the bounded regime — and even Chinchilla still has to bolt chain-of-thought and retrieval
+\_optimal* looks like inside the bounded regime — and even Chinchilla still has to bolt chain-of-thought and retrieval
 onto inference to do anything genuinely sequential. **Chinchilla is the right answer to "how should I spend a fixed
 pretraining budget"; it is not an answer to "how do I escape the architectural ceiling."**
 
@@ -228,8 +227,10 @@ eleven-paper corpus collectively points to.
 
 The Garrison framework decomposes "memory" into two formal requirements (recursive state maintenance, reliable history
 access) and four sub-requirements on the second (reference any previous state, distinguish unambiguously, maintain
-temporal order, guarantee integrity). Mapped onto a Linus assistant, this lands as four practical layers, each with a
-preferred substrate the corpus already names.
+temporal order, guarantee integrity). Mapped onto a Linus assistant, this lands as five practical layers (A–E), each
+with a preferred substrate the corpus already names. The fifth layer — investigation memory (Layer D) — was added
+2026-05-06 via DEC-0052, which inserted a task-scoped multi-agent shared-context layer between cross-session episodic
+(Layer C) and semantic knowledge (formerly Layer D, now Layer E).
 
 ### Layer A — Intra-step latent state (within a single Worker forward pass)
 
@@ -313,18 +314,35 @@ markdown file; it is an entry in the addressable episodic substrate, with the sa
 but stored as a first-class record alongside the session's reasoning traces and tool outputs. The hosted-Claude pattern
 is a workaround for a missing layer; the Linus design treats that layer as infrastructure.
 
-### Layer D — Semantic / knowledge memory (durable, shared, factual)
+### Layer D — Investigation memory (task-scoped, multi-agent, single-investigation lifetime)
 
-This is the layer KnowledgeBase already serves. The Garrison framing argues it is part of memory infrastructure, not a
-separate "RAG feature" — which has a concrete implication for the orchestration layer: the same API shape should serve
-all four memory layers, with substrate variation hidden behind it. A Worker should not care whether a piece of context
-came from its own scratchpad (Layer B), a prior session (Layer C), or the KnowledgeBase (Layer D) — all three satisfy
-the same reliable-history- access contract. Different layers have different decay rates and different authority levels,
-but the _shape_ of the read API is uniform.
+This layer was added 2026-05-06 (DEC-0052) when the agentic-systems synthesis surfaced a gap in the original four-layer
+model: task-scoped shared context maintained across agents within one investigation — distinct from per-session
+scratchpad (Layer B), archived episodic history (Layer C), and durable knowledge (Layer E). Three systems in the corpus
+occupy this gap: Kosmos's world model (shared state across a full research investigation), Sketch2Simulation's
+intermediate representation (passed between pipeline stages), and HKUST QuantAgent's context buffer (strategy +
+reasoning log shared between planner and executor within one trading cycle). See the
+[agentic-systems synthesis](agentic-systems-synthesis.md) for the corpus examples that motivated this layer.
+
+The practical commitment for Linus: when a multi-agent fan-out spawns (Phase 3+), a shared investigation context is
+created, all participating agents can read and write to it, and the context is archived to Layer C when the
+investigation closes. Per DEC-0052, the substrate is a SQLite table in `~/.linus/investigations.db`, partitioned by
+`investigation_id`, with a GC policy that archives investigations idle for 30 days. An `investigation_stateful`
+memory-mode primitive is deferred to Phase 3; Layer D is not exposed in the Phase 2 router.
+
+### Layer E — Semantic / knowledge memory (durable, shared, factual)
+
+This is the layer KnowledgeBase already serves (renamed from Layer D to Layer E 2026-05-06 per DEC-0052). The Garrison
+framing argues it is part of memory infrastructure, not a separate "RAG feature" — which has a concrete implication for
+the orchestration layer: the same API shape should serve all five memory layers, with substrate variation hidden behind
+it. A Worker should not care whether a piece of context came from its own scratchpad (Layer B), a prior session (Layer
+C), an active investigation (Layer D), or the KnowledgeBase (Layer E) — all satisfy the same reliable-history-access
+contract. Different layers have different decay rates and different authority levels, but the _shape_ of the read API is
+uniform.
 
 This is also where the [LLM Wiki synthesis](llm-wiki-synthesis.md)'s discipline (claim typing, content hashing,
-write-back rule, contradiction policy) is most load-bearing. Layer D is where claims live longest and where ungrounded
-synthesis does the most damage. Memory and knowledge- quality controls are the same controls.
+write-back rule, contradiction policy) is most load-bearing. Layer E is where claims live longest and where ungrounded
+synthesis does the most damage. Memory and knowledge-quality controls are the same controls.
 
 ---
 
@@ -390,7 +408,7 @@ The single biggest implication of this synthesis is that **memory should be prom
 a Phase 2 first-class architectural layer.** This affects the ROADMAP directly. A reasonable restructured Phase 2
 includes, alongside the existing MVP work:
 
-- A `docs/specs/memory-architecture.md` spec walking through Layers A–D, the four sub-requirement obligations, and the
+- A `docs/specs/memory-architecture.md` spec walking through Layers A–E, the four sub-requirement obligations, and the
   substrate choice for each layer.
 - A v0 episodic store implementation (SQLite + content hashes + git as the persistence substrate), wired into the
   Maestro/Worker protocol so that every Worker invocation reads-and-writes-back through it.
@@ -412,12 +430,12 @@ a category error.
 
 Concretely, Linus needs orchestration-layer analogues of the four hosted-Claude commands and the PreCompact hook
 pattern. A diagnostic command parallel to `/context` that reports per-call context fill at dispatch time, broken down by
-layer (scratchpad, episodic, semantic, system); a full-reset operation parallel to `/clear` for moves to unrelated
-tasks; a summarising compression operation parallel to `/compact` that takes explicit preservation instructions about
-what must survive; a surgical rollback operation parallel to `/rewind` that returns to a named checkpoint without losing
-the work before it; and a PreCompact-style hook that captures critical state to the durable substrate before any lossy
-compression event fires. The reactive-versus- active framing Mughal closes on — context as a resource to manage rather
-than a bucket that fills — is the Maestro/Worker stance Linus should adopt by default.
+layer (scratchpad, episodic, investigation, semantic, system); a full-reset operation parallel to `/clear` for moves to
+unrelated tasks; a summarising compression operation parallel to `/compact` that takes explicit preservation
+instructions about what must survive; a surgical rollback operation parallel to `/rewind` that returns to a named
+checkpoint without losing the work before it; and a PreCompact-style hook that captures critical state to the durable
+substrate before any lossy compression event fires. The reactive-versus- active framing Mughal closes on — context as a
+resource to manage rather than a bucket that fills — is the Maestro/Worker stance Linus should adopt by default.
 
 These are not separate from the M-series resolutions; they are the orchestration-layer surface that exposes the M-series
 substrate to the Maestro/Worker protocol. The architectural commitment in M3 (scratchpad as durable artifact,
@@ -506,7 +524,7 @@ turns is non-conformant.
 
 The biggest move: lift the memory architecture from Phase 3+ to Phase 2 as a first-class deliverable. Concretely:
 
-- `docs/specs/memory-architecture.md` (new) walks through Layers A–D, the four sub-requirement obligations, the
+- `docs/specs/memory-architecture.md` (new) walks through Layers A–E, the four sub-requirement obligations, the
   substrate choice per layer, and the read/write API the orchestration layer exposes.
 - v0 episodic store implementation: SQLite + content hashes + git as persistence substrate. Wired into the
   Maestro/Worker protocol so that every Worker invocation reads relevant episodic context on entry and writes the
@@ -523,8 +541,8 @@ The biggest move: lift the memory architecture from Phase 3+ to Phase 2 as a fir
   episodic store. Prevents the long-context-as-memory-substitute anti-pattern.
 - A first-class diagnostic command in the orchestration surface (the Linus analogue of
   [`/context`](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)) that reports
-  per-call context fill at dispatch time, broken down by layer (scratchpad, episodic, semantic, system). Visibility is
-  the precondition for active management; without it, every "context is full" decision is folklore.
+  per-call context fill at dispatch time, broken down by layer (scratchpad, episodic, investigation, semantic, system).
+  Visibility is the precondition for active management; without it, every "context is full" decision is folklore.
 - A session-handoff record written to the episodic store at session end and read at session start. The Linus-native
   analogue of Mughal's `.claude/session-handoff.md`, but addressable via the M2 substrate rather than a single volatile
   file — which means handoff content is versioned alongside the session it summarises, and a project that spans many
@@ -604,7 +622,8 @@ The Garrison nucleus:
 
 - [`context/notes/garrison_memory_makes_computation_universal.md`](../../context/notes/garrison_memory_makes_computation_universal.md)
   — the synthesized blog + paper note that anchored this reading.
-- [`context/papers/2412.17794v1.pdf`](../../context/papers/2412.17794v1.pdf) — Garrison's proof paper (formal arXiv version now in corpus as ([2412.17794v1](../paper-notes/2412.17794v1.md))).
+- [`context/papers/2412.17794v1.pdf`](../../context/papers/2412.17794v1.pdf) — Garrison's proof paper (formal arXiv
+  version now in corpus as ([2412.17794v1](../paper-notes/2412.17794v1.md))).
 
 The eleven supporting paper notes (all in [`docs/paper-notes/`](../paper-notes/)):
 
