@@ -1,7 +1,7 @@
 # Group 2 Synthesis — LLM Wiki Engine Implementations
 
-_Date: 2026-05-04. Sources: eleven repo notes under `docs/repo-notes/` for link, llmwiki, llmbase, llmwiki-cli,
-wikidesk, wikiloom, wikimind, OmegaWiki, swarmvault, synthadoc, and TheKnowledge. Read against
+_Date: 2026-05-08 (updated). Sources: eleven repo notes under `docs/repo-notes/` for link, llmwiki, llmbase,
+llmwiki-cli, wikidesk, wikiloom, wikimind, OmegaWiki, swarmvault, synthadoc, and TheKnowledge. Read against
 `docs/syntheses/llm-wiki-synthesis.md` (the conceptual framework this extends) and Crossing 3 of
 `docs/landscapes/total-landscape.md` (the KB substrate decision this feeds)._
 
@@ -28,11 +28,12 @@ one LLM maintaining a wiki over that directory, one agent reading the wiki back.
 repos ship it with real sophistication. But Linus's KB is governed by three decisions that collectively put it outside
 any sibling's drop-in range. DEC-0026/27 commits to a dual-substrate RDF plus property graph (rdflib + networkx,
 Oxigraph evaluated later), rather than the flat markdown graph every sibling uses. DEC-0028 elevates memory architecture
-to a Phase 2 first-class pillar with Layers A through D, which means the KB is not the entire memory system — it is
-Layer D of a four-layer stack, and its read API must eventually present uniformly alongside the scratchpad and episodic
-layers. And the overall system targets scientific papers with claim-level epistemic typing (`[!source]`, `[!analysis]`,
-`[!unverified]`, `[!gap]`) and content-hash provenance at the chunk level, which is stricter than anything any sibling
-enforces as a first-class invariant.
+to a Phase 2 first-class pillar, subsequently expanded to Layers A through E (DEC-0052 added Layer D — investigation
+memory — and renumbered KB to Layer E), which means the KB is not the entire memory system — it is Layer E of a
+five-layer stack, and its read API must eventually present uniformly alongside the scratchpad, episodic, and
+investigation-memory layers. And the overall system targets scientific papers with claim-level epistemic typing
+(`[!source]`, `[!analysis]`, `[!unverified]`, `[!gap]`) and content-hash provenance at the chunk level, which is
+stricter than anything any sibling enforces as a first-class invariant.
 
 The gap is not capability — some siblings are impressively complete. The gap is shape. A personal-vault wiki engine that
 works for markdown notes works poorly as the semantic memory pillar of a Maestro/Worker orchestration backend with
@@ -188,16 +189,21 @@ framework established there — it assumes it. The community patterns (content h
 ingest, hybrid retrieval past 200 nodes, scoping deterministically before reasoning probabilistically) are the
 conceptual framework; the above lift candidates are the community's concrete implementations of those patterns.
 
-The memory-synthesis cross-reference (`docs/syntheses/memory-synthesis.md`) is also load-bearing. Layer D of the
-four-layer memory architecture (semantic/knowledge memory) is where KnowledgeBase sits. The uniform read API requirement
-— Workers cannot tell whether context came from scratchpad, episodic, or knowledge memory — is a design constraint no
-sibling has addressed because none is building a layered memory system. This is the architectural gap that makes all 11
-Study rather than Integrate, and it is worth naming explicitly in the Phase 2 KB spec.
+The memory-synthesis cross-reference (`docs/syntheses/memory-synthesis.md`) is also load-bearing. Layer E of the
+five-layer memory architecture (semantic/knowledge memory, renumbered from Layer D via DEC-0052) is where KnowledgeBase
+sits. The uniform read API requirement — Workers cannot tell whether context came from scratchpad, episodic, or
+knowledge memory — is a design constraint no sibling has addressed because none is building a layered memory system.
+This is the architectural gap that makes all 11 Study rather than Integrate, and it is worth naming explicitly in the
+Phase 2 KB spec.
 
-The G3 wiki patterns group adds 7 more repos to the same Study verdict (see the group synthesis when it lands), bringing
-the full count to 18 LLM Wiki repos, all Study. If anything in G3 has implemented claim-level typing plus chunk-level
-hashing plus citation enforcement simultaneously, this synthesis should be updated to redirect the provenance-depth
-observation to that repo rather than splitting it across wikiloom and TheKnowledge.
+The G3 wiki patterns group adds 7 more repos to the same Study verdict (see
+`docs/syntheses/repo-clusters/g3-wiki-patterns.md`), bringing the full count to 18 LLM Wiki repos, all Study. The G3
+survey confirms that none of the seven G3 repos (agentic-wiki-builder, AgenticResearchWiki, llm-research-wiki,
+llm-wikidata, atomic-knowledge, beever-atlas, obsidian-llm-wiki-local) achieved all three provenance properties
+simultaneously — the wikiloom + TheKnowledge split for provenance depth stands across the full 18-repo cohort. The
+paper-qa reframing from g8-sci-agents (KB substrate as "adopt + extend" rather than "build from scratch") is worth
+surfacing here: Phase 2 KB can bootstrap on paper-qa's existing ingest pipeline and layer the chunk-id derivation and
+citation enforcement described above on top rather than re-implementing the base infrastructure.
 
 ---
 
@@ -241,7 +247,11 @@ the first line of KB code is written.
 **Operations registry adoption.** Llmbase's `Operation` dataclass is a near-drop-in for the "one definition, three
 surfaces" tool registry Linus needs in Phase 2a. The alternative is a Linus-native abstraction designed from scratch to
 better fit the Maestro/Worker delegation model (e.g., an Operation carries an autonomy tier from SAFETY.md, not just a
-writes flag). Which direction: lift llmbase's proven contract, or design around Linus's specific constraints?
+writes flag). Which direction: lift llmbase's proven contract, or design around Linus's specific constraints? _Partially
+resolved (DEC-0018, DEC-0045, see [answered-questions.md](../../questions/answered-questions.md)): MCP adopted as
+extensibility substrate; fastmcp's decorator API is the in-house Linus server pattern. The specific shape of the Phase
+2a tool registry (whether to lift llmbase's `Operation` dataclass or design a Linus-native abstraction with
+autonomy-tier fields) remains open — see R2-01 in top-questions.md._
 
 **Wiki-compilation layer or RAG-only?** Every sibling builds a compiled wiki over the raw corpus and argues it is more
 useful than RAG-on-raw-PDFs for compounding research knowledge. KnowledgeBase today is RAG-as-product. Is there appetite
@@ -249,14 +259,16 @@ for an LLM-maintained markdown wiki layer on top of KnowledgeBase in Phase 3, or
 provenance via content-hashed citations? The community's unanimous answer is "compile" but the community has not tried
 it on academic biochemistry/genomics papers with table-heavy data sections.
 
-**G3 cross-check on provenance depth.** The wikiloom + TheKnowledge combination gives the best chunk-level provenance
-story in this group, but no single repo has implemented chunk-level hashing plus claim-type typing plus citation
-enforcement simultaneously. Once the G3 synthesis lands, check whether any G3 repo has achieved all three. If so, that
-repo displaces wikiloom/TheKnowledge as the primary provenance reference.
+**G3 cross-check on provenance depth.** _Resolved (2026-05-08):_ The G3 synthesis
+(`docs/syntheses/repo-clusters/g3-wiki-patterns.md`) is now available and confirms no G3 repo achieved chunk-level
+hashing plus claim-type typing plus citation enforcement simultaneously. The wikiloom + TheKnowledge combination remains
+the primary provenance reference for the 18-repo cohort. G3's most relevant provenance contribution is
+obsidian-llm-wiki-local's SHA-256 hashing with atomic-rename writes, which is chunk-level-adjacent but stops short of
+per-claim typing and citation enforcement at write time.
 
 ---
 
-_Update this document when the Phase 2 KB schema spec lands, when the G3 wiki patterns synthesis is complete, and when
-Phase 3 parallel-agent write coordination design begins. Primary inputs: `docs/repo-notes/` for all eleven repos;
-`docs/syntheses/llm-wiki-synthesis.md`; `docs/syntheses/memory-synthesis.md`; Crossing 3 of
-`docs/landscapes/total-landscape.md`._
+_Update this document when the Phase 2 KB schema spec lands and when Phase 3 parallel-agent write coordination design
+begins. G3 cross-check is now complete (2026-05-08). Primary inputs: `docs/repo-notes/` for all eleven repos;
+`docs/syntheses/llm-wiki-synthesis.md`; `docs/syntheses/memory-synthesis.md`;
+`docs/syntheses/repo-clusters/g3-wiki-patterns.md`; Crossing 3 of `docs/landscapes/total-landscape.md`._

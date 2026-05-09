@@ -92,7 +92,13 @@ to a biological FM. BioReason proves the recipe on DNA reasoning over KEGG pathw
 to protein function prediction with ESM3 and adds the **GO-GPT typed-prediction companion** as an evidence channel
 before the free-text reasoning stage. Together they argue that reasoning over a biological FM is a tractable engineering
 pattern, not a research project, and that the right primitive is **typed predictions feeding free-text reasoning**, not
-either alone.
+either alone. A notable counterpoint is [ProteinReasoner (2025.07.21.665832v2)](../paper-notes/2025.07.21.665832v2.md),
+anchored in [biological-foundation-models-synthesis](biological-foundation-models-synthesis.md): it reaches similar
+goals through a structurally different bet — the evolutionary profile as a _typed intermediate token stream_ forced
+between sequence and structure within a single generative PLM, beating ESM3-Open-1.4B without a separate reasoning LLM.
+BioReason-Pro's free-text CoT and ProteinReasoner's typed-profile intermediate are the two architectural poles for how
+reasoning enters biological FMs; Linus's Phase 7 encoder-swap experiment (R2-58) will surface which fits better for
+protein-function annotation in Dan's domain.
 
 The **cross-modality archetype** is held by [PertFormer](../paper-notes/2024.12.19.629561v2.md) alone. Where the other
 six papers operate at the molecule level, PertFormer operates at the **cell-state** level — each training sample is one
@@ -236,10 +242,12 @@ list closes them deliberately.
 Several Group C papers consume Group A FMs as substrate, which means a Group A release propagates directly into a Group
 C skill upgrade. BioReason consumes Evo 2 and Nucleotide Transformer as `f_DNA`; the frozen-encoder design makes a
 future BioReason variant on AlphaGenome's 1 Mb context (addressing the 2 kb truncation) a Linus-original direction the
-paper does not pursue. BioReason-Pro consumes ESM3; substituting LucaOne or ProteinReasoner is testable. ProtHGT
-explicitly ablates ProtT5 vs TAPE vs ESM-2 and is agnostic to which PLM provides node features. Horizyn-1 uses ProtT5
-frozen and the ablations showed that end-to-end ESM-2 fine-tuning did _not_ help, but swapping in a stronger frozen
-backbone is exactly the upgrade path predicted by "backbones matter more than encoder architecture."
+paper does not pursue. BioReason-Pro consumes ESM3; substituting LucaOne or ProteinReasoner is testable —
+ProteinReasoner's now-documented benchmark profile (150M/650M beating ESM3-Open-1.4B on structure and fitness tasks)
+makes it a concrete candidate, not a speculative one. ProtHGT explicitly ablates ProtT5 vs TAPE vs ESM-2 and is agnostic
+to which PLM provides node features. Horizyn-1 uses ProtT5 frozen and the ablations showed that end-to-end ESM-2
+fine-tuning did _not_ help, but swapping in a stronger frozen backbone is exactly the upgrade path predicted by
+"backbones matter more than encoder architecture."
 
 **A Group A model upgrade is a Group C skill upgrade**, and because all three patterns hold the encoder frozen,
 substitution cost is re-running embedding precomputation, not retraining. Linus's tool registry should carry the encoder
@@ -367,42 +375,53 @@ needs an explicit `model_prediction` edge class with producing-model + version
 ## Tensions and open questions
 
 **ProtHGT vs Horizyn-1 vs BioReason-Pro for the first protein-function skill — on what criteria?** Three architectures,
-three output shapes, three operational profiles. Pick on benchmark against a Dan-authored protein-function eval, but the
-deeper question is which axis matters: latency, narrative quality, GO-Fmax, low-similarity robustness, ease of local
-deployment, agreement with experimental controls. BioReason-Pro's own four-tier evaluation (automated Fmax, LLM-judge,
-human pairwise, structural grounding) is a credible picking template; a scaled-down version belongs in
-`benchmarks/dan_tasks/biology/`.
+three output shapes, three operational profiles. The deeper question is which axis matters: latency, narrative quality,
+GO-Fmax, low-similarity robustness, ease of local deployment, agreement with experimental controls. BioReason-Pro's own
+four-tier evaluation (automated Fmax, LLM-judge, human pairwise, structural grounding) is a credible picking template; a
+scaled-down version belongs in `benchmarks/dan_tasks/biology/`. _Partially resolved (S24, see
+[answered-questions.md](../questions/answered-questions.md)): BioReason-Pro first, because its four-tier eval also
+establishes the typed-structured-prediction shape from day one; ProtHGT and Horizyn-1 remain on the Phase 7 skill
+roster. Tracked as R2-18 for the on-hardware benchmark-informed comparison._
 
 **Should LAB-Bench MCQ + BixBench agent harness be the Phase 1 baseline for Worker selection?** Case for yes: most
 rigorous public benchmarks in Dan's domain, established frontier upper bounds, days of work instead of weeks. Case for
 caution: a benchmark is an opinion about what matters, and adopting LAB-Bench's MCQ-with-refusal smuggles in the
-FutureHouse opinion. Recommended: **adopt now, supplement with Dan- authored capsules over Phase 1–3, reserve the right
-to weight categories differently than the source papers**. Benchmarking ADR resolves the convention.
+FutureHouse opinion. _Partially resolved (S11, see [answered-questions.md](../questions/answered-questions.md)): adopt
+both with caveats — Dan-authored capsule tasks carry more Phase 1 decision weight than LAB-Bench; LAB-Bench is
+contextual calibration. Benchmarking ADR (S12) partially adopted; Qwen3 designated as local judge. Tracked as R2-19._
 
 **Is the FutureHouse evaluation philosophy worth adopting wholesale?** The insufficient-info option, the
 open-answer-vs-MCQ contrast, the 80/20 public/private split, the LLM-judge for open-answer grading, the pure-recall
-calibration baseline — these are coherent choices that hang together. Yes, with one caveat: the LLM-judge dependency on
-hosted Claude is not aligned with Linus's local-first posture, and Phase 4 should target a local judge or accept a
-hybrid where hosted Claude is benchmarking-only. Deserves an explicit ADR.
+calibration baseline — these are coherent choices that hang together. _Partially resolved (S12, see
+[answered-questions.md](../questions/answered-questions.md)): partial adoption — keep MCQ-with-refusal structure and
+open-answer framing; use Qwen3 as local judge for Phase 1; avoid adopting the hosted-Claude judge dependency. Tracked as
+R2-19 for the full ADR._
 
 **Should the BioReason-Pro encoder be swapped to LucaOne or ProteinReasoner?** Frozen-encoder design makes the swap
 mechanically cheap. Hypothesis: a cross-modal pretrained encoder (LucaOne) or an explicitly reasoning encoder
 (ProteinReasoner) gives different — possibly better — cellular-component or organism-specific behaviour than ESM3. Phase
-6 / 7 spike worth naming: rerun the BioReason-Pro harness with each substituted, report deltas. Pending ProteinReasoner
-checkpoint release.
+6 / 7 spike worth naming: rerun the BioReason-Pro harness with each substituted, report deltas. The
+[ProteinReasoner note (2025.07.21.665832v2)](../paper-notes/2025.07.21.665832v2.md) (anchored in
+[biological-foundation-models-synthesis](biological-foundation-models-synthesis.md)) confirms ProteinReasoner beats
+ESM3-Open-1.4B on zero-shot structure and fitness prediction benchmarks; it is a concrete, architecture-compatible swap
+candidate — checkpoint release remains the gating factor. Tracked as R2-58 in
+[top-questions.md](../questions/top-questions.md).
 
 **"PLM + heterogeneous KG + graph transformer" as a named Linus archetype?** At least three corpus papers (ProtHGT,
-DeepHGAT, PSPGO) are variants. Recommendation: **name after a second independent replication outside this corpus**, with
-ProtHGT as the lead worked example.
+DeepHGAT, PSPGO) are variants. _Partially resolved (S32, see
+[answered-questions.md](../questions/answered-questions.md)): naming deferred until second independent out-of-corpus
+replication; ProtHGT is the lead example, criterion already set._
 
 **"Dual-encoder cross-modal retrieval" as a named Linus archetype?** The pattern is well-established externally (CLIP,
-CLAP, VideoCLIP, CodeBERT, ProtST), and Horizyn-1 is the first scientific-discovery instantiation in the corpus. **Name
-it now** with Horizyn-1 as lead worked example — external priors are strong enough that the pattern is not speculative.
+CLAP, VideoCLIP, CodeBERT, ProtST), and Horizyn-1 is the first scientific-discovery instantiation in the corpus.
+_Resolved (S33, see [answered-questions.md](../questions/answered-questions.md)): named and added to GLOSSARY.md as
+"dual-encoder cross-modal retrieval" with Horizyn-1 as primary example._
 
 **Should Linus pick a default mode for function prediction?** Linus needs all three (ProtHGT KG-grounded, BioReason-Pro
-FM-with-typed- companion, Horizyn-1 pure FM), but the default for new skills should be what the orchestration layer
-audits most cleanly. Recommended default: **typed structured prediction wrapping free-text rationale** (the
-BioReason-Pro shape) — both human-readable and machine-queryable, and generalises beyond biology.
+FM-with-typed-companion, Horizyn-1 pure FM), but the default for new skills should be what the orchestration layer
+audits most cleanly. _Resolved (S25, see [answered-questions.md](../questions/answered-questions.md)): typed structured
+prediction wrapping free-text rationale is the adopted CLAUDE.md engineering convention for any domain skill producing
+predictive output — the BioReason-Pro shape is the reference. Tracked as R2-59 for the implementation-detail follow-on._
 
 ---
 
@@ -422,13 +441,15 @@ alone — to make claim-typing operationally load-bearing. The [memory synthesis
 BioReason and BioReason-Pro are domain confirmations of the CoT-escapes-TC0 thesis — the 86→98% KEGG jump and the 79%
 UniProt expert tie-or-exceed are biology-domain instantiations of the theoretical capability gap.
 
-This synthesis should produce: a Group C cluster entry in [paper-landscape.md](../landscapes/paper-landscape.md); a
-headline- claim row in [synthesis-landscape.md](../landscapes/synthesis-landscape.md); the LAB-Bench + BixBench Phase 1
-benchmarking commitment, the Horizyn-1 first-skill recommendation, the ProtHGT-vs-BioReason-Pro benchmark-informed
-selection, the DIAMOND DeepClust Phase 4 mirror, and the BioReason-Pro atlas Phase 3 KB ingestion in
-[total-landscape.md](../landscapes/total-landscape.md). Open questions go into `top-questions.md`. The two
-named-archetype proposals (dual-encoder cross-modal retrieval; PLM + heterogeneous KG + graph transformer) become short
-standalone syntheses once a second clean external instance lands.
+This synthesis produced: a Group C cluster entry in [paper-landscape.md](../landscapes/paper-landscape.md); a
+headline-claim row in [synthesis-landscape.md](../landscapes/synthesis-landscape.md); the LAB-Bench + BixBench Phase 1
+benchmarking commitment (primary benchmark anchor moved to [infra-foundations-synthesis](infra-foundations-synthesis.md)
+as of 2026-05-05; domain treatment retained here), the BioReason-Pro first-skill selection (S24), the
+typed-structured-prediction convention (S25 / CLAUDE.md), the DIAMOND DeepClust Phase 4 mirror, and the BioReason-Pro
+atlas Phase 3 KB ingestion in [total-landscape.md](../landscapes/total-landscape.md). Open questions in
+`top-questions.md`. Of the two named-archetype proposals: **"dual-encoder cross-modal retrieval"** is now named and in
+GLOSSARY.md (S33); **"PLM + heterogeneous KG + graph transformer"** is deferred pending second out-of-corpus replication
+(S32).
 
 ---
 

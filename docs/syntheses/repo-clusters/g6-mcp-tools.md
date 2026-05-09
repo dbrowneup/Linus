@@ -1,7 +1,9 @@
 # Group 6 Synthesis — MCP Servers & Code/Document Context Tools
 
-**Date:** 2026-05-04 **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne) **Trigger:** G6 fan-out
-synthesis pass; six repos evaluated: fastmcp, ontomics, codesight, qmd, vectorless, WeKnora.
+**Date:** 2026-05-04 (updated 2026-05-08) **Author:** Claude Sonnet 4.6 (Worker, commissioned by Dan Browne)
+**Trigger:** G6 fan-out synthesis pass; initial six repos (fastmcp, ontomics, codesight, qmd, vectorless, WeKnora);
+batch 2 added five (markdownify-mcp, codebase-memory-mcp, vanna, ExtractThinker, rendergit). Eleven repos as of
+2026-05-08.
 
 ---
 
@@ -10,15 +12,15 @@ synthesis pass; six repos evaluated: fastmcp, ontomics, codesight, qmd, vectorle
 Group 6 is the highest-density Integrate cluster of the fan-out. The cluster has expanded from six repos to eleven,
 reflecting a broadened scope beyond tool-registry patterns to include document-context tools, structured-extraction
 tools, codebase-intelligence servers, and code-visualization utilities. Among the eleven, five earn Integrate verdicts
-(fastmcp, ontomics, codesight, markdownify-mcp, codebase-memory-mcp) with direct connections to Phase deliverables.
-The others are Study verdicts with concrete contributions: qmd's fusion math, vectorless's shell-command surface,
-WeKnora's anti-pattern catalogue, vanna's user-context-injection design, ExtractThinker's ORM-style extraction
-contracts, and rendergit's dual human/LLM-view pattern.
+(fastmcp, ontomics, codesight, markdownify-mcp, codebase-memory-mcp) with direct connections to Phase deliverables. The
+others are Study verdicts with concrete contributions: qmd's fusion math, vectorless's shell-command surface, WeKnora's
+anti-pattern catalogue, vanna's user-context-injection design, ExtractThinker's ORM-style extraction contracts, and
+rendergit's dual human/LLM-view pattern.
 
 This document does not re-review individual repos. The per-file notes in `docs/repo-notes/` cover that ground. What it
 does is name what this cluster collectively establishes, extract the reusable engineering patterns, connect G6 to the
-broader Linus corpus, and make the phase-tagged implications explicit so they can be acted on without re-reading
-eleven notes.
+broader Linus corpus, and make the phase-tagged implications explicit so they can be acted on without re-reading eleven
+notes.
 
 ---
 
@@ -37,10 +39,11 @@ permissions, which transport (stdio for local-only, streamable-http when two har
 how to compose multiple servers into one endpoint a front-end sees. All of these are engineering decisions, not
 architectural ones, and fastmcp provides the machinery for each.
 
-The practical implication is that DEC-0029's "KB tool registry" question is answered: build it as a FastMCP server with
-`@mcp.tool`-decorated functions calling into KnowledgeBase, not as a bespoke in-house protocol layer. Do not design a
-Linus-native tool protocol. Do not wait for Phase 3 to make the call. The call is already made by the weight of
-evidence.
+The practical implication is that the "KB tool registry" question is answered: build it as a FastMCP server with
+`@mcp.tool`-decorated functions calling into KnowledgeBase, not as a bespoke in-house protocol layer (DEC-0045: fastmcp
+adopted as the default MCP framework; DEC-0044: paper-qa as Phase 2c KB retrieval-and-synthesis engine, the first
+in-house FastMCP server). Do not design a Linus-native tool protocol. Do not wait for Phase 3 to make the call. The call
+is already made by the weight of evidence.
 
 The expanded cluster (six → eleven repos) consolidates a parallel finding: MCP is not only the tool-registry substrate,
 but the unified interface for document-context ingestion (markdownify-mcp), structured extraction (ExtractThinker),
@@ -61,10 +64,11 @@ registers a URI-template resource; four transports (stdio, http, sse, streamable
 OAuth, JWT, and OIDC live in `server/auth/`; a real middleware pipeline covers caching, rate limiting, response
 limiting, timing, logging, authorization, and tool injection. `FastMCP.as_proxy()` wraps any MCP server — in-memory,
 stdio, or HTTP — and re-exposes its surface, which is how Linus would eventually compose pmetal-mcp's 45 tools under its
-own endpoint with Linus middleware applied. Apache 2.0. Python ≥3.10 (linus env is 3.12). The Phase 1f smoke test is:
+own endpoint with Linus middleware applied. Apache 2.0. Python ≥3.10 (linus env is 3.12). The Phase 1f evaluation is
+settled by DEC-0045: fastmcp is adopted as the default MCP framework for all in-house Linus servers; paper-qa's FastMCP
+wrapper (DEC-0044) is the first in-house server. The Phase 1f smoke test remains the right entry point:
 `pip install fastmcp`, write a 30-line server that wraps one KnowledgeBase query as an `@mcp.tool`, point Cline at it
-over stdio, confirm a round-trip, write the verdict as an ADR. If that round-trip has surprises, surface them. Otherwise
-commit.
+over stdio, confirm a round-trip. If that round-trip has surprises, surface them. Otherwise commit.
 
 **ontomics (Integrate) — Maestro's semantic window into `src/linus/`.** ontomics is a Rust binary (npm-distributed,
 `npm install -g @ontomics/ontomics`) that builds a precomputed semantic ontology of a codebase from tree-sitter ASTs:
@@ -117,8 +121,8 @@ KnowledgeBase's existing section graph, gives Maestro and Workers a navigable do
 vector retrieval rather than replacing it. The cost of building `kb_ls` / `kb_cd` / `kb_cat` / `kb_grep` / `kb_concepts`
 over existing KnowledgeBase metadata is small; the payoff is a retrieval mode appropriate for precise, multi-hop
 navigation on small document sets where the latency of 5–10 navigation calls is acceptable. A smoke test in
-`experiments/vectorless-smoke/` (3–5 papers, Ollama/qwen3:14b, same Dan-task questions as the qmd baseline)
-produces the data that determines whether this pattern earns a Phase 3 tool slot.
+`experiments/vectorless-smoke/` (3–5 papers, Ollama/qwen3:14b, same Dan-task questions as the qmd baseline) produces the
+data that determines whether this pattern earns a Phase 3 tool slot.
 
 **WeKnora (Study) — the conscious anti-pattern.** WeKnora is Tencent's enterprise RAG platform: Go monolith, Python gRPC
 sidecar, Vue/TS frontend, six-container Docker Compose minimum (frontend, app, docreader, Postgres, Redis, Jaeger),
@@ -145,20 +149,20 @@ transcripts) into Markdown. It wraps Microsoft's `markitdown[all]` and exposes t
 into KnowledgeBase. The conversion pipeline preserves document structure (headings, lists, tables), and the sandbox
 policy (`MD_ALLOWED_PATHS` environment variable) provides a reusable pattern for Linus's own tool-permission model.
 Audio transcription via Whisper is valuable if Dan's corpus includes voice notes or recorded talks. For Phase 2a,
-markdownify-mcp is a two-line config addition once the MCP orchestration backend exists: declare the server, mount it
-in the tool registry, smoke-test on 5 PDFs from context/ to confirm Markdown quality is ingestion-ready. The bottleneck
-is not the tool itself but the post-conversion pipeline — markdownify produces raw Markdown; validation and schema
+markdownify-mcp is a two-line config addition once the MCP orchestration backend exists: declare the server, mount it in
+the tool registry, smoke-test on 5 PDFs from context/ to confirm Markdown quality is ingestion-ready. The bottleneck is
+not the tool itself but the post-conversion pipeline — markdownify produces raw Markdown; validation and schema
 enforcement come later (via ExtractThinker). Combined with codesight's structural understanding of HTML and ontomics's
 semantic understanding of code, markdownify completes the document-context layer for the Phase 2 MCP surface.
 
 **codebase-memory-mcp (Integrate, Phase 2a spike) — semantic code intelligence at scale.** codebase-memory-mcp is a
 static C binary (155 languages via tree-sitter, zero Python dependencies) that indexes full repositories into a
 knowledge graph in minutes and exposes fourteen MCP tools: structural search, call tracing, dead code detection, impact
-analysis, and Cypher-lite graph queries. The headline is 120x fewer tokens than file-by-file exploration; on a 28M
-LOC codebase (Linux kernel), it indexes in 3 minutes and answers queries in <1 ms. For Linus, the immediate win is
-adding codebase-memory indexing to Workers' task context — a Worker asked to understand a repository gets a searchable
-graph instead of raw file dumps. The semantic_query tool uses `nomic-embed-code` (int8, 768-dim, compiled in) without
-external API calls. Linus's binary distribution strategy can copy codebase-memory's model: pre-built, cross-platform,
+analysis, and Cypher-lite graph queries. The headline is 120x fewer tokens than file-by-file exploration; on a 28M LOC
+codebase (Linux kernel), it indexes in 3 minutes and answers queries in <1 ms. For Linus, the immediate win is adding
+codebase-memory indexing to Workers' task context — a Worker asked to understand a repository gets a searchable graph
+instead of raw file dumps. The semantic_query tool uses `nomic-embed-code` (int8, 768-dim, compiled in) without external
+API calls. Linus's binary distribution strategy can copy codebase-memory's model: pre-built, cross-platform,
 signature-verified, zero runtime dependencies. Phase 2a recommendation is a spike: call the binary via subprocess on
 Linus's own src/linus/ codebase, validate the indexing output, measure tokens saved on a Worker task ("understand this
 module, trace the call graph"). If successful, vendorize the binary in repos/ and integrate into the Phase 2 MCP
@@ -192,18 +196,18 @@ integrate into the KB ingestion pipeline (Phase 2b) as the post-markdownify extr
 The hybrid approach (Tesseract for OCR text, local Llava for semantic understanding) may be necessary for tables and
 figures in complex papers; measure before committing to an LLM-only extraction path.
 
-**rendergit (Monitor, Phase 5+) — dual human/LLM-view code export.** rendergit is Andrej Karpathy's Python CLI that
-flattens any GitHub repository into a single static HTML page with syntax highlighting, directory tree, and search-friendly
-full-text indexing. Two views: human-readable (pretty colors, file browser, Ctrl+F) and LLM-ready (raw CXML text,
-optimized for copy/paste into Claude). The implementation is lightweight (~200 lines, no dependencies beyond Pygments).
-For Linus, rendergit's value is in repo analysis and review workflows: flatten an external codebase before integration,
-feed the CXML view to hosted Claude (Maestro) for architectural analysis, iterate based on feedback. The dual-view UI
-pattern (supporting both human browsing and AI-as-reader) is a model for Linus frontends. Phase 5+ recommendation:
-integrate rendergit if Linus needs to analyze external repos or export its own codebase for remote review. For Phase 1-4,
-skip it; direct GitHub/git access and Claude Code's file reading are sufficient. If adopted, wrap it as a Linus tool
-that invokes rendergit, caches the output locally, and pipes CXML to Claude with result markdown. The read-only nature
-(no editing, no test execution) limits it to static analysis and code review; it is not a substitute for a proper
-IDE-integrated development experience.
+**rendergit (Watch, Phase 5+) — dual human/LLM-view code export.** rendergit is Andrej Karpathy's Python CLI that
+flattens any GitHub repository into a single static HTML page with syntax highlighting, directory tree, and
+search-friendly full-text indexing. Two views: human-readable (pretty colors, file browser, Ctrl+F) and LLM-ready (raw
+CXML text, optimized for copy/paste into Claude). The implementation is lightweight (~200 lines, no dependencies beyond
+Pygments). For Linus, rendergit's value is in repo analysis and review workflows: flatten an external codebase before
+integration, feed the CXML view to hosted Claude (Maestro) for architectural analysis, iterate based on feedback. The
+dual-view UI pattern (supporting both human browsing and AI-as-reader) is a model for Linus frontends. Phase 5+
+recommendation: integrate rendergit if Linus needs to analyze external repos or export its own codebase for remote
+review. For Phase 1-4, skip it; direct GitHub/git access and Claude Code's file reading are sufficient. If adopted, wrap
+it as a Linus tool that invokes rendergit, caches the output locally, and pipes CXML to Claude with result markdown. The
+read-only nature (no editing, no test execution) limits it to static analysis and code review; it is not a substitute
+for a proper IDE-integrated development experience.
 
 ---
 
@@ -260,11 +264,12 @@ these are cognates worth comparing when Phase 3 hybrid-retrieval design lands.
 applied. This is the lowest-cost path to a rich tool surface in Phase 2: Linus adds KB tools on top of pmetal's
 inference and training tools, and `as_proxy` handles the composition without duplicating the tool definitions.
 
-**Total-landscape MCP finding.** The total-landscape document's "MCP as tool substrate" observation, previously framed
-as a Phase 3 question, is now resolved by the weight of evidence across G1, G5, and G6. The synthesis recommendation is
-to update the total-landscape's MCP section from "candidate substrate" to "committed substrate, pending policy
-decisions." The policy decisions — tool allowlist, transport selection, per-tool permission tiers — belong in a new ADR
-(`DEC-NNNN, slug mcp-adoption`) at Phase 2a planning time, not Phase 3.
+**Total-landscape MCP finding.** The total-landscape document's "MCP as tool substrate" observation is now committed
+architecture: DEC-0018 (MCP as extensibility substrate), DEC-0045 (fastmcp as default framework), and DEC-0046
+(`external_api_tool` deployment field in the tool registry) collectively close the Phase 3-vs-Phase-2a decision. The
+policy details — tool allowlist, transport selection, per-tool permission tiers — are Phase 2a engineering decisions
+rather than architectural unknowns. Transport choice (stdio vs. streamable-http) is promoted to R2-06 in
+`top-questions.md`.
 
 ---
 
@@ -278,21 +283,21 @@ honest data point on whether BM25+vector+rerank wins on Dan's specific corpus. R
 papers to get the latency number that determines whether the navigation pattern is Worker-viable at all on local
 hardware. Add two exploratory scopes for Phase 2a planning: (1) test markdownify on 5 PDFs from context/ to confirm
 Markdown conversion quality for KB ingestion, measuring both output fidelity and subprocess overhead; (2) run
-codebase-memory-mcp as a spike on Linus's own src/linus/ directory to validate indexing speed and measure tokens
-saved on a Worker task (e.g., "understand the module structure and trace a call graph").
+codebase-memory-mcp as a spike on Linus's own src/linus/ directory to validate indexing speed and measure tokens saved
+on a Worker task (e.g., "understand the module structure and trace a call graph").
 
 **Phase 2a (orchestration layer, document-context MCP platform).** Build the Phase 2a backend as a unified MCP
-document-context platform (not "KB tool registry" only). The platform has four layers: (1) **KB tools** (semantic search,
-hybrid retrieval via qmd fusion math, paper fetch, citation graph walk); (2) **Document ingestion** (markdownify-mcp for
-PDF/web-to-Markdown conversion, ExtractThinker as optional Phase 2a spike for structured metadata extraction); (3)
-**Codebase intelligence** (codebase-memory-mcp for Workers to understand repo structure and dependencies via graph
-queries); (4) **Code and KB context** (ontomics and codesight for semantic and structural maps). Transport:
-`streamable-http` on localhost from day one — not stdio — because Cline and Claude Code will want simultaneous access.
-The Phase 2a MCP surface is the foundation the Phase 3 expansion builds on. ExtractThinker (Phase 2a spike, Phase 2b
-integration) is conditional on the Phase 1f research proving extraction accuracy acceptable; if so, it becomes part of
-the KB ingestion pipeline. Vanna's tool-layer and user-context patterns (lifecycle hooks, permission tiers, audit
-logging) should be incorporated into the Phase 2a MCP middleware design so that every tool carries user context and
-audit metadata.
+document-context platform (not "KB tool registry" only). The platform has four layers: (1) **KB tools** (semantic
+search, hybrid retrieval via qmd fusion math, paper fetch, citation graph walk); (2) **Document ingestion**
+(markdownify-mcp for PDF/web-to-Markdown conversion, ExtractThinker as optional Phase 2a spike for structured metadata
+extraction); (3) **Codebase intelligence** (codebase-memory-mcp for Workers to understand repo structure and
+dependencies via graph queries); (4) **Code and KB context** (ontomics and codesight for semantic and structural maps).
+Transport: `streamable-http` on localhost from day one — not stdio — because Cline and Claude Code will want
+simultaneous access. The Phase 2a MCP surface is the foundation the Phase 3 expansion builds on. ExtractThinker (Phase
+2a spike, Phase 2b integration) is conditional on the Phase 1f research proving extraction accuracy acceptable; if so,
+it becomes part of the KB ingestion pipeline. Vanna's tool-layer and user-context patterns (lifecycle hooks, permission
+tiers, audit logging) should be incorporated into the Phase 2a MCP middleware design so that every tool carries user
+context and audit metadata.
 
 **Phase 2b (Maestro src/ navigation, KB structured extraction).** Once `src/linus/` has enough code to be worth
 indexing, ontomics provides the semantic map and codesight provides the structural map. The combined MCP surface —
@@ -319,18 +324,19 @@ of writing, not three months of evaluation.
 
 **Phase 5+ (rendergit for repo analysis and code export).** Integrate rendergit if Linus's workflow includes analyzing
 external repositories before integration (e.g., studying MLX backend code, evaluating new inference patterns). The
-dual-view export (human-readable HTML + CXML for Claude) enables a fasttrack: render repo, feed CXML to Maestro,
-iterate on findings. For Phase 1-4, skip rendergit; direct GitHub/git access and Claude Code's file reading are
-sufficient. If adopted, wrap it as a Linus MCP tool or standalone utility with local caching of rendered outputs.
+dual-view export (human-readable HTML + CXML for Claude) enables a fasttrack: render repo, feed CXML to Maestro, iterate
+on findings. For Phase 1-4, skip rendergit; direct GitHub/git access and Claude Code's file reading are sufficient. If
+adopted, wrap it as a Linus MCP tool or standalone utility with local caching of rendered outputs.
 
 ---
 
 ## Open questions for Dan
 
-**Stdio or streamable-http from Phase 2 launch?** The fastmcp note frames this as a question; this synthesis recommends
-streamable-http on localhost from day one. The reasoning: Cline and Claude Code will want simultaneous access to the
-same KB tool surface, and spawning N stdio children for N clients is more fragile than one HTTP server. Is there a
-reason to start with stdio instead — startup latency, process isolation, dependency simplicity?
+**Stdio or streamable-http from Phase 2 launch?** _Promoted to R2-06 in
+[`top-questions.md`](../../questions/top-questions.md) (Tier 1)._ This synthesis recommends streamable-http on localhost
+from day one. The reasoning: Cline and Claude Code will want simultaneous access to the same KB tool surface, and
+spawning N stdio children for N clients is more fragile than one HTTP server. Is there a reason to start with stdio
+instead — startup latency, process isolation, dependency simplicity?
 
 **Ontomics benchmarking scope.** The 20× token reduction claim is on voxelmorph and ScribblePrompt — clean ML repos.
 Dan's scientific Python (numerical pipelines, bioinformatics, no web framework routes) is a messier target. Should the
@@ -338,14 +344,13 @@ Phase 1f benchmark suite include an ontomics run against the KnowledgeBase submo
 should CodeRankEmbed's clustering of bioinformatics function bodies (lots of array math, similar shapes, different
 intents) get an explicit ablation before ontomics is registered as a default Worker tool?
 
-_Resolved (DEC-0018, DEC-0045): MCP commitment formalized at Phase 2 onwards — not deferred to Phase 3. fastmcp is
-the default framework. Linus's tool registry is MCP-shape from Phase 2a per ARCHITECTURE.md C.1._
+_Resolved (DEC-0018, DEC-0045): MCP commitment formalized at Phase 2 onwards — not deferred to Phase 3. fastmcp is the
+default framework. Linus's tool registry is MCP-shape from Phase 2a per ARCHITECTURE.md C.1._
 
 **Vectorless bake-off model selection.** The vectorless smoke test needs an LLM in the loop. Against a hosted model
-(Claude Haiku, gpt-4o-mini) the quality ceiling is honest but expensive; against Ollama/qwen3:14b the ceiling is
-the realistic Linus-on-MacBook constraint. The two answers could diverge significantly. Which framing is more useful for
-the Phase 3 decision: "does this pattern work in principle?" (hosted) or "does this pattern work on my hardware?"
-(local)?
+(Claude Haiku, gpt-4o-mini) the quality ceiling is honest but expensive; against Ollama/qwen3:14b the ceiling is the
+realistic Linus-on-MacBook constraint. The two answers could diverge significantly. Which framing is more useful for the
+Phase 3 decision: "does this pattern work in principle?" (hosted) or "does this pattern work on my hardware?" (local)?
 
 **WeKnora's per-KB indexing toggle — relevant for KnowledgeBase v1?** WeKnora lets each knowledge base instance
 independently choose its retrieval mode (dense-only, hybrid, GraphRAG, Wiki). KnowledgeBase v1 currently has no such
@@ -355,7 +360,7 @@ than building it in.
 
 ---
 
-_This synthesis should be revisited when the Phase 1f fastmcp, qmd, and vectorless smoke tests produce results (they
-determine the Phase 2 tool surface), when the MCP adoption ADR lands (it collapses the remaining policy questions), and
-when Phase 3 hybrid-retrieval design begins (the qmd fusion math and vectorless navigation pattern both land there as
-concrete inputs)._
+_This synthesis should be revisited when the Phase 1f qmd and vectorless smoke tests produce results (they determine
+whether those patterns earn Phase 2/3 tool slots), and when Phase 3 hybrid-retrieval design begins (the qmd fusion math
+and vectorless navigation pattern both land there as concrete inputs). The MCP framework question is settled: DEC-0018 +
+DEC-0045 + DEC-0046 close it. The transport question (stdio vs. streamable-http) is the live Tier 1 open item (R2-06)._

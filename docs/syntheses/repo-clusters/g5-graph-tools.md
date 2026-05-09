@@ -2,13 +2,13 @@
 
 ## What this document is
 
-A cross-cutting synthesis of the seven repos in Group 5: **hyalo** (Integrate), **keppi** (Study), **py3plex**
-(Study), **infranodus** (Study), **infranodus-skills** (Study), **OptimusKG** (Study), and **dlt** (Study/Integrate).
-These repos arrived in the same fan-out because they all touch graph-structured knowledge management, network analysis,
+A cross-cutting synthesis of the seven repos in Group 5: **hyalo** (Integrate), **keppi** (Study), **py3plex** (Study),
+**infranodus** (Study), **infranodus-skills** (Study), **OptimusKG** (Study), and **dlt** (Study/Integrate). These repos
+arrived in the same fan-out because they all touch graph-structured knowledge management, network analysis,
 knowledge-graph construction, ETL infrastructure, or the tooling layer that sits between a markdown vault and an LLM
-agent. The initial five repos address graph analysis and vault interaction; OptimusKG and dlt expand the group to include
-production knowledge-graph pipelines and data-ingestion tooling, both critical for Phase 3–4 KnowledgeBase scaling. The
-repo notes live in `docs/repo-notes/{hyalo,keppi,py3plex,infranodus,infranodus-skills,OptimusKG,dlt}.md`.
+agent. The initial five repos address graph analysis and vault interaction; OptimusKG and dlt expand the group to
+include production knowledge-graph pipelines and data-ingestion tooling, both critical for Phase 3–4 KnowledgeBase
+scaling. The repo notes live in `docs/repo-notes/{hyalo,keppi,py3plex,infranodus,infranodus-skills,OptimusKG,dlt}.md`.
 
 One repo that appeared in an early draft of this group — prism — was removed before synthesis began: it was cloned in
 error while searching for a differently-named project (claude-prism, now in Group 8). Its verdict was Ignore and it has
@@ -18,15 +18,15 @@ no bearing on the findings here.
 
 ## The unifying thesis
 
-These five repos collectively argue that the markdown vault — a folder of interlinked notes with structured frontmatter
-— is not primarily a text corpus. It is a graph, and graph structure should be a first-class retrieval primitive, not an
-afterthought layered on top of similarity search. Each repo in Group 5 attacks a different face of this problem:
-infranodus shows what network science can reveal about a text corpus (cognitive variability, structural gaps), py3plex
-provides the programmatic multilayer substrate and DSL for querying and analyzing that structure, keppi turns wikilinks
-into a traversable graph and builds the retrieval layer on top of it, and hyalo provides the safe, schema-validated
-editing surface that keeps the graph's edges trustworthy in the face of concurrent agent and human edits. Infranodus-
-skills closes the loop by showing what LLM-facing prompt patterns look like when the graph analysis has already been
-done.
+The core graph-and-vault repos (hyalo, keppi, py3plex, infranodus, infranodus-skills) collectively argue that the
+markdown vault — a folder of interlinked notes with structured frontmatter — is not primarily a text corpus. It is a
+graph, and graph structure should be a first-class retrieval primitive, not an afterthought layered on top of similarity
+search. Each repo in Group 5 attacks a different face of this problem: infranodus shows what network science can reveal
+about a text corpus (cognitive variability, structural gaps), py3plex provides the programmatic multilayer substrate and
+DSL for querying and analyzing that structure, keppi turns wikilinks into a traversable graph and builds the retrieval
+layer on top of it, and hyalo provides the safe, schema-validated editing surface that keeps the graph's edges
+trustworthy in the face of concurrent agent and human edits. Infranodus- skills closes the loop by showing what
+LLM-facing prompt patterns look like when the graph analysis has already been done.
 
 None of these repos is complete in isolation. Hyalo edits the vault safely but performs no analysis. Keppi traverses and
 retrieves but does not edit. Py3plex analyzes multilayer structure but has no vault-specific parser. Infranodus computes
@@ -87,12 +87,13 @@ should push toward an ADR.
 and betweenness centrality onto a four-state model of biased, focused, diversified, and dispersed knowledge — is a
 genuine addition to the analytical vocabulary Linus can apply to KnowledgeBase. The `Statement`-as-hyperedge data model
 (a statement is a node linked to every concept it co-mentions, rather than just a binary edge between pairs) is also
-worth lifting into the property-graph half of DEC-0027: it preserves provenance ("this claim appeared in this context,
-attributed to this source") in the graph topology itself rather than as sidecar metadata. Neither of these requires
-touching the AGPL code. The WWW'19 paper is the right source; `lib/entry.js` is worth reading for the text-to-graph
-pipeline; `lib/db/neo4j.js` is worth reading for the Cypher patterns that compute communities and gaps. Nothing should
-be vendored. The Python port (`DiscourseDiversity` on GitLab, MIT-licensed) is a more tractable starting point for any
-re-implementation, subject to checking that it does not derive from AGPL-protected logic.
+worth lifting into the property-graph half of DEC-0015 (dual RDF + property-graph substrates): it preserves provenance
+("this claim appeared in this context, attributed to this source") in the graph topology itself rather than as sidecar
+metadata. Neither of these requires touching the AGPL code. The WWW'19 paper is the right source; `lib/entry.js` is
+worth reading for the text-to-graph pipeline; `lib/db/neo4j.js` is worth reading for the Cypher patterns that compute
+communities and gaps. Nothing should be vendored. The Python port (`DiscourseDiversity` on GitLab, MIT-licensed) is a
+more tractable starting point for any re-implementation, subject to checking that it does not derive from AGPL-protected
+logic.
 
 **Infranodus-skills clarifies the Linus Skills format and surfaces a SaaS dependency problem.** Roughly one-third of the
 fifteen skills in the repo call the hosted `mcp.infranodus.com` MCP server via an `INFRANODUS_API_KEY` — a direct
@@ -112,8 +113,8 @@ execution, validation, error recovery) and custom runners (FixedParallelRunner, 
 validation are directly applicable patterns. Most critically: OptimusKG's Polars-based transformation layer (not Pandas)
 and validation story (checksums, schema validation, human-in-the-loop QA via PaperQA3) show what data integrity and
 reproducibility look like at production scale. Linus does not need to match OptimusKG's 65-source integration; the Phase
-3 scope is closer to 10–15 sources. But the architectural pattern — landing → bronze → silver → gold, with catalog-driven
-governance — is the blueprint for KnowledgeBase v1's design.
+3 scope is closer to 10–15 sources. But the architectural pattern — landing → bronze → silver → gold, with
+catalog-driven governance — is the blueprint for KnowledgeBase v1's design.
 
 **dlt is the authoritative ETL backbone for KnowledgeBase corpus feeding and ingestion.** dlt is a production-grade
 Python library that abstracts the "extract, normalize, load" cycle: extract from REST APIs, SQL databases, cloud
@@ -122,13 +123,13 @@ storage, or 5000+ verified sources; infer and normalize schemas from messy, nest
 domain-specific), but three core capabilities: schema contracts (Pydantic models that enforce required fields and types,
 catching corruptions early), incremental loading with checkpoint-based state tracking (enabling monthly corpus updates
 without re-processing everything), and a pure-Python library model that runs anywhere without lock-in. These three
-features directly address the "corpus health monitoring" and "reliable incremental ingestion" problems that KnowledgeBase
-v1 will face. The contract system parallels the validation layer Linus will build; the state-tracking pattern enables
-periodic corpus refresh (new papers, updated genome annotations) without waste. dlt is also tuned for Linus's stack:
-typed with mypy and ruff, uses `uv` for fast dependency resolution, and includes a rich CLI for schema inspection. The
-Phase 2a entry point is straightforward: a simple spike that prototypes a pipeline loading 10 papers from a local
-directory into DuckDB, validates schema contracts, and measures init cost and runtime on M1 Max. If that spike proves
-promising, dlt becomes the Phase 2b authoritative ETL layer for all KnowledgeBase ingestion.
+features directly address the "corpus health monitoring" and "reliable incremental ingestion" problems that
+KnowledgeBase v1 will face. The contract system parallels the validation layer Linus will build; the state-tracking
+pattern enables periodic corpus refresh (new papers, updated genome annotations) without waste. dlt is also tuned for
+Linus's stack: typed with mypy and ruff, uses `uv` for fast dependency resolution, and includes a rich CLI for schema
+inspection. The Phase 2a entry point is straightforward: a simple spike that prototypes a pipeline loading 10 papers
+from a local directory into DuckDB, validates schema contracts, and measures init cost and runtime on M1 Max. If that
+spike proves promising, dlt becomes the Phase 2b authoritative ETL layer for all KnowledgeBase ingestion.
 
 ---
 
@@ -175,7 +176,7 @@ adopt now.
 **Infranodus's `Statement`-as-hyperedge data model.** Rather than binary concept-to-concept edges, infranodus stores
 each statement as a node that is then linked to every concept it co-mentions via `:OF` edges. This preserves the
 provenance of the relation (which statement, in which context, from which user) in the graph topology itself. For the
-property-graph half of DEC-0027, this is worth adopting for episodic memory events that span multiple concepts — an
+property-graph half of DEC-0015, this is worth adopting for episodic memory events that span multiple concepts — an
 event node linked to the concepts it mentions rather than binary edges between each concept pair. It solves the
 "provenance as sidecar metadata" problem that binary edges create.
 
@@ -184,7 +185,7 @@ event node linked to the concepts it mentions rather than binary edges between e
 ## Cross-references
 
 **Total-landscape Crossing 3 (KB as graph + vector substrate).** This group provides the tooling layer Crossing 3 was
-missing. The dual-substrate decision (rdflib + networkx, DEC-0026/27) resolves which storage engines to use; hyalo and
+missing. The dual-substrate decision (rdflib + networkx, DEC-0015) resolves which storage engines to use; hyalo and
 keppi together resolve how that substrate gets populated and queried at the agent layer. Py3plex is the upgrade path
 when the property graph becomes genuinely multilayer.
 
@@ -201,34 +202,37 @@ both py3plex and keppi ship MCP servers without friction, and both demonstrate t
 carry retrieval strategy (keppi's `instructions` field) alongside tool parameters. The ADR on "MCP as Linus tool surface
 vs. native registry" should absorb this group's findings.
 
-**Memory synthesis (Layer D — semantic/knowledge memory).** KnowledgeBase is Layer D in the four-layer memory
-architecture. This group provides the tooling that makes Layer D queryable via graph structure rather than only via
-vector similarity. The `context_pack` primitive from keppi is the deterministic scoping mechanism the memory
-architecture calls for: Workers receive pre-filtered context from the graph layer rather than filtering in-context,
-which is both faster and more reliable. The uniform read API across memory layers (scratchpad / episodic / semantic)
-should present `context_pack`-shaped calls at the KB tool surface regardless of which layer the context ultimately comes
-from.
+**Memory synthesis (Layer E — semantic/knowledge memory).** KnowledgeBase is Layer E in the five-layer memory
+architecture (A: intra-step latent; B: within-session scratchpad; C: cross-session episodic; D: investigation memory; E:
+semantic knowledge — per DEC-0028 through DEC-0052). This group provides the tooling that makes Layer E queryable via
+graph structure rather than only via vector similarity. The `context_pack` primitive from keppi is the deterministic
+scoping mechanism the memory architecture calls for: Workers receive pre-filtered context from the graph layer rather
+than filtering in-context, which is both faster and more reliable. The uniform read API across memory layers (scratchpad
+/ episodic / semantic) should present `context_pack`-shaped calls at the KB tool surface regardless of which layer the
+context ultimately comes from.
 
 ---
 
 ## Phase-tagged implications
 
-**Phase 2a — Linus MVP (immediate + early spike):** Install hyalo via Homebrew, point `.hyalo.toml` at
-`context/notes/` with a Linus schema (`paper`, `thread`, `decision`, `experiment`, `iteration`), run `hyalo init
---claude` to install the vault-scoped rule and skills into `.claude/`. This is an afternoon of setup and it
-immediately improves every Maestro session that touches KnowledgeBase notes. Read py3plex's DSL v2 design
-(`dsl/builder.py`, `dsl/ast.py`) before finalizing Linus's graph-query surface in `docs/specs/kb-architecture.md` —
-the DSL is a stronger prior for what a typed, chainable, uncertainty-aware query interface looks like than anything
-Linus would design from scratch. Port the `@require`/`@ensure` contract pattern into `src/linus/` for sandbox
-boundary code (DEC-0026/27 implementation). Conduct a Phase 2a spike with dlt: prototype a simple pipeline that
-loads 10 papers from a local directory into a DuckDB table, verify that schema contracts catch format mismatches,
+**Phase 2a — Linus MVP (immediate + early spike):** Install hyalo via Homebrew, point `.hyalo.toml` at `context/notes/`
+with a Linus schema (`paper`, `thread`, `decision`, `experiment`, `iteration`), run `hyalo init --claude` to install the
+vault-scoped rule and skills into `.claude/`. This is an afternoon of setup and it immediately improves every Maestro
+session that touches KnowledgeBase notes. Read py3plex's DSL v2 design (`dsl/builder.py`, `dsl/ast.py`) before
+finalizing Linus's graph-query surface in `docs/specs/kb-architecture.md` — the DSL is a stronger prior for what a
+typed, chainable, uncertainty-aware query interface looks like than anything Linus would design from scratch. Port the
+`@require`/`@ensure` contract pattern into `src/linus/` for sandbox boundary code (DEC-0027 implementation — Linus
+practice stance on public APIs and engineering hygiene). Conduct a Phase 2a spike with dlt: prototype a simple pipeline
+that loads 10 papers from a local directory into a DuckDB table, verify that schema contracts catch format mismatches,
 and measure init cost and runtime on M1 Max. The goal is to validate whether dlt is the right ETL backbone for
 KnowledgeBase ingestion before committing to Phase 2b integration.
 
 **Phase 2b — Knowledge Base ingestion backbone:** If the dlt spike succeeds, integrate dlt as the authoritative ETL
-layer for KnowledgeBase corpus feeding. Use dlt's schema contracts to validate paper metadata and content quality,
-and checkpoint-based state tracking to enable monthly corpus updates without re-processing. Start with a simple
-source (local papers directory) before expanding to API-driven sources (GitHub READMEs, structured databases).
+layer for KnowledgeBase corpus feeding. Use dlt's schema contracts to validate paper metadata and content quality, and
+checkpoint-based state tracking to enable monthly corpus updates without re-processing. Start with a simple source
+(local papers directory) before expanding to API-driven sources (GitHub READMEs, structured databases). Note: DEC-0029
+chose SQLite as the episodic and session store; the corpus analytics destination for dlt is a separate open question
+(DuckDB and PostgreSQL are still candidates for Phase 2b bulk corpus indexing).
 
 **Phase 3 — Knowledge & Parallel Agents (primary target):** Port keppi's `blast_radius` and `context_pack` as
 Linus-native functions over the KnowledgeBase graph, replacing keppi's Zettelkasten edge weights with paper-corpus
@@ -237,10 +241,10 @@ into the Worker invocation protocol as a standard pre-task KB query. At that poi
 both the authoring side (DEC-0026/27 graph population via vault editing) and the retrieval side (deterministic graph
 traversal for context scoping) without custom infrastructure beyond the weight adapter. Adopt OptimusKG's medallion
 architecture (landing → bronze → silver → gold) and catalog-first governance pattern as the canonical design for
-KnowledgeBase v1. Phase 3 scope is 10–15 initial sources (papers, notes, genomics databases, tool documentation),
-not 65, but the medallion pattern scales cleanly and provides the reproducibility and validation hooks Linus will
-need as the KB grows. Evaluate whether the infranodus cognitive-variability metric (biased/focused/diversified/dispersed)
-is worth implementing in Python against the KnowledgeBase graph as a quality-of-coverage signal.
+KnowledgeBase v1. Phase 3 scope is 10–15 initial sources (papers, notes, genomics databases, tool documentation), not
+65, but the medallion pattern scales cleanly and provides the reproducibility and validation hooks Linus will need as
+the KB grows. Evaluate whether the infranodus cognitive-variability metric (biased/focused/diversified/dispersed) is
+worth implementing in Python against the KnowledgeBase graph as a quality-of-coverage signal.
 
 **Phase 4+ — Uncertainty quantification on KB retrieval:** If the property graph has grown to include multiple node
 types in earnest (paper / author / concept / claim / source) and retrieval ranking needs principled confidence
@@ -261,28 +265,33 @@ infranodus-skills' MCP-dependent skills as candidates to wire against that local
 (gitignored, personal), a new top-level `vault/` (tracked, Dan-owned), or inside `modules/KnowledgeBase/` next to the
 paper corpus — each have different implications for what gets indexed, what is gitignored, and how KnowledgeBase's own
 submodule governance interacts with hyalo's schema. The simplest starting point is `context/notes/` with a `.hyalo.toml`
-that stays gitignored alongside it.
+that stays gitignored alongside it. _Promoted to top-questions.md as R2-07._
 
 **Hyalo vs. keppi bake-off.** The repo notes recommend a 30-minute Phase 1 spike (find by tag, bulk set status, rename +
 link rewrite, lint with schema, summary) run under both tools on the same sample vault. That spike would close the
 "confirm which operations keppi actually supports" question that the infra note leaves open, and produce an ADR verdict
-on how the two tools divide responsibility rather than leaving it implicit.
+on how the two tools divide responsibility rather than leaving it implicit. _Promoted to top-questions.md as R2-08._
 
-**Paper-corpus edge weights for blast radius.** Keppi's default weights (wikilink=1.0, embed=1.5, related_to=2.0) were
+**Paper-corpus edge weights for blast radius.** Keppi's default weights (wikilink=1.0, embed=1.5, related*to=2.0) were
 tuned for a Zettelkasten. KnowledgeBase's edges are paper-shaped. What is the right relative weight for a citation edge
 vs. a co-authorship edge vs. a shared-topic edge? The answer should come from a smoke test on a known retrieval case
-(given paper A, what should context-pack return?), not from a priori intuition.
+(given paper A, what should context-pack return?), not from a priori intuition. \_Tracked in top-questions.md as R2-33
+(Tier 3).*
 
 **AGPL re-implementation scope.** The cognitive-variability metric from infranodus is unencumbered as an idea (WWW'19
 paper); the code is AGPL. The Python port on GitLab (`DiscourseDiversity`) is MIT-licensed but derives from the same
 codebase. Confirm the policy — "re-implement from the paper, never copy, and verify MIT ports are independently clean
-before borrowing" — and document it as a DECISIONS.md entry rather than leaving it implicit in the repo note.
+before borrowing" — and document it as a DECISIONS.md entry rather than leaving it implicit in the repo note. _Tracked
+in top-questions.md as R2-34 (Tier 3)._
 
-_Resolved (DEC-0018, DEC-0045, DEC-0046): MCP is Linus's tool-registration substrate from Phase 2 onwards; the
-registry is built on fastmcp. Local-only MCP is the default; external MCP servers requiring paid API keys are
-governed by DEC-0046's `external_api_tool` registry class with a `deployment` field._
+_Resolved (DEC-0018, DEC-0045, DEC-0046): MCP is Linus's tool-registration substrate from Phase 2 onwards; the registry
+is built on fastmcp. Local-only MCP is the default; external MCP servers requiring paid API keys are governed by
+DEC-0046's `external_api_tool` registry class with a `deployment` field._
 
 **InfraNodus self-hosting.** If Linus reaches Phase 3 with a working text-network-analysis layer over KnowledgeBase, the
 MCP-dependent skills in infranodus-skills become interesting again if that layer can expose an InfraNodus-compatible
 API. Is that worth scoping as a Phase 3 stretch goal, or does it stay filed under "interesting but not load-bearing
-until someone actually misses it"?
+until someone actually misses it"? _Partially resolved (DEC-0018, DEC-0045, see
+[answered-questions.md](../../questions/answered-questions.md)): MCP adopted as extensibility substrate; fastmcp as the
+in-house default. A local infranodus façade would follow the same pattern if Phase 3 brings a self-hostable
+text-network-analysis component._

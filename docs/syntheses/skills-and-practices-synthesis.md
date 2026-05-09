@@ -151,15 +151,22 @@ SQL by hand. Vanna AI (`vanna-ai/vanna`) implements this pattern. Linus does not
 Phase 3 when the KnowledgeBase includes structured datasets alongside document vectors. Worth evaluating Vanna's MLX
 compatibility.
 
-**10. Codebase-to-knowledge-graph (Codebase Memory MCP pattern).** `DeusData/codebase-memory-mcp` converts a codebase
-into a persistent knowledge graph. For Linus, this is relevant both as a capability to offer (understanding large
-scientific codebases) and as internal infrastructure for Linus's own growing codebase. Phase 3 item, after KnowledgeBase
-v1 is operational.
+**10. Codebase-to-knowledge-graph (Codebase Memory MCP pattern).** `DeusData/codebase-memory-mcp` is a static C binary
+(zero dependencies, macOS arm64 native) that indexes repositories into a knowledge graph via tree-sitter AST analysis
+across 155 languages, exposing 14 MCP tools for structural search, call tracing, dead code detection, and Cypher-like
+queries. Now studied in full (see `docs/repo-notes/codebase-memory-mcp.md`). _Verdict:_ **Integrate (Phase 2a spike)** —
+the integration path is simple (call the binary from Python Worker tasks via subprocess). Smoke-test on Linus's own
+`src/linus/` codebase first; if queries are useful, wire into KnowledgeBase as an optional indexing layer. Phase 2a
+spike, Phase 3 for deeper integration.
 
 **11. Autonomous research loop (autoresearch pattern).** Karpathy's autoresearch repo is already in `repos/` and
-`autoresearch-mlx` is there as the MLX variant. The integration step — wiring it into Linus's orchestration layer as a
-schedulable Worker task — belongs in Phase 3. This is one of the highest-leverage capabilities for Dan's scientific
-work.
+`autoresearch-mlx` is there as the Apple Silicon port. _Verdict for the MLX fork:_ **Integrate** (see
+`docs/repo-notes/autoresearch-mlx.md`). The MLX fork runs natively on M1 Max today via `uv sync`. Concrete plan: in
+Phase 1 finish, run the upstream loop verbatim for one overnight session as a smoke test (confirm the 6–7 min/experiment
+cycle on Dan's chip). In Phase 6d, fork under `experiments/autoloop/` and swap the pretraining payload for a LoRA
+fine-tune harness; keep `program.md` and the keep-or-revert-by-git discipline. The `program.md` pattern is itself the
+closest working example of a Linus-style `SKILL.md` in the cloned repo collection. The wiring into Linus's orchestration
+layer as a schedulable Worker task belongs in Phase 3, but the smoke run should not wait.
 
 **12. SOP generation from conversation history.** From the "$312/Day" thread: turn Slack threads or messy notes into
 step-by-step SOPs and decision trees. For Linus, this is how the project's own operational knowledge gets formalized. A
@@ -179,36 +186,50 @@ These are repos from the "Top 50" thread not already present in `repos/` that de
 already in Linus (`autoresearch`, `autoresearch-mlx`, `cline`, `openclaw`, `claw-code`, `claw-code-local`) are excluded.
 
 **fastmcp** (`jlowin/fastmcp`) — Build MCP servers in minimal Python. Directly relevant for Phase 2 when Linus needs to
-expose its tools and KnowledgeBase via MCP. The low-friction approach fits the "delete requirements" principle. Phase 2.
+expose its tools and KnowledgeBase via MCP. The low-friction approach fits the "delete requirements" principle. _Verdict
+settled (DEC-0045):_ **Integrate**. FastMCP is the committed MCP framework; Linus builds FastMCP servers whose
+`@mcp.tool`-decorated functions call into Linus's KB and orchestration code. Do not build a parallel in-house MCP layer.
+Phase 2.
 
 **Task Master AI** (`eyaltoledano/claude-task-master`) — PRD → structured tasks with dependencies → Claude executes
-sequentially. Works across Claude Code, Cursor, and Windsurf. This is the closest external implementation of Linus's
-intended orchestration pattern. Worth studying carefully for Phase 2's task scheduler design, even if Linus builds its
-own. Phase 1 evaluation, Phase 2 design input.
+sequentially. Now studied in full (see `docs/repo-notes/claude-task-master.md`). _Verdict:_ **Study** — adopt the
+pattern (task-spec JSON shape, three-role model split, complexity-then-expand, update-subtask breadcrumb), not the
+product. MIT-with-Commons-Clause license and Node.js monolith footprint rule out vendoring. Phase 1 evaluation, Phase 2
+design input.
 
-**claude-squad** (`smtg-ai/claude-squad`) — Terminal agents in parallel sessions. Simpler than a full orchestration
-backend; might be usable as a Phase 1 stopgap for running parallel Workers while the full orchestration layer is built.
+**claude-squad** (`smtg-ai/claude-squad`) — Terminal app supervising multiple coding-agent CLIs in parallel, each in an
+isolated git worktree. Now studied in full (see `docs/repo-notes/claude-squad.md`). _Verdict:_ **Study** — the
+git-worktree-per-task isolation pattern and AutoYes daemon are the reusable primitives; do not vendor the Go binary.
+Critically: claude-squad and Task Master AI are _complementary, not competing_ (Task Master decomposes; claude-squad
+gives each task a private worktree). The Phase 1f answer is "use both patterns, neither product, build the glue."
 Phase 1.
 
-**pydantic-ai** (`pydantic/pydantic-ai`) — Type-safe agent framework. Given Dan's Python background and Linus's use of
-Python throughout `src/linus/`, a type-safe agent framework would catch errors at definition time rather than runtime.
-Phase 2 evaluation.
+**pydantic-ai** (`pydantic/pydantic-ai`) — Type-safe agent framework. Now studied in full (see
+`docs/repo-notes/pydantic-ai.md`). _Verdict:_ **Integrate (Phase 2a)** — the Agent class, RunContext dependency
+injection, and validated `@tool` decorator are the orchestration primitive for Linus Workers. Reduces orchestration code
+by ~70% versus a bespoke wrapper; tradeoff is a new core-path dependency. Tier 1 open question: R2-01. Phase 2a.
 
-**DSPy** (`stanfordnlp/dspy`) — Program (not prompt) foundation models. Directly relevant to Linus's Phase 6 fine-tuning
-work: DSPy's approach of optimizing prompts programmatically rather than hand-tuning them is well-suited to local model
-iteration. Phase 1 evaluation for awareness, Phase 6 application.
+**DSPy** (`stanfordnlp/dspy`) — Program (not prompt) foundation models. Now studied in full (see
+`docs/repo-notes/dspy.md`). _Verdict:_ **Study (Phase 1 → 6)** — not a runtime for Phase 2a; essential reading for
+Phase 6. DSPy Signatures are a clean tool-contract habit to establish now; the BootstrapFewShot experiment (DSPy-
+optimized prompts → LoRA training demonstrations for Qwen2.5-Coder) is the Phase 6 entry point. Phase 1 for awareness,
+Phase 6 for application.
 
-**lmnr** (`lmnr-ai/lmnr`) — Trace and evaluate agent behavior. Linus needs observability infrastructure: session logs,
-audit trails, performance measurement. lmnr covers agent behavior tracing and evaluation. Phase 2, alongside the audit
-log component.
+**lmnr** (`lmnr-ai/lmnr`) — Full-stack AI observability platform. Now studied in full (see `docs/repo-notes/lmnr.md`).
+_Verdict:_ **Study (Phase 5+)** — the app-server is Linux-only, blocking native M1 Max deployment. Immediate Phase 2a
+implication: OTel instrumentation from day one (one SDK import, standard `gen_ai.*` attributes, lightweight SQLite span
+store) so no retroactive changes are needed when Laminar is deployed at Phase 5. Phase 5.
 
-**rendergit** (`karpathy/rendergit`) — Git repo → single file for LLMs. Converts a repo into a format optimized for LLM
-ingestion. Useful for feeding reference repos to Workers for analysis without polluting context with directory structure
-noise. Phase 1, immediately useful.
+**rendergit** (`karpathy/rendergit`) — Git repo → single static HTML file for LLMs. Now studied in full (see
+`docs/repo-notes/rendergit.md`). _Verdict:_ **Watch (Phase 5+)** — Claude Code's file reading is sufficient for Phase
+1–4; useful for repo-to-hosted-Claude architectural reviews at Phase 5+. Phase 5+.
 
-**gptme** (`gptme/gptme`) — Personal AI agent in terminal. A simpler, lighter alternative to cline for terminal-based
-agentic workflows. Worth evaluating against claw-code-local for Phase 1 use, especially given its local-model support.
-Phase 1.
+**gptme** (`gptme/gptme`) — Terminal-first AI agent CLI with a layered Python architecture: core chat loop, stateless
+tools, plugin system, skills (YAML bundles), and lessons (pattern-activated contextual guidance). Now studied in full
+(see `docs/repo-notes/gptme.md`). _Verdict:_ **Study (Phase 2a, 7)** — the lessons system (inject domain knowledge when
+task language matches keywords) is the concrete answer to encoding Dan's bioinformatics expertise into Worker context
+without re-injecting it in every prompt. The hook system is the enforcement point for SAFETY.md sandbox policy. Phase 2a
+study, Phase 7 adaptation.
 
 **markdownify-mcp** (`zcaceres/markdownify-mcp`) — PDFs, images, audio → Markdown. Relevant for KnowledgeBase ingestion:
 converting heterogeneous documents (papers, slides, book excerpts) to a consistent Markdown format before chunking and
@@ -226,31 +247,50 @@ the safety infrastructure.
 tables, figures, metadata — with an ORM-like API. Relevant for scientific paper processing in the KnowledgeBase.
 Phase 3.
 
-**Huginn** (`huginn/huginn`) — Self-hosted web agents for monitoring and alerts. Privacy-first, no cloud dependency. For
-Phase 4's data sovereignty goals, Huginn could handle monitoring of scientific databases, preprint servers, or news
-sources and feed updates into the KnowledgeBase. Phase 4.
+**Huginn** (`huginn/huginn`) — Self-hosted event-driven automation platform. Despite its presentation as a monitoring
+tool, its primary value for Linus is as an _orchestration reference_. Now studied in full (see
+`docs/repo-notes/huginn.md`). _Verdict:_ **Study (before Phase 2a orchestration design)** — the Agent/Event DAG pattern
+(stateful Agents consuming and emitting structured Events along a directed graph in a scheduler loop) directly informs
+Phase 2a dispatch design. Read the agent-wiring code before finalizing the session-store mechanism; the pattern
+transfers, not the Ruby implementation. Phase 2 reference.
 
 ---
 
-## 4a. Cluster anchor: g11 agent frameworks (added 2026-05-05)
+## 4a. Cluster anchor: g11 agent frameworks (added 2026-05-05, updated 2026-05-08)
 
-The 2026-05-05 landscape remapping made **[g11 agent frameworks](../syntheses/repo-clusters/g11-agent-frameworks.md)** the primary cluster anchor for this synthesis. g11 covers pydantic-ai, dspy, superpowers, Agent-Skills-for-Context-Engineering, gptme, huginn, lmnr, and promptfoo—the agent framework, skills definition, and evaluation infrastructure that operationalize the practices and skills listed above. Adopting g11 as the anchoring cluster reframes the skills-and-practices question from "what should Linus do" to "here is what the community has already built; which patterns apply to Linus's Maestro/Worker model."
+The 2026-05-05 landscape remapping made **[g11 agent frameworks](repo-clusters/g11-agent-frameworks.md)** the primary
+cluster anchor for this synthesis. g11 covers pydantic-ai, dspy, superpowers, Agent-Skills-for-Context-Engineering,
+gptme, huginn, lmnr, and promptfoo — the agent framework, skills definition, and evaluation infrastructure that
+operationalize the practices and skills listed above. Adopting g11 as the anchoring cluster reframes the
+skills-and-practices question from "what should Linus do" to "here is what the community has already built; which
+patterns apply to Linus's Maestro/Worker model."
+
+Three findings from the g11 synthesis have immediate design weight. First, g11 identifies a three-layer Worker stack:
+pydantic-ai as the runtime base (type safety, provider abstraction, tool registration), superpowers's behavioral
+patterns as the discipline layer (spec-first, RED-GREEN-REFACTOR, two-stage review), and gptme's plugin/lessons
+architecture as the extensibility model for domain skills. These fit together because they operate at different levels
+of the same stack rather than competing. Second, the progressive-disclosure skill architecture (YAML frontmatter index
+loaded at startup, markdown body content activated lazily on keyword match) appears independently in superpowers, gptme,
+and Agent-Skills-for-Context-Engineering — triple convergence is strong evidence the pattern is correct; Linus should
+adopt it as the standard format for domain skills in a `src/linus/skills/` directory. Third, g11 distinguishes
+evaluation (promptfoo — measures correctness on known tasks) from observability (lmnr — measures what the system
+actually does during live operation); both are needed and they are not substitutes for each other.
 
 ---
 
 ## 5. Entrepreneurial Opportunities
 
 > **Extracted 2026-05-05.** The seven entrepreneurial opportunities originally listed here have been promoted to a
-> first-class [`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md), where they sit alongside the
-> g10-finance transferable-context-management patterns and the Phase 7 biology pillar's commercial surface. This
-> section is retained as a pointer; new entrepreneurship content should land in the new synthesis.
+> first-class [`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md), where they sit alongside the g10-finance
+> transferable-context-management patterns and the Phase 7 biology pillar's commercial surface. This section is retained
+> as a pointer; new entrepreneurship content should land in the new synthesis.
 
 The seven opportunities (Scientific literature intelligence service for biotech teams; Automated genomics pipeline
-auditing and SOP generation; Domain-specific decision frameworks for funding and grant applications; Environmental
-data intelligence for compliance and monitoring teams; AI-accelerated scientific manuscript preparation; Notion
-template systems for scientific project management; Local AI infrastructure consulting for research institutions)
-remain Dan-profile-relevant; their full treatment lives in the entrepreneurship synthesis. The Tier-1-equivalent
-action and Tier 1/2/3 questions for the commercial surface are now owned by that synthesis.
+auditing and SOP generation; Domain-specific decision frameworks for funding and grant applications; Environmental data
+intelligence for compliance and monitoring teams; AI-accelerated scientific manuscript preparation; Notion template
+systems for scientific project management; Local AI infrastructure consulting for research institutions) remain
+Dan-profile-relevant; their full treatment lives in the entrepreneurship synthesis. The Tier-1-equivalent action and
+Tier 1/2/3 questions for the commercial surface are now owned by that synthesis.
 
 ---
 
@@ -280,7 +320,11 @@ relevant for M1 Max throughput.
 Cline does not replace Claude Code in the Maestro role. It fills the Worker role within VS Code specifically — it is the
 harness for code-writing Workers the way Ollama's HTTP API is the harness for text/analysis Workers. Phase 1 is the
 right time to validate this integration: pick one well-specified coding task from the `experiments/` queue, configure
-Cline against Ollama, and measure whether the output quality justifies the local-only constraint.
+Cline against Ollama, and measure whether the output quality justifies the local-only constraint. One architectural
+implication from the full Cline note (see `docs/repo-notes/cline.md`): Cline's prompt variants architecture (`xs`,
+`hermes`, `glm` tuned for small or local models) is prior art evidence that tool-use prompt templates need to be
+per-model-family to work reliably on anything smaller than frontier. Linus's Phase 7 skills design should plan for
+variant templates per Worker model class (Qwen, Mistral, future Linus fine-tunes) from the start, not as a retrofit.
 
 ---
 
@@ -290,12 +334,13 @@ Cline against Ollama, and measure whether the output quality justifies the local
 [`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md) on 2026-05-05; retained here as a cross-reference for
 the build-vs-monetize tension that touches Maestro/Worker discipline.)_
 
-**Question 2: Does Linus need a custom orchestration layer, or will Task Master AI + Cline cover Phase 2?** The "Task
-Master AI" pattern (PRD → structured tasks → sequential Claude execution) and Claude-squad (parallel terminal agents)
-together might satisfy Phase 2's orchestration requirements without building a custom router. The Algorithm says delete
-before building. The question is whether Dan's requirements for KnowledgeBase integration, sandbox policy enforcement,
-and Apple Silicon optimization justify a custom orchestration layer, or whether combining existing tools is faster to a
-working system.
+**Question 2: Does Linus need a custom orchestration layer, or will Task Master AI + Cline cover Phase 2?** _Partially
+resolved (DEC-0002; see [answered-questions.md](../../questions/answered-questions.md)):_ custom orchestration stands,
+but with Algorithm-checked primitives. Task Master AI and claude-squad are not competing orchestration replacements —
+they occupy different layers (decomposition vs. runtime isolation) and the Phase 1f deliverable captures "adopt both
+patterns, neither product, build the glue." The open sub-question is whether pydantic-ai as the Phase 2a Worker base
+abstraction (Tier 1 R2-01) satisfies the KnowledgeBase integration and sandbox policy requirements without requiring a
+fully bespoke router, or whether the custom layer must go deeper.
 
 **Question 3: How does Dan want to handle the transition from Maestro-only to Maestro+Worker in practice?** The "Stop
 Staring at the Files" thread describes a developer who typed ten sentences and walked away, with agents doing the rest.
@@ -304,12 +349,15 @@ smaller loops. What is Linus's smallest-possible closed loop — a Worker receiv
 verifiable result — that Dan could run this week? Getting that loop working, even trivially, is more valuable than any
 further planning.
 
-**Question 4: What is the right fine-tuning target in Phase 6?** Phase 6 is described as LoRA on domain corpus. But
-which domain? A model fine-tuned on genomics literature behaves differently from one fine-tuned on Dan's personal
-writing style, which behaves differently from one fine-tuned on scientific Python. A genomics-specialized model
-accelerates the scientific intelligence path; a coding-specialized model accelerates Linus's own development. This
-decision should probably be made by Phase 3, not deferred to Phase 6. _(Entrepreneurial-calculus implications now live
-in [`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md).)_
+**Question 4: What is the right fine-tuning target in Phase 6?** _Partially resolved (DEC-0043; see
+[answered-questions.md](../../questions/answered-questions.md)):_ memory-mode-specific fine-tuning targets for Phase 6
+are now planned — one fine-tune per memory mode (`stateless`, `session_stateful`, `project_stateful`) rather than a
+single monolithic domain target. The original tension (genomics corpus vs. personal writing style vs. scientific Python)
+is absorbed into this framing: the `project_stateful` mode target naturally covers KnowledgeBase-aware genomics
+reasoning; the `stateless` mode target covers fast coding assistance. The DSPy BootstrapFewShot experiment (g11) adds a
+third axis — DSPy-optimized in-context demonstrations can serve as training data for LoRA adapters, bridging the "which
+domain" question via measurement rather than upfront choice. _(Entrepreneurial-calculus implications live in
+[`entrepreneurship-synthesis.md`](entrepreneurship-synthesis.md).)_
 
 **Question 5: Is the "Stop Staring at the Files" architectural clarity claim actually load-bearing for Dan's specific
 situation?** The thread argues that task decomposition and architectural clarity are the scarce inputs as agents

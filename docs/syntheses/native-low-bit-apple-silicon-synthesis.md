@@ -94,12 +94,12 @@ to actually train and release one.
 
 **Early 2025** delivered the productization engineering. bitnet.cpp landed in February, giving the BitNet weight format
 a CPU inference runtime tuned specifically for ternary mpGEMM via lookup tables and mirror consolidation, and —
-critically for Linus — published M2 Ultra throughput numbers showing 2.15× to 4.91× over FP16. April brought BitNet v2
-(Hadamard transforms cleaning up the 4-bit-activation path that a4.8 had pioneered) and, in the same month, the released
-checkpoint the field had been waiting two years for: BitNet b1.58 2B4T, 2B parameters trained on 4T tokens,
-instruction-tuned via SFT+DPO, packaged as both bf16 master weights for further training and GGUF for bitnet.cpp. **0.4
-GB non-embedding memory, 29 ms time-per-output-token on CPU.** For the first time the BitNet thesis was something a
-researcher could download.
+critically for Linus — published M2 Ultra throughput numbers showing 2.15× to 4.91× over FP16 on CPU (NEON SIMD, no
+Metal or ANE path; up to 6.25× on x86). April brought BitNet v2 (Hadamard transforms cleaning up the 4-bit-activation
+path that a4.8 had pioneered) and, in the same month, the released checkpoint the field had been waiting two years for:
+BitNet b1.58 2B4T, 2B parameters trained on 4T tokens, instruction-tuned via SFT+DPO, packaged as both bf16 master
+weights for further training and GGUF for bitnet.cpp. **0.4 GB non-embedding memory, 29 ms time-per-output-token on
+CPU.** For the first time the BitNet thesis was something a researcher could download.
 
 October 2025 added the recipe for converting other models. BitNet Distillation showed that with three carefully chosen
 stages — SubLN insertion, ~10B tokens of continued pretraining, and multi-loss distillation from an FP16 teacher — any
@@ -178,9 +178,12 @@ engines either pad ternary weights to 2-bit (wasting compression and producing s
 activation quantization that doesn't match BitNet's per-tensor INT8 training scheme (so inference output diverges from
 training output). The TL family uses element-wise lookup tables with sign/magnitude consolidation to fit three weights
 into 5 bits; I2_S strictly mirrors b1.58's training quantization scheme for bit-exact inference. **Apple M2 Ultra**:
-2.15× to 4.91× speedup over FP16 across model sizes from 700M to 70B. This is the only paper in the thread with directly
-published Apple Silicon numbers, and the runtime is what would actually serve a BitNet 2B4T checkpoint to a Linus Worker
-today.
+2.15× to 4.91× speedup over FP16 across model sizes from 700M to 70B (up to 6.25× on x86 laptop CPUs). Critically,
+bitnet.cpp targets CPU SIMD only — NEON on ARM, AVX2 on x86 — with no Metal or ANE path; the Apple Silicon GPU and
+Neural Engine are left on the table. This is the only paper in the thread with directly published Apple Silicon numbers,
+and the runtime is what would actually serve a BitNet 2B4T checkpoint to a Linus Worker today, though its CPU-only
+nature means it is increasingly a baseline rather than the primary serving path as MLX-native alternatives (Bonsai)
+mature.
 
 [BitNet Distillation](../paper-notes/2510.13998v1.md) closes the loop by giving the line a _recipe for converting other
 models_. Rather than train BitNet from scratch (which costs millions of dollars and trillions of tokens, and is closed
@@ -409,12 +412,15 @@ Flash-MoE stays methodology-only reference (no Linus dependency on its bespoke M
 lesson and the deferred-CMD3 pipeline pattern inform the Linus inference layer when it eventually has its own kernel
 work).
 
-**Phase 8 — the speculative cross-product.** A "Bonsai-MoE-streamed- with-Cayley-stability" research direction now has
+**Phase 8 — the speculative cross-product.** A "Bonsai-MoE-streamed-with-Cayley-stability" research direction now has
 materially more plausibility than it did a year ago. Eight Ternary Bonsai 8B Workers in parallel consume ~14 GB of
-weights — a fan-out that wasn't credible at FP16 even with 4-bit quantization. Combining JPmHC's Cayley- stabilized
-hyper-connections with BitNet ternary weights and Flash-MoE streaming would push the single-machine inference frontier
-further; nothing in the ROADMAP is gated on this, but it remains the most ambitious natural cross-product the corpus
-collectively points at.
+weights — a fan-out that wasn't credible at FP16 even with 4-bit quantization. Combining
+[JPmHC's](../paper-notes/2602.18308v2.md) Cayley-stabilized hyper-connections (which replace Sinkhorn-constrained
+doubly-stochastic matrices with orthogonal `O(n)` mixers, eliminating spectral stalling in deep stacks) with BitNet
+ternary weights and Flash-MoE streaming would push the single-machine inference frontier further. The JPmHC paper note
+also connects to BitNet 2B4T explicitly: both use SubLN-style normalization inserts as a training-stability mechanism,
+though via different mathematical routes. Nothing in the ROADMAP is gated on this cross-product, but it remains the most
+ambitious natural synthesis the corpus collectively points at.
 
 **MLX ternary kernel as a Linus contribution.** The most tractable, well-scoped, immediately community-beneficial
 contribution opportunity in the entire Linus corpus is a native MLX ternary kernel that exploits the actual zeros in the
@@ -434,9 +440,9 @@ synthesis can sharpen but not finally resolve. The corpus surfaces seven sharp q
 **1. Should Phase 1c benchmark Bonsai 8B and BitNet 2B4T together under a unified Worker-selection methodology?** The
 synthesis says yes — the natural shape is a four-way comparison with one unified harness, scoring on the joint cost /
 quality / latency Pareto position rather than any single metric. The open question is methodology authority: should the
-methodology spec live in [`docs/specs/phase1c-spike.md`](../specs/) (proposed) or in
-[`docs/experimental-protocol.md`](../experimental-protocol.md) (existing)? Either is defensible; the second is more
-durable.
+methodology spec live exclusively in [`docs/specs/phase1c-spike.md`](../specs/phase1c-spike.md) (the per-phase spec
+already committed) or in a separate `docs/specs/experimental-protocol.md` that generalizes across phases? The per-phase
+spec is the more immediate deliverable; the generalized protocol can be extracted later if the pattern recurs.
 
 **2. Should the MLX ternary kernel gap be a Linus contribution?** This is the single best-scoped contribution
 opportunity in the corpus. The question is whether to scope it as Phase 1d (immediately, while the spike's measurement
@@ -493,7 +499,10 @@ The connections to the rest of the corpus are direct. The memory pillar treats 1
 the "structure compounds" thesis ([memory synthesis Layer A](memory-synthesis.md)) — a Linus Worker substrate hosted on
 a recurrent / minGRU / SSM architecture with BitLinear gates is the most extreme hardware-friendly substrate the
 combined corpus points at, and the Phase 8 speculative direction in the memory synthesis points at the same
-cross-product as the BitNet × Flash- MoE × JPmHC speculation here. The agentic systems thread benefits directly: cheaper
+cross-product as the BitNet × Flash-MoE × JPmHC speculation here. The [JPmHC paper note](../paper-notes/2602.18308v2.md)
+is now in the corpus and connects both to Flash-MoE (JPmHC's ordinary HC is used there; the paper explicitly names
+combining JPmHC stability with Flash-MoE streaming as a natural research direction) and to BitNet 2B4T (both use
+SubLN-style inserted norms as variance-preservation mechanisms). The agentic systems thread benefits directly: cheaper
 Workers enable more parallel agentic fan-out, and the Bonsai footprint puts that fan-out in Phase 2 rather than Phase 3.
 The biological foundation models thread (Group A) interacts in a more speculative way: foundation models could plausibly
 be ternary-distilled via BitDistill, though no domain-specific BitDistill recipe has been published and the

@@ -2,8 +2,8 @@
 
 ## What this document is
 
-A rewrite of the prior Group D synthesis, expanded from seven to ten paper-notes. This rewrite absorbs three new
-papers — the two same-named-but-different _QuantAgent_ papers ([HKUST/IDEA, 2024](../paper-notes/2402.03755v1.md) and
+A rewrite of the prior Group D synthesis, expanded from seven to ten paper-notes. This rewrite absorbs three new papers
+— the two same-named-but-different _QuantAgent_ papers ([HKUST/IDEA, 2024](../paper-notes/2402.03755v1.md) and
 [Stony Brook et al., 2025](../paper-notes/2509.09995v3.md)) and [WikiAutoGen](../paper-notes/2503.19065v1.md)
 (KAUST, 2025) — and surfaces them as fresh evidence on threads that were present-but-quiet in the prior synthesis
 (structured inter-agent communication, critic- stronger-than-writer, regret-bounded self-improvement). Tone matches the
@@ -13,11 +13,11 @@ the landscape and questions documents.
 The headline claim sharpens with the expansion: the agentic-systems literature has converged on a small set of
 architectural primitives — role specialization, structured shared state, multi-level validation, per-tool documentation,
 hybrid local/hosted-model routing, ReAct + reflection as the default loop, and a critic tier distinct from a writer tier
-— and Linus's Phase 2/3 design is implicitly committing to most of them. The ten-paper version also promotes two
-threads the seven-paper version under-weighted: structured inter-agent communication as a load-bearing primitive in its
-own right, and the question of whether agentic-system theory (regret bounds, MDP formalism) deserves more weight in
-Linus's design alongside the formal results that already anchor the memory pillar. The sober line under transferability
-stays: most impressive results in this group lean on hosted frontier models in ways that don't transfer cleanly to a
+— and Linus's Phase 2/3 design is implicitly committing to most of them. The ten-paper version also promotes two threads
+the seven-paper version under-weighted: structured inter-agent communication as a load-bearing primitive in its own
+right, and the question of whether agentic-system theory (regret bounds, MDP formalism) deserves more weight in Linus's
+design alongside the formal results that already anchor the memory pillar. The sober line under transferability stays:
+most impressive results in this group lean on hosted frontier models in ways that don't transfer cleanly to a
 local-first substrate — though [BioGuider](../paper-notes/2026.02.09.704801v1.md)'s finding that GPT-OSS edged out
 Claude Sonnet and GPT-4o on its task remains the most encouraging local-first signal in the group.
 
@@ -59,8 +59,10 @@ The [Fundamentals survey](../paper-notes/2510.09244v1.md) sits at the centre as 
 present-day upper-bound demonstration. The five domain-specific multi-agent papers — BioGuider, Sketch2Simulation,
 TradingAgents, the two QuantAgents, and WikiAutoGen — are different points in the same design space.
 [Practical Guide](../paper-notes/2506.13023v1.md) is the cross-cutting discipline. The HKUST QuantAgent supplies the
-only theoretical contribution (a regret bound); the Stony Brook QuantAgent supplies the leanest worked example of
-structured-prompt multi-agent dispatch; WikiAutoGen sharpens the critic-stronger-than-writer thread.
+only theoretical contribution (a regret bound); the Stony Brook QuantAgent ([g10-finance](repo-clusters/g10-finance.md))
+supplies the leanest worked example of structured-prompt multi-agent dispatch — TradingAgents and Stony Brook QuantAgent
+bracket the orchestration design space at DEC-0050: one is the maximal debate-style roster, the other the minimal
+four-role linear pipeline. WikiAutoGen sharpens the critic-stronger-than-writer thread.
 
 ---
 
@@ -99,7 +101,7 @@ Error Handling, Memory Management, Action, Coding, Constraint, Security) but doe
 it lists them.
 
 For Linus this maps onto the agent spawner directly, and the expanded paper set makes the recommendation more confident,
-not less. **The Phase 3 spawner should treat Role as a first-class type**, not as a convention. The Stony Brook
+not less. **Role is a first-class type in the Phase 3 spawner per DEC-0050**, not a convention. The Stony Brook
 QuantAgent's four-specialists-plus- integrator topology with a majority-with-confirmation commit rule is the cleanest
 minimal template the corpus offers; the Kosmos data point bounds it from below at two roles when focus matters more than
 fan-out; WikiAutoGen's four-viewpoint critic block is the corresponding template for the review side. Three to seven
@@ -146,13 +148,14 @@ and folds it back into the KB: **KB-grows-from-real-feedback as a design pattern
 [Sketch2Simulation](../paper-notes/2603.24629v1.md) implements the same pattern at the pipeline level: a typed
 JSON-graph IR is the contract between parsing and synthesis.
 
-This connects directly to Linus's [memory synthesis](memory-synthesis.md). The four-layer pillar still has no explicit
-slot for the Kosmos-style task-scoped working state that sits between scratchpad (ephemeral) and episodic (durable). The
-expanded paper set strengthens the prior recommendation: a fifth layer worth naming explicitly — _investigation memory_
-— with a single- investigation lifetime and a multi-agent read/write contract. The HKUST QuantAgent's outer-loop
-KB-update pattern adds a second observation: episodic memory keyed by _(problem, attempt, real-world- outcome, review)_
-tuples is a domain-portable shape, and the spawner should let a Role declare its episodic schema as part of the role
-definition.
+This connects directly to Linus's [memory synthesis](memory-synthesis.md). The Kosmos-style task-scoped working state
+that sits between scratchpad (ephemeral) and episodic (durable) is now named and decided: **Layer D — Investigation
+memory** (DEC-0052), with a single-investigation lifetime, a multi-agent read/write contract, and SQLite substrate keyed
+by `investigation_id`. The five-layer pillar (A–E; Layer E is the new name for semantic knowledge) supersedes the
+earlier four-layer design, with investigation memory exactly filling the gap this paper set identified. The HKUST
+QuantAgent's outer-loop KB-update pattern adds a second observation: episodic memory keyed by _(problem, attempt,
+real-world-outcome, review)_ tuples is a domain-portable shape, and the spawner should let a Role declare its episodic
+schema as part of the role definition.
 
 ### Thread 4: validation as a per-stage spawner primitive, not an end-of-pipeline check
 
@@ -172,9 +175,9 @@ is the _content-quality_ version: the draft is validated against four orthogonal
 bulk filtering, slow expensive outer-loop reviewer for ground-truth checking — mapping onto Maestro/Worker discipline
 directly.
 
-The application papers make the architectural commitment: validation is per-stage, not per-pipeline. **The agent spawner
-should expose validation hooks per stage** (`pre_dispatch`, `post_synthesis`, `post_execution`) and require at least an
-execution-validator, even if no-op for non-executable tasks. This is also where the
+The application papers make the architectural commitment: validation is per-stage, not per-pipeline. Per-stage
+validation hooks in the orchestration spawner (not the sandbox layer) with an execute → detect → fix pattern — the
+fixer-agent as a separate Worker — have been adopted as the Phase 3 spawner design per S15. This is also where the
 [Practical Guide](../paper-notes/2506.13023v1.md)'s component-level evaluation argument lands — the orchestration
 layer's intermediate components need their own metrics rather than only an end-to-end pass/fail.
 
@@ -265,23 +268,25 @@ Phase 3 ADR on the agent spawner: which architectural choices have formal suppor
 The Phase 2 orchestration layer needs to commit to several things that the current architecture documents either name
 implicitly or defer. Pulling these together by the existing roadmap:
 
-**Phase 2 — orchestration layer commitments.** The agent spawner's contract should treat **Role as a first-class type**
-— a tuple of
-`(name, goal, constraints, allowed_tools, model_tier, context_schema, position_in_workflow, episodic_schema)`. The role
-tuple's `model_tier` field is the hook for the critic-stronger-than-writer pattern; `episodic_schema` is the hook for
-KB-grows-from-real-feedback. The tool registry should ship per-tool documentation artifacts alongside typed signatures.
-The audit log should record enough per-call detail that the Practical Guide's non-determinism estimation can be applied
-retroactively. The default Worker reasoning loop should be ReAct + Reflexion. The canonical inter-agent message format
-should be a typed `AgentReport` schema with free-form text confined to a named rationale field.
+**Phase 2 — orchestration layer commitments.** **Role is a first-class type** in the Phase 3 agent spawner per DEC-0050:
+minimum schema `{role_id, capability_set, memory_access_tier, critic_eligible}`, serializable to YAML, enforced at
+dispatch. The `critic_eligible` field is the hook for the critic-stronger-than-writer pattern; the spawner should allow
+episodic schema declaration per role for KB-grows-from-real-feedback patterns. **AgentReport is the canonical
+inter-agent message format** per DEC-0051: `{task_id, role_id, status, result, rationale, evidence, timestamp}`,
+free-form text confined to `rationale`, appended to the workgraph JSONL session store. The tool registry should ship
+per-tool documentation artifacts alongside typed signatures. The audit log should record enough per-call detail that the
+Practical Guide's non-determinism estimation can be applied retroactively. The default Worker reasoning loop should be
+ReAct + Reflexion.
 
 **Phase 3 — parallel agents.** The spawner's `≤N parallel rollouts per cycle` shape should target the Kosmos pattern,
-with the Stony Brook QuantAgent's majority-with-confirmation rule as the cheap default integrator. The shared-state
-artifact (investigation memory) deserves its own ADR before implementation. Natural starting specialization: two
-general-purpose Workers (code/analysis, knowledge-retrieval) coordinated through the shared state. Multi-level
-validation hooks (`pre_dispatch`, `post_synthesis`, `post_execution`) should be exposed by the spawner and required
-(no-op acceptable). The execution-fix-loop pattern (Sketch2Simulation B4) is the required default for any Worker
-producing an executable artifact. The HKUST QuantAgent's two-loop self-improvement structure is a Phase 3 candidate
-template for any skill where ground-truth feedback is programmatic.
+with the Stony Brook QuantAgent's majority-with-confirmation rule as the cheap default integrator. Investigation memory
+(Layer D per DEC-0052) is the shared-state artifact: SQLite-backed, keyed by `investigation_id`, shared read/write
+across all agents in one investigation, archived to Layer C (episodic) on close. Natural starting specialization: two
+general-purpose Workers (code/analysis, knowledge-retrieval) coordinated through Layer D. Per-stage validation hooks
+(`pre_dispatch`, `post_synthesis`, `post_execution`) are exposed by the spawner; the execute → detect → fix pattern
+(Sketch2Simulation B4) is the required default for any Worker producing an executable artifact. The HKUST QuantAgent's
+two-loop self-improvement structure is a Phase 3 candidate template for any skill where ground-truth feedback is
+programmatic.
 
 **Sandbox and SAFETY.md.** Boiko/Gomes' dual-use safety study argues for **screening at prompt ingress, not action
 egress**, and for an explicit "physical-world tool" class in the registry from Phase 2 (empty until Phase 7). The Stony
@@ -289,25 +294,27 @@ Brook QuantAgent's RiskAgent ("fixed safety floor + LLM-tunable parameter inside
 formulation of bounded-envelope autonomy in the corpus and worth lifting as a SAFETY.md formalism: every tool registered
 as `(fixed_safety_bounds, model_tunable_params_within_bounds)`.
 
-**Phase 7 — skills and autonomy graduation.** BioGuider remains the cleanest reference design for a Linus _skill_. The
-first non-trivial skill could plausibly be a documentation-review skill modeled on BioGuider, run against the Linus repo
-itself as the smoke test. The longer-term Phase 7 target remains a "Linus Kosmos-mode" deliverable.
+**Phase 7 — skills and autonomy graduation.** BioGuider remains the cleanest reference design for the _shape_ of a Linus
+skill: bounded multi-agent workflow, named roles, constrained corrector, structured output, SKILL.md YAML-frontmatter
+format (resolved S30/E6). The Phase 7 inaugural skills bundle is bioSkills + scientific-agent-skills (~573 skills
+total). BioGuider's error-injection benchmark methodology is a reusable `dan_tasks/` family for any correction or
+refactoring skill. The longer-term Phase 7 target remains a "Linus Kosmos-mode" deliverable.
 
-**Memory pillar refinement.** _Investigation memory_ as the fifth layer (task-scoped, multi-agent, single-investigation
-lifetime). The HKUST QuantAgent's outer-loop KB-update pattern adds: episodic memory keyed by _(problem, attempt,
-real-world-outcome, review)_ tuples is domain-portable; the spawner should let a Role declare its episodic schema. The
-[Fundamentals survey](../paper-notes/2510.09244v1.md)'s "procedures" content type is a related gap deserving explicit
-decision (fifth layer? episodic with a "generalized" flag? semantic-knowledge with a "procedural" type?) before Phase 3
-fan-out.
+**Memory pillar refinement.** _Investigation memory_ is now **Layer D** in the five-layer pillar (A–E) per DEC-0052.
+Layer E is the new name for semantic knowledge throughout. The HKUST QuantAgent's outer-loop KB-update pattern adds:
+episodic memory keyed by _(problem, attempt, real-world-outcome, review)_ tuples is domain-portable; the spawner should
+let a Role declare its episodic schema. The [Fundamentals survey](../paper-notes/2510.09244v1.md)'s "procedures" content
+type remains an open gap (episodic with a "generalized" flag? Layer E with a "procedural" type?) — resolve before Phase
+3 fan-out; it is not covered by DEC-0052.
 
 ---
 
 ## Implications for Linus evaluation
 
 The [Practical Guide](../paper-notes/2506.13023v1.md) is essentially the design document for `benchmarks/dan_tasks/`.
-(BixBench and LAB-Bench moved to [`infra-foundations-synthesis.md`](infra-foundations-synthesis.md) as benchmark
-anchors as of 2026-05-05; their agent-loop aspect is referenced from there. Practical Guide remains the central
-evaluation anchor for Group D.)
+(BixBench and LAB-Bench moved to [`infra-foundations-synthesis.md`](infra-foundations-synthesis.md) as benchmark anchors
+as of 2026-05-05; their agent-loop aspect is referenced from there. Practical Guide remains the central evaluation
+anchor for Group D.)
 
 The 5 D's apply item-by-item: **Defined Scope** (tag the Linus capability targeted), **Demonstrative** (Dan would
 actually send the prompt), **Diverse** (topic/difficulty/format spread, embedding clustering), **Decontaminated** (Dan's
@@ -330,27 +337,30 @@ set of 30-50 thin-source topics would let Linus measure whether its degradation 
 drops sharply as topics get more obscure.
 
 Three pre-Phase-2 measurements deserve highest priority. **Per-Worker debate-quality smoke test** — does TradingAgents'
-bull/bear pattern beat single-Worker reasoning at equivalent token cost on local hardware? **Per-Worker judge-fidelity
-smoke test** — can a local 7B Worker play the HKUST QuantAgent's inner-loop judge with informative fidelity, or must the
-judge be hosted Claude or a hardcoded checker? **Per-Worker critic-tier smoke test** — does WikiAutoGen's critic-
-stronger-than-writer pattern survive when both are local (larger Qwen2.5 critiquing smaller Qwen2.5)? Each is hours of
-work and informs weeks of architecture.
+bull/bear pattern beat single-Worker reasoning at equivalent token cost on local hardware? Adversarial debate as a
+Worker primitive is deferred until this measurement exists (resolved S55/E4). **Per-Worker judge-fidelity smoke test** —
+can a local 7B Worker play the HKUST QuantAgent's inner-loop judge with informative fidelity? Qwen3 is the Phase 1 local
+judge for open-answer grading; hybrid escalation pattern is deferred (S12). **Per-Worker critic-tier smoke test** — does
+WikiAutoGen's critic-stronger-than-writer pattern survive when both are local (larger Qwen2.5 critiquing smaller
+Qwen2.5)? Each is hours of work and informs weeks of architecture.
 
 ---
 
 ## Tensions and open questions
 
-**1. Should Role be a first-class type in the Phase 3 agent spawner?** TradingAgents / BioGuider / Sketch2Simulation /
-Stony-Brook-QuantAgent / WikiAutoGen all argue yes; Kosmos's two-role minimalism is the counter-data-point against
-over-decomposition. The expanded paper set tilts strongly toward "yes." ADR before Phase 3.
+**1. Should Role be a first-class type in the Phase 3 agent spawner?** _Resolved (DEC-0050, see
+[answered-questions.md](../questions/answered-questions.md)): Yes. Role is a first-class Python type with minimum schema
+`{role_id, capability_set, memory_access_tier, critic_eligible}`, serializable to YAML, enforced at spawner dispatch._
 
-**2. Should Linus name a fifth memory layer for "investigation memory"?** Kosmos world model, Sketch2Simulation IR, and
-the HKUST QuantAgent context buffer all occupy a layer the four-layer pillar lacks (task-scoped, multi-agent,
-single-investigation lifetime). Resolve before Phase 3.
+**2. Should Linus name a fifth memory layer for "investigation memory"?** _Resolved (DEC-0052, see
+[answered-questions.md](../questions/answered-questions.md)): Yes. Layer D — Investigation memory — added to the
+five-layer pillar (A–E). SQLite substrate, `investigation_id`-keyed, shared read/write across all participating agents,
+archived to Layer C on close. Layer E is now the name for semantic knowledge._
 
-**3. Does Linus need a "validation gate" primitive in the spawner, or is that the sandbox layer's job?**
-Sketch2Simulation argues per-stage hooks make failures localizable; the HKUST QuantAgent two-loop judge/reviewer and
-WikiAutoGen four-viewpoint critic block strengthen the case.
+**3. Does Linus need a "validation gate" primitive in the spawner, or is that the sandbox layer's job?** _Partially
+resolved (S15): Per-stage validation hooks sit in the orchestration spawner, not the sandbox. The execute → detect → fix
+pattern with a fixer-agent as a separate Worker is the Phase 3 design. Sandbox policy enforcement (DEC-0024) is
+complementary but distinct._
 
 **4. Is "12-hour autonomous Linus run on a Dan-supplied dataset" the right Phase 7 north-star?** Concrete, falsifiable,
 inherits Kosmos's evaluation. Honest concern: gated on hosted-model-class capability local Workers may not reach on M1
@@ -359,14 +369,14 @@ Max.
 **5. What is Linus's policy on hosted-model fallback?** The critic-tier thread reframes this: not "do we ever call
 hosted Claude?" but "which Roles are tagged as critic-tier and what is the budget policy?"
 
-**6. Should adversarial debate be a Worker primitive?** Each round costs 2N+1 model calls; TradingAgents has no ablation
-isolating debate. The Stony Brook QuantAgent is a partial counter — it works without debate, with
-majority-with-confirmation as integrator. Empirical question for `benchmarks/dan_tasks/`.
+**6. Should adversarial debate be a Worker primitive?** _Partially resolved (S55/E4): Deferred to empirical testing. Do
+not architect a debate primitive until there is measurement data on quality lift from `benchmarks/dan_tasks/`. The
+majority-with-confirmation integrator (Stony Brook QuantAgent) is the architectural default pending that data._
 
-**7. Typed inter-agent message format?** The expanded set makes this hard to defer — TradingAgents, both QuantAgents,
-WikiAutoGen, BioGuider, and Sketch2Simulation all use typed structured outputs; only Kosmos hides the schema in a shared
-state object. Default to typed `AgentReport` with free text confined to a named rationale field. ADR before the spawner
-ships.
+**7. Typed inter-agent message format?** _Resolved (DEC-0051, see
+[answered-questions.md](../questions/answered-questions.md)): Typed `AgentReport` is the canonical inter-agent message
+format: `{task_id, role_id, status, result, rationale, evidence, timestamp}`. Free text confined to `rationale`.
+`status: "partial"` handles incomplete-but-useful Worker results. Records appended to workgraph JSONL session store._
 
 **8. Should agentic-system theory join memory-pillar theory as first-class architectural input?** The HKUST QuantAgent
 regret bound is the first formal result in the group. Assumptions don't hold strictly, but the design intuition (KB
@@ -378,10 +388,10 @@ theory" note in the Phase 3 spawner ADR.
 ## Where this synthesis fits
 
 This synthesis reinforces the [memory synthesis](memory-synthesis.md)'s argument that structured addressable state is a
-load-bearing primitive — every paper in this group depends on some version of it. It adds two refinements: a fifth
-_investigation memory_ layer (task-scoped, multi-agent, single- investigation lifetime), and per-Role declared episodic
-schemas keyed by _(problem, attempt, real-world-outcome, review)_ tuples from the HKUST QuantAgent's KB-feedback
-pattern.
+load-bearing primitive — every paper in this group depends on some version of it. The two refinements it contributed are
+now resolved: Layer D (investigation memory, DEC-0052) and the per-Role episodic schema pattern keyed by _(problem,
+attempt, real-world-outcome, review)_ tuples from the HKUST QuantAgent's KB-feedback pattern. The five-layer pillar
+(A–E) replaces the earlier four-layer design, with Layer E now naming semantic knowledge.
 
 It reinforces the [skills synthesis](skills-and-practices-synthesis.md)'s argument that the bottleneck has shifted from
 intelligence to clarity — TradingAgents' role tuples, BioGuider's per-agent constraints, Sketch2Simulation's per-tool

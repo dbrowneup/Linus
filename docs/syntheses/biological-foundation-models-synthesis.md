@@ -52,10 +52,10 @@ a secondary axis of **operational reach** on M1 Max.
 
 At the _generalist_ extreme sits **LucaOne**, the only model spanning DNA, RNA, and protein in a single shared embedding
 space. The unified 39-token vocabulary plus a token-type embedding is the operationalisation of the central-dogma claim,
-and the few-shot DNA-protein matching result (LucaOne 0.84 vs DNABert2+ESM2 0.73 ([s42256-025-01044-4](../paper-notes/s42256-025-01044-4.md))) is the cleanest evidence in the corpus
-that joint training learns what neither half can learn alone. A step inward sits **Evo 2**, generalist _within_ DNA: 9.3
-T base pairs across all three domains of life, zero-shot variant scoring, generative as well as discriminative, 1
-M-token context.
+and the few-shot DNA-protein matching result (LucaOne 0.84 vs DNABert2+ESM2 0.73
+([s42256-025-01044-4](../paper-notes/s42256-025-01044-4.md))) is the cleanest evidence in the corpus that joint training
+learns what neither half can learn alone. A step inward sits **Evo 2**, generalist _within_ DNA: 9.3 T base pairs across
+all three domains of life, zero-shot variant scoring, generative as well as discriminative, 1 M-token context.
 
 At the _specialist_ extreme sit the rest. **RiNALMo** bets that ncRNA-only pretraining with diversity-clustered batching
 produces stronger inter-family generalisation than any cross-modal prior. **AlphaGenome** bets that supervised
@@ -69,12 +69,12 @@ homology baselines exactly where homology breaks down.
 
 The empirical evidence is mixed in a clarifying way. LucaOne's discussion explicitly concedes that small specialised
 models occasionally outperform large pretrained ones. RiNALMo beats SpliceBERT (pretrained exclusively on pre-mRNA) on
-splicing despite seeing no mRNA at all ([s41467-025-60872-5](../paper-notes/s41467-025-60872-5.md)). AlphaGenome beats Evo 2 on the regulatory variant subdomain where Evo 2's own
-paper acknowledges trailing ChromBPNet. Bacformer beats fine-tuned Evo on bacterial gene essentiality. **Neither pure
-strategy survives contact with the evidence.** A LucaOne-only registry would underperform on regulatory variants,
-scarce-data protein engineering, bacterial genome analysis, and metagenomic annotation. A pure specialist registry would
-be operationally heavy and would lose LucaOne's cross-modal embedding geometry — the natural anchor for a multi-modality
-biological knowledge graph.
+splicing despite seeing no mRNA at all ([s41467-025-60872-5](../paper-notes/s41467-025-60872-5.md)). AlphaGenome beats
+Evo 2 on the regulatory variant subdomain where Evo 2's own paper acknowledges trailing ChromBPNet. Bacformer beats
+fine-tuned Evo on bacterial gene essentiality. **Neither pure strategy survives contact with the evidence.** A
+LucaOne-only registry would underperform on regulatory variants, scarce-data protein engineering, bacterial genome
+analysis, and metagenomic annotation. A pure specialist registry would be operationally heavy and would lose LucaOne's
+cross-modal embedding geometry — the natural anchor for a multi-modality biological knowledge graph.
 
 The right Phase 7 design is layered: **LucaOne (or an open small embedding model) as the cross-modal default and KG
 anchor; specialists invoked when the task is in their named domain.** The router needs to know which specialists apply
@@ -120,9 +120,10 @@ models out of the box. The exceptions (Evo 2's hyena operators, ProteinReasoner'
 in Phase 7 over Evo 2, where local-inference plumbing is not yet mature.
 
 A second pattern worth naming: RiNALMo's **diversity-clustered batching** (cluster 36 M sequences at 70% identity into
-17 M clusters, sample one per cluster per minibatch ([s41467-025-60872-5](../paper-notes/s41467-025-60872-5.md))) is "data curation as architecture." A few lines of data-loader code
-that produced the inter-family generalisation gain. This is a candidate Linus engineering convention to adopt the moment
-any Linus-trained model has a sequence corpus large enough to benefit.
+17 M clusters, sample one per cluster per minibatch ([s41467-025-60872-5](../paper-notes/s41467-025-60872-5.md))) is
+"data curation as architecture." A few lines of data-loader code that produced the inter-family generalisation gain.
+This is a candidate Linus engineering convention to adopt the moment any Linus-trained model has a sequence corpus large
+enough to benefit.
 
 ### Long context vs resolution
 
@@ -160,11 +161,12 @@ only paper that pretrains on **synthetic data from biophysical simulation** — 
 run through Rosetta to extract 55 biophysical attributes, with the trained encoder predicting those attributes from
 sequence. The motivating argument is mechanistic: protein engineering wants to know what happens at non-natural
 mutations, and natural sequences are silent on that regime by definition. The evidence is the GFP design experiment
-(fine-tune on 64 wet-lab variants, synthesise 20, get 16 functional ([s41592-025-02776-2](../paper-notes/s41592-025-02776-2.md))) and the "29 simulated points ≈ 1 experimental
-point" trade-off heuristic ([s41592-025-02776-2](../paper-notes/s41592-025-02776-2.md)). The pattern generalises beyond proteins — **simulation-pretrained, observation-fine-tuned**
-applies to any Linus domain with scarce real data plus a slower-but-correct simulator (enzyme kinetics, RNA folding,
-docking, spectroscopy). Worth lifting to a named architectural pattern in `docs/syntheses/` once a second clean instance
-lands.
+(fine-tune on 64 wet-lab variants, synthesise 20, get 16 functional
+([s41592-025-02776-2](../paper-notes/s41592-025-02776-2.md))) and the "29 simulated points ≈ 1 experimental point"
+trade-off heuristic ([s41592-025-02776-2](../paper-notes/s41592-025-02776-2.md)). The pattern generalises beyond
+proteins — **simulation-pretrained, observation-fine-tuned** applies to any Linus domain with scarce real data plus a
+slower-but-correct simulator (enzyme kinetics, RNA folding, docking, spectroscopy). Worth lifting to a named
+architectural pattern in `docs/syntheses/` once a second clean instance lands.
 
 ### M1 Max viability: what Dan can actually run, fine-tune, retrain
 
@@ -197,14 +199,22 @@ pathway → disease). **Bacformer phenotype attributions** are weighted gene→t
 annotation cache for 32 traits is itself a candidate ingest. **REBEAN annotations** form a multi-edge graph (read → EC →
 gene → MAG → sample → environment).
 
-The cross-cutting design implication: **KnowledgeBase should expose a typed `model_prediction` edge class** carrying the
-producing model, version, confidence, and content hash. This generalises the
+The cross-cutting design implication: **KnowledgeBase exposes a typed `model_prediction` edge class** carrying the
+producing model, version, confidence, and content hash — committed in DEC-0048. This generalises the
 [LLM wiki synthesis](llm-wiki-synthesis.md)'s claim-typing pattern to model-derived claims: a predicted operon from
-Bacformer is an `[!analysis]` claim with specific provenance, distinct from an `[!source]` claim from a curated
-database. When the model is updated, the content-hash mechanism flags the KG edges that need revalidation. Without this
-discipline, model-derived KG content becomes indistinguishable from curated content within months.
+Bacformer is an `[!unverified]` claim (default per DEC-0048) with specific provenance, distinct from an `[!source]`
+claim from a curated database. Dan may manually upgrade a prediction to `[!analysis]` or `[!source]` after review;
+upgrades are audit-logged. When the model is updated, the content-hash mechanism flags the KG edges that need
+revalidation. The `model_prediction` edge class must be present in the KnowledgeBase schema before any Group A Wave 1
+skills start writing back (Phase 2 spec; Phase 3 implementation).
 
-**OptimusKG** ([2604.27269v1](../paper-notes/2604.27269v1.md)) provides a mature reference for biomedical knowledge-graph design at scale: a unified ontology across 18 sources, 190K+ nodes and 21.8M edges with explicit FAIR principles, evidence grounding, and property-rich metadata. While OptimusKG's full integration is deferred (it covers biomedical-only domains and requires 18+ external ontology harmonization), its medallion architecture (Landing → Bronze → Silver → Gold layers) and provenance-tracking schema are directly reusable patterns for Phase 3's KnowledgeBase integration of Group A model outputs.
+**OptimusKG** ([2604.27269v1](../paper-notes/2604.27269v1.md)) provides a mature reference for biomedical
+knowledge-graph design at scale: a unified ontology across 18 sources, 190K+ nodes and 21.8M edges with explicit FAIR
+principles, evidence grounding, and property-rich metadata. While OptimusKG's full integration is deferred (it covers
+biomedical-only domains and requires 18+ external ontology harmonization), its medallion architecture (Landing → Bronze
+→ Silver → Gold layers) and provenance-tracking schema are directly reusable patterns for Phase 3's KnowledgeBase
+integration of Group A model outputs. The medallion-architecture ingest pattern is the closest external analogue to the
+KB ingest quality surface per DEC-0019.
 
 ---
 
@@ -219,10 +229,10 @@ _better_ than what hosted Claude can do, because Claude cannot run REBEAN on a 5
 Phase 7. Effort: a focused week.
 
 **Skill 2: `linus.bio.bacterial_genome.analyse`** (Bacformer). Natural companion to REBEAN. Operon prediction, gene
-essentiality, KEGG function (188 classes), and 139-trait phenotype inference as zero-shot or fine- tuned heads. Apache
+essentiality, KEGG function (188 classes), and 139-trait phenotype inference as zero-shot or fine-tuned heads. Apache
 2.0 on HuggingFace; custom architecture so MLX needs custom code but the model is small. **Analytical heads only
-initially**; defer the generative head behind explicit per-call confirmation pending a SAFETY.md update — the authors
-flag the dual-use surface themselves.
+initially**; the generative head is Tier B under the DEC-0047 biosecurity policy (explicit Dan sign-off per invocation,
+audit-logged) — the authors flag the dual-use surface themselves and the three-tier policy is already in SAFETY.md.
 
 **Skill 3: `linus.bio.rna.predict_structure`** (RiNALMo). 650 M params, public Zenodo weights, modern recipe so MLX
 conversion is straightforward, strongest published inter-family generalisation in the RNA-LM literature. Surface the
@@ -310,22 +320,27 @@ _Sub-question:_ is the hybrid worth the operational cost, or is the right Phase 
 scoring, Evo 2 as a separate generative DNA skill," with no internal routing?
 
 **Should the tool registry have an `external_api_tool` class for non-locally-deployable models?** AlphaGenome's hybrid
-release is the motivating case; Evo 2 40B is the second. Explicit auth, rate-limiting, cost accounting, graceful offline
-fallback, trust-tier tagging — recommend an ADR.
+release is the motivating case; Evo 2 40B is the second. _Resolved (DEC-0046, see
+[answered-questions.md](../questions/answered-questions.md)): a `deployment` field (`"local" | "mcp" | "external_api"`)
+is now in the registry schema; Phase 2a activates the local and MCP variants; `external_api` execution path is deferred
+to Phase 7._
 
 **Is METL's simulation-pretrained pattern worth applying to other Linus domains now, or wait for a second instance?**
 Recommend waiting; this synthesis is the placeholder. The risk of premature naming is generalising from a single case.
 
-**Is a focused "Evo 2 + Wave 3 generative phage" mini-synthesis worth writing?** The Evo 2 paper-note flags an explicit
-downstream application (bioRxiv 2025.09.12.675911v1) using Evo 1/2 as backbone. The pairing would land at "what does a
-private generative-biology workflow look like in Linus" and would force a sharp answer to the local-vs-remote-Evo-2
-question. **Recommend yes**, 1500–2000 words, scheduled as Wave 3 prep.
+**Is a focused "Evo 2 + Wave 3 generative phage" mini-synthesis worth writing?** A full paper note now exists for the
+phage genome design paper ([2025.09.12.675911v1](../paper-notes/2025.09.12.675911v1.md)) — the first experimental
+demonstration that a genome LM can design viable whole-genome phages using Evo 1/2 as backbone. The pipeline (pretrained
+FM → family-scoped SFT → template prompt → inference-time constraint scoring → wet-lab validation) is the canonical
+generative-biology archetype. The pairing (Evo 2 foundation model + phage design downstream application) would land at
+"what does a private generative-biology workflow look like in Linus" and would force a sharp answer to the
+local-vs-remote-Evo-2 question. **Recommend yes**, 1500–2000 words, tracked as R2-57 (Tier 3, top-questions.md).
 
 **Faithfulness of model-derived KG content.** Group A is the first Wave 1 batch where the volume of model-derived KG
-content is large enough to make claim-typing load-bearing. _Sub-question:_ does the KnowledgeBase schema need a
-`model_prediction` edge class with explicit producing-model
-
-- version + confidence + content-hash provenance before Group A skills start writing back? Recommend yes.
+content is large enough to make claim-typing load-bearing. _Resolved (DEC-0048, see
+[answered-questions.md](../questions/answered-questions.md)): the `model_prediction` edge class with producing-model +
+version + confidence + content-hash provenance is committed to the KnowledgeBase schema; must be present before any
+Group A Wave 1 skills start writing back._
 
 **ProteinReasoner checkpoint release** — worth a low-priority watch on BioMap GitHub and the `airkingbd` HuggingFace
 org.
@@ -360,11 +375,18 @@ and output interpretation. **Group A is the concrete realisation of that boundar
 whether the novel-enzyme candidates are biologically plausible. AlphaGenome predicts mechanism; Dan judges whether it's
 consistent with the patient phenotype. This is the moat in operation.
 
-This synthesis should produce edits to `paper-landscape.md` (a Group A cluster entry), `synthesis-landscape.md` (the
-headline claim as a quick- reference row), and `total-landscape.md` (the four Phase 7 skill priorities, the Phase 4
-OpenGenome2/AlphaGenome benchmark mirrors, the METL Phase 6 fine-tuning exemplar, the REMME full pretraining target).
-The Wave 3 Evo 2 + generative phage mini-synthesis goes onto the synthesis backlog; the open questions go into
-`top-questions.md`.
+The closest cross-synthesis neighbor is [function-annotation-discovery](function-annotation-discovery-synthesis.md):
+BioReason-Pro (typed-profile CoT over a multi-model pipeline) and ProteinReasoner (typed-profile intermediate within a
+single PLM) bracket the "make-a-biological-FM-reason" design space, and the encoder-swap experiment (R2-58) is the
+concrete Phase 7 comparison between this synthesis's Group A foundation models and that synthesis's
+reasoning-architecture poles.
+
+This synthesis feeds `synthesis-landscape.md` (the headline claim as a quick-reference row) and `total-landscape.md`
+(the four Phase 7 skill priorities, the Phase 4 OpenGenome2/AlphaGenome benchmark mirrors, the METL Phase 6 fine-tuning
+exemplar, the REMME full pretraining target). The `paper-landscape.md` pointer is deprecated; per-paper navigation lives
+in [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md). The Wave 3 Evo 2 + generative phage mini-synthesis is tracked
+as R2-57 in `top-questions.md`; the phage paper note ([2025.09.12.675911v1](../paper-notes/2025.09.12.675911v1.md)) is
+already written and tagged to this synthesis.
 
 ---
 
@@ -389,14 +411,22 @@ The eight Group A paper notes (all in [`docs/paper-notes/`](../paper-notes/)):
 - [gkaf836](../paper-notes/gkaf836.md) — Prabakaran & Bromberg, _Deciphering enzymatic potential in metagenomic reads
   through DNA language models_ (REMME/REBEAN, _Nucleic Acids Research_ 2025).
 
+One directly adjacent paper note now tagged to this synthesis (not a core input but the natural Wave 3 companion):
+
+- [2025.09.12.675911v1](../paper-notes/2025.09.12.675911v1.md) — King et al., _Generative design of novel bacteriophages
+  with genome language models_ (bioRxiv 2025) — first experimental demonstration that a genome LM can design viable
+  whole-phage genomes; uses Evo 1/2 as backbone; see R2-57 in `top-questions.md`.
+
 Cross-references that were load-bearing: [memory-synthesis.md](memory-synthesis.md),
 [skills-and-practices-synthesis.md](skills-and-practices-synthesis.md), [llm-wiki-synthesis.md](llm-wiki-synthesis.md),
+[generative-biology-synthesis.md](generative-biology-synthesis.md),
 [synthesis-landscape.md](../landscapes/synthesis-landscape.md).
 
 ---
 
-_This synthesis is the input to the next round of edits to [paper-landscape.md](../landscapes/paper-landscape.md),
-[synthesis-landscape.md](../landscapes/synthesis-landscape.md), [total-landscape.md](../landscapes/total-landscape.md),
-and the Phase 6 / 7 spec backlog. It should be revisited when ProteinReasoner checkpoints appear, when the AlphaGenome
-and Evo 2 7B local-deployability spikes land, when the Wave 3 Evo 2 + generative phage mini-synthesis is written, and
-when any new Group A paper enters `context/papers/`._
+_This synthesis feeds [synthesis-landscape.md](../landscapes/synthesis-landscape.md) and
+[total-landscape.md](../landscapes/total-landscape.md) and the Phase 6/7 spec backlog. The `paper-landscape.md` pointer
+is deprecated; paper-level navigation lives in [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md). Revisit when:
+ProteinReasoner checkpoints appear on BioMap GitHub / `airkingbd` HF (passive watch per S52); the AlphaGenome and Evo 2
+7B local-deployability spikes land; the Wave 3 Evo 2 + generative phage mini-synthesis (R2-57) is written; any new Group
+A paper enters `context/papers/`. Updated 2026-05-08._
