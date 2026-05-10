@@ -99,6 +99,30 @@ Ternary-Bonsai checkpoint large enough to exceed RAM does not yet exist on Apple
 target (per the Crossing 2 resolution), but it is not available today and should not be planned around for any Phase 1
 or Phase 2 deliverable.
 
+**Inference framework convergence corroborates DEC-0036 and signals an MLX-backend trajectory worth tracking (Canteen
+Theme C).** An external practitioner survey of the major LLM inference servers — Ollama, SGLang, TensorRT, Triton,
+vLLM, and llama.cpp — reports a shared optimization trajectory across the field. As Canteen summarizes it: _"The
+KV-cache trajectory is consistent across frameworks: PagedAttention was the breakthrough, RadixAttention added prefix
+sharing, HiCache adds hierarchical storage with CPU offloading."_ and _"Quantization is moving from INT4 (common for
+local) through FP8 (TensorRT, SGLang, vLLM) to MXFP formats as the next generation." — Canteen, Inference Serving
+Landscape, 2026-01-03_
+([Canteen, _Inference Serving Landscape_, 2026-01-03](../../../context/notes/canteen_blog_landscape_2026-05.md)). The
+first observation is direct corroboration of DEC-0036 (KV-cache continuity as an architectural constraint): every
+serious serving framework now treats the KV cache as load-bearing and is iterating on its memory layout rather than
+treating it as an implementation detail. Specifically, HiCache's hierarchical KV with CPU offload is the same
+conceptual pattern — active state in fast memory, overflow to slow memory, prefetch the working set — that the Phase
+6d weight-streaming target generalizes from KV state to model weights. The pattern is identical; the storage tier and
+the substrate are different. The second observation, on quantization formats, is forward-looking: INT4 dominates the
+local-inference tier today (BitNet/Bonsai 1-bit notwithstanding), FP8 is becoming the default for hosted serving, and
+MXFP is the next step. Linus's commitment to native-low-bit (1-bit ternary) inference on Apple Silicon does not
+change, but the cluster should track FP8/MXFP support in MLX and pmetal as those formats mature. The Canteen survey
+also notes that **MLX backends are appearing as development branches across major frameworks** (vLLM, SGLang, and
+adjacent projects). This is a relevant tracking signal for DEC-0049 (pmetal vs PrismML fork decision deferred to Phase
+1b): if MLX backends in the major frameworks mature into production-grade Apple Silicon support, that path may
+eventually obsolete pmetal as the primary inference candidate. The question is not active for Phase 1b, but it should
+be revisited at every Phase 1 close — the relative maturity gap between pmetal and MLX-backed mainline frameworks is
+the metric that determines whether DEC-0049 stays settled or reopens.
+
 ---
 
 ## Patterns and modules worth lifting
