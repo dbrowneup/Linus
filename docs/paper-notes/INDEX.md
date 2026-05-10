@@ -97,6 +97,8 @@ only at the per-paper-note + landscape level for now.
 | [`2511.09057v3`](../paper-notes/2511.09057v3.md) | PAN: A World Model for General, Interactable, and Long-Horizon Worl… | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2511.20099v4`](../paper-notes/2511.20099v4.md) | QiMeng-CRUX: Narrowing the Gap Between Natural Language and Verilog… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2511.20100v1`](../paper-notes/2511.20100v1.md) | QiMeng-Kernel: Macro-Thinking Micro-Coding Paradigm for LLM-Based H… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
+| [`2602.15922v1`](../paper-notes/2602.15922v1.md) | DreamZero: World Action Models are Zero-shot Policies | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
+| [`2602.16710v1`](../paper-notes/2602.16710v1.md) | EgoScale: Scaling Dexterous Manipulation with Diverse Egocentric H… | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2602.16800v2`](../paper-notes/2602.16800v2.md) | Large-scale online deanonymization with LLMs | [safety-alignment-privacy](../syntheses/safety-alignment-privacy-synthesis.md) |
 | [`2602.18308v2`](../paper-notes/2602.18308v2.md) | JPmHC — Dynamical Isometry via Orthogonal Hyper-Connections | _Uncovered_ |
 | [`2603.24629v1`](../paper-notes/2603.24629v1.md) | Sketch2Simulation: Automating Flowsheet Generation via Multi-Agent … | [agentic-systems](../syntheses/agentic-systems-synthesis.md) |
