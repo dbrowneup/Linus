@@ -501,12 +501,36 @@ cross-thread reference exemplar. The cluster synthesis treats the discipline at 
 patterns, verification-surface comparisons, repo-level integration verdicts); this thematic synthesis treats it as the
 load-bearing pattern Linus should generalize across domains.
 
+**Robotics as a third physical-realization arm of the idea→reality spine.** The two arms this synthesis treats as
+primary — QiMeng's LLM→hardware-description-language→fabricated-chip path and Sketch2Simulation's
+LLM→flowsheet→process-engineer path — share a spine with a third arm that lives outside this synthesis's primary scope:
+robotics, where a video-or-VLM-derived action policy emits motor commands that a robot's physical hardware realizes as
+task completion. The 2026-02-19 NVIDIA GEAR Lab paper drop —
+[DreamZero](../paper-notes/2602.15922v1.md) (a 14B autoregressive flow-matching DiT that doubles VLA zero-shot
+generalization on bimanual manipulation) and [EgoScale](../paper-notes/2602.16710v1.md) (a flow-matching VLA trained on
+20,854 hours of egocentric human video, with a clean log-linear data-scale-vs-loss law) — are the watch-the-field
+exemplars. Both inherit from the [WHAM](../paper-notes/s41586-025-08600-3.md) world-action-model lineage anchored in
+[infra-foundations](infra-foundations-synthesis.md), and both are Phase 7/8 watch-only for Linus rather than directly
+liftable: the GB200/H100 hardware floor (NVFP4 quantization Blackwell-specific, `flash-attn` with no Metal backend, 14B
+at fp16 leaving no activation headroom on M1 Max) closes the door on near-term deployment, and Dan does not currently
+operate any robotic embodiment. The reason the cross-thread is worth naming anyway is structural: the idea→reality
+discipline this synthesis canonicalizes — planner emits structured intermediate, coder emits artifact, verifier
+provides oracle, downstream non-LLM actor realizes the artifact as physical reality — is the same shape regardless of
+whether the downstream actor is a fab tool, a process simulator, or a robot. If Linus's Phase 7+ scope ever opens an
+embodied-actor or lab-instrument-automation lane (a 3D printer, a microscope stage, a manipulator, benchtop biotech
+instrumentation), the world-action-model paradigm is currently the strongest empirical evidence for the right
+architecture to get there, and the planner/coder/verifier discipline this synthesis develops is what would carry over.
+
 **Cross-thread links.**
 
 - [native-low-bit-apple-silicon-synthesis](native-low-bit-apple-silicon-synthesis.md) — the Apple Silicon kernel-codegen
   relevance is direct: any Phase 6d Linus-internal MTMC-style pipeline targeting Metal / MLX kernels is the same
   hardware-bound discipline, and the Kimi-K2 / Bonsai / flash-MoE work shape the Phase 6d streaming target this
   synthesis points at.
+- [infra-foundations-synthesis](infra-foundations-synthesis.md) — the WHAM / DreamZero / EgoScale world-action-models
+  sub-thread is the robotics arm of the idea→reality spine this synthesis canonicalizes; cross-thread is watch-only
+  while the GB200/H100 hardware floor holds, but the discipline (planner / coder / verifier with downstream
+  physical-actor) is shared.
 - [agentic-systems-synthesis](agentic-systems-synthesis.md) — the Sketch2Simulation cross-thread fold-in. The
   multi-agent decomposition and execution-fix-loop patterns are first surfaced there; this synthesis extends them to
   the idea-to-reality lens.
