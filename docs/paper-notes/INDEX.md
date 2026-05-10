@@ -24,9 +24,9 @@ only at the per-paper-note + landscape level for now.
 
 | Paper note | Title | Thematic syntheses |
 | --- | --- | --- |
-| [`0549`](../paper-notes/0549.md) | Automated Superscalar Processor Design by Learning Data Dependencies | _Pending llm-hardware-design_ |
+| [`0549`](../paper-notes/0549.md) | Automated Superscalar Processor Design by Learning Data Dependencies | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`1-s2.0-S0022283626000513-main`](../paper-notes/1-s2.0-S0022283626000513-main.md) | mCSM-metal: A Deep Learning Resource to Predict Effect of Mutations… | [generative-biology](../syntheses/generative-biology-synthesis.md) |
-| [`13337-ZhouQ`](../paper-notes/13337-ZhouQ.md) | QiMeng-GEMM: Automatically Generating High-Performance Matrix Multi… | _Pending llm-hardware-design_ |
+| [`13337-ZhouQ`](../paper-notes/13337-ZhouQ.md) | QiMeng-GEMM: Automatically Generating High-Performance Matrix Multi… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`1910.07467`](../paper-notes/1910.07467.md) | Root Mean Square Layer Normalization | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2002.05202`](../paper-notes/2002.05202.md) | GLU Variants Improve Transformer | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2003.02320v6`](../paper-notes/2003.02320v6.md) | Knowledge Graphs | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
@@ -51,7 +51,7 @@ only at the per-paper-note + landscape level for now.
 | [`2305.13245`](../paper-notes/2305.13245.md) | GQA: Training Generalized Multi-Query Transformer Models from Multi-… | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2305.15408v5`](../paper-notes/2305.15408v5.md) | Towards Revealing the Mystery behind Chain of Thought: A Theoretica… | [memory](../syntheses/memory-synthesis.md) |
 | [`2306.03809v1`](../paper-notes/2306.03809v1.md) | Can large language models democratize access to dual-use biotechnol… | [generative-biology](../syntheses/generative-biology-synthesis.md), [llms-in-science](../syntheses/llms-in-science-synthesis.md), [safety-alignment-privacy](../syntheses/safety-alignment-privacy-synthesis.md) |
-| [`2306.12456v2`](../paper-notes/2306.12456v2.md) | Pushing the Limits of Machine Design: Automated CPU Design with AI | _Pending llm-hardware-design_ |
+| [`2306.12456v2`](../paper-notes/2306.12456v2.md) | Pushing the Limits of Machine Design: Automated CPU Design with AI | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2310.07923v5`](../paper-notes/2310.07923v5.md) | The Expressive Power of Transformers with Chain of Thought | [memory](../syntheses/memory-synthesis.md) |
 | [`2310.11453v1`](../paper-notes/2310.11453v1.md) | BitNet — Scaling 1-bit Transformers for Large Language Models | [infra-foundations](../syntheses/infra-foundations-synthesis.md), [native-low-bit-apple-silicon](../syntheses/native-low-bit-apple-silicon-synthesis.md) |
 | [`2311.12351`](../paper-notes/2311.12351.md) | Advancing Transformer Architecture in Long-Context LLMs: A Comprehe… | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
@@ -61,7 +61,7 @@ only at the per-paper-note + landscape level for now.
 | [`2402.17764v1`](../paper-notes/2402.17764v1.md) | The Era of 1-bit LLMs — All Large Language Models are in 1.58 Bits | [native-low-bit-apple-silicon](../syntheses/native-low-bit-apple-silicon-synthesis.md) |
 | [`2406.17557v2`](../paper-notes/2406.17557v2.md) | The FineWeb Datasets — Decanting the Web for the Finest Text Data… | _Uncovered_ |
 | [`2407.10362v3`](../paper-notes/2407.10362v3.md) | LAB-Bench: Measuring Capabilities of Language Models for Biology Re… | [function-annotation-discovery](../syntheses/function-annotation-discovery-synthesis.md) |
-| [`2407.10424v5`](../paper-notes/2407.10424v5.md) | CodeV: Empowering LLMs for Verilog Generation through Multi-Level S… | _Pending llm-hardware-design_ |
+| [`2407.10424v5`](../paper-notes/2407.10424v5.md) | CodeV: Empowering LLMs for Verilog Generation through Multi-Level S… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2407.21783v3`](../paper-notes/2407.21783v3.md) | The Llama 3 Herd of Models | [infra-foundations](../syntheses/infra-foundations-synthesis.md), [memory](../syntheses/memory-synthesis.md) |
 | [`2408.08073v2`](../paper-notes/2408.08073v2.md) | Extracting Sentence Embeddings from Pretrained Transformer Models | _Uncovered_ |
 | [`2410.01201v3`](../paper-notes/2410.01201v3.md) | Were RNNs All We Needed? | [memory](../syntheses/memory-synthesis.md) |
@@ -79,31 +79,31 @@ only at the per-paper-note + landscape level for now.
 | [`2503.19065v1`](../paper-notes/2503.19065v1.md) | WikiAutoGen: Towards Multi-Modal Wikipedia-Style Article Generation | [agentic-systems](../syntheses/agentic-systems-synthesis.md) |
 | [`2504.12285v2`](../paper-notes/2504.12285v2.md) | BitNet b1.58 2B4T Technical Report | [native-low-bit-apple-silicon](../syntheses/native-low-bit-apple-silicon-synthesis.md) |
 | [`2504.18415v2`](../paper-notes/2504.18415v2.md) | BitNet v2 — Native 4-bit Activations with Hadamard Transformation… | [native-low-bit-apple-silicon](../syntheses/native-low-bit-apple-silicon-synthesis.md) |
-| [`2505.06302v1`](../paper-notes/2505.06302v1.md) | QiMeng-TensorOp: Automatically Generating High-Performance Tensor O… | _Pending llm-hardware-design_ |
+| [`2505.06302v1`](../paper-notes/2505.06302v1.md) | QiMeng-TensorOp: Automatically Generating High-Performance Tensor O… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2505.23579v2`](../paper-notes/2505.23579v2.md) | BioReason: Incentivizing Multimodal Biological Reasoning within a D… | [function-annotation-discovery](../syntheses/function-annotation-discovery-synthesis.md) |
-| [`2505.24183v5`](../paper-notes/2505.24183v5.md) | QiMeng-CodeV-R1: Reasoning-Enhanced Verilog Generation | _Pending llm-hardware-design_ |
+| [`2505.24183v5`](../paper-notes/2505.24183v5.md) | QiMeng-CodeV-R1: Reasoning-Enhanced Verilog Generation | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2506.02070v3`](../paper-notes/2506.02070v3.md) | An Introduction to Flow Matching and Diffusion Models | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
-| [`2506.05007v1`](../paper-notes/2506.05007v1.md) | QiMeng: Fully Automated Hardware and Software Design for Processor … | _Pending llm-hardware-design_ |
-| [`2506.11153v2`](../paper-notes/2506.11153v2.md) | QiMeng-MuPa: Mutual-Supervised Learning for Sequential-to-Parallel … | _Pending llm-hardware-design_ |
-| [`2506.12355v1`](../paper-notes/2506.12355v1.md) | QiMeng-Attention: SOTA Attention Operator is generated by SOTA Atte… | _Pending llm-hardware-design_ |
+| [`2506.05007v1`](../paper-notes/2506.05007v1.md) | QiMeng: Fully Automated Hardware and Software Design for Processor … | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
+| [`2506.11153v2`](../paper-notes/2506.11153v2.md) | QiMeng-MuPa: Mutual-Supervised Learning for Sequential-to-Parallel … | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
+| [`2506.12355v1`](../paper-notes/2506.12355v1.md) | QiMeng-Attention: SOTA Attention Operator is generated by SOTA Atte… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2506.13023v1`](../paper-notes/2506.13023v1.md) | A Practical Guide for Evaluating LLMs and LLM-Reliant Systems | [agentic-systems](../syntheses/agentic-systems-synthesis.md), [function-annotation-discovery](../syntheses/function-annotation-discovery-synthesis.md), [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2508.09834`](../paper-notes/2508.09834.md) | Speed Always Wins: A Survey on Efficient Architectures for Large La… | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2508.15734v1`](../paper-notes/2508.15734v1.md) | Measuring the environmental impact of delivering AI at Google Scale | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`2509.09995v3`](../paper-notes/2509.09995v3.md) | QuantAgent: Price-Driven Multi-Agent LLMs for High-Frequency Trading | [agentic-systems](../syntheses/agentic-systems-synthesis.md) |
 | [`2510.09244v1`](../paper-notes/2510.09244v1.md) | Fundamentals of Building Autonomous LLM Agents | [agentic-systems](../syntheses/agentic-systems-synthesis.md) |
 | [`2510.13998v1`](../paper-notes/2510.13998v1.md) | BitNet Distillation | [native-low-bit-apple-silicon](../syntheses/native-low-bit-apple-silicon-synthesis.md) |
-| [`2510.19296v4`](../paper-notes/2510.19296v4.md) | QiMeng-SALV: Signal-Aware Learning for Verilog Code Generation | _Pending llm-hardware-design_ |
+| [`2510.19296v4`](../paper-notes/2510.19296v4.md) | QiMeng-SALV: Signal-Aware Learning for Verilog Code Generation | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2511.02824v2`](../paper-notes/2511.02824v2.md) | Kosmos: An AI Scientist for Autonomous Discovery | [agentic-systems](../syntheses/agentic-systems-synthesis.md), [function-annotation-discovery](../syntheses/function-annotation-discovery-synthesis.md) |
 | [`2511.09057v3`](../paper-notes/2511.09057v3.md) | PAN: A World Model for General, Interactable, and Long-Horizon Worl… | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
-| [`2511.20099v4`](../paper-notes/2511.20099v4.md) | QiMeng-CRUX: Narrowing the Gap Between Natural Language and Verilog… | _Pending llm-hardware-design_ |
-| [`2511.20100v1`](../paper-notes/2511.20100v1.md) | QiMeng-Kernel: Macro-Thinking Micro-Coding Paradigm for LLM-Based H… | _Pending llm-hardware-design_ |
+| [`2511.20099v4`](../paper-notes/2511.20099v4.md) | QiMeng-CRUX: Narrowing the Gap Between Natural Language and Verilog… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
+| [`2511.20100v1`](../paper-notes/2511.20100v1.md) | QiMeng-Kernel: Macro-Thinking Micro-Coding Paradigm for LLM-Based H… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`2602.16800v2`](../paper-notes/2602.16800v2.md) | Large-scale online deanonymization with LLMs | [safety-alignment-privacy](../syntheses/safety-alignment-privacy-synthesis.md) |
 | [`2602.18308v2`](../paper-notes/2602.18308v2.md) | JPmHC — Dynamical Isometry via Orthogonal Hyper-Connections | _Uncovered_ |
 | [`2603.24629v1`](../paper-notes/2603.24629v1.md) | Sketch2Simulation: Automating Flowsheet Generation via Multi-Agent … | [agentic-systems](../syntheses/agentic-systems-synthesis.md) |
 | [`2604.05181v1`](../paper-notes/2604.05181v1.md) | General Multimodal Protein Design Enables DNA-Encoding of Chemistry | [generative-biology](../syntheses/generative-biology-synthesis.md) |
 | [`2604.27269v1`](../paper-notes/2604.27269v1.md) | OptimusKG: Unifying biomedical knowledge in a modern multimodal graph | [biological-foundation-models](../syntheses/biological-foundation-models-synthesis.md) |
-| [`3696443.3708931`](../paper-notes/3696443.3708931.md) | VEGA: Automatically Generating Compiler Backends using a Pre-traine… | _Pending llm-hardware-design_ |
-| [`9546_AutoOS_Make_Your_OS_More_`](../paper-notes/9546_AutoOS_Make_Your_OS_More_.md) | AutoOS: Make Your OS More Powerful by Exploiting Large Language Mod… | _Pending llm-hardware-design_ |
+| [`3696443.3708931`](../paper-notes/3696443.3708931.md) | VEGA: Automatically Generating Compiler Backends using a Pre-traine… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
+| [`9546_AutoOS_Make_Your_OS_More_`](../paper-notes/9546_AutoOS_Make_Your_OS_More_.md) | AutoOS: Make Your OS More Powerful by Exploiting Large Language Mod… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`bandaru_transformer_design_guide_pt2_modern_architecture`](../paper-notes/bandaru_transformer_design_guide_pt2_modern_architecture.md) | Transformer Design Guide (Part 2: Modern Architecture) | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`binz-et-al-2025-how-should-the-advancement-of-large-language-models-affect-the-practice-of-science`](../paper-notes/binz-et-al-2025-how-should-the-advancement-of-large-language-models-affect-the-practice-of-science.md) | How should the advancement of large language models affect the prac… | [llms-in-science](../syntheses/llms-in-science-synthesis.md) |
 | [`bonsai-1-bit-8b-whitepaper`](../paper-notes/bonsai-1-bit-8b-whitepaper.md) | 1-bit Bonsai 8B: End-to-end 1-bit language model deployment across … | [native-low-bit-apple-silicon](../syntheses/native-low-bit-apple-silicon-synthesis.md) |
@@ -119,7 +119,7 @@ only at the per-paper-note + landscape level for now.
 | [`mughal_context_window_management`](../paper-notes/mughal_context_window_management.md) | Why Claude Gets Dumber the Longer Your Session Runs (and the Exact… | [infra-foundations](../syntheses/infra-foundations-synthesis.md), [memory](../syntheses/memory-synthesis.md) |
 | [`nihms-2096004`](../paper-notes/nihms-2096004.md) | The brain works at more than 10 bits per second | [humans-teams-performance](../syntheses/humans-teams-performance-synthesis.md) |
 | [`NIPS-2017-attention-is-all-you-need-Paper`](../paper-notes/NIPS-2017-attention-is-all-you-need-Paper.md) | Attention Is All You Need | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
-| [`osdi25-dong`](../paper-notes/osdi25-dong.md) | QiMeng-Xpiler: Transcompiling Tensor Programs for Deep Learning Sys… | _Pending llm-hardware-design_ |
+| [`osdi25-dong`](../paper-notes/osdi25-dong.md) | QiMeng-Xpiler: Transcompiling Tensor Programs for Deep Learning Sys… | [llm-hardware-design](../syntheses/llm-hardware-design-synthesis.md) |
 | [`PIIS0896627324008080`](../paper-notes/PIIS0896627324008080.md) | The unbearable slowness of being: Why do we live at 10 bits/s? | [humans-teams-performance](../syntheses/humans-teams-performance-synthesis.md) |
 | [`raschka_2025_big_llm_architecture_comparison`](../paper-notes/raschka_2025_big_llm_architecture_comparison.md) | The Big LLM Architecture Comparison: From DeepSeek V3 to GLM-5 | [infra-foundations](../syntheses/infra-foundations-synthesis.md) |
 | [`rocks-et-al-2026-dual-encoder-contrastive-learning-accelerates-enzyme-discovery`](../paper-notes/rocks-et-al-2026-dual-encoder-contrastive-learning-accelerates-enzyme-discovery.md) | Dual-encoder contrastive learning accelerates enzyme discovery | [function-annotation-discovery](../syntheses/function-annotation-discovery-synthesis.md) |
