@@ -264,6 +264,91 @@ current LanzaTech enterprise-LLM-infrastructure role as credibility.
 
 ---
 
+## The Canteen / Agora signal — first commercial-surface inbound (added 2026-05-10)
+
+On 2026-05-09, the first concrete commercial-surface inbound arrived. A cold email from "Alan Hernandez" at Canteen — an
+NYC-based research and technology firm at the crypto / AI / payments intersection — landed in Dan's inbox, sourced
+almost certainly through the public GitHub stars graph (TradingAgents and adjacent agentic-finance repos publicly
+starred by `dbrowneup`). The pitch: a virtual, invite-only hackathon called the **Agora Agents Hackathon**, May 11–25,
+2026, $50K total prize pool ($10K top + 2× $7.5K + 3× $5K + standout teams), sponsored by Circle (the USDC issuer) and
+Arc (Circle's stablecoin-native L1). Provenance and full email-thread record live in
+[`context/notes/canteen_outreach_2026-05.md`](../../context/notes/canteen_outreach_2026-05.md); the supporting
+practitioner-claim corpus from Canteen's six published blog posts is in
+[`context/notes/canteen_blog_landscape_2026-05.md`](../../context/notes/canteen_blog_landscape_2026-05.md).
+
+The signal matters for this synthesis for a reason that goes beyond "a hackathon happened." Linus is private; only the
+public stars graph and Dan's OSS contributions were visible to the sourcer. That a sourcing pipeline keyed on
+"TradingAgents adjacency + agentic-systems repo activity" produced this email is itself a calibration: the public
+surface that Dan curates with no commercial intent is already legible enough to attract substantive inbound from people
+building agent-native commercial infrastructure. The substance of the cold email — four concrete RFB (Request-for-
+Builder) ideas, all internally coherent, all citing real research — and the technical depth of the corroborating blog
+corpus (six posts on x402, Tempo, inference serving, the AI agent landscape, multi-agent systems, prediction markets,
+all consistent with independently verifiable references) make this the first commercial-surface event Linus has had to
+process where the operational question is not "is this real?" but "what posture does it imply?"
+
+The posture established: **register, build a public satellite repo (NOT a fork of the Linus tree), commit at
+evenings-and-weekends scope, and treat the hackathon as a forcing function for the Phase 2 orchestration MVP.** The
+satellite consumes Linus services through the future OpenAI-compatible endpoint (DEC-0005) once Phase 2 ships; until
+then it calls Ollama directly. This is the architectural commitment that matters: the satellite respects the front-end /
+orchestration-layer split (DEC-0002) by acting as another front-end against the same backend, rather than becoming a
+divergent fork. If the satellite ships and the architecture works, it is the first external validation that the
+OpenAI-compatible substrate is the right interface contract for Linus's downstream surface — exactly the
+"build-then-validate" arrow ordering the whiteboard pipeline insists on. If it does not ship, the work was its own
+reward and the exposure to Arc, agent-payments, and the prediction-market builder community is the actual prize the $50K
+is a proxy for.
+
+The four RFB ideas in the cold email are commercial-substrate evidence regardless of which (if any) is pursued: **(i)
+reasoning-traces-as-product** — Trading-R1 (Wang et al. 2025, Tauric Research; the same-lab follow-on to TradingAgents
+already in the corpus, see [`docs/paper-notes/2412.20138v7.md`](../paper-notes/2412.20138v7.md) for the trajectory note)
+full reasoning trace hashed and pinned to IPFS/Arc, supporting bets on which reasoning patterns converge to profit;
+**(ii) Hyperliquid Whale Index** — Arc-native ERC-20 with auto-rebalancing exposure across Hyperliquid forks based on
+top-trader migration; **(iii) slash-bonded copy-trading** — USDC performance bond on Arc read by oracle against
+leaderboard rank, slash schedule directly encoding the empirical decay function; and **(iv) translation-as-alpha** — the
+most thematically aligned with Linus's own thesis. The translation argument: each TradingAgents fork added different
+locale-specific data brokers (TradingAgents-CN added Tushare; AlpacaTradingAgent added Coindesk + DeFiLlama + Reddit)
+but the framework is interchangeable; the structural translation work — turning a non-English macro event into a
+well-formed prediction-market question — is the actual scarce resource. This is the same translation-as-moat observation
+that the Canteen blog landscape note flags as having a direct analog in Dan's bilingual scientific-corpus work and the
+broader KB-as-knowledge-graph thesis. RFB selection is deferred until kickoff on May 11; the four ideas are starting
+points, not commitments.
+
+The protocol intersection that earns durable attention here is **x402**. x402 is Coinbase's HTTP-402 payment protocol
+for pay-per-API-call agent surfaces; the v2 release ships a modular `@x402/*` package family (separating `@x402/core`
+spec from pluggable EVM/SVM settlement backends), and **`@x402/mcp` is on the roadmap as a TODO**. Linus's existing MCP
+commitment (DEC-0018, DEC-0045) means that when `@x402/mcp` ships a stable spec, the substrate Linus already speaks is
+the substrate `@x402/mcp` will eventually use. This is not a hypothetical alignment — it is the canonical
+agent-monetization-via-MCP integration point, signaled but not yet shipped. The right move is to surface it as an ADR
+seed now and re-evaluate when the package stabilizes, rather than wait for the question to become urgent. _Seed:
+DEC-NNNN agent-monetization-via-x402-mcp_ — to be promoted to a real ADR slot when `@x402/mcp` ships a stable spec or
+when a concrete commercial-surface decision forces the question. Until then it lives as a tracked-but-deferred seed in
+the entrepreneurship thread.
+
+The substrate shift this thread enables is the most generalizable artifact of the Canteen exchange. Canteen's
+_Unbundling the Prediction Market Stack_ post (2026-05-01) decomposes the prediction-market stack into three
+independently replaceable layers: **Agent** (the LLM-driven framework that emits structured decisions with persistent
+logs), **Identity** (cryptographic primitives — `bytes32` builder codes in Polymarket V2, Hyperliquid HIP-3, Pump.fun
+fee-recipient — that attribute flow to the originating agent), and **Venue** (the operator-mediated matching surface
+that replaces bilateral signed orders). The decomposition matured simultaneously in early 2026 and became visible when
+Polymarket and Pump.fun shipped breaking protocol upgrades within hours of each other on 2026-04-28. The framing
+generalizes well beyond crypto: any future Linus surface that emits attributable agent decisions — paper-qa research
+output, bioinformatics skill output, KB write-back, authored manuscript drafts — faces the same three-layer question.
+Who reasoned (Agent)? Who can prove they did the reasoning (Identity)? Where does the result get matched or consumed
+(Venue)? For the literature-intelligence offering that this synthesis already names as Linus's first plausible
+commercial surface, the three layers map cleanly: paper-qa + bioSkills as the Agent layer; citation-grounded reasoning
+traces with author attribution as the Identity layer (the "scratchpad is durable" discipline of DEC-0030 is already the
+internal version of this); and the client engagement — biotech competitive-intelligence team, regulatory submission,
+peer-review preparation — as the Venue layer. The Identity-layer point is the load-bearing one: reasoning traces are
+auditable artifacts, and a productized offering's defensibility depends on the trace being attributable to a specific
+agent run with a specific corpus and a specific set of skills invoked. This is the abstraction worth preserving from the
+prediction-market thread, independent of any crypto pivot.
+
+The Tier-1 and Tier-2 repo candidates flagged in the Canteen blog landscape note (Letta, rig, AutoGen, LangGraph, x402,
+Goose, debate-or-vote, MiroFish-Offline) are pending clones — a separate decision tracked under the curation protocol,
+not folded in here. The Canteen blog corpus is a stable snapshot; its themes can be batched into the existing
+synthesis-update spec convention rather than handled one at a time.
+
+---
+
 ## What this synthesis intentionally does not cover
 
 - **A business plan.** Pricing models above are anchors for sanity-checking unit economics, not commitments. Real
@@ -294,6 +379,22 @@ baseline. A commercial derivative remains an open future decision but the defaul
 
 _E2 resolved (ROADMAP.md Phase 2g, VISION.md): renamed to `docs/knowledge-mining-surface.md`. The local-files-as-
 gunpowder framing is canonical. The doc is a Phase 2g deliverable — write only after Linus is demonstrably useful._
+
+**E13. Agent-monetization-via-x402-mcp — when does the ADR seed graduate?** _Seed: DEC-NNNN
+agent-monetization-via-x402-mcp._ x402's v2 release signals `@x402/mcp` as a roadmap TODO; Linus's existing MCP
+commitment (DEC-0018, DEC-0045) means the substrate is already aligned. Open: at what trigger does this graduate from
+seed to real ADR slot? Recommendation: when `@x402/mcp` ships a stable spec, or when a concrete commercial-surface
+decision (Phase 5+ release, satellite-project monetization question, paid-API tool exposure) forces the question —
+whichever comes first. Until then, tracked as a deferred seed.
+
+**E14. Agent / Identity / Venue as a Linus-internal abstraction for attributable agent output.** Canteen's layered
+decomposition of the prediction-market stack generalizes well beyond crypto. Open: at what point does Linus's own
+internal architecture benefit from naming the three layers explicitly — Agent (the Worker that reasoned), Identity (the
+auditable trace + attribution that proves it), Venue (the surface where the result is consumed)? The
+"scratchpad-is-durable" discipline (DEC-0030) is already the internal Identity-layer mechanism. Recommendation: defer
+formalization until the literature-intelligence offering or another commercial-surface artifact actually needs the
+three-layer vocabulary; until then, the framing is a useful lens, not yet a commitment. Promotable to top-questions when
+a concrete Phase 7 productizable artifact is on the table.
 
 ### Tier 2 — transferable g10-finance patterns worth tracking (not commercial-specific)
 
@@ -392,3 +493,12 @@ R2-51, R2-52, R2-53, R2-54 in [`top-questions.md`](../questions/top-questions.md
 milestone where the corpus is genuinely queryable end-to-end (Phase 5 at earliest), if the open-source-by-default
 posture is challenged by a specific opportunity, or if the algae landscape shifts in a way that opens a path Dan finds
 credible._
+
+_Updated 2026-05-10 with the Canteen / Agora outreach fold-in: first concrete commercial-surface inbound, Agora
+hackathon (May 11–25, 2026) as a Phase 2 forcing function for the orchestration MVP, the four RFB ideas as
+commercial-substrate evidence, the x402 protocol intersection seeded as a future ADR (E13), and the Agent / Identity /
+Venue layered decomposition surfaced as a Linus-internal lens (E14). Source notes:
+[`canteen_outreach_2026-05.md`](../../context/notes/canteen_outreach_2026-05.md) and
+[`canteen_blog_landscape_2026-05.md`](../../context/notes/canteen_blog_landscape_2026-05.md). Revisit when the hackathon
+kicks off, when an RFB is selected, when `@x402/mcp` ships a stable spec, or when the satellite project's architecture
+starts to inform Phase 2 decisions._
