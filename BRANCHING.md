@@ -452,6 +452,8 @@ See SAFETY.md for the complete autonomy tier and tool use policy. Branch-specifi
 ## Related Reading
 
 - [CLAUDE.md](CLAUDE.md) — session protocol, tool use policy
+- [CLAUDE.md § Worktree fan-out discipline](CLAUDE.md#worktree-fan-out-discipline) — branch preservation, base-SHA
+  pinning, edit-tool path resolution, and worktree-cleanup sequence for parallel agent fan-outs
 - [SAFETY.md](SAFETY.md) — autonomy tiers, branch-level safety, audit log
 - [docs/protocols/maestro-worker-protocol.md](docs/protocols/maestro-worker-protocol.md) — end-to-end workflow for spec
   → implementation → review

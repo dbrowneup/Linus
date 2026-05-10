@@ -127,6 +127,42 @@ use "world model" to mean a predictive simulation of the environment (`task_stat
 perceptual representation (`belief_state`). Linus uses `shared_context` on its orchestration surface to avoid the
 ambiguity.
 
+**Planner / coder / verifier discipline.** A 3-role decomposition recurring across QiMeng / agentic-systems work where
+one model decomposes (planner), another implements (coder), and a third checks (verifier). Cited in g12 and the
+agentic-systems synthesis as the canonical pattern for self-correcting agent loops.
+
+**MTMC (Macro-Thinking Micro-Coding).** QiMeng pattern separating high-level architectural reasoning ("macro thinking")
+from low-level token-by-token implementation ("micro coding") into distinct model passes — a cousin of the
+planner/coder/verifier split.
+
+**Idea→reality spine.** Naming convention for LLM-driven hardware/biology design pipelines that synthesize artifacts
+which downstream actors then realize physically (silicon, sequenced DNA, fabricated parts). The g12 cluster is the first
+time this spine is named explicitly in Linus docs; biology-side analogues sit in the generative-biology synthesis.
+
+**Agent/Identity/Venue decomposition.** Canteen-derived layered framing for multi-jurisdiction skill deployment. Agent
+holds capability; Identity holds the legal/credentialed wrapper; Venue holds the jurisdiction-specific deployment
+surface. Used in the entrepreneurship synthesis to articulate why a single agent skill needs three orthogonal layers to
+ship commercially.
+
+**Venue layer.** The Canteen-derived deployment / monetization / jurisdiction surface above the Linus orchestration
+layer. Phase 5+ extension; not a current implementation target.
+
+**Translation-as-moat.** Canteen entrepreneurship angle: the moat is in translating between agent capability and the
+jurisdiction-specific Venue surface, not in the underlying model or skill. Phase 5+ commercial-surface candidate.
+
+**Reproducibility bundle.** Sealed-bundle convention for primary-source distribution (papers + code + data + configs +
+weights) so a Worker can re-run an experiment with no external lookup. Seeded ADR DEC-NNNN-reproducibility-bundle —
+sourced from Kimi-K2 + ProtiCelli pairings.
+
+**SKILL.md conformance linter.** Auto-checker for SKILL.md frontmatter and structure across Linus skill directories.
+Seeded ADR DEC-NNNN-skill-md-conformance-linter — sourced from Kimi-K2 + claude-code-guide.
+
+**Weight-streaming.** The mlx-flash / Kimi-K2 inference target where MoE active weights are paged from SSD to unified
+memory on demand, allowing models that exceed RAM to serve at acceptable latency. Phase 6d target.
+
+**x402-mcp.** Pending commercial-surface protocol pairing Coinbase's x402 (HTTP-402-based pay-per-call) with MCP for
+metered agent endpoints. Seeded ADR DEC-NNNN-agent-monetization-via-x402-mcp.
+
 ## Domain and biology archetypes
 
 These named patterns have appeared in at least one surveyed repo or paper and are canonical enough to reference by name
@@ -213,3 +249,20 @@ truth for autonomy tier graduation decisions.
 - **BitNet** — Microsoft 1-bit LLM inference framework.
 - **Bonsai** — PrismML 1-bit 8B model.
 - **ANE (Maderix)** — ANE reverse-engineering reference.
+- **Kimi-K2** — Moonshot's 1T-parameter / 32B-active MoE; canonical fold-in for the Phase 6d weight-streaming lane. See
+  `repo-notes/Kimi-K2.md` and the paired `paper-notes/Kimi-K2-2507.20534.md`.
+- **DreamZero** — RL-derived hardware design / synthesis system (g12 cluster).
+- **EgoScale** — first-person video data scaling (g12 cluster reference).
+- **ClawBio** — biology-domain Claude-based agent stack reference (paired-repo from PR #29).
+- **Canteen** — entrepreneurship-blog source for Agent/Identity/Venue decomposition, translation-as-moat, x402-mcp seed.
+- **Agora** — agent-marketplace reference (Phase 5+ commercial-surface adjacency).
+- **qimeng / QiMeng family** — CodeV, MuPa, SALV, cpu-v1 — LLM-driven hardware design family in g12 cluster.
+- **Letta** — episodic-memory agent framework (formerly MemGPT); Bin A integration target.
+- **autogen** — Microsoft's multi-agent orchestration framework, now in maintenance mode (see Microsoft Agent Framework,
+  `microsoft/agent-framework`, for the active line).
+- **langgraph** — state-machine harness for stateful agent loops; Bin A reference.
+- **rig** — Rust agent framework; Bin A reference.
+- **goose** — Block's terminal coding agent; Bin B reference.
+- **debate-or-vote** — multi-agent debate-vs-vote evaluation harness; Bin B reference.
+- **MiroFish-Offline** — offline-first agent runner (AGPL); Bin B reference.
+- **x402** — Coinbase HTTP-402-based pay-per-call protocol; commercial-surface candidate.

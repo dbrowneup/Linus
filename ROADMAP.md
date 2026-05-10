@@ -30,17 +30,19 @@ satisfied.
 
 **Target duration:** 2 weeks (in progress)
 
-**Status snapshot (2026-05-07):**
+**Status snapshot (2026-05-10):**
 
-- **1a — Repo synthesis notes:** complete. ~99 repo notes written across 12 original + the second-wave additions
-  (omega-memory, keppi, agentmemory, openaugi, fastmcp, Task Master AI, claude-squad, and the g11 cluster). Folded
-  primarily into Phase 1a; second-wave items now also covered by Phase 1f (this section).
+- **1a — Repo synthesis notes:** complete. 117 repo notes + 118 paper notes + 27 syntheses (15 thematic + 12 cluster,
+  g1–g12) written across 12 original + multiple waves of second-wave additions (omega-memory, keppi, agentmemory,
+  openaugi, fastmcp, Task Master AI, claude-squad, the g11 cluster, then PR #29's QiMeng family + Kimi-K2 + DreamZero +
+  EgoScale + ClawBio + transcriptformer + ProtiCelli, then PR 30's Bin A Letta / rig / autogen / langgraph / x402 and
+  Bin B goose / debate-or-vote / MiroFish-Offline). Folded primarily into Phase 1a; second-wave items now also covered
+  by Phase 1f (this section).
 - **1b — pmetal deep evaluation:** in progress. Built from source successfully; smoke tests pass; initial impressions
-  strongly positive. LoRA trial, serve trial, and comparative benchmark vs. Ollama still to run before the verdict
-  ADR (next free DEC-NNNN, slug `inference-backend`) is written.
+  strongly positive. LoRA trial, serve trial, and comparative benchmark vs. Ollama still to run before the verdict ADR
+  (next free DEC-NNNN, slug `inference-backend`) is written.
 - **1c, 1d, 1e, 1f:** not yet started; specs and decision rules are committed (memory-pillar spikes per DEC-0033/
-  DEC-0034/ DEC-0037; minGRU MLX port spike per DEC-0038; Phase 1c Pareto methodology in
-  `docs/specs/phase1c-spike.md`).
+  DEC-0034/ DEC-0037; minGRU MLX port spike per DEC-0038; Phase 1c Pareto methodology in `docs/specs/phase1c-spike.md`).
 
 **Goal:** know what each repo is, know how our worker models perform on real tasks, and have the first Maestro/Worker
 loop on record.
@@ -82,8 +84,8 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
 
 - Install `lm-eval` in the `linus` conda env
 - Configure Ollama backend
-- Run MBPP, HumanEval, MMLU (5-shot), GPQA (main) against best available Qwen3 model for hardware (e.g.,
-  `qwen3:8b` or `qwen3:14b` via Ollama) and one FP16 reference
+- Run MBPP, HumanEval, MMLU (5-shot), GPQA (main) against best available Qwen3 model for hardware (e.g., `qwen3:8b` or
+  `qwen3:14b` via Ollama) and one FP16 reference
 - Results to `benchmarks/results/public_baseline_YYYY-MM-DD.json`
 
 **Phase 1c memory-pillar spikes (run alongside the four-config inference comparison):**
@@ -93,8 +95,8 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
   `benchmarks/results/cot_gap_<YYYY-MM-DD>.json` and mirrored into `~/.linus/registry/models.json`.
 - **Worker-size vs. CoT-length comparison** (DEC-0034): four-configuration sweep on a sequential-task subset of
   `dan_tasks/`. Answers: does a smaller model with longer CoT outperform a larger model with shorter CoT? Output to
-  `benchmarks/results/cot_length_vs_size_<YYYY-MM-DD>.json`. Sequenced after the CoT-gap fingerprint so
-  configurations are calibrated per Worker.
+  `benchmarks/results/cot_length_vs_size_<YYYY-MM-DD>.json`. Sequenced after the CoT-gap fingerprint so configurations
+  are calibrated per Worker.
 - **TTT Apple-Silicon viability spike** (DEC-0037): 10 ARC validation tasks, Llama-3.2-1B base, mlx-lm LoRA pipeline,
   leave-one-out synthetic data with geometric augmentations. Decision rule: under 5 minutes wall-clock per task. If it
   passes, TTT graduates to Phase 6 candidate substrate. Output to `experiments/ttt-mlx-arc-spike/results.md` +
@@ -109,8 +111,8 @@ adds an Ollama backend and is the more practical lead for a future local CLI har
   - "Given these 50 paper titles, cluster them into 5 topics and name each"
   - "Given this bioinformatics pipeline error traceback, diagnose and propose a fix"
 - Each task: input, expected output schema, rubric (what counts as success)
-- Run against hosted Claude (reference), Ollama+Qwen3 (best available for hardware), and pmetal+something if adopted
-  in 1b
+- Run against hosted Claude (reference), Ollama+Qwen3 (best available for hardware), and pmetal+something if adopted in
+  1b
 - Results to `benchmarks/results/dan_tasks_baseline_YYYY-MM-DD.json`
 - This suite becomes the primary evaluation measure for every future phase
 
@@ -129,8 +131,8 @@ fastmcp, Task Master AI, claude-squad, etc.). Same format as 1a.
 
 **minGRU MLX port spike** (DEC-0038): port the few-line minGRU/minLSTM PyTorch reference to MLX using MLX's scan
 primitives + Heinsen 2023 log-space scan; run Shakespeare benchmark (~1M chars) on M1 Max; compare against vanilla MLX
-LSTM baseline. Decision rule: within 2× of paper's T4 numbers AND matched perplexity. If it passes, minGRU graduates
-to Phase 6 candidate substrate. Output to `experiments/mingru-mlx-shakespeare/results.md` +
+LSTM baseline. Decision rule: within 2× of paper's T4 numbers AND matched perplexity. If it passes, minGRU graduates to
+Phase 6 candidate substrate. Output to `experiments/mingru-mlx-shakespeare/results.md` +
 `benchmarks/results/mingru_mlx_<YYYY-MM-DD>.json`.
 
 **Gate to Phase 2:** we know (a) which inference engine to use for the serving layer, (b) our baseline numbers on public
@@ -283,10 +285,9 @@ gap on domain-specific tasks.
 
 **3d — Memory deepening:**
 
-The Phase 2 memory pillar v0 (Layers B + C + E per DEC-0028 onwards) ships as part of Phase 2h. Phase 3 deepens it
-along the dimensions below. The earlier "build memory only if a concrete use case demands it" framing was replaced
-on 2026-05-03 by the memory pillar resolution: memory is now a load-bearing architectural pillar, not a deferred
-feature.
+The Phase 2 memory pillar v0 (Layers B + C + E per DEC-0028 onwards) ships as part of Phase 2h. Phase 3 deepens it along
+the dimensions below. The earlier "build memory only if a concrete use case demands it" framing was replaced on
+2026-05-03 by the memory pillar resolution: memory is now a load-bearing architectural pillar, not a deferred feature.
 
 **Phase 3 memory additions:**
 
@@ -324,9 +325,9 @@ network access, with every data source under Dan's physical control.
   (worked explanations, exercises, learning trees) where Kiwix serves reference lookups — both belong, as distinct
   tools. Kolibri also serves as a **parallel benchmark surface** at `benchmarks/kolibri_tasks/` — testing Worker
   reasoning on canonical educational problems (not just a content server).
-- ProtoMaps PMTiles with planet-wide OSM coverage as the goal; fallback prioritization if disk requires it
-  (US → EU → Middle East → Asia → Eurasia → Africa, or population-density-weighted). Research planet-PMTiles disk
-  footprint before committing.
+- ProtoMaps PMTiles with planet-wide OSM coverage as the goal; fallback prioritization if disk requires it (US → EU →
+  Middle East → Asia → Eurasia → Africa, or population-density-weighted). Research planet-PMTiles disk footprint before
+  committing.
 - Dataset version tracking: `~/.linus/data_packages.json` registry
 - Update check tool: `linus.data.check_updates` polls upstream, reports available updates, user approves downloads
 - `linus.kiwix.search(zim, query)` tool wrapping Kiwix's HTTP API
@@ -399,8 +400,8 @@ local source — with no network required.
 
 - LoRA adapter trained on ~1M tokens of genomics/biochem papers from KnowledgeBase
 - Base: Qwen3-7B or Qwen3-14B (pick based on Phase 1c Pareto result and memory headroom)
-- BitDistill spike: evaluate ~10B token continued pretraining on M1 Max (hours vs. days). Gate: MLX BitNet
-  training-path functional? If yes, BitDistill-style compressed adapter as 6a parallel experiment.
+- BitDistill spike: evaluate ~10B token continued pretraining on M1 Max (hours vs. days). Gate: MLX BitNet training-path
+  functional? If yes, BitDistill-style compressed adapter as 6a parallel experiment.
 - Pipeline via pmetal or mlx-lm-ft (per Phase 1b verdict)
 - Validation: held-out perplexity on KB papers + Dan task suite
 - First "Linus model" adapter, saved to `experiments/adapters/linus-pretrain-v1/`
@@ -422,9 +423,9 @@ local source — with no network required.
 
 **6d — Flash-streaming evaluation (1 week):**
 
-- mlx-flash applies to fine-tuned models that genuinely exceed 32 GB RAM — Linus-branded 30B+ or opportunistic
-  ternary 30B+ from PrismML. Bonsai 8B (1.75 GB weight footprint) does NOT need streaming; the original framing
-  ("dense fine-tuned 8B exceeds RAM") is obsolete post-Bonsai. (Updated 2026-05-06 per S20.)
+- mlx-flash applies to fine-tuned models that genuinely exceed 32 GB RAM — Linus-branded 30B+ or opportunistic ternary
+  30B+ from PrismML. Bonsai 8B (1.75 GB weight footprint) does NOT need streaming; the original framing ("dense
+  fine-tuned 8B exceeds RAM") is obsolete post-Bonsai. (Updated 2026-05-06 per S20.)
 - Target: LoRA'd Qwen3-32B or equivalent, streamed via mlx-flash from SSD.
 - Benchmark on Dan task suite: does the larger streamed model outperform the smaller native-speed model?
 - Apply autoresearch methodology: set a target tok/s, iterate until hit.
@@ -438,14 +439,16 @@ parametric upgrade path.
 **6f — Coconut substrate experiment (conditional on DEC-0042 graduation).**
 
 Phase 1 prerequisite spike checks MLX-portability of Meta's reference implementation vs. iCoT alternative. If tractable
-+ comparable cost to LoRA, Coconut joins minGRU and TTT on the Phase 6 substrate menu.
+
+- comparable cost to LoRA, Coconut joins minGRU and TTT on the Phase 6 substrate menu.
 
 **Explicit open-research non-goal for Phase 6:** streaming-based training (gradients and optimizer states on SSD).
 Deferred — this is unsolved research territory.
 
 **Later-phase model candidates** for fusion/flash-inference experiments but NOT for fine-tuning on 32GB: Kimi K2 (~1T /
-32B active), DeepSeek V3 (~671B / 37B active), Llama 4 Scout (~109B). Re-evaluate as inference targets once
-flash-streaming is proven.
+32B active; promoted to Phase 6/8 weight-streaming candidate per the 2026-05-09 fold-in — see `repo-notes/Kimi-K2.md`
+and `paper-notes/Kimi-K2-2507.20534.md`), DeepSeek V3 (~671B / 37B active), Llama 4 Scout (~109B). Re-evaluate as
+inference targets once flash-streaming is proven.
 
 **Gate to Phase 7:** a fine-tuned Linus-branded adapter that beats the base model on Dan task suite by a measurable
 margin.
@@ -461,18 +464,21 @@ margin.
 **7a — Inaugural skills bundle and biology FM pairs (2026-05-06 update):**
 
 Biology skills bundle (~573 skills total):
+
 - **bioSkills** (~438 SKILL.md files, 63 bioinformatics categories, Bio-Task Bench benchmarked) — primary anchor
 - **scientific-agent-skills** (~135 broad-science skills + 100+ databases) — complement
 - **Pre-launch measurement gate:** A/B test on 5 tasks — with vs. without skills loaded. If in-context skill priming
   doesn't measurably lift judgment-heavy tasks, launch with skills as opt-in (not default-on).
 
 Generalist × specialist FM pairing sequence (Phase 7-tractable first):
+
 1. **Trias + GenNA** — protein threading + RNA generation
 2. **REBEAN + DeepSeMS** — microbiome embedding + BGC-to-SMILES
-3. **Bacformer + DeepSeMS** — broad bacterial FM + synthesis route design
-Phase 8 (Apple-Silicon plumbing or NC-license risk not yet resolved): mCSM-metal + DISCO; AlphaGenome + GenNA.
+3. **Bacformer + DeepSeMS** — broad bacterial FM + synthesis route design Phase 8 (Apple-Silicon plumbing or NC-license
+   risk not yet resolved): mCSM-metal + DISCO; AlphaGenome + GenNA.
 
 Custom domain skills (emerge from usage patterns):
+
 - `genomics-pipeline`: helpers for common bioinformatics tasks
 - `paper-to-script`: generate reproducibility scripts from paper methods
 - `plot-style-consistency`: enforce Dan's matplotlib/seaborn preferences
@@ -517,14 +523,13 @@ same format). Evaluate alternatives only if a concrete deficiency in this format
 
 The long-term goal is for Linus to be fully Maestro-capable: able to plan complex tasks, decompose them, direct local
 Workers, and produce research-quality outputs entirely offline — without hosted Claude in the loop. This requires
-passing the Maestro-class evaluation suite at a level competitive with hosted Claude on Dan's domain tasks. When
-that bar is cleared: Dan reviews outputs; Linus orchestrates; local Workers execute. The Maestro/Worker discipline
-doesn't disappear — it gains a new option where Linus _is_ the Maestro.
+passing the Maestro-class evaluation suite at a level competitive with hosted Claude on Dan's domain tasks. When that
+bar is cleared: Dan reviews outputs; Linus orchestrates; local Workers execute. The Maestro/Worker discipline doesn't
+disappear — it gains a new option where Linus _is_ the Maestro.
 
-The measurement gate: Maestro-class eval suite in `benchmarks/dan_tasks/maestro/` (added per S23, Phase 1 plan)
-serves as the readiness indicator. When Linus consistently scores within 10 percentage points of hosted Claude on
-Maestro-class tasks, Phase 8b transition planning begins. Timeline: entirely driven by model quality; not plannable
-in advance.
+The measurement gate: Maestro-class eval suite in `benchmarks/dan_tasks/maestro/` (added per S23, Phase 1 plan) serves
+as the readiness indicator. When Linus consistently scores within 10 percentage points of hosted Claude on Maestro-class
+tasks, Phase 8b transition planning begins. Timeline: entirely driven by model quality; not plannable in advance.
 
 **Memory long-horizon directions:**
 
@@ -532,8 +537,8 @@ in advance.
   requires both the minGRU MLX spike (DEC-0038) and the TTT Apple-Silicon viability spike (DEC-0037) to graduate.
 - **Hybrid Layer C graduation pattern** (DEC-0029): text → parametric LoRA after sufficient repeated access. Gated on
   Phase 6e TTT spike result.
-- **Layer A active management** via Coconut-style or minGRU-style substrate (DEC-0042, DEC-0038): Phase 6+ pending
-  spike outcomes; Phase 8 if spikes don't graduate.
+- **Layer A active management** via Coconut-style or minGRU-style substrate (DEC-0042, DEC-0038): Phase 6+ pending spike
+  outcomes; Phase 8 if spikes don't graduate.
 
 ---
 

@@ -23,15 +23,15 @@ atom. Linus is a force that harnesses human knowledge for good in the world.
   Science with Chemistry minor, University of Portland (2011). Doctoral thesis on systems analysis of metabolism and
   physiology in the oil-producing green alga _Botryococcus braunii_ (Showa, race B).
 - **Domain specialty**: genomics and computational biology — long-read sequencing (PacBio HiFi), genome/transcriptome
-  assembly, comparative genomics, metagenomics, gene cloning/expression/editing, protein purification and enzyme
-  assays. _B. braunii_ genome assembly and downstream lipid/terpene metabolism analyses are the deepest part of his
-  publication record (11 publications, 15 presentations).
+  assembly, comparative genomics, metagenomics, gene cloning/expression/editing, protein purification and enzyme assays.
+  _B. braunii_ genome assembly and downstream lipid/terpene metabolism analyses are the deepest part of his publication
+  record (11 publications, 15 presentations).
 - **Production stack he already operates in**: Python, Linux, Bash, Git, GitHub, GitHub Actions, SQL, WDL, Docker, AWS,
   Azure; Agile/Jira; pipeline validation and automated testing.
 - **Entrepreneurship background**: founded Botryonyx LLC (2018–2019), an algae-based wastewater-treatment + carbon-
-  capture venture; raised $42K in seed funding, tested a prototype, competed at Rice Business Plan and was an SEC
-  Pitch semi-finalist for Texas A&M; 2nd place at the Aggie Pitch Competition ($12K). Scientific Advisor at CaribAlgae
-  in Curaçao (2018–2022). The speed-and-evidence instinct in this repo's Algorithm/blitzscaling framings is lived
+  capture venture; raised $42K in seed funding, tested a prototype, competed at Rice Business Plan and was an SEC Pitch
+  semi-finalist for Texas A&M; 2nd place at the Aggie Pitch Competition ($12K). Scientific Advisor at CaribAlgae in
+  Curaçao (2018–2022). The speed-and-evidence instinct in this repo's Algorithm/blitzscaling framings is lived
   experience, not borrowed mindset.
 - **13 years of Python in scientific computing**; self-taught CS, comfortable with trial-and-error debugging.
 - **Currently learning**: Rust, nodejs/npm, agentic systems, LLM inference/fine-tuning. Calibrate explanations
@@ -80,8 +80,8 @@ Ship rough, learn, iterate.
 
 - **Maestro** = Dan + hosted Claude (this chat, Claude Code, Claude.ai). Architecture, planning, spec writing, hard
   debugging, taste-level decisions.
-- **Worker** = local models (Qwen3 — best available for 32 GB M1 Max hardware; future fine-tuned Linus). Bulk implementation, test generation,
-  refactors, pipeline execution.
+- **Worker** = local models (Qwen3 — best available for 32 GB M1 Max hardware; future fine-tuned Linus). Bulk
+  implementation, test generation, refactors, pipeline execution.
 - Maestro attention is the scarce resource. Push any well-specified task to Workers.
 
 ### Evidence beats intuition
@@ -109,10 +109,10 @@ working.
   optimized for Apple Silicon.
 - **Ollama** is the first worker-model server; runs on port 11434 via `brew services`.
 - **Rust** is installed inside the linus conda env via `conda install rust` (needed for pmetal).
-- **uv** is installed inside the linus conda env via conda. uv is the **disposable-env tool of choice** for
-  experimental packages: untrusted or experimental Python packages always run in a fresh `uv venv`, never installed
-  into the linus conda env. The linus conda env is the production substrate (hash-pinned); uv envs are scratch space
-  discarded after the experiment (DEC-0024).
+- **uv** is installed inside the linus conda env via conda. uv is the **disposable-env tool of choice** for experimental
+  packages: untrusted or experimental Python packages always run in a fresh `uv venv`, never installed into the linus
+  conda env. The linus conda env is the production substrate (hash-pinned); uv envs are scratch space discarded after
+  the experiment (DEC-0024).
 - **node/npm** installable inside conda env if openclaw or other JS-based components are used.
 - **poppler** is available via a Homebrew install to read PDF files in the context folder.
 
@@ -150,8 +150,8 @@ Linus/
 └── docs/                                                                 # Long-form writing, synthesis notes
     ├── README.md                                                         # Tour of the docs tree
     ├── curation-log.md                                                   # Per-DEC-0025 archive/removal record
-    ├── repo-notes/                                                       # ~99 per-repo write-ups + INDEX.md
-    ├── paper-notes/                                                      # ~100 per-paper write-ups + INDEX.md
+    ├── repo-notes/                                                       # 117 per-repo write-ups + INDEX.md
+    ├── paper-notes/                                                      # 118 per-paper write-ups + INDEX.md
     ├── adr/                                                              # Per-file ADRs (NNNN-<slug>.md matching DEC-NNNN ids)
     │   ├── README.md                                                     # ADR index and authoring conventions
     │   ├── 0001-project-name-and-namesake.md                             # Pauling/Torvalds + carbon-atom rationale
@@ -253,22 +253,30 @@ Linus/
     │   ├── 2026-05-04-fan-out-session-summary.md                         # Section 7 fan-out session
     │   ├── 2026-05-05-landscape-rollup-session-summary.md                # Landscape rollup session
     │   ├── 2026-05-05-planning-update-session-summary.md                 # Planning-update spec authoring session
-    │   └── 2026-05-07-planning-update-execution-session-summary.md       # Planning-update Worker fan-out + L1-L7 lessons
+    │   ├── 2026-05-07-planning-update-execution-session-summary.md       # Planning-update Worker fan-out + L1-L7 lessons
+    │   ├── 2026-05-08-notes-consistency-sweep-session-summary.md         # Notes-consistency sweep session
+    │   └── 2026-05-08-synthesis-refinement-session-summary.md            # Synthesis refinement session
     ├── specs/                                                            # Implementation specs (living docs)
     │   ├── kb/                                                           # KnowledgeBase-specific specs
     │   │   ├── canaries.yaml                                             # KB canary test set (machine-readable)
     │   │   ├── canary-blocklist.md                                       # KB canary blocklist (curated)
     │   │   ├── model-prediction-edges.md                                 # Model-prediction edge-class spec (DEC-0048)
     │   │   └── paper-qa-substrate-integration.md                         # paper-qa integration spec (DEC-0044)
+    │   ├── 2026-05-09-context-foldin-fanout.md                           # Context fold-in fan-out spec (PR 30 source)
+    │   ├── 2026-05-10-pr30-cleanup-spec.md                               # PR 30 cleanup tier spec (this Tier 5 pass)
+    │   ├── biology-phase7-roadmap.md                                     # Phase 7 biology-skills roadmap
     │   ├── memory-architecture.md                                        # 5-layer memory pillar implementation contract (DEC-0028+)
+    │   ├── notes-consistency-fanout.md                                   # Notes-consistency sweep fan-out spec
     │   ├── phase1c-spike.md                                              # Phase 1c Worker-selection spike spec
     │   ├── phase3-spawner.md                                             # Phase 3 agent-spawner design-intent stub (DEC-0050)
     │   ├── phase6d-streaming-target.md                                   # Phase 6d weight-streaming target spec
-    │   ├── biology-phase7-roadmap.md                                     # Phase 7 biology-skills roadmap
     │   ├── planning-update-spec.md                                       # Most-recent planning-update task router (rewritten per session)
-    │   └── synthesis-cleanup-spec.md                                     # Synthesis open-questions cleanup spec (Policy B)
-    └── syntheses/                                                        # 14 thematic + 11 cluster syntheses
-        ├── repo-clusters/                                                # 11 repo-cluster syntheses (g1-g11)
+    │   ├── qimeng-category-promotion.md                                  # QiMeng family category promotion spec
+    │   ├── question-lifecycle.md                                         # Question lifecycle protocol spec
+    │   ├── synthesis-cleanup-spec.md                                     # Synthesis open-questions cleanup spec (Policy B)
+    │   └── synthesis-refinement-spec.md                                  # Synthesis refinement spec
+    └── syntheses/                                                        # 15 thematic + 12 cluster syntheses
+        ├── repo-clusters/                                                # 12 repo-cluster syntheses (g1-g12)
         │   ├── g1-apple-silicon.md                                       # Apple Silicon inference + training
         │   ├── g2-wiki-engines.md                                        # LLM Wiki engine implementations
         │   ├── g3-wiki-patterns.md                                       # LLM Wiki agent-driven build patterns
@@ -279,7 +287,8 @@ Linus/
         │   ├── g8-sci-agents.md                                          # Scientific reasoning agents (FutureHouse stack + adjacents)
         │   ├── g9-bio.md                                                 # Bioinformatics + domain-specific science models
         │   ├── g10-finance.md                                            # Finance / quant agents
-        │   └── g11-agent-frameworks.md                                   # General-purpose agent frameworks
+        │   ├── g11-agent-frameworks.md                                   # General-purpose agent frameworks
+        │   └── g12-llm-hardware-design.md                                # LLM-driven hardware design (Kimi-K2 + QiMeng family)
         ├── agentic-systems-synthesis.md                                  # Agentic-systems thematic synthesis
         ├── biological-foundation-models-synthesis.md                     # Biological foundation models thematic synthesis
         ├── entrepreneurship-synthesis.md                                 # Entrepreneurship thematic synthesis (E1-E12)
@@ -287,6 +296,7 @@ Linus/
         ├── generative-biology-synthesis.md                               # Generative biology thematic synthesis
         ├── humans-teams-performance-synthesis.md                         # Humans, teams, performance synthesis
         ├── infra-foundations-synthesis.md                                # Infrastructure foundations synthesis
+        ├── llm-hardware-design-synthesis.md                              # LLM-driven hardware design synthesis (idea→reality spine)
         ├── llm-wiki-synthesis.md                                         # LLM Wiki thematic synthesis
         ├── llms-in-science-synthesis.md                                  # LLMs in science thematic synthesis
         ├── memory-synthesis.md                                           # Memory thematic synthesis
@@ -476,16 +486,17 @@ Three discipline rules apply across all Worker work:
   reasoning between turns is forbidden.
 - **Context is a resource to manage, not a capacity to fill.** Phase 2 default in-context cap: 16K tokens per Worker
   call (DEC-0032); overflow routes through the episodic store; explicit cap-bypass is audit-logged.
-- **Memory mode is dispatch-time-explicit.** Every Worker call carries a `memory_mode`
-  (`stateless` / `session_stateful` / `project_stateful`) and a `cot_budget` (`logarithmic` / `linear` / `polynomial`)
-  per DEC-0031. Both recorded in the audit log.
+- **Memory mode is dispatch-time-explicit.** Every Worker call carries a `memory_mode` (`stateless` / `session_stateful`
+  / `project_stateful`) and a `cot_budget` (`logarithmic` / `linear` / `polynomial`) per DEC-0031. Both recorded in the
+  audit log.
 
 ### Typed structured prediction for biology skills (resolved 2026-05-06, S25)
 
 For any biology skill or domain skill producing a predictive output, use typed structured prediction wrapping free-text
 rationale — the BioReason-Pro shape. The structured result is machine-queryable; the `rationale` field preserves
-explanation for human review. Example: `{gene: "BRCA1", predicted_function: "DNA repair", confidence: 0.87, evidence:
-["pmid:12345"], rationale: "..."}`. This generalizes beyond biology to any task where auditability matters.
+explanation for human review. Example:
+`{gene: "BRCA1", predicted_function: "DNA repair", confidence: 0.87, evidence: ["pmid:12345"], rationale: "..."}`. This
+generalizes beyond biology to any task where auditability matters.
 
 ### Sub-agent hook bypass flow
 
@@ -511,19 +522,18 @@ opened and merged before anyone checked, and the actual content nearly went into
 The rule has two specific applications worth calling out:
 
 - **Branch state verification before "ready to merge" claims.** Before any end-of-session report that a PR is ready or
-  that a branch contains a commit, run `git log <branch>..main --stat` and `git log main..<branch> --stat`. If those
-  two commands don't show the expected diff, the claim is false.
-- **Compaction-summary humility.** Treat any synthesized session summary as a hypothesis about prior state, not a
-  ground truth. Verify any "X was committed / pushed / merged / written" claim against the actual artefact before
-  proceeding.
+  that a branch contains a commit, run `git log <branch>..main --stat` and `git log main..<branch> --stat`. If those two
+  commands don't show the expected diff, the claim is false.
+- **Compaction-summary humility.** Treat any synthesized session summary as a hypothesis about prior state, not a ground
+  truth. Verify any "X was committed / pushed / merged / written" claim against the actual artefact before proceeding.
 
 ### Cherry-pick to preserve, never reset to delete
 
 Before any `git reset --hard` past a commit, run `git branch --contains <sha>` to confirm the commit exists elsewhere.
-If it does not, the reset will leave the commit reachable only via reflog (recoverable for ~90 days, durable for
-zero). The safe pattern is cherry-pick first to a known-good branch, then reset; never the reverse. Canonical failure
-mode: the Task A redo (2026-05-06), where a "cleanup" reset destroyed the only copy of the cherry-pickable commit. The
-reflog rescue worked but the discipline rule is cheaper.
+If it does not, the reset will leave the commit reachable only via reflog (recoverable for ~90 days, durable for zero).
+The safe pattern is cherry-pick first to a known-good branch, then reset; never the reverse. Canonical failure mode: the
+Task A redo (2026-05-06), where a "cleanup" reset destroyed the only copy of the cherry-pickable commit. The reflog
+rescue worked but the discipline rule is cheaper.
 
 ### PR summary discipline
 
@@ -532,14 +542,17 @@ reviewer can scan a batch of related PRs without recalibrating per-author style.
 
 ```markdown
 ## Summary
+
 <1–2 sentence executive summary: what the PR changes and why>
 
 ## Changes
+
 - **<spec-item-id>** — <terse 1-line description>. <DEC refs where relevant>
 - ...
 - **Bonus fix** — <description> (only when applicable)
 
 ## Spec
+
 See [`docs/specs/<spec-name>.md`](docs/specs/<spec-name>.md) — Task <X>.
 
 [## Background — only when reviewer needs context, e.g. a redo or a non-obvious dependency]
@@ -547,47 +560,47 @@ See [`docs/specs/<spec-name>.md`](docs/specs/<spec-name>.md) — Task <X>.
 
 Apply this for every Worker-delivered or Maestro-delivered PR that descends from a planning-update spec or any
 multi-task spec doc. Per-PR ad-hoc structures (Test plan checklists, prose blocks, bold-per-file headers) are
-specifically out of scope; pick this template even if it feels less expressive for a particular task. Consistency
-across the batch beats expressivity within one PR.
+specifically out of scope; pick this template even if it feels less expressive for a particular task. Consistency across
+the batch beats expressivity within one PR.
 
 ### Agent fan-out: probe permissions first
 
-When fanning out N parallel agents that need bash access for `git` / `gh` / `pytest` / similar operations, probe with
-a single canary agent before the full fan-out. Run a one-step task that exercises the same tool surface (e.g., "create
-a branch, write a file, commit, push, open a PR") and confirm the agent completes. If the canary is blocked at a step,
-the full fan-out will be blocked too — and Maestro will end up doing the work serially anyway, having paid the
-fan-out tax for no parallelism gain. The canary costs a minute; debugging six stuck agents costs much more.
+When fanning out N parallel agents that need bash access for `git` / `gh` / `pytest` / similar operations, probe with a
+single canary agent before the full fan-out. Run a one-step task that exercises the same tool surface (e.g., "create a
+branch, write a file, commit, push, open a PR") and confirm the agent completes. If the canary is blocked at a step, the
+full fan-out will be blocked too — and Maestro will end up doing the work serially anyway, having paid the fan-out tax
+for no parallelism gain. The canary costs a minute; debugging six stuck agents costs much more.
 
 ### Worktree fan-out discipline
 
 Worktrees enable genuine parallel agent work but carry non-obvious failure modes. Apply these rules for any
 `isolation: "worktree"` agent dispatch or manual `git worktree add` fan-out.
 
-**Branch preservation.** `git worktree remove` deletes the working directory but leaves the branch pointer in git.
-This is the desired behavior — preserve it. Do NOT immediately `git branch -D` agent branches after removing their
-worktrees. Retain agent branches in git history for at least as long as the consolidated PR is open; they are the
-per-agent audit trail and can be re-cherry-picked if a conflict was resolved incorrectly. Only delete agent branches
-after their commits are confirmed present in the merged target branch.
+**Branch preservation.** `git worktree remove` deletes the working directory but leaves the branch pointer in git. This
+is the desired behavior — preserve it. Do NOT immediately `git branch -D` agent branches after removing their worktrees.
+Retain agent branches in git history for at least as long as the consolidated PR is open; they are the per-agent audit
+trail and can be re-cherry-picked if a conflict was resolved incorrectly. Only delete agent branches after their commits
+are confirmed present in the merged target branch.
 
-**Base-SHA pinning.** All parallel worktrees in one fan-out must branch from the same commit. Before dispatching,
-record the base SHA (`git rev-parse HEAD`) and include it verbatim in each agent's prompt. If Maestro commits to the
-base branch between dispatching individual agents, later agents get a different base — cherry-picks at consolidation
-produce false conflicts or silently miss commits. Verify with `git log <agent-branch>..<base-branch>` before
-beginning cherry-pick consolidation.
+**Base-SHA pinning.** All parallel worktrees in one fan-out must branch from the same commit. Before dispatching, record
+the base SHA (`git rev-parse HEAD`) and include it verbatim in each agent's prompt. If Maestro commits to the base
+branch between dispatching individual agents, later agents get a different base — cherry-picks at consolidation produce
+false conflicts or silently miss commits. Verify with `git log <agent-branch>..<base-branch>` before beginning
+cherry-pick consolidation.
 
 **Edit-tool path resolution.** Inside a worktree, Edit/Write tool calls using absolute paths sometimes resolve to the
-primary checkout rather than the worktree path — the Edit tool's path resolver anchors to the repo's registered
-primary worktree. Agents inside worktrees should use Bash with `git -C <worktree-path>` for git operations, and
-prefer `Bash(cd <worktree-path> && <cmd>)` over direct Edit calls for mechanical bulk file edits. When an agent
-reports "file already has this content" or edits appear in the wrong checkout, the root cause is almost always
-absolute-path resolution.
+primary checkout rather than the worktree path — the Edit tool's path resolver anchors to the repo's registered primary
+worktree. Agents inside worktrees should use Bash with `git -C <worktree-path>` for git operations, and prefer
+`Bash(cd <worktree-path> && <cmd>)` over direct Edit calls for mechanical bulk file edits. When an agent reports "file
+already has this content" or edits appear in the wrong checkout, the root cause is almost always absolute-path
+resolution.
 
 **When not to use worktrees.** Worktrees earn their complexity only when per-agent isolation is a hard requirement —
 e.g., each agent opens its own PR for independent review, or commits must be cherry-picked selectively. For fan-outs
 where agents write non-overlapping files on a shared branch (filling out N notes, running N analyses), the simpler
 pattern is sequential agent dispatch with file-level partitioning: Maestro reviews and commits each agent's output
-without the worktree overhead (base-SHA drift, path-resolution quirks, manual cleanup, cherry-pick conflicts). When
-in doubt, start with the simpler pattern.
+without the worktree overhead (base-SHA drift, path-resolution quirks, manual cleanup, cherry-pick conflicts). When in
+doubt, start with the simpler pattern.
 
 **Worktree cleanup sequence.** After all agent commits are cherry-picked and confirmed:
 
@@ -595,6 +608,16 @@ in doubt, start with the simpler pattern.
 2. `git worktree remove --force <path>` — removes directory; branch pointer persists
 3. Verify: `git branch | grep agent/` — branches should still appear
 4. Delete branches only after the consolidated PR is merged: `git branch -D agent/<name>`
+
+### Reference-stack maintenance signals (PR 30 fold-ins, 2026-05-09)
+
+Two findings from the PR 30 Bin A/B repo-notes are worth surfacing as engineering-convention signals. First, **AutoGen
+is in maintenance mode** — Microsoft has redirected new multi-agent development to Microsoft Agent Framework
+(`microsoft/agent-framework`); future Linus reference work for multi-agent patterns may pivot to MAF, with AutoGen
+retained as frozen reference. Second, **Anthropic-compat HTTP endpoints are converging as a production-stack norm**:
+four independent Bin A/B + Kimi-K2 confirmations show production agent stacks shipping Anthropic-compat alongside
+OpenAI-compat. DEC-0005 (OpenAI-compatible-protocol) earns a Phase 2a revisit — a Linus orchestration backend that
+speaks both is the likely shape.
 
 ### Writing style for docs
 
@@ -605,69 +628,69 @@ style.
 ### Doc-type conventions
 
 The corpus has matured into recognizable per-document-type shapes. Until they graduate to dedicated guides under
-`docs/skills/notes/` (or similar) the inline definitions below are the source of truth. Fan-out agents and future
-note authors should match them exactly. Fixed section order matters because cross-doc grep and fan-out agents rely
-on it; don't reorder sections without surfacing the change as a convention update.
+`docs/skills/notes/` (or similar) the inline definitions below are the source of truth. Fan-out agents and future note
+authors should match them exactly. Fixed section order matters because cross-doc grep and fan-out agents rely on it;
+don't reorder sections without surfacing the change as a convention update.
 
-**Paper-note** — `docs/paper-notes/<paper-id>.md`. YAML frontmatter (`title`, `source`, `authors`,
-`affiliation`, `date`, `pdf`, `tags`). H1 = paper title. Eight H2 sections in fixed order: `## TL;DR` ·
+**Paper-note** — `docs/paper-notes/<paper-id>.md`. YAML frontmatter (`title`, `source`, `authors`, `affiliation`,
+`date`, `pdf`, `tags`). H1 = paper title. Eight H2 sections in fixed order: `## TL;DR` ·
 `## The problem (in plain language)` · `## What they propose` · `## Key results` · `## What's reusable in Linus` ·
-`## What's NOT applicable / hype filter` · `## Connections` · `## Open questions for Dan`. The "Reusable in
-Linus" section maps each point to a phase (Phase 1..8) and references a DEC or spec where applicable.
-"Connections" uses relative markdown links. Open questions are numbered sequentially with no gaps;
-partial-resolved items use
+`## What's NOT applicable / hype filter` · `## Connections` · `## Open questions for Dan`. The "Reusable in Linus"
+section maps each point to a phase (Phase 1..8) and references a DEC or spec where applicable. "Connections" uses
+relative markdown links. Open questions are numbered sequentially with no gaps; partial-resolved items use
 `_Partially resolved (DEC-NNNN, see [answered-questions.md](../questions/answered-questions.md)): nuance._`.
 
 **Paper-note (paired-repo variant).** When the source PDF lives in a paired repo rather than `context/papers/` (e.g., a
-model release shipping its own tech report alongside the weights/code), use a hybrid filename
-`<RepoName>-<arxiv-id>.md` instead of the default `<arxiv-id>.md`. This makes the paper↔repo pairing visible at
-INDEX-scan time and prevents the paper-note from looking like a standalone arxiv entry when it's actually load-bearing
-for a specific repo. The `pdf:` frontmatter field points to a relative path into `repos/` (e.g.,
-`../../repos/Kimi-K2/tech_report.pdf`) rather than `../../context/papers/...`. Canonical example: Kimi-K2 tech report
-(arxiv 2507.20534) → `paper-notes/Kimi-K2-2507.20534.md` paired with `repo-notes/Kimi-K2.md`.
+model release shipping its own tech report alongside the weights/code), use a hybrid filename `<RepoName>-<arxiv-id>.md`
+instead of the default `<arxiv-id>.md`. This makes the paper↔repo pairing visible at INDEX-scan time and prevents the
+paper-note from looking like a standalone arxiv entry when it's actually load-bearing for a specific repo. The `pdf:`
+frontmatter field points to a relative path into `repos/` (e.g., `../../repos/Kimi-K2/tech_report.pdf`) rather than
+`../../context/papers/...`. Canonical example: Kimi-K2 tech report (arxiv 2507.20534) →
+`paper-notes/Kimi-K2-2507.20534.md` paired with `repo-notes/Kimi-K2.md`.
 
-**Repo-note** — `docs/repo-notes/<repo-name>.md`. No frontmatter. H1 = `# <repo-name> (\`<owner/repo>\`)`. Seven
-numbered H2 sections in fixed order: `## 1. Purpose and scope` · `## 2. Architecture summary` ·
-`## 3. What's reusable in Linus` · `## 4. What's inspiration only` · `## 5. What's incompatible or out of scope` ·
-`## 6. Recommendation: **<verdict>**` · `## 7. Questions for Dan`. Recommendation verdicts come from a fixed
-vocabulary: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore** (single primary verdict; modifiers like
-"with a high prior on later Integrate-as-service" are allowed). Section 7 uses numbered sequential items (no
-bullets), matching paper-notes; legacy bulleted items in repo-notes are tolerated and converted to numbered by
-Maestro at consolidation, not by per-note authors during normal work — to avoid drift. Same Reusable /
-Connections / Open-questions discipline as paper-notes.
+**Repo-note** — `docs/repo-notes/<repo-name>.md`. No frontmatter. H1 =
+`# <repo-name> (\`<owner/repo>\`)`. Seven numbered H2 sections in fixed order: `## 1. Purpose and scope`·`## 2.
+Architecture summary`·`## 3. What's reusable in Linus`·`## 4. What's inspiration only`·`## 5. What's incompatible or out
+of scope`·`## 6. Recommendation: **<verdict>**`·`## 7. Questions for Dan`. Recommendation verdicts come from a fixed
+vocabulary: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore** (single primary verdict; modifiers like "with a
+high prior on later Integrate-as-service" are allowed). Section 7 uses numbered sequential items (no bullets), matching
+paper-notes; legacy bulleted items in repo-notes are tolerated and converted to numbered by Maestro at consolidation,
+not by per-note authors during normal work — to avoid drift. Same Reusable / Connections / Open-questions discipline as
+paper-notes.
 
-**Partial-resolved citation format.** Items use `_Partially resolved (DEC-NNNN, see [answered-questions.md](...)):
-nuance._` where DEC-NNNN points to the resolving ADR. Where no ADR exists but a sweep / entrepreneurship / memory
-ID does (S-NN / E-NN / M-NN from the planning-update arc), the form `_Partially resolved (S-NN, see
-[answered-questions.md](...)): nuance._` is accepted; agents should not normalize S/E/M IDs to DEC-NNNN unless
-the mapping is verifiable from `docs/adr/` alone (Maestro handles cross-referencing through `docs/questions/`).
+**Partial-resolved citation format.** Items use
+`_Partially resolved (DEC-NNNN, see [answered-questions.md](...)): nuance._` where DEC-NNNN points to the resolving ADR.
+Where no ADR exists but a sweep / entrepreneurship / memory ID does (S-NN / E-NN / M-NN from the planning-update arc),
+the form `_Partially resolved (S-NN, see [answered-questions.md](...)): nuance._` is accepted; agents should not
+normalize S/E/M IDs to DEC-NNNN unless the mapping is verifiable from `docs/adr/` alone (Maestro handles
+cross-referencing through `docs/questions/`).
 
-**Audit** — `docs/audits/<batch-name>/<source>-audit.md`. H1 = audit subject. Sections: `## Summary` ·
-`## Findings` (with H3 sub-categories grouped by severity or class) ·
-`## Remediation recommendations (priority order)` · `## Confidence assessment`.
+**Audit** — `docs/audits/<batch-name>/<source>-audit.md`. H1 = audit subject. Sections: `## Summary` · `## Findings`
+(with H3 sub-categories grouped by severity or class) · `## Remediation recommendations (priority order)` ·
+`## Confidence assessment`.
 
-**Session summary** — `docs/session-summaries/<YYYY-MM-DD>-<slug>-session-summary.md`. Filename always
-date-prefixed with ISO date. Structure: `## Pre-execution context`, then numbered `## Step N — <name>` sections in
-chronological order, then `## Lessons learned (write-back candidates)` with H3 sub-items naming each lesson's
-destination doc, then `## Outstanding items for next session`, then `## Suggested next steps`. The date prefix
-and lessons-learned sub-structure are required; step structure is recommended. Per the "Measure, don't just
-estimate" convention below, every session summary records "estimated wall time vs actual" in its closing section.
+**Session summary** — `docs/session-summaries/<YYYY-MM-DD>-<slug>-session-summary.md`. Filename always date-prefixed
+with ISO date. Structure: `## Pre-execution context`, then numbered `## Step N — <name>` sections in chronological
+order, then `## Lessons learned (write-back candidates)` with H3 sub-items naming each lesson's destination doc, then
+`## Outstanding items for next session`, then `## Suggested next steps`. The date prefix and lessons-learned
+sub-structure are required; step structure is recommended. Per the "Measure, don't just estimate" convention below,
+every session summary records "estimated wall time vs actual" in its closing section.
 
 ### Measure, don't just estimate
 
-Time and resource estimates degrade quickly when not measured. Convention: every multi-step task and every
-fan-out logs start time, end time, and a short variance note whenever actual diverges from estimate by more than
-~20%. Two implementation paths:
+Time and resource estimates degrade quickly when not measured. Convention: every multi-step task and every fan-out logs
+start time, end time, and a short variance note whenever actual diverges from estimate by more than ~20%. Two
+implementation paths:
 
-- **Per-session summaries** — every entry in `docs/session-summaries/` records "estimated wall time vs actual"
-  in its closing section. This is the durable measurement record.
-- **Per-fan-out reports** — each Worker agent records bin-level start/end timestamps in its summary report;
-  Maestro records wall-time delta vs the planned estimate in the spec's status line at consolidation.
+- **Per-session summaries** — every entry in `docs/session-summaries/` records "estimated wall time vs actual" in its
+  closing section. This is the durable measurement record.
+- **Per-fan-out reports** — each Worker agent records bin-level start/end timestamps in its summary report; Maestro
+  records wall-time delta vs the planned estimate in the spec's status line at consolidation.
 
-Use the accumulated record to refine future estimates. If session-summary measurements show that
-"spec-first + canary + parallel fan-out + consolidate + PR" consistently overruns 2-hour estimates by 50%, the
-next plan starts from the empirical 3-hour anchor, not the optimistic 2-hour one. This is the flash-moe pattern
-(DEC-0027) applied to time itself: measurement wins over intuition, even on workflow estimates.
+Use the accumulated record to refine future estimates. If session-summary measurements show that "spec-first + canary +
+parallel fan-out + consolidate + PR" consistently overruns 2-hour estimates by 50%, the next plan starts from the
+empirical 3-hour anchor, not the optimistic 2-hour one. This is the flash-moe pattern (DEC-0027) applied to time itself:
+measurement wins over intuition, even on workflow estimates.
 
 ### Branch discipline
 
@@ -717,8 +740,8 @@ For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 - Write/edit files under `src/`, `benchmarks/`, `experiments/`, `docs/`
 - Run `pytest`, `ruff`, `prettier --write|--check` (Linus tree only), `mdlint check` (Linus tree only — but see Known
   Library Quirks; mdlint mutates), `python` (in linus env), `git add`, `git commit`
-- Read-only git: `git status`, `git log`, `git diff`, `git branch`, `git show`, `git worktree list`,
-  `git for-each-ref`, `git reflog`, `git rev-parse`, `git cherry-pick` (within Linus tree, agent branches only)
+- Read-only git: `git status`, `git log`, `git diff`, `git branch`, `git show`, `git worktree list`, `git for-each-ref`,
+  `git reflog`, `git rev-parse`, `git cherry-pick` (within Linus tree, agent branches only)
 - Branch creation and pushing: `git switch -c <branch>`, `git push -u origin <branch>`
 - Pull request creation and interaction: `gh pr create`, `gh pr view`, `gh pr list`, `gh pr comment`, `gh pr merge`
   (with Dan approval for merge)

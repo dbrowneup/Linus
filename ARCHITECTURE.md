@@ -19,6 +19,10 @@ automations), decides which model should handle each request, exposes a persiste
 maintains durable state (sessions, memory, audit logs), enforces policies that need to apply regardless of front-end,
 and can coordinate multiple model calls into a single workflow (e.g., fan out to parallel agents, merge results). It has
 no UI of its own — front-ends are its UIs. The orchestration layer is where Dan-specific intelligence accrues over time.
+A Phase 5+ extension surfaced in the Canteen Agent/Identity/Venue decomposition (see
+[`docs/syntheses/entrepreneurship-synthesis.md`](docs/syntheses/entrepreneurship-synthesis.md)) frames a future **Venue
+layer** sitting above orchestration — the deployment / monetization / jurisdiction surface that turns orchestrated
+skills into addressable services.
 
 The cleanest analogy: harnesses are terminal emulators. The orchestration layer is the shell. One shell, many terminals.
 Swap the terminal, keep your shell. Swap the harness, keep Linus.
@@ -141,10 +145,10 @@ Useful for safety review, usage analysis, and autonomy graduation criteria.
 Stored under `src/linus/skills/<skill_name>/SKILL.md`. Invoked via the `linus.skill.invoke` tool. Phase 7 is when domain
 skills bloom.
 
-**Memory.** First-class architectural pillar at Phase 2 (DEC-0028). Five layers (A–E) per DEC-0052; Phase 2 ships
-Layers B (within-session scratchpad), C (cross-session episodic SQLite + content hashes + git), and E
-(KnowledgeBase). Layer A (intra-step latent) stays implicit at v0; Layer D (investigation memory) ships in Phase 3
-alongside the multi-agent spawner. See the **Memory pillar** section below and
+**Memory.** First-class architectural pillar at Phase 2 (DEC-0028). Five layers (A–E) per DEC-0052; Phase 2 ships Layers
+B (within-session scratchpad), C (cross-session episodic SQLite + content hashes + git), and E (KnowledgeBase). Layer A
+(intra-step latent) stays implicit at v0; Layer D (investigation memory) ships in Phase 3 alongside the multi-agent
+spawner. See the **Memory pillar** section below and
 [`docs/specs/memory-architecture.md`](docs/specs/memory-architecture.md) for the implementation contract.
 
 **RAG gateway.** Thin adapter layer between Linus's tool registry and KnowledgeBase's existing retrieval infrastructure.
@@ -161,7 +165,9 @@ context object.
 - **mlx-lm.** Reference/fallback MLX-based LLM runtime. Used for anything pmetal doesn't yet support and for direct MLX
   access in experiments. Also the alt path for LoRA fine-tuning if pmetal's LoRA doesn't pan out.
 - **mlx-flash** (Phase 5+). Weight streaming from SSD for larger-than-RAM models. Used for inference-only evaluation of
-  large fine-tuned models. Inspired by Dan Woods' flash-moe and Apple's LLM in a Flash paper.
+  large fine-tuned models. Inspired by Dan Woods' flash-moe and Apple's LLM in a Flash paper. Phase 6d target spec at
+  [`docs/specs/phase6d-streaming-target.md`](docs/specs/phase6d-streaming-target.md); Kimi-K2 (1T / 32B-active MoE) is
+  the canonical fold-in candidate for this lane (see [`docs/repo-notes/Kimi-K2.md`](docs/repo-notes/Kimi-K2.md)).
 - **BitNet / Bonsai** (Phase 5+). 1-bit model inference for specific memory-constrained deployments. Evaluated for the
   Linus-on-phone future and for the "bigger-model-smaller- memory" direction.
 
@@ -217,19 +223,19 @@ Docker is acceptable for these services; they do not require Metal passthrough.
 
 Memory is lifted to a first-class architectural pillar at Phase 2 (DEC-0028). Five layers:
 
-| Layer | Name                       | Lifetime                   | Substrate                                          | Phase              |
-| ----- | -------------------------- | -------------------------- | -------------------------------------------------- | ------------------ |
-| A     | Intra-step latent state    | Single forward pass        | KV cache (model-internal)                          | Phase 1 (implicit) |
-| B     | Within-session scratchpad  | Single session             | In-context window, capped at 16K tokens            | Phase 2            |
-| C     | Cross-session episodic     | Persistent                 | SQLite + content hashes + git                      | Phase 2            |
-| D     | Investigation memory       | Single investigation (task-scoped) | SQLite `investigations.db`                 | Phase 3            |
-| E     | Semantic knowledge         | Persistent                 | KnowledgeBase (RDF + property graph)               | Phase 2            |
+| Layer | Name                      | Lifetime                           | Substrate                               | Phase              |
+| ----- | ------------------------- | ---------------------------------- | --------------------------------------- | ------------------ |
+| A     | Intra-step latent state   | Single forward pass                | KV cache (model-internal)               | Phase 1 (implicit) |
+| B     | Within-session scratchpad | Single session                     | In-context window, capped at 16K tokens | Phase 2            |
+| C     | Cross-session episodic    | Persistent                         | SQLite + content hashes + git           | Phase 2            |
+| D     | Investigation memory      | Single investigation (task-scoped) | SQLite `investigations.db`              | Phase 3            |
+| E     | Semantic knowledge        | Persistent                         | KnowledgeBase (RDF + property graph)    | Phase 2            |
 
 Implementation contract and API surface: [`docs/specs/memory-architecture.md`](docs/specs/memory-architecture.md).
 
 **Memory Budget Accounting.** Memory budget is a first-class architectural quantity. Linus's design target is tens of
-dollars of electricity per day on a single M1 Max, narrowing the gap to the human-with-pen-and-paper lower bound
-through substrate (DEC-0029), discipline (DEC-0030, 0031, 0032), and measurement (DEC-0033, 0035).
+dollars of electricity per day on a single M1 Max, narrowing the gap to the human-with-pen-and-paper lower bound through
+substrate (DEC-0029), discipline (DEC-0030, 0031, 0032), and measurement (DEC-0033, 0035).
 
 **Router primitives.** Every Worker dispatch carries `memory_mode` (`stateless` / `session_stateful` /
 `project_stateful`) and `cot_budget` (`logarithmic` / `linear` / `polynomial`) as first-class fields in the dispatch
@@ -323,6 +329,6 @@ Phase 6 extends: training backend (pmetal or mlx-lm-ft), first fine-tuned adapte
   `docs/specs/memory-architecture.md`. Layer D (investigation memory) and beyond in Phase 3.
 - **MCP adoption.** Resolved (DEC-0018): adopt as extensibility substrate from Phase 2 onwards.
 - **Voice input routing.** Resolved: openclaw transcribes to text before sending to Linus; Phase 5 adoption.
-- **Per-Worker-class tool-use templates.** Resolved (DEC-0027): Phase 7 plan using role-differentiated templates.
-  Phase 2 tool registry built without single-template assumptions.
+- **Per-Worker-class tool-use templates.** Resolved (DEC-0027): Phase 7 plan using role-differentiated templates. Phase
+  2 tool registry built without single-template assumptions.
 - **Inference backend.** Proposed (DEC-0049): pmetal vs. MLX-native PrismML fork; gate decision at Phase 1b verdict.
