@@ -618,6 +618,14 @@ Linus" section maps each point to a phase (Phase 1..8) and references a DEC or s
 partial-resolved items use
 `_Partially resolved (DEC-NNNN, see [answered-questions.md](../questions/answered-questions.md)): nuance._`.
 
+**Paper-note (paired-repo variant).** When the source PDF lives in a paired repo rather than `context/papers/` (e.g., a
+model release shipping its own tech report alongside the weights/code), use a hybrid filename
+`<RepoName>-<arxiv-id>.md` instead of the default `<arxiv-id>.md`. This makes the paper↔repo pairing visible at
+INDEX-scan time and prevents the paper-note from looking like a standalone arxiv entry when it's actually load-bearing
+for a specific repo. The `pdf:` frontmatter field points to a relative path into `repos/` (e.g.,
+`../../repos/Kimi-K2/tech_report.pdf`) rather than `../../context/papers/...`. Canonical example: Kimi-K2 tech report
+(arxiv 2507.20534) → `paper-notes/Kimi-K2-2507.20534.md` paired with `repo-notes/Kimi-K2.md`.
+
 **Repo-note** — `docs/repo-notes/<repo-name>.md`. No frontmatter. H1 = `# <repo-name> (\`<owner/repo>\`)`. Seven
 numbered H2 sections in fixed order: `## 1. Purpose and scope` · `## 2. Architecture summary` ·
 `## 3. What's reusable in Linus` · `## 4. What's inspiration only` · `## 5. What's incompatible or out of scope` ·
