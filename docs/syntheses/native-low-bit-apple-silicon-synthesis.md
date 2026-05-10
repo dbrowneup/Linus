@@ -2,27 +2,35 @@
 
 ## What this document is
 
-A synthesis of eleven paper-notes that together describe the most internally coherent operational thread in the Linus
+A synthesis of twelve paper-notes that together describe the most internally coherent operational thread in the Linus
 corpus: the path from "can a 1-bit LLM exist" through "here is an 8B native-ternary checkpoint runnable on M1 Max today,
-and here is the streaming machinery that makes anything larger tractable." Three sub-threads — the BitNet research line
-out of Microsoft Research (seven papers), the Bonsai productized line out of PrismML (two whitepapers), and the
-larger-than-RAM streaming work (two papers from Apple and Anthropic + Daniel Woods) — are unified by a single question:
-_how do you run capable LLMs efficiently on Apple Silicon under 32 GB of unified memory?_
+here is the streaming machinery that makes anything larger tractable, and here is a frontier-class trillion-parameter
+MoE that lives at the intersection of both." Four sub-threads — the BitNet research line out of Microsoft Research
+(seven papers), the Bonsai productized line out of PrismML (two whitepapers plus a public announcement), the
+larger-than-RAM streaming work (two papers from Apple and Anthropic + Daniel Woods), and the new Kimi-K2 frontier-MoE
+candidate (Moonshot AI, 2025-07) — are unified by a single question: _how do you run capable LLMs efficiently on Apple
+Silicon under 32 GB of unified memory?_
 
 The thread predates the eight-group triage that organized the rest of the corpus; it absorbed the existing BitNet thread
-in the [paper-landscape](../landscapes/paper-landscape.md) and the larger-than-RAM streaming pair, and the two new
-Bonsai whitepapers shift its center of gravity. This synthesis formalizes the previously implicit "Group I" so the Phase
-1c benchmark spike, the Phase 2 Worker selection, the Phase 6 fine-tuning roadmap, and the Phase 6d streaming-or-not
-scoping decision all work from the same picture.
+in the [paper-landscape](../landscapes/paper-landscape.md) and the larger-than-RAM streaming pair, the two Bonsai
+whitepapers shifted its center of gravity in spring 2026, and the Kimi-K2 fold-in (added 2026-05-09) raises the ceiling
+of what the synthesis can plausibly target. This document formalizes the previously implicit "Group I" so the Phase 1c
+benchmark spike, the Phase 2 Worker selection, the Phase 6 fine-tuning roadmap and possible base-model swap, the Phase
+6d streaming-or-not scoping decision, and the Phase 8 Linus-flavored frontier-MoE research direction all work from the
+same picture.
 
-The headline claim is short. **In roughly two years the field went from "1-bit LLMs are possible in principle" (BitNet,
-late 2023) to "the first MLX-native, Apache-licensed, downloadable native-ternary 8B checkpoint runs on consumer Apple
-Silicon" (Bonsai Ternary 8B, April 2026).** That trajectory closes the gap between the BitNet research line and Linus's
-Phase 1c spike: the spike was originally scoped around BitNet b1.58 2B4T, and Bonsai's 8B release fundamentally changes
-what "the most capable native-low-bit Worker we can run on M1 Max" means. The Phase 6d stretch target — opportunistic
-ternary >8B integration if the community released one — has been delivered ahead of schedule. The two streaming papers
-remain the path for whatever does not fit, but Bonsai 8B at 1.15–1.75 GB of weight footprint makes that "whatever" a
-much smaller residual than it was a year ago.
+The headline claim has grown a third clause. **In roughly two years the field went from "1-bit LLMs are possible in
+principle" (BitNet, late 2023) to "the first MLX-native, Apache-licensed, downloadable native-ternary 8B checkpoint runs
+on consumer Apple Silicon" (Bonsai Ternary 8B, April 2026), and in mid-2025 a frontier-class 1T-parameter MoE
+(Kimi-K2-Instruct) was released under a Modified MIT license whose architecture is sized such that an int4 or
+ternary/1-bit Linus-flavored variant is plausibly streamable on M1 Max + a 600 GB external SSD.** That third clause is
+load-bearing: BitNet/Bonsai built the 1-bit substrate; flash-streaming made >32 GB MoE feasible on consumer Apple
+Silicon; **Kimi-K2 is the candidate model that could combine both for Linus**. The Phase 6d stretch target —
+opportunistic ternary >8B integration if the community released one — has been delivered ahead of schedule by Bonsai.
+The Phase 6/8 ceiling — a frontier-class agentic base model that Linus can plausibly fine-tune and serve under its own
+inference layer — has a concrete candidate for the first time. Two ADR seeds named in this synthesis (DEC-0055 for the
+Phase 6 Qwen3 → Kimi-K2 base swap, DEC-0056 for the Phase 8 Linus-flavored 1-bit Kimi-K2 variant) are open commitments,
+not speculation.
 
 ---
 
@@ -58,6 +66,12 @@ much smaller residual than it was a year ago.
 - [Bonsai Ternary 8B (2026-04-16)](../paper-notes/bonsai-ternary-8b-whitepaper.md) — same recipe, ternary `{−1, 0, +1}`
   instead of binary. 1.75 GB on disk, 75.5 average (95% of FP16 Qwen3-8B's 79.3), 83 tok/s decode on M4 Pro. The first
   openly released native-ternary 8B checkpoint; structurally the BitNet b1.58 weight scheme applied as PTQ to Qwen3.
+- _Companion announcement_ — `context/notes/Announcing 1-bit Bonsai.txt` (PrismML's 2026-03-31 launch piece) frames the
+  release as the founding artifact of an "intelligence density" research program out of Caltech, defined as
+  `D = -log(P_e)/N` where `P_e = 1 − score/100` and `N` is GB of weight footprint. The announcement positions Bonsai as
+  "the first commercially viable 1-bit LLMs," foregrounding the Pareto-frontier shift from the FP16 8B-class cluster to
+  the 1.15 GB regime — a positioning that matters for Linus's framing of low-bit not as a research curio but as a
+  deployment substrate.
 
 **The larger-than-RAM streaming line:**
 
@@ -68,6 +82,17 @@ much smaller residual than it was a year ago.
   tok/s sustained on a 48 GB M3 Max via custom Metal/Objective-C inference engine. Notable: primary author is Claude
   Opus 4.6 itself, working under Daniel Woods' direction over a 24-hour collaborative session — the paper is itself a
   Maestro/Worker artifact.
+
+**The Kimi-K2 frontier-MoE candidate:**
+
+- [Kimi-K2 (2507.20534, 2025-07)](../paper-notes/Kimi-K2-2507.20534.md) — Moonshot AI's open-weights frontier model. A
+  **1.04-trillion-parameter MoE** with **32B activated parameters per token**, 384 experts (8 active + 1 shared), MLA
+  attention, 128K context, pre-trained on 15.5T tokens with **zero loss spikes** thanks to the new MuonClip optimizer.
+  Block-fp8 weights under a Modified MIT license. Open-source SOTA on every agentic benchmark axis (65.8 SWE-bench
+  Verified single-attempt, 71.6 multi-attempt; 66.1 τ²-Bench; 76.5 ACEBench). For this synthesis it is simultaneously
+  the largest weight-streaming target ever credibly proposed for a Linus phase, a Phase 6 LoRA-base candidate that could
+  replace Qwen3, and the substrate for a Phase 8 1-bit Linus-flavored variant — three independent strategic vectors plus
+  MuonClip as a fourth optimizer-level vector. Sub-thread D below covers the architectural and operational details.
 
 ---
 
@@ -122,6 +147,16 @@ from-scratch BitNet 2B4T checkpoint.
 The arc is _research → engineering → productization → MLX-native deployment_. It took roughly twenty-eight months. The
 Phase 1c spike, scoped a year ago around BitNet 2B4T as the one publicly available artifact, now has a much richer
 comparison table.
+
+A fourth point on this arc, sitting orthogonal to the BitNet/Bonsai line but directly relevant to where the synthesis is
+heading, was already on the table when Bonsai released. **Kimi-K2-Instruct** (Moonshot AI, July 2025) shipped a
+1.04T-parameter MoE under a Modified MIT license with block-fp8 weights and open-source SOTA agentic benchmarks. It is
+not low-bit in the BitNet sense and not Apple-Silicon-targeted in any sense, but its architecture (8 active experts of
+~44 MB each at FP8, ~350 MB/token streamed shard set, ~15–25 GB of always-resident attention/embed/norm/dense/shared-
+expert layer) is sized such that it sits **just past the M1 Max FP8 ceiling, plausibly inside at int4, and comfortably
+inside at 1-bit/ternary**. That sizing is what turns Kimi-K2 from "a frontier model Dan can read about" into "a frontier
+model whose 1-bit Linus-flavored variant is a credible Phase 8 research target on Dan's hardware." Sub-thread D below
+unpacks the math.
 
 ---
 
@@ -248,6 +283,25 @@ CPU-only on Apple Silicon (NEON SIMD on ARM, no Metal, no ANE). Bonsai ships cus
 Swift, and for Metal via a PrismML fork of llama.cpp. For the first time, Apple Silicon GPU acceleration of a low-bit
 LLM ships in a downloadable package.
 
+The PrismML announcement (`context/notes/Announcing 1-bit Bonsai.txt`, 2026-03-31) frames the release with a piece of
+quantitative rhetoric worth absorbing into the Linus framing of low-bit. Rather than report raw benchmark averages
+alone, PrismML defines an **intelligence density** metric `D = −log(P_e)/N` where `P_e = 1 − score/100` and `N` is
+weight footprint in GB. The metric assigns greater value to improvements near high accuracy (where further gains are
+typically harder) than to equal-sized improvements at lower performance levels. By that measure 1-bit Bonsai 8B scores
+1.06/GB, where the closest comparable model in its parameter class (Qwen3-8B itself) scores 0.10/GB — "not just ahead on
+this measure; it is in a different regime." The metric is self-serving but the underlying claim survives reasonable
+alternative definitions, and the framing is useful: when Linus selects Workers, **quality at fixed footprint** is a
+better single-axis summary than benchmark score alone, especially in a 32 GB unified-memory regime where every spare GB
+earns interest in concurrent-Worker capacity.
+
+![1-bit Bonsai 8B intelligence density vs other 8B-class models — PrismML announcement, Fig I](../../context/pics/PrismML_Intelligence_Density_Measurement.png)
+
+![1-bit Bonsai 8B raw benchmark scores vs 8B-class models at radically smaller footprint — PrismML announcement, Fig II](../../context/pics/PrismML_Benchmark_Performance.png)
+
+![1-bit Bonsai family Pareto frontier shift — performance vs size across 20 leading instruct models, PrismML announcement, Fig IV](../../context/pics/Bonsai%20Performance%20vs%20Size.png)
+
+![1-bit Bonsai 8B energy consumption (mWh/tok) across hardware platforms — PrismML announcement, Fig III](../../context/pics/Bonsai%20Energy%20Use.png)
+
 ---
 
 ## Sub-thread C: The larger-than-RAM streaming line
@@ -270,16 +324,18 @@ paper is the design doc for [`repos/mlx-flash`](../../repos/mlx-flash/), which o
 models.
 
 [Flash-MoE](../paper-notes/flash_moe.md) is the extreme demonstration of the same philosophy. A 397-billion-parameter
-Qwen3.5 MoE running at 5.74 tok/s sustained on a 48 GB M3 Max via custom Metal/Objective-C streaming. The technique
-stack is dense: 2-bit re-quantization of the 4-bit experts (RMSE 0.001–0.003, exploiting the fact that within a group of
-64 4-bit values only 16 distinct floats exist anyway); a three-command-buffer Metal pipeline with the third buffer's
-expert fetch dispatched in parallel via `pread()` from the CPU while CMD2 executes on the GPU; hand-written kernels for
-tiled threadgroup matrix-vector multiply with inline dequantization; a counterintuitive finding that _removing_ a 9.8 GB
-application-level expert cache gave +38% throughput because it was competing for DRAM with the macOS page cache. The
-paper is its own existence proof of the Maestro/Worker model Linus aspires to, written by Claude Opus 4.6 as primary
-author under Daniel Woods' direction over a 24-hour collaborative session. The techniques are too bespoke to vendor, but
-the methodology — and three specific lessons (trust the OS page cache, the deferred-CMD3 pipeline, custom Metal beats
-MLX by 12× on this workload) — generalize beyond MoE.
+Qwen3.5 MoE running at 5.74 tok/s sustained on a 48 GB M3 Max via custom Metal/Objective-C streaming.
+
+![Flash-MoE 397B benchmark scatter — quality vs footprint frontier with the streamed Flash-MoE 397B point](../../context/pics/HDtyosvbcAAHMwd.png)
+The technique stack is dense: 2-bit re-quantization of the 4-bit experts (RMSE 0.001–0.003, exploiting the fact that
+within a group of 64 4-bit values only 16 distinct floats exist anyway); a three-command-buffer Metal pipeline with the
+third buffer's expert fetch dispatched in parallel via `pread()` from the CPU while CMD2 executes on the GPU;
+hand-written kernels for tiled threadgroup matrix-vector multiply with inline dequantization; a counterintuitive finding
+that _removing_ a 9.8 GB application-level expert cache gave +38% throughput because it was competing for DRAM with the
+macOS page cache. The paper is its own existence proof of the Maestro/Worker model Linus aspires to, written by Claude
+Opus 4.6 as primary author under Daniel Woods' direction over a 24-hour collaborative session. The techniques are too
+bespoke to vendor, but the methodology — and three specific lessons (trust the OS page cache, the deferred-CMD3
+pipeline, custom Metal beats MLX by 12× on this workload) — generalize beyond MoE.
 
 The relevance of these two papers to Linus has been **changed by Bonsai's release** in a specific and significant way.
 Before Bonsai, the only credible path to running an 8B-class capable model on M1 Max under serious memory pressure was
@@ -289,7 +345,127 @@ memory with plenty of room for KV cache, KnowledgeBase indices, and orchestratio
 native quality, or at 70B+ if and when PrismML scales the Bonsai recipe upward. This is a major Phase 6d scoping result:
 the original stretch target was "ternary 8B if community releases" — Bonsai delivers exactly that. The streaming roadmap
 shifts from "we may need this for any reasonably capable Worker" to "we need this only for the rare model that genuinely
-exceeds RAM in the regime that matters."
+exceeds RAM in the regime that matters." Kimi-K2, covered next, is exactly that rare model.
+
+---
+
+## Sub-thread D: The Kimi-K2 frontier-MoE candidate
+
+The fourth sub-thread is a single paper-note ([Kimi-K2 (2507.20534)](../paper-notes/Kimi-K2-2507.20534.md)) that arrived
+in the corpus late but reframes the synthesis's upper bound. Moonshot AI's open-weights release in July 2025 is a
+1.04-trillion-parameter MoE with 32B activated parameters per token, 384 experts (8 active + 1 shared), MLA attention,
+128K context, pre-trained on 15.5T tokens with — and this is the load-bearing claim of the paper — **zero loss spikes
+anywhere** in the training trace. The optimizer that delivered that stability is **MuonClip**: Muon plus a per-head
+QK-Clip post-update that, after each Muon step, rescales the query and key projection weights of any attention head
+whose maximum pre-softmax logit exceeds threshold τ=100. The mechanism is roughly ten lines of Python on top of an
+existing Muon implementation, and it is the kind of optimizer-level intervention that becomes a discipline default if it
+generalizes.
+
+Kimi-K2 does not, on first inspection, belong in a synthesis about running LLMs efficiently under 32 GB of unified
+memory. The released block-fp8 distribution is ~1.04 TB on disk; resident memory under naïve loading is multi-hundred-
+GB; the training infrastructure (256 H800 GPUs with NVLink and 8×400 Gbps RoCE) is a different planet from a MacBook
+Pro. But on second inspection — once the synthesis's pre-existing tools (BitNet/Bonsai quantization to 1-bit/ternary,
+flash-MoE expert streaming) are brought to bear — the architecture is sized in a way that puts a Linus-flavored variant
+inside the M1 Max + 600 GB external SSD envelope. The footprint math from the paper-note is the load-bearing surface.
+
+**The footprint math.** Each MoE expert in Kimi-K2 has hidden dimension 2048; one expert is roughly
+`(3 × 7168 × 2048) ≈ 44M parameters → ~44 MB at FP8`. Eight active routed experts plus one shared expert plus
+attention/embed/norm/dense-layer overhead gives **~350 MB of expert weights streamed per token at FP8, plus a 15–25 GB
+always-resident layer for attention/embeds/norms/dense/shared-expert**. That sustained-bandwidth requirement (~350
+MB/token at decode rates) is just past the M1 Max's external-SSD ceiling: the full 1.04 TB FP8 distribution does not fit
+on the 600 GB external SSD as-distributed and would require staging. At **int4** the total drops to ~250 GB and the
+per-token streamed shard set drops to ~175 MB — fits with headroom, plausibly inside the latency envelope. At
+**ternary/1-bit** (1.58 bits/weight or 1 bit/weight) the total drops to ~130–205 GB and per-token streaming drops to
+~44–88 MB — comfortably inside Phase 8 territory.
+
+**Three strategic vectors.** Kimi-K2 is simultaneously a Phase 6 LoRA-base candidate, a Phase 6d weight-streaming
+target, and a Phase 8 substrate for a 1-bit Linus-flavored MoE. These vectors operate at different time horizons and
+have different success criteria, but they are not independent: the Phase 6d feasibility result determines whether the
+Phase 6 base swap is even a question, and the Phase 8 1-bit variant is the only path that brings the model fully into
+the unified-memory regime (the streaming path keeps it interactive but expensive). The next section unpacks the
+combinable-bets thesis that ties them together.
+
+The non-streaming use of Kimi-K2 is **MuonClip as a Phase 6 fine-tuning convention candidate, independent of base-model
+choice**. Whether MuonClip generalizes to dense models, to smaller scales, or to MLX implementations on Apple Silicon
+are open questions, but the surface area is small enough that a Phase 6 spike could LoRA-fine-tune a 7B–32B Worker with
+MuonClip vs. Muon vs. AdamW and settle the matter cheaply. Even a negative result (MuonClip doesn't help LoRA on a small
+Worker) is a useful boundary on the technique's domain of validity. This is the kind of paper-supplied optimizer-level
+finding that Linus's Phase 6 fine-tuning convention — already committed to FP16-LoRA on Qwen3-8B as the safe baseline —
+should explicitly evaluate.
+
+The agentic dimension matters even outside this synthesis's primary frame. Kimi-K2's agentic-data-synthesis pipeline (a
+3,000+ MCP tool repository plus 20,000+ synthetic tools, multi-turn rollouts in a stochastic simulator, LLM-judge
+filtering against task rubrics) is the closest published template to what Phase 7's biology-skills training will need.
+The agentic-systems and skills-and-practices syntheses fold this in directly; here it is mentioned only because Linus's
+"capable agentic Worker" requirement is the **reason** the Phase 6 base-swap question is sharp at all. If Qwen3-32B-LoRA
+delivered the agentic benchmarks Linus needs, Kimi-K2 would be a curiosity. It does not — Kimi-K2 leads SWE-bench
+Verified open-source by ~10 percentage points, τ²-Bench by similar margins — and that gap is what makes the swap
+question worth asking.
+
+---
+
+## The combinable-bets thesis: Kimi-K2 × flash-MoE × BitNet/Bonsai
+
+The most consequential strategic move surfaced by this synthesis is the realization that the four sub-threads above are
+**combinable** in a specific way that targets a specific deployable artifact. The argument runs in three steps.
+
+**Step 1: BitNet/Bonsai built the 1-bit substrate.** The trajectory from BitNet (existence proof, 2023) through Bonsai
+Ternary 8B (deployable artifact, 2026) demonstrates that capable LLMs can live in 1-bit / 1.58-bit / ternary weight
+formats with quality losses bounded by single-digit percentage points relative to FP16, that the conversion path can be
+either from-scratch pretraining (BitNet b1.58 2B4T), distillation (BitNet Distillation), or post-training quantization
+on a strong open base (Bonsai). The substrate is real, the artifacts are downloadable, and the deployment kernels exist
+on Apple Silicon for the first time.
+
+**Step 2: Flash-streaming made >32 GB MoE feasible on consumer Apple Silicon.** Flash-MoE's 397B-parameter, 5.74 tok/s
+result on a 48 GB M3 Max — combining 2-bit re-quantization of experts, a three-command-buffer Metal pipeline with
+deferred CMD3 expert fetch, and the "trust the OS page cache" finding — is the existence proof that the bandwidth-vs-
+compute imbalance of MoE inference can be exploited on consumer hardware to run models 4× the size of unified memory.
+The methodology is too bespoke to vendor wholesale, but the technique stack generalizes, and the M1 Max + 600 GB
+external SSD has roughly half the streaming bandwidth of M3 Max — a degradation factor, not a categorical barrier.
+
+**Step 3: Kimi-K2 is the candidate model that combines both for Linus.** The 1.04T-parameter Kimi-K2 architecture sits
+exactly where the two prior threads converge. It is too large for unified-memory deployment at any precision currently
+practical (the FP8 distribution alone is ~1 TB), so the BitNet/Bonsai-style aggressive quantization is necessary. It is
+sparse enough (8 active routed experts out of 384, ~3% activation rate per token) that the flash-streaming pattern
+applies. It is licensed permissively enough (Modified MIT) that a Linus-flavored derivative is a real option. It is
+agentically capable enough at FP8 that the Phase 6/8 prize is worth the engineering. **No single paper in the existing
+synthesis would produce this candidate**; the candidate emerges only from the combination.
+
+The two ADR seeds named in this synthesis make the combinable-bets thesis durable.
+
+**DEC-0055 (Phase 6 Qwen3 → Kimi-K2 base swap).** _Seed: DEC-0055._ CLAUDE.md currently names Qwen3 as Linus's default
+Worker base "for 32 GB M1 Max hardware." The decision criteria for swapping Qwen3 → Kimi-K2 ought to be: (a) **agentic
+benchmark deltas** on Dan's domain corpus after LoRA training (not zero-shot) — concretely SWE-bench Verified, τ²-Bench,
+Aider-Polyglot scores; (b) **memory-budget feasibility** under a flash-MoE-style streaming inference path on M1 Max with
+the 600 GB external SSD; (c) **license cleanliness** (Modified MIT is more permissive than Llama 3 Community License and
+competitive with Apache 2.0 once the trademark/attribution clauses are read end-to-end). Tentative threshold for
+discussion: ≥10 percentage points on SWE-bench Verified after equivalent LoRA training, ≥5 percentage points on τ²-
+Bench, _and_ per-token latency within 2× of Qwen3-32B-native. If Kimi-K2 hits two of three, mixed verdict; if all three,
+commit to swap; if zero, commit to staying on Qwen3. The decision is gated on the Phase 6d streaming-feasibility spike,
+which is a measurement task, not an argumentation task.
+
+**DEC-0056 (Phase 8 1-bit / ternary Linus-flavored Kimi-K2 variant).** _Seed: DEC-0056._ The aspirational target. Apply
+flash-MoE's expert-streaming methodology to Kimi-K2's released base checkpoint and apply BitNet's / Bonsai's ternary or
+1-bit weight quantization at the same time. A 1.58-bit ternary Kimi-K2 carries roughly `1.04T × 1.58 bits ≈ 205 GB`
+total; a strict 1-bit variant carries ~130 GB. The active-expert per-token streaming budget at 1-bit drops from ~350 MB
+(FP8) to ~44 MB — within an order of magnitude of the M1 Max's sustained external-SSD bandwidth budget for interactive
+use. Whether this artifact can be _produced_ is a research question separate from whether it can be _served_: the
+established BitNet line trains from scratch (closed to anyone outside frontier labs), Bonsai's PTQ recipe is closed
+intellectual property, and BitNet Distillation's three-stage SubLN-insertion + 10B-token continued pretraining + multi-
+loss distillation pipeline is the closest published path. Phase 8 should scope a feasibility spike that distills
+Kimi-K2-Base into a ternary variant on a small subset of layers, evaluates on SWE-bench-Verified-lite and τ²-Bench-lite,
+and decides.
+
+**The strategic gravity of these two seeds is asymmetric**, and the asymmetry is the point. DEC-0055 is a Phase 6
+decision that depends primarily on a Phase 6d measurement (does the streaming path produce interactive latency on Dan's
+hardware) plus an empirical comparison (does Kimi-K2 LoRA beat Qwen3 LoRA on Dan's domain by enough margin). The
+measurement and the comparison are bounded tasks. DEC-0056 is a Phase 8 research direction that could land anywhere
+between "produces a frontier-class agentic Linus Worker that runs on a MacBook Pro" and "demonstrates a sharp boundary
+on what 1-bit quantization preserves at trillion-parameter scale" — both outcomes are useful, but the upper bound is
+materially more transformative than anything else the synthesis points at. The reason the seeds are surfaced together is
+that Phase 6d's measurement informs both: the streaming feasibility result is the prerequisite for both the base- swap
+decision and the Phase 8 substrate research direction. **Phase 6d's spike is the most important measurement in the
+entire low-bit-Apple-Silicon arc**, in a way it was not before Kimi-K2 was added to the corpus.
 
 ---
 
@@ -393,34 +569,50 @@ layer can keep specialized Workers warm (a code Worker via Qwen2.5-Coder-7B, a g
 small Worker for fast classification via BitNet 2B4T at 0.4 GB) without the swap-in / swap- out friction that an FP16
 Worker selection would impose. Worker specialization becomes operationally cheap.
 
-**Phase 6 — fine-tuning.** Three production paths to a Linus-branded low-bit Worker now exist, ranked by tractability
-and risk: _FP16-LoRA on Dan's domain corpus_, the safe baseline already committed in the existing planning, leaves a
-deployable artifact even if the low-bit paths fail. _BitDistill on a small fine-tuned Worker_, using the three-stage
-SubLN-insertion-plus-continued-pretraining-plus- distillation pipeline, is the published recipe for converting any
-HuggingFace FP16 model to 1.58-bit; cost is dominated by the ~10B-token continued pretraining step, which on M1 Max
-needs a benchmark spike to verify is hours/days/weeks. _Bonsai-style PTQ_ on a domain-fine-tuned Qwen3-8B is appealing
-because the Bonsai artifacts validate the format, but the recipe is closed; either PrismML opens it or the community
-reverse-engineers it. The pragmatic Phase 6 sequence is FP16-LoRA first (unconditional), then BitDistill on the small
-fine-tuned Worker as the first low-bit pass (when the spike confirms tractability), then watch PrismML for either an
-opened recipe or a Bonsai-LoRA workflow.
+**Phase 6 — fine-tuning and the open base-model question.** Three production paths to a Linus-branded low-bit Worker now
+exist, ranked by tractability and risk: _FP16-LoRA on Dan's domain corpus_, the safe baseline already committed in the
+existing planning, leaves a deployable artifact even if the low-bit paths fail. _BitDistill on a small fine-tuned
+Worker_, using the three-stage SubLN-insertion-plus-continued-pretraining-plus-distillation pipeline, is the published
+recipe for converting any HuggingFace FP16 model to 1.58-bit; cost is dominated by the ~10B-token continued pretraining
+step, which on M1 Max needs a benchmark spike to verify is hours/days/weeks. _Bonsai-style PTQ_ on a domain-fine-tuned
+Qwen3-8B is appealing because the Bonsai artifacts validate the format, but the recipe is closed; either PrismML opens
+it or the community reverse-engineers it. The pragmatic Phase 6 sequence is FP16-LoRA first (unconditional), then
+BitDistill on the small fine-tuned Worker as the first low-bit pass (when the spike confirms tractability), then watch
+PrismML for either an opened recipe or a Bonsai-LoRA workflow.
 
-**Phase 6d — streaming as residual.** Reframe Phase 6d explicitly: mlx-flash is the path for any _future_ fine-tuned
-model that genuinely exceeds RAM. Bonsai's existence makes the 8B-class regime not need streaming at all. The streaming
-roadmap shifts from "we may need this for any capable Worker" to "we need this only for the rare large fine- tuned
-Worker that genuinely exceeds RAM, or for opportunistic ternary 30B+ if PrismML ever scales the Bonsai recipe upward."
-Flash-MoE stays methodology-only reference (no Linus dependency on its bespoke Metal codebase, but the OS-page-cache
+The new Phase 6 question Kimi-K2 raises is the **base-model swap (DEC-0055 seed, see Sub-thread D and the combinable-
+bets section above)**. CLAUDE.md currently commits to Qwen3 as Linus's default Worker base. Kimi-K2-Instruct is at
+minimum a credible alternative on agentic benchmarks (open-source SOTA on every axis the paper measures) and at maximum
+an architecturally distinct path that — combined with the 1-bit Linus-flavored variant of DEC-0056 — could replace the
+Qwen3-Bonsai-Ternary-8B center of gravity entirely with a Kimi-K2-derived MoE Worker. The decision is gated on the Phase
+6d streaming-feasibility spike. MuonClip surfaces independently as a fine-tuning convention candidate worth a small
+ablation (LoRA on a 7B–32B Worker with MuonClip vs. Muon vs. AdamW) regardless of base-model choice.
+
+**Phase 6d — streaming as residual, but with a sharply elevated upper target.** Reframe Phase 6d explicitly: mlx-flash
+is the path for any _future_ fine-tuned model that genuinely exceeds RAM. Bonsai's existence makes the 8B-class regime
+not need streaming at all. The streaming roadmap shifts from "we may need this for any capable Worker" to "we need this
+only for the rare large model that genuinely exceeds RAM." But the rare large model now has a name: **Kimi-K2 at int4
+(~250 GB total, ~175 MB/token streamed) or at ternary/1-bit (~130–205 GB total, ~44–88 MB/token streamed)**. Phase 6d's
+spike, formerly a contingency for fine-tuned-Linus-Worker overrun, is now the gating measurement for both DEC-0055 and
+DEC-0056 — the most consequential single measurement in the synthesis's strategic arc. The flash-MoE
+methodology-only-reference status persists (no Linus dependency on its bespoke Metal codebase, but the OS-page-cache
 lesson and the deferred-CMD3 pipeline pattern inform the Linus inference layer when it eventually has its own kernel
-work).
+work), with Kimi-K2 as the concrete target the methodology would be applied to.
 
-**Phase 8 — the speculative cross-product.** A "Bonsai-MoE-streamed-with-Cayley-stability" research direction now has
-materially more plausibility than it did a year ago. Eight Ternary Bonsai 8B Workers in parallel consume ~14 GB of
-weights — a fan-out that wasn't credible at FP16 even with 4-bit quantization. Combining
-[JPmHC's](../paper-notes/2602.18308v2.md) Cayley-stabilized hyper-connections (which replace Sinkhorn-constrained
-doubly-stochastic matrices with orthogonal `O(n)` mixers, eliminating spectral stalling in deep stacks) with BitNet
-ternary weights and Flash-MoE streaming would push the single-machine inference frontier further. The JPmHC paper note
-also connects to BitNet 2B4T explicitly: both use SubLN-style normalization inserts as a training-stability mechanism,
-though via different mathematical routes. Nothing in the ROADMAP is gated on this cross-product, but it remains the most
-ambitious natural synthesis the corpus collectively points at.
+**Phase 8 — the speculative cross-product, now with a concrete substrate.** The "Bonsai-MoE-streamed-with-Cayley-
+stability" research direction has had materially more plausibility than a year ago since Bonsai released; with Kimi-K2
+in the corpus, it has a concrete substrate. Eight Ternary Bonsai 8B Workers in parallel consume ~14 GB of weights — a
+fan-out that wasn't credible at FP16 even with 4-bit quantization. Combining [JPmHC's](../paper-notes/2602.18308v2.md)
+Cayley-stabilized hyper-connections (which replace Sinkhorn-constrained doubly-stochastic matrices with orthogonal
+`O(n)` mixers, eliminating spectral stalling in deep stacks) with BitNet ternary weights and Flash-MoE streaming
+**applied to Kimi-K2** would push the single-machine inference frontier further than any other combination the corpus
+points at. The JPmHC paper note also connects to BitNet 2B4T explicitly: both use SubLN-style normalization inserts as a
+training-stability mechanism, though via different mathematical routes — and Kimi-K2 introduces a third stability
+mechanism (MuonClip's QK-Clip rescale) operating at the optimizer level rather than the architecture level. The four
+mechanisms (BitNet's SubLN, Bonsai's group-128 quantization recipe, JPmHC's Cayley orthogonal mixers, MuonClip's
+QK-Clip) are independent stability surfaces that could in principle compose. DEC-0056 (Phase 8 1-bit Linus-flavored
+Kimi-K2 variant) is the durable name for this cross-product as a research direction, distinct from the speculative
+four-paper synthesis it would draw on.
 
 **MLX ternary kernel as a Linus contribution.** The most tractable, well-scoped, immediately community-beneficial
 contribution opportunity in the entire Linus corpus is a native MLX ternary kernel that exploits the actual zeros in the
@@ -482,7 +674,39 @@ path for any fine- tuned Worker that exceeded RAM. Bonsai's compactness makes th
 answer is that mlx-flash is not deprecated — it is _narrowed in scope_ — and the Phase 6d formal target should be
 rewritten to reflect that. Fine-tuned models that genuinely exceed RAM (Linus-branded 30B+ or any opportunistic ternary
 30B+ from PrismML) remain the proper streaming targets. The Bonsai existence proof has shifted Phase 6d's center of
-gravity, not removed its motivation.
+gravity, not removed its motivation. Kimi-K2 (questions 8–12 below) is the most consequential addition to the streaming
+target list.
+
+**8. Is weight-streaming Kimi-K2 on M1 Max + 600 GB external SSD actually feasible at interactive latency?** The
+synthesis-level argument requires that the per-token streaming budget (~350 MB/token at FP8, ~175 MB at int4, ~44–88 MB
+at 1-bit/ternary) lands inside the M1 Max external-SSD sustained read budget under the flash-MoE-style `pread()` access
+pattern. The full Kimi-K2 FP8 distribution (~1 TB) does not fit on the 600 GB external SSD as-distributed and would
+require staging; the int4 form (~250 GB) fits with headroom. The first-byte and steady-state per-token latencies are
+empirical, not analytical — Phase 6d needs to measure, not estimate.
+
+**9. What is the per-token latency floor for Kimi-K2 streaming vs. Qwen3-32B native?** If the streaming gap is ≥5×, the
+streamed-Kimi-K2 Worker is not interactive even if it fits; if it's ≤2×, it's a viable Worker. The threshold matters
+because hosted Claude is the comparison point — interactive should mean responses begin within 1–2 seconds and stream at
+≥5 tok/s. This question gates DEC-0055.
+
+**10. Does FP8 → int4 → ternary preservation of agentic benchmarks hold for Kimi-K2?** The published Kimi-K2 numbers are
+at FP8. Whether the block-fp8 distribution requantizes cleanly to int4 with <2% benchmark degradation on SWE-bench
+Verified and τ²-Bench, and whether the BitNet-Distillation-style path preserves those numbers at ternary, are empirical
+questions that need a quantization spike smaller in scope than the full Phase 8 rebuild. A negative result (>5%
+degradation at int4) would close DEC-0056 cleanly; a positive result keeps both seeds open.
+
+**11. Is MuonClip reproducible on Apple Silicon, and does it generalize beyond MLA-MoE?** The MuonClip optimizer is
+reproducible in MLX in principle (Muon already exists; QK-Clip is a 10-line addition), but the per-head `Smax_h`
+tracking interacts with MLX's eager-by-default execution. Whether it generalizes to dense models (Kimi-K2 only validates
+on MLA-MoE) and to smaller scales (the only published trace is the 1T run) is the second-order question. A Phase 6 spike
+LoRA-fine-tuning a 7B–32B model with MuonClip vs. Muon vs. AdamW would settle the matter cheaply, and the result informs
+Phase 6 fine-tuning conventions independent of any Kimi-K2 base-swap decision.
+
+**12. What is the evidence threshold for the Phase 6 Qwen3 → Kimi-K2 base swap?** Tentative threshold for discussion:
+≥10 percentage points on SWE-bench Verified after equivalent LoRA training on Dan's domain corpus, ≥5 percentage points
+on τ²-Bench, _and_ per-token latency within 2× of Qwen3-32B-native. If Kimi-K2 hits two of three, mixed verdict; if all
+three, commit to the swap; if zero, commit to staying on Qwen3. The threshold itself is an open commitment — Dan's call,
+to be sharpened during the Phase 6d planning session.
 
 ---
 
@@ -516,6 +740,18 @@ BitDistill paper's claims) the BitDistill training code; it is the comparison ba
 Worker exceeds RAM. [`repos/pmetal`](../../repos/pmetal/) is the long-term native runtime where a Linus-contributed MLX
 ternary kernel would land. [`repos/ANE`](../../repos/ANE/) is the methodology reference for any future ANE-side work;
 per the Crossing 1 resolution, Linus's own code stays on public APIs, with pmetal as the supported ANE path.
+[`repos/Kimi-K2`](../../repos/Kimi-K2/) is the Moonshot release artifact (block-fp8 weights, deployment scripts, and the
+load-bearing `tech_report.pdf` that backs the [Kimi-K2 paper-note](../paper-notes/Kimi-K2-2507.20534.md)) — the
+substrate for both DEC-0055 and DEC-0056.
+
+The cross-synthesis links matter for Kimi-K2 specifically. The architectural and training-claim fold-in lives in
+[`infra-foundations-synthesis.md`](infra-foundations-synthesis.md) (MuonClip as optimizer-stability finding; MLA-at-64-
+heads scaling-law sweep; sparsity-48 result). The agentic-benchmark fold-in lives in
+[`agentic-systems-synthesis.md`](agentic-systems-synthesis.md) (SOTA τ²-Bench / ACEBench scores; the 3,000-MCP-tool
+synthetic-data pipeline as Phase 7 methodology import). The Anthropic-compatible-API fold-in lives in
+[`skills-and-practices-synthesis.md`](skills-and-practices-synthesis.md). This synthesis's primary fold focuses
+exclusively on the operational thread — quantization, streaming, and Apple-Silicon feasibility — and explicitly defers
+the architectural commentary, agentic-benchmark detail, and API-pattern commentary to those sibling syntheses.
 
 The landscape doc connections close the loop. This synthesis formalizes the union of
 [Crossing 1 (BitNet → Apple Silicon → ANE)](../landscapes/total-landscape.md#crossing-1-the-bitnet--apple-silicon--ane-bridge)
@@ -532,5 +768,8 @@ synthesis. The [`docs/landscapes/synthesis-landscape.md`](../landscapes/synthesi
 _This synthesis should be revisited when the Phase 1c spike results land (it will turn the four-way comparison into
 concrete Worker-selection data), when PrismML opens or refuses to open the Bonsai compression recipe (the Phase 6
 fine-tuning path depends on this), when an MLX native ternary kernel lands either from PrismML or from a Linus
-contribution (it removes the deployment-path tax that limits the Bonsai numbers reported here), and whenever a new
-ternary or 1-bit checkpoint at 8B+ scale lands in the open ecosystem._
+contribution (it removes the deployment-path tax that limits the Bonsai numbers reported here), whenever a new ternary
+or 1-bit checkpoint at 8B+ scale lands in the open ecosystem, when the Phase 6d streaming-feasibility spike returns a
+verdict on Kimi-K2 at int4 or 1-bit (this gates DEC-0055 and DEC-0056), when Moonshot AI or any community effort
+publishes a low-bit Kimi-K2 derivative, and when MuonClip's generalization to dense models or smaller scales is
+empirically tested._
