@@ -2,8 +2,8 @@
 
 ## What this document is
 
-The cross-synthesis structural map. Linus has accumulated 25 synthesis documents — 14 thematic syntheses in
-[`docs/syntheses/`](../syntheses/) and 11 repo-cluster syntheses in
+The cross-synthesis structural map. Linus has accumulated 27 synthesis documents — 15 thematic syntheses in
+[`docs/syntheses/`](../syntheses/) and 12 repo-cluster syntheses in
 [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/). Each one is itself a cross-cut: a thematic synthesis
 crosses paper-notes against an architectural or operational concern; a cluster synthesis crosses repo-notes within a
 fan-out group. This document goes one level higher — it crosses the syntheses against each other.
@@ -18,20 +18,22 @@ primary cluster anchor for the skills-and-practices synthesis.
 This is intentionally a complement to [`total-landscape.md`](total-landscape.md). The total landscape is the master
 integration map (architecture × roadmap × open questions in one place); this file is the structural map across the
 syntheses themselves (where they agree, tension, overlap, and what meta-shape emerges). The total landscape works
-top-down (Phase 2 needs X, X is informed by syntheses A, B, C); this file works bottom-up (here are 25 syntheses, this
+top-down (Phase 2 needs X, X is informed by syntheses A, B, C); this file works bottom-up (here are 27 syntheses, this
 is what falls out when you stack them).
 
 The previous version of this document covered four syntheses (security, llm-wiki, skills-and-practices, memory). That
 ratio has expanded ~6× since the post-fan-out integration pass. Read this once before working through Tier 1 in
 `top-questions.md`; refer back as decisions land. (Updated 2026-05-05 to reflect g11 + 5 thematic additions; refreshed
 2026-05-08 after the synthesis-refinement pass that flowed paper- and repo-note cleanup deltas into the syntheses,
-propagated DEC-0044 through DEC-0054 status across the rows, and harvested the R3 question batch.)
+propagated DEC-0044 through DEC-0054 status across the rows, and harvested the R3 question batch. Updated 2026-05-09
+to add the 15th thematic synthesis `llm-hardware-design` and the 12th cluster `g12-llm-hardware-design` after the
+QiMeng / idea→reality fan-out per `docs/specs/qimeng-category-promotion.md`.)
 
 ---
 
-## The 25 syntheses
+## The 27 syntheses
 
-### Thematic syntheses (14)
+### Thematic syntheses (15)
 
 | Synthesis                                                                                  | One-line characterization                                                                                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -49,8 +51,9 @@ propagated DEC-0044 through DEC-0054 status across the rows, and harvested the R
 | [`safety-alignment-privacy`](../syntheses/safety-alignment-privacy-synthesis.md)           | Activation observability + values + dual-use uplift + privacy through local execution. DEC-0047 (biosecurity tier), DEC-0053 (KB → hosted-Maestro flow), DEC-0054 (activation hooks API stub) all landed; SAFETY.md additions PR #16 merged.                                                                                             |
 | [`agentic-systems`](../syntheses/agentic-systems-synthesis.md)                             | Multi-agent role specialization + typed messages + validation gates + critic tier; first formal theory result (regret bound). Role (DEC-0050), AgentReport (DEC-0051), and investigation memory Layer D (DEC-0052) all resolved 2026-05-06. (BixBench/LAB-Bench's agent-loop aspect cross-linked to infra-foundations as of 2026-05-05.) |
 | [`entrepreneurship`](../syntheses/entrepreneurship-synthesis.md) _(added 2026-05-05)_      | Commercial surface for Linus + biotech-team literature-intelligence productization + transferable Maestro/Worker context-management patterns from quant-agent prior art (g10 anchor). E1 (open-source-by-default) and E2 (entrepreneurial-surface doc) resolved 2026-05-06; E3–E10 promoted to R2-25..R2-26, R2-50..R2-54.               |
+| [`llm-hardware-design`](../syntheses/llm-hardware-design-synthesis.md) _(added 2026-05-09)_ | Idea → reality spine: LLMs producing artifacts (kernels, hardware schematics, build instructions) that downstream non-LLM actors (compiler, fab, manufacturer) accept and realize. Anchored on the QiMeng family (15 paper-notes + g12 cluster) with Sketch2Simulation as cross-thread process-engineering exemplar. 11 ADR seeds named (MTMC, idea→reality skill class, RLVR/Worker self-improvement, two-tier verification, biotech-tangible Phase 8 target). |
 
-### Repo-cluster syntheses (11)
+### Repo-cluster syntheses (12)
 
 | Synthesis                                                                                         | One-line characterization                                                                                                                                                                                                                                                                                                                                                             |
 | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -65,6 +68,7 @@ propagated DEC-0044 through DEC-0054 status across the rows, and harvested the R
 | [`g9-bio`](../syntheses/repo-clusters/g9-bio.md)                                                  | 4 bioinformatics models; bioSkills as Phase 7 inaugural skills bundle (~438 bio skills).                                                                                                                                                                                                                                                                                              |
 | [`g10-finance`](../syntheses/repo-clusters/g10-finance.md)                                        | 5 finance/quant agents (5 × Study; QuantAgent reclassified from Ignore to Study 2026-05-08, contributing the minimal four-role linear-pipeline pattern alongside TradingAgents' maximal debate-style roster); transferable Maestro/Worker context-management patterns. Anchors the entrepreneurship thematic synthesis (2026-05-05).                                                  |
 | [`g11-agent-frameworks`](../syntheses/repo-clusters/g11-agent-frameworks.md) _(added 2026-05-05)_ | 8 agent framework, skills, and evaluation repos; pydantic-ai (Integrate) + promptfoo (Integrate) as immediate actionables; dspy, superpowers, gptme, huginn, Agent-Skills, lmnr as Study. Primary anchor for skills-and-practices synthesis. pydantic-ai Capabilities pattern resolved to Linus-native shape (DEC-0046 deployment field + DEC-0050 Role `capability_set`) 2026-05-06. |
+| [`g12-llm-hardware-design`](../syntheses/repo-clusters/g12-llm-hardware-design.md) _(added 2026-05-09)_ | 4 QiMeng-family repos (CodeV, QiMeng-MuPa, QiMeng-SALV, QiMeng-cpu-v1) covering LLM-driven Verilog/CUDA/processor design via planner/coder discipline + RLVR/signal-aware DPO/MuSL feedback loops. Sketch2Simulation cited as cross-thread reference exemplar (g8 member, not g12). Primary anchor for the new `llm-hardware-design` thematic synthesis. |
 
 ---
 
@@ -89,7 +93,10 @@ Two clusters are anchors-only (anchor one or two syntheses but don't function as
 skills-and-practices secondary). Both are doing focused work rather than cross-cutting work. **g11-agent-frameworks**
 (added 2026-05-05) is currently an anchor for skills-and-practices primary plus secondary edges into agentic-systems and
 infra-foundations — anchors-only status at launch but the pydantic-ai + promptfoo + dspy pattern library could expand
-its reach as Phase 2a hardens.
+its reach as Phase 2a hardens. **g12-llm-hardware-design** (added 2026-05-09) is anchor-only for the new
+`llm-hardware-design` thematic synthesis at launch; whether it expands into a hub depends on how broadly the
+planner/coder/verifier discipline ports to other domains (Apple-Silicon kernel codegen, biology skill design,
+schematics-from-natural-language) — the thematic synthesis flags this as Phase 6/7/8 evidence-gathering.
 
 The remaining clusters — **g2-wiki-engines**, **g3-wiki-patterns**, **g5-graph-tools**, **g6-mcp-tools** — are
 mid-degree: each touches three to five thematic syntheses, mostly as secondary edges that sharpen substrate or tooling
@@ -106,7 +113,7 @@ integration.
 
 ## The unifying thesis (expanded)
 
-Across all 25 syntheses, from completely different starting points, the same underlying claim recurs: **the bottleneck
+Across all 27 syntheses, from completely different starting points, the same underlying claim recurs: **the bottleneck
 has shifted from capability to structure.** The earlier four-synthesis version of this document already named four
 angles on this; the expanded set adds four more.
 
@@ -243,6 +250,27 @@ Max," "pmetal is the inference-backend lead pending Phase 1b verdict") show up u
 The entrepreneurship synthesis is intentionally cross-cutting: it reads Phase 7 biology output (paper-qa + bioSkills +
 Bacformer + LAB-Bench + KnowledgeBase) as the inaugural commercial surface, and reads g10's harnesses as the
 context-management pattern library.
+
+### LLM-hardware-design has its own synthesis + one cluster (added 2026-05-09)
+
+- **llm-hardware-design** synthesis frames the **idea → reality** spine — LLMs producing artifacts (kernels,
+  hardware schematics, build instructions) that downstream non-LLM actors (compiler, fab, manufacturer, contractor,
+  builder) accept and realize as physical or computational artifacts. Anchored on 15 QiMeng-family paper-notes plus
+  the g12 cluster, with Sketch2Simulation as cross-thread process-engineering exemplar (a g8-sci-agents member, not
+  a g12 member). 11 ADR seeds are flagged inline (`_Seed: DEC-NNNN_`), most importantly: MTMC pipeline as Linus
+  orchestration substrate, RLVR-with-automated-oracle as canonical Worker self-improvement architecture, and
+  idea→reality as a load-bearing Phase 7 skill class.
+- **g12-llm-hardware-design** cluster surfaces the planner/coder/verifier discipline across 4 QiMeng repos (CodeV,
+  QiMeng-MuPa, QiMeng-SALV, QiMeng-cpu-v1), with QiMeng-SALV identified as the cleanest tractable Apple-Silicon
+  reproduction target (signal-aware DPO + AST-based reward shaping); MuPa-on-MLX as Phase 7/8 highest-leverage
+  application; cpu-v1's behavioral-synthesis methodology as the ongoing reference.
+
+The thread reaches into native-low-bit-apple-silicon (the QiMeng kernel-codegen patterns inform Apple-Silicon MLX
+kernel generation; QiMeng-GEMM-style hint-repo + auto-tune is a candidate Phase 6d substrate) and agentic-systems
+(Sketch2Simulation's multi-agent error-recovery loop is the closest sibling pattern; planner/coder/verifier Roles
+extend the existing Role specialization argument). Phase 6/7/8 evidence-gathering is the immediate need; Phase 8's
+"design real physical things from natural language" target is the strategic destination per Dan's stated framing in
+[`qimeng-category-promotion.md`](../specs/qimeng-category-promotion.md).
 
 ### Orchestration has three syntheses + two clusters (updated 2026-05-05)
 
