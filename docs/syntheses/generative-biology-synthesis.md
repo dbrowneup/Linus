@@ -95,18 +95,38 @@ scaffold-aligned SMILES enumeration. Once trained, DeepSeMS scales effortlessly:
 produces 65,868 unique novel candidate metabolites. The generation→curation pipeline runs at metagenomic scale; wet-lab
 validation does not.
 
-**Whole-organism genome (generative phages).** The top of the ladder. The artefact is a complete ~5 kb phage genome with
-eleven densely-overlapping ORFs and a viability surface that decades of rational engineering have struggled to navigate.
-The substrate is Evo 1 (7B/131K) and Evo 2 (7B/8K) fine-tuned on ~15K Microviridae genomes; the recipe is a six-stage
-pipeline (host → template family → SFT → conserved-prefix prompt → tiered inference-time scoring → wet-lab); the
-validation is the strongest in the corpus because **16 of 302 designs produced viable phages
+**Whole-organism genome (generative phages).** The top of the genome rung. The artefact is a complete ~5 kb phage genome
+with eleven densely-overlapping ORFs and a viability surface that decades of rational engineering have struggled to
+navigate. The substrate is Evo 1 (7B/131K) and Evo 2 (7B/8K) fine-tuned on ~15K Microviridae genomes; the recipe is a
+six-stage pipeline (host → template family → SFT → conserved-prefix prompt → tiered inference-time scoring → wet-lab);
+the validation is the strongest in the corpus because **16 of 302 designs produced viable phages
 ([King et al., 2025](../paper-notes/2025.09.12.675911v1.md))**, several outcompeting ΦX174 itself, and a cocktail broke
 through LPS-mediated resistance that ΦX174 alone never could. This is also the paper that crosses the line into dual-use
 territory.
 
+**Cell-scale generative imaging (ProtiCelli).** A late-2026 fold-in (Wave 2) that extends the ladder beyond genome by
+shifting modality entirely. ProtiCelli ([Sun et al., 2026](../paper-notes/2026.03.31.715748v1.md)) is a ~458M-parameter
+Diffusion Transformer Large (DiT-L) trained under the EDM framework on 1.23M single-cell crops from the Human Protein
+Atlas, conditioned on three landmark stains (microtubules, nucleus, ER) plus learnable protein and cell-line embeddings.
+It synthesizes 512×512 single-cell immunofluorescence images for **12,800 human proteins across 39 cell lines**, with
+hierarchical subcellular organization preserved well enough to recover cell-line-specific localization (e.g. EGFR Golgi
+in SiHa vs. plasma membrane in A-431, where prior baselines uniformly default to plasma membrane), predict drug-induced
+relocalization from morphology alone (Paclitaxel and Vorinostat on MDA-MB-468), and spatially decompose Reactome
+pathways into ER/lipid-droplet/mitochondrion sub-compartments. The headline downstream artefact is **Proteome2Cell**:
+30.7M generated images forming 2,400 "virtual cells" (200 per cell line × 12 cell lines), each carrying the predicted
+localizations of all 12,800 proteins, integrated into HPA v26 for interactive exploration. ProtiCelli is the corpus's
+**generative imaging substrate** — distinct in modality from every other rung above it (the artefact is a microscopy
+image, not a sequence or a molecule), but homologous in workflow shape: pretrained FM, conditional generation under a
+small landmark/identifier vocabulary, downstream filtering and clustering for biological readout. The primary fold for
+this paper is the [biological-foundation-models synthesis](biological-foundation-models-synthesis.md), where ProtiCelli
+joins TranscriptFormer as the imaging-and-transcriptomics extension of the specialists-as-Workers panel; the secondary
+fold here is to install it as a new rung at the cell-scale level, orthogonal to but composable with the residue→genome
+ladder.
+
 The ladder is not just descriptive. Every cross-cutting thread — local deployability, validation cost, dual-use weight,
-foundation model dependence, KG schema choice — shifts monotonically along the scale axis. Bigger artefacts cost more to
-generate, more to validate, more to deploy locally, and more to gatekeep.
+foundation model dependence, KG schema choice — shifts monotonically along the residue→genome axis. Bigger artefacts
+cost more to generate, more to validate, more to deploy locally, and more to gatekeep. ProtiCelli sits off-axis at the
+cell-image scale and inherits a different concern profile — the dual-use section below treats this directly.
 
 ---
 
@@ -226,6 +246,18 @@ Linus should not surface DISCO-mediated design of enzymes for controlled or prec
 substantially lower-risk: mCSM-metal predicts mutation effects on existing structures (no novel catalytic capacity);
 Trias optimises codons within a fixed protein (no novel function); DeepSeMS predicts metabolite structures from natural
 BGCs (no novel biosynthesis); GenNA generates eukaryotic sequences within natural functional classes.
+
+**ProtiCelli is a useful illustration of how DEC-0047's tier policy disambiguates risk by output modality.** It is the
+heaviest generative model in this synthesis by training cost and the only one operating at cell scale — and yet it lands
+unambiguously at **Tier A (low concern)** because the synthesis output is _microscopy imagery_, not synthetic DNA or
+synthetic proteins. ProtiCelli does not propose sequences, structures, or molecules; it predicts where existing proteins
+would localize in a cell given landmark stains. There is no synthesis-or-design boundary crossed in normal use, so
+standard sandbox policy applies and no per-invocation Dan sign-off is required. (A future ProtiCelli-derived workflow
+that consumed predicted localization changes to _propose_ engineered mutations would graduate to Tier B; the gating
+question is "does the output cross a synthesis or design boundary?", not "does it touch biology?".) This is the cleanest
+in-corpus demonstration that the three-tier framework is doing real work — without it, an instinct to treat "large-scale
+generative biology" as uniformly higher-risk would mis-classify a microscopy generator alongside a phage designer, and
+the operational cost of that mis-classification compounds across the Phase 7 skill catalogue.
 
 The connection to [2306.03809v1](../paper-notes/2306.03809v1.md) is direct. That paper's threat model was that LLMs
 collapse the tacit-knowledge moat around pandemic biology by acting as patient expert tutors over the literature.
@@ -530,6 +562,12 @@ The six Group B paper notes (all in [`docs/paper-notes/`](../paper-notes/)):
 - [2025.03.02.641084v1](../paper-notes/2025.03.02.641084v1.md) — Xu et al., _DeepSeMS_ (bioRxiv 2025).
 - [2025.09.12.675911v1](../paper-notes/2025.09.12.675911v1.md) — King et al., _Generative design of novel bacteriophages
   with genome language models_ (Hie lab, bioRxiv 2025).
+
+Wave 2 fold-in (2026-05-09):
+
+- [2026.03.31.715748v1](../paper-notes/2026.03.31.715748v1.md) — Sun et al., _ProtiCelli — proteome-wide generative
+  imaging FM_ (Stanford / CMU / KTH / CZ Biohub, bioRxiv 2026). Cell-scale generative imaging substrate; primary fold in
+  [biological-foundation-models-synthesis.md](biological-foundation-models-synthesis.md), secondary fold here.
 
 Cross-references that were load-bearing:
 [biological-foundation-models-synthesis.md](biological-foundation-models-synthesis.md) (Group A sister synthesis;
