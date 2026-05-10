@@ -8,20 +8,19 @@ family) plus four cluster repos plus Sketch2Simulation as cross-thread exemplar.
 ## What this document is
 
 This synthesis covers fifteen paper-notes in the QiMeng family — the most coherent line of work in the Linus reference
-corpus on **using LLMs to design real artifacts that downstream non-LLM actors then realize as physical or
-computational reality** — together with four cluster repos (CodeV, QiMeng-MuPa, QiMeng-SALV, QiMeng-cpu-v1), the
-parallel-authored cluster synthesis at [`g12-llm-hardware-design.md`](repo-clusters/g12-llm-hardware-design.md), and one
-cross-thread exemplar — Sketch2Simulation's process-engineering flowsheet generator — that lives outside the QiMeng
-family but shares the spine. The thematic spine is **idea → reality**. Dan stated it directly in the seed spec for the
-category:
+corpus on **using LLMs to design real artifacts that downstream non-LLM actors then realize as physical or computational
+reality** — together with four cluster repos (CodeV, QiMeng-MuPa, QiMeng-SALV, QiMeng-cpu-v1), the parallel-authored
+cluster synthesis at [`g12-llm-hardware-design.md`](repo-clusters/g12-llm-hardware-design.md), and one cross-thread
+exemplar — Sketch2Simulation's process-engineering flowsheet generator — that lives outside the QiMeng family but shares
+the spine. The thematic spine is **idea → reality**. Dan stated it directly in the seed spec for the category:
 
 > [QiMeng] also relate[s] more to Sketch2Simulation than anything else. That paper and repo is also focused on using
 > LLMs to design real physical things. That's the idea I love and want to capture. The ability for Linus to design
 > physical things in a practical, highly useful way. I'd love to be able to have Linus produce schematics and designs
 > for me, which could be accepted by a manufacturer or engineer or builder or some such, resulting in a real physical
 > thing being built. Idea to reality. That's the dream. Having these skills informed by the corpus of knowledge I've
-> accumulated should amplify my ability to design and build tangible things, with help from Linus.
-> — `qimeng-category-promotion.md` §"Dan's stated framing"
+> accumulated should amplify my ability to design and build tangible things, with help from Linus. —
+> `qimeng-category-promotion.md` §"Dan's stated framing"
 
 That framing is the load-bearing reason this synthesis exists. The narrower technical category — "LLMs that produce
 hardware-description-language code" — is a subset of the broader vision: LLMs producing artifacts that a real downstream
@@ -34,8 +33,8 @@ family as the most directly transferable methodology corpus the Linus collection
 
 The papers cluster around the same group: the Yunji Chen / Qi Guo lab at the State Key Lab of Processors, Institute of
 Computing Technology, Chinese Academy of Sciences, plus a few coauthors at Cambricon Technologies, ICT, and the
-University of Chinese Academy of Sciences. The fifteen-paper / four-repo footprint is coherent enough to be a
-single research program rather than a coincidence of topical overlap, and that internal coherence is what makes the
+University of Chinese Academy of Sciences. The fifteen-paper / four-repo footprint is coherent enough to be a single
+research program rather than a coincidence of topical overlap, and that internal coherence is what makes the
 synthesis-level claims durable: the same planner/coder discipline, the same verification-as-oracle pattern, the same
 learning-the-domain-from-real-artifacts data philosophy recurs paper after paper, applied to progressively larger
 artifact classes. This synthesis traces what is durable across that recurrence and identifies which patterns Linus
@@ -43,11 +42,12 @@ should adopt now versus watch versus build toward.
 
 The fifteen paper-notes covered, in approximately the order the synthesis treats them:
 
-- **Foundational microarchitecture work.** [Push the Limits — automated CPU design with AI
-  (2306.12456v2)](../paper-notes/2306.12456v2.md) — the existence proof that AI can design a working RISC-V CPU from I/O
-  examples; [Automated Superscalar Processor Design (0549)](../paper-notes/0549.md) — the State-BSD extension to
-  superscalar territory; [QiMeng: Fully Automated HW+SW Design (2506.05007v1)](../paper-notes/2506.05007v1.md) — the
-  integrating overview paper.
+- **Foundational microarchitecture work.**
+  [Push the Limits — automated CPU design with AI (2306.12456v2)](../paper-notes/2306.12456v2.md) — the existence proof
+  that AI can design a working RISC-V CPU from I/O examples;
+  [Automated Superscalar Processor Design (0549)](../paper-notes/0549.md) — the State-BSD extension to superscalar
+  territory; [QiMeng: Fully Automated HW+SW Design (2506.05007v1)](../paper-notes/2506.05007v1.md) — the integrating
+  overview paper.
 - **Kernel and tensor-operator codegen.** [QiMeng-GEMM (13337-ZhouQ)](../paper-notes/13337-ZhouQ.md) — meta-prompts +
   beam-search auto-tuning; [QiMeng-TensorOp (2505.06302v1)](../paper-notes/2505.06302v1.md) — tensor operators at the
   hardware-primitive level; [QiMeng-Kernel (2511.20100v1)](../paper-notes/2511.20100v1.md) — Macro-Thinking Micro-Coding
@@ -60,8 +60,8 @@ The fifteen paper-notes covered, in approximately the order the synthesis treats
   [QiMeng-SALV (2510.19296v4)](../paper-notes/2510.19296v4.md) — signal-aware DPO at sub-module granularity.
 - **Compiler and OS adjacencies.** [VEGA (3696443.3708931)](../paper-notes/3696443.3708931.md) — automatic LLVM back-end
   generation; [QiMeng-Xpiler (osdi25-dong)](../paper-notes/osdi25-dong.md) — neural-symbolic tensor-program
-  transcompilation; [AutoOS (9546_AutoOS_Make_Your_OS_More_)](../paper-notes/9546_AutoOS_Make_Your_OS_More_.md) — LLM-driven
-  Linux kernel configuration tuning.
+  transcompilation; [AutoOS (9546*AutoOS_Make_Your_OS_More*)](../paper-notes/9546_AutoOS_Make_Your_OS_More_.md) —
+  LLM-driven Linux kernel configuration tuning.
 
 Plus the four cluster repos — [CodeV](../repo-notes/CodeV.md), [QiMeng-MuPa](../repo-notes/QiMeng-MuPa.md),
 [QiMeng-SALV](../repo-notes/QiMeng-SALV.md), [QiMeng-cpu-v1](../repo-notes/QiMeng-cpu-v1.md) — and the cross-thread
@@ -71,8 +71,8 @@ exemplar [Sketch2Simulation paper](../paper-notes/2603.24629v1.md) + [repo-note]
 
 ## The discipline that recurs
 
-Across the fifteen papers a single discipline keeps reappearing in different guises. The shape: a **planner** step
-emits a structured intermediate representation; a **coder** step emits target-language artifacts informed by that
+Across the fifteen papers a single discipline keeps reappearing in different guises. The shape: a **planner** step emits
+a structured intermediate representation; a **coder** step emits target-language artifacts informed by that
 intermediate; a **verifier** — compiler, simulator, hardware testbench, AST analyzer, or boot-and-benchmark loop —
 provides a correctness signal that can drive either online search (beam search, MCTS) or offline training (SFT, DPO,
 RLVR). The intermediate representation is load-bearing in a specific way: it is the surface area where domain expertise
@@ -108,17 +108,17 @@ CodeV inverts the data-synthesis direction without changing the discipline. The 
 relies on a structural insight about the LLM's own asymmetry: GPT-3.5 can summarize Verilog at 64.7% pass@1 but generate
 it at only 33.5% pass@1, a fact the authors quantify directly. So the recipe collects 165K syntax-correct Verilog
 modules from GitHub, asks GPT-3.5 to **summarize** each one at multiple abstraction levels, and uses the resulting
-(description, code) pairs as SFT training data for Qwen2.5-Coder-7B. The verifier in this loop is the iverilog
-testbench (functional correctness on VerilogEval / RTLLM) plus the synthesis tool (Yosys for syntax-and-elaboration
-sanity). The intermediate is the multi-level summary itself, which doubles as fine-tuning data. The discipline holds:
-real artifacts harvested from the real world, summarized into a structured form, paired with the original code as
-training data, validated by an automated oracle. This insight — **summarization is the structurally easier task in
-low-resource code domains** — is the most directly transferable component of CodeV for any Linus Phase 6 fine-tuning
-roadmap that targets a domain where Dan has artifacts but limited public corpora (bioinformatics WDL pipelines, _B.
-braunii_ assembly scripts, LanzaTech metagenomics SOPs).
+(description, code) pairs as SFT training data for Qwen2.5-Coder-7B. The verifier in this loop is the iverilog testbench
+(functional correctness on VerilogEval / RTLLM) plus the synthesis tool (Yosys for syntax-and-elaboration sanity). The
+intermediate is the multi-level summary itself, which doubles as fine-tuning data. The discipline holds: real artifacts
+harvested from the real world, summarized into a structured form, paired with the original code as training data,
+validated by an automated oracle. This insight — **summarization is the structurally easier task in low-resource code
+domains** — is the most directly transferable component of CodeV for any Linus Phase 6 fine-tuning roadmap that targets
+a domain where Dan has artifacts but limited public corpora (bioinformatics WDL pipelines, _B. braunii_ assembly
+scripts, LanzaTech metagenomics SOPs).
 
-CodeV-R1 takes the next step. The SFT model from CodeV becomes the starting point for a five-stage RLVR pipeline:
-crawl → summarize → distill (CodeV-R1-7B-Distill, the chain-of-thought SFT) → equivalence-check → adaptive-DAPO RL
+CodeV-R1 takes the next step. The SFT model from CodeV becomes the starting point for a five-stage RLVR pipeline: crawl
+→ summarize → distill (CodeV-R1-7B-Distill, the chain-of-thought SFT) → equivalence-check → adaptive-DAPO RL
 (CodeV-R1-7B). The verifier is a rule-based testbench generator that uses Yosys for circuit-structure analysis to
 extract I/O ports, clock signals, and reset signals, then runs M=100 random stimuli of N=1000 cycles against both the
 generated and reference modules with per-signal equivalence checks. The testbench itself is the contribution that
@@ -128,18 +128,18 @@ oracle the RLVR loop has no signal; with it, a 7B specialist beats 671B DeepSeek
 generalizes to every domain Linus might pursue with RLVR (`_Seed: DEC-NNNN_` for "automated-oracle-first as a Linus
 fine-tuning convention", a generalization of CLAUDE.md §Smoke-test gates to fine-tuning data).
 
-A fourth instance — for a fourth domain class — is QiMeng-Xpiler. The artifact here is a translated tensor program
-(CUDA → BANG C, CUDA → HIP, etc.), the downstream actor is the platform-specific compile-and-run pipeline, and the
-discipline is wrapped around an explicit neural-symbolic split. Eleven transformation passes — sequentialization /
-parallelization, memory conversion, (de)tensorization — are each instantiated by the LLM via meta-prompt and then
-**repaired** by an SMT solver (Z3) for low-level details (loop bounds, indexing, tensor-intrinsic parameters). The
-hierarchical auto-tuner — brute-force intra-pass plus MCTS inter-pass — finds optimal pass parameters and sequences. The
-verifier is unit-test execution; failed transformations get pruned by the unit-test wall and earn reward zero in the
-MCTS reward function. The neural-symbolic split is more architecturally explicit than in QiMeng-GEMM or QiMeng-Kernel,
-and it earns its complexity precisely because tensor-program transcompilation has more low-level detail than
-GEMM-codegen does — too much for the LLM to get right one-shot. **The point is not the specific architecture; the point
-is that the discipline is the same**: planner emits structured intermediate, coder emits artifact, verifier provides
-ground truth, search procedure prunes failed branches.
+A fourth instance — for a fourth domain class — is QiMeng-Xpiler. The artifact here is a translated tensor program (CUDA
+→ BANG C, CUDA → HIP, etc.), the downstream actor is the platform-specific compile-and-run pipeline, and the discipline
+is wrapped around an explicit neural-symbolic split. Eleven transformation passes — sequentialization / parallelization,
+memory conversion, (de)tensorization — are each instantiated by the LLM via meta-prompt and then **repaired** by an SMT
+solver (Z3) for low-level details (loop bounds, indexing, tensor-intrinsic parameters). The hierarchical auto-tuner —
+brute-force intra-pass plus MCTS inter-pass — finds optimal pass parameters and sequences. The verifier is unit-test
+execution; failed transformations get pruned by the unit-test wall and earn reward zero in the MCTS reward function. The
+neural-symbolic split is more architecturally explicit than in QiMeng-GEMM or QiMeng-Kernel, and it earns its complexity
+precisely because tensor-program transcompilation has more low-level detail than GEMM-codegen does — too much for the
+LLM to get right one-shot. **The point is not the specific architecture; the point is that the discipline is the same**:
+planner emits structured intermediate, coder emits artifact, verifier provides ground truth, search procedure prunes
+failed branches.
 
 The recurrence is informative. **The artifact class varies — kernel source, Verilog modules, tensor programs, CPU
 microarchitectures, OS configs, compiler back-ends — but the architectural skeleton is constant**. That constancy is
@@ -171,9 +171,9 @@ The QiMeng family's verification surfaces, by domain:
   end-to-end performance under realistic workload shapes.
 - **Verilog / HDL** (CodeV, CodeV-R1, QiMeng-CRUX, QiMeng-SALV) — Yosys for structural analysis (I/O port extraction,
   bit widths, clock and reset polarity) plus iverilog for simulation, with random-stimulus testbenches running against a
-  reference module. The CodeV-R1 testbench generator is the family's most engineered verification surface: a
-  three-phase pipeline (circuit-structure analysis → simulation → verification) with dual-stage validation for
-  sequential reset signals and exhaustive testing of non-conflicting reset combinations.
+  reference module. The CodeV-R1 testbench generator is the family's most engineered verification surface: a three-phase
+  pipeline (circuit-structure analysis → simulation → verification) with dual-stage validation for sequential reset
+  signals and exhaustive testing of non-conflicting reset combinations.
 - **CPU microarchitecture** (Push the Limits, 0549) — formal verification via property-checking (the QiMeng-cpu-v1 BSD
   pipeline achieves 100% verification pass-rate) plus full-system tests like Linux kernel boot, SPEC CINT 2000,
   Dhrystone, and self-hosting. The verification surface is thicker here because the artifact is a CPU; but the
@@ -185,21 +185,21 @@ The QiMeng family's verification surfaces, by domain:
   compile + boot + bench is genuinely slow), and AutoOS's pre-pruning of boot-fatal options via the LLM's
   observe-prune-propose-act loop is what makes the verification budget tractable.
 - **Compiler back-ends** (VEGA) — the LLVM regression suite (16,000+ test cases) plus per-statement confidence scoring
-  on the generated code. The verification surface for compiler back-ends is unusually thick — back-end generation can
-  be wrong in ways that pass all unit tests but produce miscompiled code at scale — and VEGA's 71.5% / 73.2% / 62.2%
-  pass@1 across RISC-V / RI5CY / xCORE is bounded by exactly that thickness.
+  on the generated code. The verification surface for compiler back-ends is unusually thick — back-end generation can be
+  wrong in ways that pass all unit tests but produce miscompiled code at scale — and VEGA's 71.5% / 73.2% / 62.2% pass@1
+  across RISC-V / RI5CY / xCORE is bounded by exactly that thickness.
 - **Tensor-program transcompilation** (QiMeng-Xpiler) — unit-test execution under the target's runtime (CUDA, HIP, BANG
-  C, VNNI), with the SMT solver (Z3) providing a complementary verifier for the low-level transformations the LLM
-  cannot get right one-shot.
+  C, VNNI), with the SMT solver (Z3) providing a complementary verifier for the low-level transformations the LLM cannot
+  get right one-shot.
 
-For Linus on Apple Silicon, the implication is concrete and somewhat sobering. **What verification surfaces are available
-locally for which output classes?** Most of the QiMeng-family verifiers are open-source and lift trivially: iverilog,
-Yosys, clang, MCTS-with-unit-tests, SMT-via-Z3 — all run on macOS without modification. **The QiMeng-GEMM and CodeV-R1
-testbench harnesses port to Apple Silicon directly**, and an Apple-Silicon kernel-codegen harness is a Phase 6d / Phase
-7 deliverable rather than a research blocker. This is the load-bearing finding for Phase 6/7 viability: the Linus
-operator does not need to build new verification infrastructure to start applying the discipline. The infrastructure
-exists; what's missing is the meta-prompt + hint repository for Apple Silicon's specific kernel-class targets (Metal
-threadgroup tiles, MLX kernel patterns, ANE-supported primitives).
+For Linus on Apple Silicon, the implication is concrete and somewhat sobering. **What verification surfaces are
+available locally for which output classes?** Most of the QiMeng-family verifiers are open-source and lift trivially:
+iverilog, Yosys, clang, MCTS-with-unit-tests, SMT-via-Z3 — all run on macOS without modification. **The QiMeng-GEMM and
+CodeV-R1 testbench harnesses port to Apple Silicon directly**, and an Apple-Silicon kernel-codegen harness is a Phase 6d
+/ Phase 7 deliverable rather than a research blocker. This is the load-bearing finding for Phase 6/7 viability: the
+Linus operator does not need to build new verification infrastructure to start applying the discipline. The
+infrastructure exists; what's missing is the meta-prompt + hint repository for Apple Silicon's specific kernel-class
+targets (Metal threadgroup tiles, MLX kernel patterns, ANE-supported primitives).
 
 The non-trivial verification surfaces — production EDA toolchains (Synopsys Design Compiler, Cadence Genus), full-system
 hardware simulation, the LLVM regression suite at full scale — are either prohibitively expensive (closed-source EDA
@@ -239,9 +239,9 @@ build, the search graph is durable as a scratchpad-class artifact (DEC-0030), an
 candidates (DEC-0029, Layer C). The pattern works across the full cluster spectrum: kernels (QiMeng-GEMM with beam
 search), tensor operators (QiMeng-TensorOp with MCTS), tensor-program transcompilation (QiMeng-Xpiler with hierarchical
 intra-pass / inter-pass MCTS), and OS configuration (AutoOS with the observe-prune-propose-act-correct state machine).
-The auto-tuning beam-search-over-LLM-emitted-code shape is a generic agent-driven program-search primitive (`_Seed:
-DEC-NNNN_` for "verifier-pruned tree search as a Linus orchestration primitive"), structurally close to workgraph's
-DAG-based dispatch (G7 synthesis,
+The auto-tuning beam-search-over-LLM-emitted-code shape is a generic agent-driven program-search primitive
+(`_Seed: DEC-NNNN_` for "verifier-pruned tree search as a Linus orchestration primitive"), structurally close to
+workgraph's DAG-based dispatch (G7 synthesis,
 [`docs/syntheses/repo-clusters/g7-harnesses.md`](repo-clusters/g7-harnesses.md)) extended with a fitness function and
 pruning step.
 
@@ -259,11 +259,11 @@ easier than generation in low-resource domains** is the durable contribution. Th
 repeatedly for runtime inference (`_Seed: DEC-NNNN_` for "multi-level summarization data synthesis as a Linus Phase 6
 fine-tuning convention").
 
-**Pattern 3: Reinforcement learning with verifiable rewards** (CodeV-R1's RL stage, QiMeng-Kernel's RL-trained micro-coder,
-QiMeng-SALV's signal-aware DPO). The student LLM is fine-tuned via RL — DAPO, GRPO, DPO, or signal-aware DPO — using
-the verifier as the reward signal. The improvement is durable; the cost is substantial (CodeV-R1's RL stage was 127
-hours on 16 A100s, ~2,032 GPU-hours, on top of the 624-hour SFT stage). The structural insight is twofold: (a) the
-oracle is the bottleneck (CodeV-R1's testbench is the dominant contribution, the RLVR loop is the consumer); (b) the
+**Pattern 3: Reinforcement learning with verifiable rewards** (CodeV-R1's RL stage, QiMeng-Kernel's RL-trained
+micro-coder, QiMeng-SALV's signal-aware DPO). The student LLM is fine-tuned via RL — DAPO, GRPO, DPO, or signal-aware
+DPO — using the verifier as the reward signal. The improvement is durable; the cost is substantial (CodeV-R1's RL stage
+was 127 hours on 16 A100s, ~2,032 GPU-hours, on top of the 624-hour SFT stage). The structural insight is twofold: (a)
+the oracle is the bottleneck (CodeV-R1's testbench is the dominant contribution, the RLVR loop is the consumer); (b) the
 **granularity of the reward signal matters as much as the algorithm**. QiMeng-SALV's signal-aware DPO is the most
 striking case in the cluster — by extracting per-signal code segments via AST analysis and computing the DPO loss only
 over those segments rather than the whole module, SALV converts partially-correct modules into useful preference pairs
@@ -276,8 +276,8 @@ self-improvement loop on Dan's domain?** The candidate ADR seed (`_Seed: DEC-NNN
 the canonical Linus Worker self-improvement architecture") rests on identifying a Linus-relevant verifiable-oracle
 domain. Candidates: pytest-passing Python (easy oracle, broad relevance); ruff-clean Python (easy oracle, narrow
 improvement); paper-qa-faithful answers (DEC-0044) (harder oracle, high relevance to Dan's KB workflow); bioinformatics
-pipeline correctness — Nextflow / WDL passing small synthetic inputs (high effort to build the oracle, high relevance
-to Dan's actual work). The apparent winner on relevance × oracle-buildability is the bioinformatics pipeline-correctness
+pipeline correctness — Nextflow / WDL passing small synthetic inputs (high effort to build the oracle, high relevance to
+Dan's actual work). The apparent winner on relevance × oracle-buildability is the bioinformatics pipeline-correctness
 oracle, but it requires Dan to author small synthetic test inputs for canonical pipeline classes (a Phase 7 oracle-build
 investment) before any RLVR can run. CodeV-R1's lesson is that this build investment is the dominant cost; the model
 training is the consumer.
@@ -286,8 +286,8 @@ Two further compute-side considerations. The total ~2,656 A100-GPU-hours cited i
 M1 Max can deliver in any reasonable wall time, and adaptive DAPO is a Verilog-specific instantiation of a more general
 algorithmic family (PPO, GRPO, DAPO, OREO). For Phase 6 Apple Silicon viability, the realistic Linus path is LoRA-only
 RLVR on a 7B Worker with a much smaller corpus, possibly with cloud A100 bursts for occasional full RL runs and on-Mac
-LoRA-RLVR for incremental sharpening between bursts. The Phase 6c spike scoping should establish per-step cost on M1
-Max (adaptive-DAPO inner loop on a 7B LoRA-only adapter, a small Linus-relevant corpus) before committing to the
+LoRA-RLVR for incremental sharpening between bursts. The Phase 6c spike scoping should establish per-step cost on M1 Max
+(adaptive-DAPO inner loop on a 7B LoRA-only adapter, a small Linus-relevant corpus) before committing to the
 architecture. This is the kind of "measure first" discipline (CLAUDE.md §Measure, don't just estimate) where the
 empirical anchor matters more than the architectural enthusiasm.
 
@@ -300,10 +300,10 @@ not a hardware kernel or a Verilog module; it is a process flow diagram converte
 simulation script via the simulator's COM API. The downstream actor is the HYSYS simulator itself (a deterministic,
 non-LLM industrial software package that accepts the script and runs it as a real chemical-process simulation). The
 discipline maps cleanly: a three-layer pipeline orchestrated as a LangGraph state machine, with parsing and
-interpretation in Layer 1, simulation model synthesis in Layer 2, multi-level validation woven through both. The verifier
-in this loop is the COM API itself — when the synthesized Python script fails at runtime, the trace is captured and an
-LLM patches the script under bounded retries. The discipline holds: planner / coder / verifier, with the verifier doing
-real work and the failure-localized fix loop providing the resilience.
+interpretation in Layer 1, simulation model synthesis in Layer 2, multi-level validation woven through both. The
+verifier in this loop is the COM API itself — when the synthesized Python script fails at runtime, the trace is captured
+and an LLM patches the script under bounded retries. The discipline holds: planner / coder / verifier, with the verifier
+doing real work and the failure-localized fix loop providing the resilience.
 
 The structural contrast with the QiMeng family is informative. QiMeng papers operate in domains where the artifact's
 **semantic correctness** is verifiable cheaply (compile-and-bench, simulate, equivalence-check) — the verifier is fast
@@ -314,18 +314,18 @@ paper does not solve this — they evaluate on F1 of unit / stream / connection 
 mechanical correctness check, not a design-quality check. **For Phase 7 idea-to-reality skills the Linus orchestration
 layer needs to support both verifier classes**: cheap-and-deterministic for the executability check, and expensive-and-
 expert for the semantic-correctness check. The QiMeng-family verifiers handle the first; Linus's KnowledgeBase
-(DEC-0044, paper-qa) plus Maestro review handle the second. The two-tier verification structure is itself a design
-seed (`_Seed: DEC-NNNN_` for "two-tier verification — cheap executability check plus expensive semantic check — as a
-Phase 7 idea-to-reality skill substrate").
+(DEC-0044, paper-qa) plus Maestro review handle the second. The two-tier verification structure is itself a design seed
+(`_Seed: DEC-NNNN_` for "two-tier verification — cheap executability check plus expensive semantic check — as a Phase 7
+idea-to-reality skill substrate").
 
 The other architectural insight Sketch2Simulation surfaces — **multi-level validation as a first-class orchestration
-primitive** — is the kind of pattern that should fold directly into the Phase 3 agent-spawner design. The ablation
-study (C1 removes the descriptor, C2 removes the normalizer, C3 merges the four coding agents into one, C4 disables
-RAG) shows that **architectural sensitivity grows with task complexity**: the simple case tolerates degradation, the
-complex one doesn't. Each layer earns its keep, and the value of decomposition rises non-linearly with task complexity.
-For Linus, this is the empirical case for the agent-spawner exposing validation hooks per stage rather than just an
-end-of-pipeline pass/fail. It is also the empirical case for the "execution validation with bounded LLM-fix retry"
-pattern as a Phase 3 substrate primitive.
+primitive** — is the kind of pattern that should fold directly into the Phase 3 agent-spawner design. The ablation study
+(C1 removes the descriptor, C2 removes the normalizer, C3 merges the four coding agents into one, C4 disables RAG) shows
+that **architectural sensitivity grows with task complexity**: the simple case tolerates degradation, the complex one
+doesn't. Each layer earns its keep, and the value of decomposition rises non-linearly with task complexity. For Linus,
+this is the empirical case for the agent-spawner exposing validation hooks per stage rather than just an end-of-pipeline
+pass/fail. It is also the empirical case for the "execution validation with bounded LLM-fix retry" pattern as a Phase 3
+substrate primitive.
 
 The hybrid cloud/local deployment (Gemini 3 Flash for multimodal vision, Qwen 2.5 / 3 Coder local via Ollama for code
 synthesis) is an operationally important point that the QiMeng family largely sidesteps. **For Linus's "private local
@@ -348,9 +348,9 @@ generic orchestration primitive, generalizing workgraph's DAG-dispatch with a fi
 verification model from Sketch2Simulation (cheap-executability + expensive-semantic) is the right shape for any Phase 3
 skill that produces an executable artifact. Multi-level validation as a per-stage hook in the agent-spawner — informed
 by the Sketch2Simulation ablation result that decomposition value rises non-linearly with task complexity — is the right
-default. ADR seeds: `_Seed: DEC-NNNN_` for "verifier-pruned tree search as a Linus orchestration primitive" and `_Seed:
-DEC-NNNN_` for "Macro-Thinking Micro-Coding pipeline as a Linus orchestration substrate" (the latter generalizes the
-QiMeng-Kernel pattern to cross-domain Linus skills, with the macro/micro split typed via DEC-0050 / DEC-0051).
+default. ADR seeds: `_Seed: DEC-NNNN_` for "verifier-pruned tree search as a Linus orchestration primitive" and
+`_Seed: DEC-NNNN_` for "Macro-Thinking Micro-Coding pipeline as a Linus orchestration substrate" (the latter generalizes
+the QiMeng-Kernel pattern to cross-domain Linus skills, with the macro/micro split typed via DEC-0050 / DEC-0051).
 
 **Phase 6 — Worker fine-tuning conventions.** Three patterns translate to Phase 6 fine-tuning. First, **multi-level
 summarization data synthesis** (CodeV) — a low-resource-domain fine-tuning recipe that uses summarization (the
@@ -359,21 +359,23 @@ Second, **automated-oracle-first** (CodeV-R1) — before fine-tuning a Worker on
 oracle for that task class first, generalizing CLAUDE.md §Smoke-test gates to the fine-tuning data layer. Third, **RLVR
 with adaptive DAPO** as the Worker self-improvement substrate, with an honest caveat that the absolute compute cost is
 not free — the realistic Linus path is LoRA-only RLVR on a 7B Worker with a small corpus, plus possibly cloud A100
-bursts for occasional full runs. ADR seeds: `_Seed: DEC-NNNN_` for "multi-level summarization data synthesis as a
-Linus Phase 6 fine-tuning convention", `_Seed: DEC-NNNN_` for "automated-oracle-first as a Linus fine-tuning
-convention", and `_Seed: DEC-NNNN_` for "RLVR-with-automated-oracle as the canonical Linus Worker self-improvement
-architecture". The QiMeng-SALV signal-aware DPO finding — that oracle granularity matters as much as the algorithm — is
-a fourth seed (`_Seed: DEC-NNNN_` for "fine-grained-reward DPO as the default Linus preference-optimization variant"
-when sub-artifact decomposition is feasible).
+bursts for occasional full runs. ADR seeds: `_Seed: DEC-NNNN_` for "multi-level summarization data synthesis as a Linus
+Phase 6 fine-tuning convention", `_Seed: DEC-NNNN_` for "automated-oracle-first as a Linus fine-tuning convention", and
+`_Seed: DEC-NNNN_` for "RLVR-with-automated-oracle as the canonical Linus Worker self-improvement architecture". The
+QiMeng-SALV signal-aware DPO finding — that oracle granularity matters as much as the algorithm — is a fourth seed
+(`_Seed: DEC-NNNN_` for "fine-grained-reward DPO as the default Linus preference-optimization variant" when sub-artifact
+decomposition is feasible).
 
 **Phase 6d — Apple Silicon kernel-codegen.** The minimum-viable Linus port of the QiMeng-GEMM paradigm is a Phase 6d
 candidate: hand-curated hint repository for Apple Silicon's unified memory model + Metal threadgroup / thread structure
-+ ANE primitives where applicable; compile-and-benchmark harness on M1 Max; frozen Worker LLM (Qwen3-Coder, DeepSeek-
-Coder-V2, or hosted Claude during development) playing the prompt-driven coder; auto-tuning beam search per
-QiMeng-GEMM. Smallest meaningful target: a single GEMM variant in MLX or a Metal SGEMM kernel or a flash-attention
-micro-kernel. The Phase 6d streaming-target spec (`docs/specs/phase6d-streaming-target.md`) already implies handcrafted
-Metal kernels somewhere downstream; this is the place where the QiMeng-GEMM discipline lands first. ADR seed: `_Seed:
-DEC-NNNN_` for "QiMeng-GEMM-style hint-repo + auto-tune as the Linus Apple Silicon kernel-codegen substrate".
+
+- ANE primitives where applicable; compile-and-benchmark harness on M1 Max; frozen Worker LLM (Qwen3-Coder, DeepSeek-
+  Coder-V2, or hosted Claude during development) playing the prompt-driven coder; auto-tuning beam search per
+  QiMeng-GEMM. Smallest meaningful target: a single GEMM variant in MLX or a Metal SGEMM kernel or a flash-attention
+  micro-kernel. The Phase 6d streaming-target spec (`docs/specs/phase6d-streaming-target.md`) already implies
+  handcrafted Metal kernels somewhere downstream; this is the place where the QiMeng-GEMM discipline lands first. ADR
+  seed: `_Seed: DEC-NNNN_` for "QiMeng-GEMM-style hint-repo + auto-tune as the Linus Apple Silicon kernel-codegen
+  substrate".
 
 **Phase 7 — idea-to-reality skill class.** The thematic synthesis's headline strategic claim. **Idea-to-reality is a
 first-class Phase 7 skill class for Linus**, with QiMeng's hardware/kernel exemplars and Sketch2Simulation's
@@ -381,25 +383,25 @@ process-engineering exemplar as the methodology corpus. The skill class is defin
 verifier with downstream actor accepting the artifact) and parameterized by domain (kernel, hardware-description
 language, process flowsheet, schematic, BOM, build instructions). For Dan specifically, the highest-leverage instances
 are the ones where his domain expertise compounds: bioinformatics pipeline generation (Nextflow / WDL); _B. braunii_-
-flavored metabolic modeling; metagenomics SOP authoring informed by his LanzaTech career. Less directly relevant but
-not zero: HDL skill via CodeV (Linus produces Verilog, accepted by Yosys + Synopsys for hobbyist FPGA / ASIC work);
+flavored metabolic modeling; metagenomics SOP authoring informed by his LanzaTech career. Less directly relevant but not
+zero: HDL skill via CodeV (Linus produces Verilog, accepted by Yosys + Synopsys for hobbyist FPGA / ASIC work);
 hand-OS-config tuning via AutoOS (Linus tunes a Linux config for Dan's Linux dev box); multi-platform tensor-program
-transcompilation via QiMeng-Xpiler (Linus translates a CUDA kernel to MLX or Metal). The Phase 7 ADR seed is the
-biggest commitment in this synthesis: `_Seed: DEC-NNNN_` for "idea-to-reality skill class — Linus skills produce
-artifacts that downstream non-LLM actors accept and realize". The Phase 7 ADR should also commit to the Phase 7-specific
+transcompilation via QiMeng-Xpiler (Linus translates a CUDA kernel to MLX or Metal). The Phase 7 ADR seed is the biggest
+commitment in this synthesis: `_Seed: DEC-NNNN_` for "idea-to-reality skill class — Linus skills produce artifacts that
+downstream non-LLM actors accept and realize". The Phase 7 ADR should also commit to the Phase 7-specific
 skill-development discipline that this synthesis surfaces: **start with the verifier**.
 
 **Phase 8 — longer-horizon ambitions.** The aspirational target — Linus designing physical things that contractors,
-fabricators, builders, and engineers accept — sits at Phase 8. The QiMeng-cpu-v1 result is the existence proof that
-the loop closes at industrial complexity (an AI-designed RISC-V CPU was actually fabbed as Enlightenment-1). What sits
-between Linus and that ambition is (a) Apple Silicon viability for the planner/coder loop on the relevant domain,
-(b) verification-surface availability or build-cost for the relevant domain, (c) Dan's domain-expertise depth in the
-target — which is highest in biology / biotech / chemistry / bioinformatics, where his career corpus and PhD-level
-training compound. The strongest candidate Phase 8 instance is **schematics + designs for tangible biotech things**
-(bioreactor designs, fermentation vessel layouts, custom electroporation cuvette geometries, bench-scale biotech
-instrumentation BOMs), where the downstream actor is a contract-manufacturing partner or a 3D-printing service or a
-benchtop-instrumentation supplier and the verifier is a CAD validation tool plus Dan's expert review. This is far
-beyond what any single paper in the cluster proves — but the QiMeng family's existence-proof at the CPU end gives the
+fabricators, builders, and engineers accept — sits at Phase 8. The QiMeng-cpu-v1 result is the existence proof that the
+loop closes at industrial complexity (an AI-designed RISC-V CPU was actually fabbed as Enlightenment-1). What sits
+between Linus and that ambition is (a) Apple Silicon viability for the planner/coder loop on the relevant domain, (b)
+verification-surface availability or build-cost for the relevant domain, (c) Dan's domain-expertise depth in the target
+— which is highest in biology / biotech / chemistry / bioinformatics, where his career corpus and PhD-level training
+compound. The strongest candidate Phase 8 instance is **schematics + designs for tangible biotech things** (bioreactor
+designs, fermentation vessel layouts, custom electroporation cuvette geometries, bench-scale biotech instrumentation
+BOMs), where the downstream actor is a contract-manufacturing partner or a 3D-printing service or a
+benchtop-instrumentation supplier and the verifier is a CAD validation tool plus Dan's expert review. This is far beyond
+what any single paper in the cluster proves — but the QiMeng family's existence-proof at the CPU end gives the
 trajectory empirical support, and Sketch2Simulation's existence-proof at the process-engineering end shows the pattern
 generalizes outside hardware. ADR seed: `_Seed: DEC-NNNN_` for "Phase 8 idea-to-reality target — biotech tangible
 things, with Dan's domain expertise as the load-bearing context".
@@ -408,11 +410,12 @@ things, with Dan's domain expertise as the load-bearing context".
 cluster (QiMeng-GEMM, QiMeng-TensorOp, QiMeng-Xpiler, QiMeng-Attention) is itself a typed-structured-prediction
 substrate in the sense of CLAUDE.md §S25 (typed structured prediction wrapping rationale, originally surfaced for
 biology skills). The shape `{primitive: "tiling", platform: "metal", hint: "...", code: "...", rationale: "..."}`
-generalizes the biology shape `{gene: "BRCA1", predicted_function: "DNA repair", confidence: 0.87, evidence:
-["pmid:12345"], rationale: "..."}` to hardware design specs. Same shape, different domain. The convention extension is
-worth committing to as part of the Phase 6 / Phase 7 ADR landing — the typed-prediction-with-rationale shape applies
-across biology, kernel codegen, and HDL generation, and it should be the default skill-output shape (`_Seed: DEC-NNNN_`
-for "typed structured prediction extended to hardware-design specs").
+generalizes the biology shape
+`{gene: "BRCA1", predicted_function: "DNA repair", confidence: 0.87, evidence: ["pmid:12345"], rationale: "..."}` to
+hardware design specs. Same shape, different domain. The convention extension is worth committing to as part of the
+Phase 6 / Phase 7 ADR landing — the typed-prediction-with-rationale shape applies across biology, kernel codegen, and
+HDL generation, and it should be the default skill-output shape (`_Seed: DEC-NNNN_` for "typed structured prediction
+extended to hardware-design specs").
 
 ---
 
@@ -425,11 +428,10 @@ strong closed or large-open models — GPT-4o, Claude 3.5 Sonnet, DeepSeek-V3 (2
 model results are uneven: Codestral-22B fails the QiMeng-GEMM multi-turn meta-prompt protocol on GPU; CodeV-R1's
 distillation only converts the coder, leaving the planner role implicit; QiMeng-Kernel uses a "lightweight LLM" for
 macro thinking but does not specify the size. **For Linus's local-only Worker plan with Qwen3 (or Kimi-K2 if the Phase 6
-base swap from
-[`docs/syntheses/native-low-bit-apple-silicon-synthesis.md`](native-low-bit-apple-silicon-synthesis.md) lands), is the
-planner step viable on a 7B–32B local model, or does it require a strong teacher (hosted Claude, frozen during
-development) to produce the planning trace?** The candidate compromise: planner runs on hosted Claude during Phase 6
-spike development, then is fine-tuned into a local Worker via CodeV-style multi-level summarization once the
+base swap from [`docs/syntheses/native-low-bit-apple-silicon-synthesis.md`](native-low-bit-apple-silicon-synthesis.md)
+lands), is the planner step viable on a 7B–32B local model, or does it require a strong teacher (hosted Claude, frozen
+during development) to produce the planning trace?** The candidate compromise: planner runs on hosted Claude during
+Phase 6 spike development, then is fine-tuned into a local Worker via CodeV-style multi-level summarization once the
 meta-prompt + hint repository is stable. This compromise echoes the Maestro budget discipline (hosted Claude as
 expensive teacher, local Worker as runtime consumer) and sidesteps the small-Worker-can't-follow-protocol risk. But it
 remains an open question worth scoping before any Phase 6 commitment.
@@ -444,10 +446,10 @@ biology / biotech / chemistry. Some candidate verifiers exist (NCBI BLAST for se
 folding scores for protein-design, simple in-vitro-assay-correctness predictions, electroporation efficiency scoring),
 but none have the cheap-and-deterministic property the QiMeng family enjoys. **A Phase 7 scoping spike — pick one
 biology subdomain, identify the cheapest verifier, build a minimum-viable QiMeng-GEMM-style port — is the right first
-step**. The answer to "can Dan's biology domain support the discipline" is the gating decision for whether Linus's
-Phase 7 idea-to-reality skill class lands as a biology-first capability or stays at the kernel-codegen / HDL generation
-end of the cluster. The cross-thread to generative-biology and function-annotation-discovery syntheses is open: are
-there parallel idea→reality dreams in those threads, and what verifiers do they imply?
+step**. The answer to "can Dan's biology domain support the discipline" is the gating decision for whether Linus's Phase
+7 idea-to-reality skill class lands as a biology-first capability or stays at the kernel-codegen / HDL generation end of
+the cluster. The cross-thread to generative-biology and function-annotation-discovery syntheses is open: are there
+parallel idea→reality dreams in those threads, and what verifiers do they imply?
 
 **The closed-source verifier ceiling.** A structural ceiling the synthesis should be honest about: the production
 end-to-end pipelines for the QiMeng family's strongest results (Synopsys Design Compiler / Cadence Genus for ASIC tape-
@@ -457,39 +459,40 @@ toolchain**: Yosys + iverilog for HDL, clang / nvcc / mlx for kernels, open-sour
 (DWSIM, COFE — neither evaluated against the cluster's papers), open-source bioinformatics pipelines for Dan's domain.
 This ceiling matters for any Phase 7 / Phase 8 commitment that imagines Linus producing artifacts a downstream
 manufacturer or fab "actually accepts" — there will be a Linus-produced artifact handoff to a closed-source toolchain
-the user (Dan or another operator) runs separately, and Linus does not internalize that segment. This is acceptable;
-it should just be explicit in the Phase 7 ADR.
+the user (Dan or another operator) runs separately, and Linus does not internalize that segment. This is acceptable; it
+should just be explicit in the Phase 7 ADR.
 
 **The compute-cost question for self-improvement.** CodeV-R1's RLVR loop landed in ~2,656 A100-GPU-hours, well above
 what an M1 Max can deliver in any reasonable wall time. For Phase 6 / Phase 7 self-improvement to be a Linus capability
 rather than a research curiosity, **either the compute cost has to come down (LoRA-only RLVR on small corpora, smaller
 inner-loop model, adaptive DAPO speedups) or Linus has to embrace occasional cloud bursts for full RL runs**. The
 cloud-burst pattern conflicts with Linus's "private local assistant" framing slightly — the compromise is that the RL
-training run is a one-time supervised data generation step, not a runtime requirement, and the resulting fine-tuned
-LoRA adapter runs locally afterward. This is the same pattern the Maestro budget discipline already endorses for
+training run is a one-time supervised data generation step, not a runtime requirement, and the resulting fine-tuned LoRA
+adapter runs locally afterward. This is the same pattern the Maestro budget discipline already endorses for
 hosted-Claude-as-teacher; extending it to occasional cloud-A100-as-trainer is a small additional commitment. The Phase
-6c spike (LoRA-RLVR feasibility on M1 Max with adaptive DAPO inner loop) is the gating measurement; the empirical
-anchor matters more than the architectural enthusiasm here.
+6c spike (LoRA-RLVR feasibility on M1 Max with adaptive DAPO inner loop) is the gating measurement; the empirical anchor
+matters more than the architectural enthusiasm here.
 
-**The "is QiMeng a single research program or many" question.** Across the fifteen papers the same author group
-recurs: Yunji Chen, Qi Guo, the State Key Lab of Processors at ICT-CAS plus collaborators. The internal coherence of
-the family is striking — the same MTMC-or-equivalent planner/coder discipline, the same verification-as-oracle pattern,
-the same data-from-real-artifacts philosophy. **Is this group running a single coherent research agenda toward
-end-to-end LLM-driven hardware design (with QiMeng-cpu-v1 / Enlightenment-1 as the existence proof and the rest as
-methodology pillars), or is it a productive group whose papers happen to share a discipline?** The answer matters for
-Linus's tracking strategy: if it's a single agenda, the corpus has a continuation worth watching closely (a future
+**The "is QiMeng a single research program or many" question.** Across the fifteen papers the same author group recurs:
+Yunji Chen, Qi Guo, the State Key Lab of Processors at ICT-CAS plus collaborators. The internal coherence of the family
+is striking — the same MTMC-or-equivalent planner/coder discipline, the same verification-as-oracle pattern, the same
+data-from-real-artifacts philosophy. **Is this group running a single coherent research agenda toward end-to-end
+LLM-driven hardware design (with QiMeng-cpu-v1 / Enlightenment-1 as the existence proof and the rest as methodology
+pillars), or is it a productive group whose papers happen to share a discipline?** The answer matters for Linus's
+tracking strategy: if it's a single agenda, the corpus has a continuation worth watching closely (a future
 QiMeng-Kernel-R1 applying CodeV-R1's RLVR template to GPU-kernel codegen, or a future QiMeng-Photonic for photonic-IC
-design); if it's a productive group, individual papers age independently. The honest read: probably the former, with
-the QiMeng-X* naming convention and the internal cross-citations as evidence. Worth an explicit Phase 6+ "watch this
-group" commitment in the Linus convention list.
+design); if it's a productive group, individual papers age independently. The honest read: probably the former, with the
+QiMeng-X\* naming convention and the internal cross-citations as evidence. Worth an explicit Phase 6+ "watch this group"
+commitment in the Linus convention list.
 
 **The biosecurity-tier question for biology extensions.** If the Phase 7 idea-to-reality skill class extends from
 hardware/kernel codegen into biology/biotech, the biosecurity-tier-control framework (DEC-0047) becomes load-bearing in
-a way it is not for kernel codegen. Schematics for fermentation vessels are bench-tier work; sequence designs that enable
-gain-of-function research in pathogens are not. The Phase 7 ADR for the idea-to-reality skill class should explicitly
-incorporate the biosecurity-tier framework into the skill's output gating — not as an afterthought, but as a first-class
-constraint on the skill's deployment surface. The QiMeng family's hardware-design domain does not exercise this
-constraint; the moment Linus extends to biology, it does. This is an open question for the Phase 7 ADR specifically.
+a way it is not for kernel codegen. Schematics for fermentation vessels are bench-tier work; sequence designs that
+enable gain-of-function research in pathogens are not. The Phase 7 ADR for the idea-to-reality skill class should
+explicitly incorporate the biosecurity-tier framework into the skill's output gating — not as an afterthought, but as a
+first-class constraint on the skill's deployment surface. The QiMeng family's hardware-design domain does not exercise
+this constraint; the moment Linus extends to biology, it does. This is an open question for the Phase 7 ADR
+specifically.
 
 ---
 
@@ -505,21 +508,21 @@ load-bearing pattern Linus should generalize across domains.
 primary — QiMeng's LLM→hardware-description-language→fabricated-chip path and Sketch2Simulation's
 LLM→flowsheet→process-engineer path — share a spine with a third arm that lives outside this synthesis's primary scope:
 robotics, where a video-or-VLM-derived action policy emits motor commands that a robot's physical hardware realizes as
-task completion. The 2026-02-19 NVIDIA GEAR Lab paper drop —
-[DreamZero](../paper-notes/2602.15922v1.md) (a 14B autoregressive flow-matching DiT that doubles VLA zero-shot
-generalization on bimanual manipulation) and [EgoScale](../paper-notes/2602.16710v1.md) (a flow-matching VLA trained on
-20,854 hours of egocentric human video, with a clean log-linear data-scale-vs-loss law) — are the watch-the-field
-exemplars. Both inherit from the [WHAM](../paper-notes/s41586-025-08600-3.md) world-action-model lineage anchored in
+task completion. The 2026-02-19 NVIDIA GEAR Lab paper drop — [DreamZero](../paper-notes/2602.15922v1.md) (a 14B
+autoregressive flow-matching DiT that doubles VLA zero-shot generalization on bimanual manipulation) and
+[EgoScale](../paper-notes/2602.16710v1.md) (a flow-matching VLA trained on 20,854 hours of egocentric human video, with
+a clean log-linear data-scale-vs-loss law) — are the watch-the-field exemplars. Both inherit from the
+[WHAM](../paper-notes/s41586-025-08600-3.md) world-action-model lineage anchored in
 [infra-foundations](infra-foundations-synthesis.md), and both are Phase 7/8 watch-only for Linus rather than directly
 liftable: the GB200/H100 hardware floor (NVFP4 quantization Blackwell-specific, `flash-attn` with no Metal backend, 14B
 at fp16 leaving no activation headroom on M1 Max) closes the door on near-term deployment, and Dan does not currently
 operate any robotic embodiment. The reason the cross-thread is worth naming anyway is structural: the idea→reality
-discipline this synthesis canonicalizes — planner emits structured intermediate, coder emits artifact, verifier
-provides oracle, downstream non-LLM actor realizes the artifact as physical reality — is the same shape regardless of
-whether the downstream actor is a fab tool, a process simulator, or a robot. If Linus's Phase 7+ scope ever opens an
-embodied-actor or lab-instrument-automation lane (a 3D printer, a microscope stage, a manipulator, benchtop biotech
-instrumentation), the world-action-model paradigm is currently the strongest empirical evidence for the right
-architecture to get there, and the planner/coder/verifier discipline this synthesis develops is what would carry over.
+discipline this synthesis canonicalizes — planner emits structured intermediate, coder emits artifact, verifier provides
+oracle, downstream non-LLM actor realizes the artifact as physical reality — is the same shape regardless of whether the
+downstream actor is a fab tool, a process simulator, or a robot. If Linus's Phase 7+ scope ever opens an embodied-actor
+or lab-instrument-automation lane (a 3D printer, a microscope stage, a manipulator, benchtop biotech instrumentation),
+the world-action-model paradigm is currently the strongest empirical evidence for the right architecture to get there,
+and the planner/coder/verifier discipline this synthesis develops is what would carry over.
 
 **Cross-thread links.**
 
@@ -532,8 +535,8 @@ architecture to get there, and the planner/coder/verifier discipline this synthe
   while the GB200/H100 hardware floor holds, but the discipline (planner / coder / verifier with downstream
   physical-actor) is shared.
 - [agentic-systems-synthesis](agentic-systems-synthesis.md) — the Sketch2Simulation cross-thread fold-in. The
-  multi-agent decomposition and execution-fix-loop patterns are first surfaced there; this synthesis extends them to
-  the idea-to-reality lens.
+  multi-agent decomposition and execution-fix-loop patterns are first surfaced there; this synthesis extends them to the
+  idea-to-reality lens.
 - [generative-biology-synthesis](generative-biology-synthesis.md) — open question on whether parallel idea-to-reality
   dreams exist in biology. The cross-thread is currently a hypothesis; no biological QiMeng-equivalent has been authored
   yet.
@@ -545,8 +548,8 @@ architecture to get there, and the planner/coder/verifier discipline this synthe
 
 **Spec home.** [`docs/specs/qimeng-category-promotion.md`](../specs/qimeng-category-promotion.md) — the canonical
 statement of the idea-to-reality spine and Dan's strategic intent. This synthesis quotes the framing directly; the spec
-is the load-bearing source for the category's strategic rationale and the placeholder for the Phase 7 / Phase 8 ADRs
-the synthesis seeds.
+is the load-bearing source for the category's strategic rationale and the placeholder for the Phase 7 / Phase 8 ADRs the
+synthesis seeds.
 
 **ADR seeds named in this synthesis** (numbers TBD — placeholders signal where commitments could land):
 
@@ -568,11 +571,11 @@ the synthesis seeds.
 - `_Seed: DEC-NNNN_` — Typed structured prediction extended to hardware-design specs (Phase 6 / 7 cross-cutting).
 
 The seed count is large, and that is itself a signal: the QiMeng family is dense with durable architectural commitments
-the Linus phased plan should make explicit. Not all eleven seeds will land as ADRs in a single Phase 6 / 7 planning
-arc; the priority order is roughly the sequence the Linus phased plan reaches — Phase 2/3 orchestration substrates
-first, Phase 6 fine-tuning conventions next, Phase 6d Apple-Silicon kernel-codegen after that, Phase 7 idea-to-reality
-skill class as the load-bearing strategic commitment, Phase 8 biotech-tangible-things target as the aspirational
-horizon. The Phase 7 ADR is the biggest commitment, and the one this synthesis exists to argue for.
+the Linus phased plan should make explicit. Not all eleven seeds will land as ADRs in a single Phase 6 / 7 planning arc;
+the priority order is roughly the sequence the Linus phased plan reaches — Phase 2/3 orchestration substrates first,
+Phase 6 fine-tuning conventions next, Phase 6d Apple-Silicon kernel-codegen after that, Phase 7 idea-to-reality skill
+class as the load-bearing strategic commitment, Phase 8 biotech-tangible-things target as the aspirational horizon. The
+Phase 7 ADR is the biggest commitment, and the one this synthesis exists to argue for.
 
 The strategic argument in one paragraph: **The QiMeng family demonstrates, across fifteen papers and four repos, that
 LLMs can produce real artifacts — kernels, hardware-description-language modules, CPU microarchitectures, OS configs,
