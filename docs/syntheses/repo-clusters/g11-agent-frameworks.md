@@ -293,6 +293,40 @@ the concrete answer to how that gap is bridged.
 
 ---
 
+## Strategic implications: Agent / Identity / Venue as cluster vocabulary
+
+A useful piece of strategic vocabulary lands here from outside the agent-frameworks corpus proper. Canteen's
+*Unbundling the Prediction Market Stack* argues that the prediction-market stack is fragmenting into three independently
+replaceable layers — an **Agent layer** (LLM-driven trading frameworks like TradingAgents and AI Hedge Fund emitting
+structured decisions with persistent logs), an **Identity layer** (cryptographic primitives such as Polymarket V2
+builder codes, Hyperliquid HIP-3, and Pump.fun fee-recipient `bytes32` fields, all attributing trades to specific
+agents), and a **Venue layer** (operator-mediated matching surfaces replacing bilateral signed orders). The thesis is
+that all three layers matured simultaneously in early 2026 and became visible when Polymarket and Pump.fun shipped
+breaking protocol upgrades within hours of each other on 2026-04-28. *"Prediction markets are no longer a monolith —
+Agent / Identity / Venue are independently replaceable layers, and the layers matured simultaneously in early 2026"*
+([Canteen, *Unbundling the Prediction Market Stack*, 2026-05-01](../../../context/notes/canteen_blog_landscape_2026-05.md)).
+
+The decomposition generalizes well beyond crypto: any domain in which reasoning, attribution, and consumption surface
+are separable concerns admits the same three-layer factoring. Mapped onto Linus, the framework Linus is building falls
+out cleanly. Pydantic-ai, DSPy, and the progressive-disclosure skills architecture sit at the **Agent layer** — these
+are the reasoning substrate. The **Identity layer** is the typed-prediction discipline that the synthesis already names
+in pieces: DEC-0051's `AgentReport` carries the typed inter-agent message; DEC-0048's `model_prediction` edge class
+records attributable model claims as first-class KB structure; DEC-0050's Role-scoped `capability_set` ties an action
+back to the Worker that performed it; provenance hashing and KB content-hashing complete the cryptographic-attribution
+analog. *"Builder codes (Polymarket V2, Hyperliquid HIP-3, Pump.fun fee-recipient) are the cross-venue identity
+primitive: a `bytes32` field attributing flow to whichever agent originated it"*
+([Canteen, *Unbundling the Prediction Market Stack*, 2026-05-01](../../../context/notes/canteen_blog_landscape_2026-05.md)) —
+the Linus equivalent is the AgentReport plus content-hash plus Role binding, attributing every decision to the Worker
+that produced it and the spec it ran under. The **Venue layer** is the orchestration backend itself: the FastMCP tool
+registry (DEC-0018, DEC-0045), the workgraph-shaped session store, and the Role-filtered MCP surface where Worker
+output is consumed. Read this way, Linus is currently strongest at the Agent layer (g11's repos collectively cover it),
+moderately developed at the Identity layer (the discipline exists but the typed primitives are still being threaded
+through the codebase), and underdeveloped at the Venue layer relative to the other two. That asymmetry is the real
+shape of Phase 2 — the Phase 2a orchestration MVP is, in this vocabulary, the Venue-layer build-out, and that is where
+the cluster's recommended Integrate work concentrates.
+
+---
+
 ## Phase-tagged implications
 
 **Phase 1 close (promptfoo baseline, dspy Signature reading).** Promptfoo is the only Phase 1 deliverable from G11.
