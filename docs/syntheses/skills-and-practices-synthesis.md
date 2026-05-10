@@ -325,6 +325,58 @@ harness-surface coverage as a double-check against Linus's own CLAUDE.md and pro
 
 ---
 
+## 4b. ClawBio as a worked example of the skills-as-shippable-bundle archetype (added 2026-05-10)
+
+The [ClawBio](../repo-notes/ClawBio.md) repo (ClawBio/ClawBio) extends the g11 framing in a direction the
+agent-framework cluster does not: it is a working precedent for **what the ship-side of a Linus skill looks like**
+once the bench has been written. Three patterns from ClawBio land directly on the skills-and-practices argument and
+are worth treating as design inputs rather than reference material.
+
+The first is **the Claude Code plugin marketplace as a Phase 5+ distribution channel**. ClawBio installs as
+`/plugin marketplace add ClawBio/ClawBio` followed by `/plugin install clawbio`, after which all 63 skills are
+agent-routable inside Claude Code without any deeper integration work. This is the same surface Linus would use to
+ship its own skill bundles to any Claude Code user — Dan first, a wider audience later if any of Linus's skills
+graduate to a commercial-surface offering. Section 6 already establishes Claude Code as the Maestro harness via
+[DEC-0007](../adr/0007-claude-code-terminal-maestro.md); the plugin marketplace is the paired distribution channel
+for skill bundles that should be addressable from Claude Code without bundling them into the Linus orchestration
+runtime. Importantly, the plugin path does not displace Linus's own internal SKILL.md format or the in-house tool
+registry — it is an _output_ format the orchestration layer can render to alongside MCP and direct in-process
+invocation. Worth surfacing as a Phase 5/7 distribution-channel option in the spec backlog.
+
+The second is **the reproducibility bundle as a candidate output convention for any Linus skill that produces a
+publishable artefact**. Every ClawBio analysis emits `commands.sh` + `environment.yml` + `checksums.sha256`
+alongside the markdown report, not as an afterthought but as part of the standard skill-output contract. The
+argument for adoption generalizes well beyond biology: any Linus skill whose output might end up in a paper, a
+slide, or a downstream pipeline should ship a bundle so a reviewer can reproduce the result in one command without
+contacting Dan. The cost is small — three files written alongside the report — and the value compounds with every
+skill that adopts it. _Seed: DEC-NNNN reproducibility-bundle-output-convention_ — companion to
+[DEC-0023](../adr/0023-output-interface-citations-llm-wiki.md) (output interface citations + LLM Wiki) and
+[DEC-0027](../adr/0027-linus-practice-stance-batch.md) (public APIs + measurement discipline). Phase 7
+finalization is the natural commit point.
+
+The third is **the SKILL.md conformance linter as a worked example of the "schema is the product" framing that
+runs through this synthesis**. ClawBio's `scripts/lint_skills.py` enforces a 17-check checklist on every skill PR:
+YAML frontmatter completeness, required sections, ≥3 trigger keywords, ≥3 gotchas, a safety disclaimer reference,
+the agent-boundary clause, demo data presence, test directory presence, and a 500-line ceiling on SKILL.md size.
+The point is not the specific checks (Linus's own would differ — agent-boundary clauses do not generalize cleanly
+to non-bio skills) but the existence of an _enforced_ schema, machine-checkable at PR time. The progressive-
+disclosure skill format Section 4a flagged as triple-converged across superpowers, gptme, and
+Agent-Skills-for-Context-Engineering becomes a stronger pattern when paired with a linter that prevents drift; a
+SKILL.md-shaped bundle that no one validates is markdown, not a contract. _Seed: DEC-NNNN
+skill-md-conformance-linter_ — Linus's own skill template, regardless of which lineage it descends from
+(Anthropic's, ClawBio's, bioSkills's, or a synthesis), should ship with an equivalent linter from day one of
+Phase 7 prep.
+
+ClawBio also extends Section 4a's claude-code-guide observation about persona library-as-quarry: ClawBio's
+templates/SKILL-TEMPLATE.md plus the conformance linter together are the **engineering shape** for what a Linus
+skill template should look like, while the breadth-of-content question (which skills, in which domain order)
+remains separately answerable from bioSkills, Anthropic's official skills repo, or whatever lineage Linus chooses
+to inaugurate Phase 7 with. The two-axis split — engineering shape from one upstream, content from another — is
+the operational form of the "delete every requirement" discipline applied to skill-library inheritance. _Verdict:
+**Study (with a high prior on later Adapt-as-skill-library-pattern)**_ from [`ClawBio.md`](../repo-notes/ClawBio.md).
+
+---
+
 ## 5. Entrepreneurial Opportunities
 
 > **Extracted 2026-05-05.** The seven entrepreneurial opportunities originally listed here have been promoted to a
