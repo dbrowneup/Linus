@@ -27,7 +27,9 @@ ratio has expanded ~6× since the post-fan-out integration pass. Read this once 
 2026-05-08 after the synthesis-refinement pass that flowed paper- and repo-note cleanup deltas into the syntheses,
 propagated DEC-0044 through DEC-0054 status across the rows, and harvested the R3 question batch. Updated 2026-05-09
 to add the 15th thematic synthesis `llm-hardware-design` and the 12th cluster `g12-llm-hardware-design` after the
-QiMeng / idea→reality fan-out per `docs/specs/qimeng-category-promotion.md`.)
+QiMeng / idea→reality fan-out per `docs/specs/qimeng-category-promotion.md`. Refreshed 2026-05-10 to add ClawBio as
+the 5th member of the g9-bio cluster — depth-vs-breadth complement to bioSkills and the closest existing precedent
+for the Phase 7 inaugural bio-skills bundle in working form.)
 
 ---
 
@@ -65,7 +67,7 @@ QiMeng / idea→reality fan-out per `docs/specs/qimeng-category-promotion.md`.)
 | [`g6-mcp-tools`](../syntheses/repo-clusters/g6-mcp-tools.md)                                      | 11 repos; fastmcp as default (DEC-0045); expanded to document-context platform (markdownify-mcp, codebase-memory-mcp, vanna, ExtractThinker, rendergit added). MCP commitment closed via DEC-0018/0045/0046; transport selection (stdio vs streamable-http) live as R2-06.                                                                                                            |
 | [`g7-harnesses`](../syntheses/repo-clusters/g7-harnesses.md)                                      | 10 agent harnesses; workgraph JSONL DAG + dispatch as recommended Phase 2a session-store shape. semanticworkbench added as HTTP-registered protocol reference.                                                                                                                                                                                                                        |
 | [`g8-sci-agents`](../syntheses/repo-clusters/g8-sci-agents.md)                                    | 12 scientific reasoning agents; paper-qa as first paper-corpus Integrate, substrate decision resolved (DEC-0044, paper-qa as Phase 2c retrieval engine; aviary ships transitively); LAB-Bench canary blocklist obligation. Sketch2Simulation error-recovery loop added.                                                                                                               |
-| [`g9-bio`](../syntheses/repo-clusters/g9-bio.md)                                                  | 4 bioinformatics models; bioSkills as Phase 7 inaugural skills bundle (~438 bio skills).                                                                                                                                                                                                                                                                                              |
+| [`g9-bio`](../syntheses/repo-clusters/g9-bio.md)                                                  | 5 bioinformatics tools / models (ClawBio added 2026-05-10 as depth-vs-breadth complement to bioSkills); bioSkills as Phase 7 inaugural skills bundle (~438 bio skills); ClawBio as worked precedent for the per-skill engineering shape (tests + reproducibility bundle + conformance linter + plugin-marketplace distribution).                                                                                                                                                                                                                                                                                              |
 | [`g10-finance`](../syntheses/repo-clusters/g10-finance.md)                                        | 5 finance/quant agents (5 × Study; QuantAgent reclassified from Ignore to Study 2026-05-08, contributing the minimal four-role linear-pipeline pattern alongside TradingAgents' maximal debate-style roster); transferable Maestro/Worker context-management patterns. Anchors the entrepreneurship thematic synthesis (2026-05-05).                                                  |
 | [`g11-agent-frameworks`](../syntheses/repo-clusters/g11-agent-frameworks.md) _(added 2026-05-05)_ | 8 agent framework, skills, and evaluation repos; pydantic-ai (Integrate) + promptfoo (Integrate) as immediate actionables; dspy, superpowers, gptme, huginn, Agent-Skills, lmnr as Study. Primary anchor for skills-and-practices synthesis. pydantic-ai Capabilities pattern resolved to Linus-native shape (DEC-0046 deployment field + DEC-0050 Role `capability_set`) 2026-05-06. |
 | [`g12-llm-hardware-design`](../syntheses/repo-clusters/g12-llm-hardware-design.md) _(added 2026-05-09)_ | 4 QiMeng-family repos (CodeV, QiMeng-MuPa, QiMeng-SALV, QiMeng-cpu-v1) covering LLM-driven Verilog/CUDA/processor design via planner/coder discipline + RLVR/signal-aware DPO/MuSL feedback loops. Sketch2Simulation cited as cross-thread reference exemplar (g8 member, not g12). Primary anchor for the new `llm-hardware-design` thematic synthesis. |
@@ -86,7 +88,7 @@ across multiple syntheses simultaneously.
 | **g4-memory**     | memory _(primary)_, agentic-systems, llm-wiki, biological-foundation-models, security                                                                                        | The memory pillar is genuinely cross-cutting — investigation memory, claim-typed write-back, model_prediction provenance, and trust-tier tagging all share the same substrate.                                                                 |
 | **g7-harnesses**  | agentic-systems _(primary)_, infra-foundations, security, entrepreneurship                                                                                                   | Harnesses are where every operational pattern actually runs; workgraph-style JSONL DAG + dispatch is the recommended Phase 2a session-store shape. (skills-and-practices primary anchor moved to g11 2026-05-05; g7 remains a secondary edge.) |
 | **g8-sci-agents** | llms-in-science _(primary)_, agentic-systems, skills-and-practices, llm-wiki, function-annotation-discovery, entrepreneurship                                                | paper-qa alone earns the breadth — it's the first paper-corpus tool to earn Integrate, the literature-intelligence engine for Phase 7, and the substrate-reframe ("adopt + extend") for Phase 2 KB.                                            |
-| **g9-bio**        | function-annotation-discovery _(primary)_, biological-foundation-models _(primary)_, generative-biology _(primary)_, skills-and-practices, llms-in-science, entrepreneurship | The biology pillar is overdetermined; bioSkills (~438 skills), Bacformer (Apple-Silicon-realistic broad-bio FM), and the integrate trio drive the Phase 7 sub-roadmap and the inaugural commercial surface.                                    |
+| **g9-bio**        | function-annotation-discovery _(primary)_, biological-foundation-models _(primary)_, generative-biology _(primary)_, skills-and-practices, llms-in-science, entrepreneurship | The biology pillar is overdetermined; bioSkills (~438 skills), Bacformer (Apple-Silicon-realistic broad-bio FM), ClawBio (added 2026-05-10 — depth-and-engineering complement to bioSkills's breadth), and the integrate trio drive the Phase 7 sub-roadmap and the inaugural commercial surface. |
 
 Two clusters are anchors-only (anchor one or two syntheses but don't function as hubs): **g1-apple-silicon**
 (native-low-bit primary; infra-foundations, security secondary), **g10-finance** (entrepreneurship primary;
@@ -199,11 +201,14 @@ for the four additions it identifies.
 - **generative-biology** for SAFETY tier-control + external_api_tool registry.
 - **biological-foundation-models** for Phase 7 substrate strategy (LucaOne as KG anchor; specialists as Workers).
 - **g9-bio** cluster surfaces Bacformer (Apple-Silicon-realistic broad bio FM) + bioSkills (Phase 7 inaugural ~438
-  skills) + DeepSeMS (BGC → SMILES generative skill) + BioReason (CUDA-locked architecture reference).
+  skills) + DeepSeMS (BGC → SMILES generative skill) + BioReason (CUDA-locked architecture reference) + ClawBio
+  (added 2026-05-10 — depth-vs-breadth complement to bioSkills; the closest existing worked example of a Phase 7
+  inaugural bio-skills bundle in working form, with per-skill tests + reproducibility bundle + conformance linter +
+  Claude Code plugin-marketplace distribution as directly liftable engineering patterns).
 
 The biology pillar is overdetermined: three thematic syntheses + a cluster + the integrate-verdict trio (paper-qa,
-bioSkills, scientific-agent-skills) + the M1-Max-realistic broad-bio FM (Bacformer) make Phase 7 biology its own
-sub-roadmap rather than a scattered set of skills.
+bioSkills, scientific-agent-skills) + the M1-Max-realistic broad-bio FM (Bacformer) + the worked-example bio-skills
+engineering precedent (ClawBio) make Phase 7 biology its own sub-roadmap rather than a scattered set of skills.
 
 ### Infra-foundations now anchors benchmarks + KG tooling (updated 2026-05-05)
 
