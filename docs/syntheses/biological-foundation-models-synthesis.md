@@ -157,6 +157,50 @@ specialist composition Phase 3's parallel-agent infrastructure exists to enable.
 
 ---
 
+## Specialists-as-Workers at the skill-class layer: ClawBio as working precedent
+
+The constellation argument above is framed at the **model-class layer** — LucaOne as cross-modal default,
+specialists invoked when the task is in their named domain. The [ClawBio](../repo-notes/ClawBio.md) repo
+(ClawBio/ClawBio) is the closest existing implementation of the same dispatch logic at the **skill-class layer**:
+a curated 63-skill bioinformatics library where each skill is a deterministic, versioned specialist, and a
+`bio-orchestrator` skill routes free-text queries to the right downstream skill based on file type and keywords.
+The dispatch surface is exactly the one this synthesis recommends — generalist orchestrator over named
+specialists — except the specialists are deterministic Python tools rather than learned FMs, and the routing
+signal is filename + keyword rather than model-class. ClawBio extends the existing g9-bio cluster prior art
+alongside Bacformer, BioReason, bioSkills, and deepsems, and is the depth-vs-breadth complement to bioSkills:
+~438 broad-but-shallow Anthropic-format skills versus 63 deeply engineered skills with tests, demo data, a
+reproducibility bundle, and a benchmark scorer where ground truth exists (e.g. the v0.5.0 AD ground-truth gene
+set with 168/182 benchmark tests passing across 10 audited skills).
+
+Two ClawBio patterns are load-bearing for the integration hooks this synthesis has already committed to. First,
+the **Galaxy Bridge skill** wraps `BioBlend` to expose the full usegalaxy.org tool catalog (8,000+ external
+bioinformatics tools) through a single Python skill — a working precedent for the
+[DEC-0046](../adr/0046-external-api-tool-registry-deployment-field.md) `external_api_tool` deployment field. The
+pattern (one Linus tool → many external tools, with the registry tagging it as external-API-deployed and the
+audit log capturing every invocation) is no longer aspirational; it is shipping today behind a `/plugin install
+clawbio` command. Second, ClawBio's **cross-platform chaining examples** (Galaxy VEP → ClawBio PharmGx; Galaxy
+Kraken2 → ClawBio metagenomics) are a working precedent for the model-prediction-edge data flow described in
+[DEC-0048](../adr/0048-kb-model-prediction-edge-class.md): a variant scored by one tool flowing as typed
+provenance into the next tool's input is exactly the `model_prediction` edge shape, and the chaining contract
+ClawBio enforces (per-skill `--input` / `--output` / `--demo` plus a per-skill `allowed_extra_flags` allowlist
+filtered before subprocess invocation) is a candidate prior-art template for the agent-spawner's tool dispatch
+contract.
+
+The framing implication for Phase 7 is that **the right Linus dispatch surface is one agent spawner that
+dispatches to both kinds of Worker — deterministic skill _and_ specialist FM — through a uniform interface**.
+ClawBio's `bio-orchestrator` plus per-skill subprocess pattern works for tools that are deterministic and fast;
+this synthesis's recommended layered design (LucaOne anchor + specialist FMs) works for tools that are stochastic
+and inference-heavy. The two are not competing — they are the two ends of the same dispatch contract, and the
+spawner needs to know which dispatch path is active for a given task. Whether Linus extracts ClawBio's specific
+implementation, re-implements over BioBlend directly with Linus's tool-registry conventions, or simply lifts the
+engineering shape (per-skill tests + reproducibility bundle + catalog generator + conformance linter) into a
+Linus-native skill bundle is a Phase 7 planning question — but the pattern itself is no longer a hypothesis. It
+is the closest existing precedent for what a Phase 7 inaugural bio-skills bundle should look like in working
+form, and the depth-vs-breadth complement to bioSkills makes the choice between them an "or both, fork the
+engineering shape from one and the breadth-of-content from the other" question rather than an "or" question.
+
+---
+
 ## Cross-cutting threads
 
 ### Open weights vs hosted-or-restricted release
@@ -513,5 +557,5 @@ _This synthesis feeds [synthesis-landscape.md](../landscapes/synthesis-landscape
 is deprecated; paper-level navigation lives in [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md). Revisit when:
 ProteinReasoner checkpoints appear on BioMap GitHub / `airkingbd` HF (passive watch per S52); the AlphaGenome and Evo 2
 7B local-deployability spikes land; the ProtiCelli and TranscriptFormer M1-Max MPS spikes land; the Wave 3 Evo 2 +
-generative phage mini-synthesis (R2-57) is written; any new Group A paper enters `context/papers/`. Updated 2026-05-09
-(ProtiCelli + TranscriptFormer cell-level FM fold-in, Task 4.1)._
+generative phage mini-synthesis (R2-57) is written; any new Group A paper enters `context/papers/`. Updated 2026-05-10
+(ClawBio specialist-skill-as-Worker fold-in)._
