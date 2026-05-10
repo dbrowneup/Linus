@@ -21,46 +21,67 @@ Bin A + Bin B repo additions deferred from the Canteen blog landscape note.
 
 ## Tasks at a glance
 
-| Tier | Family                                                          | Count   | Output                                        | Gating                                         |
-| ---- | --------------------------------------------------------------- | ------- | --------------------------------------------- | ---------------------------------------------- |
-| 1    | Promote inline-cited papers to paper-notes                      | 3       | `docs/paper-notes/<stem>.md` × 3              | none                                           |
-| 2    | Investigate + embed orphan pics                                 | 4       | inline embeds + cross-refs                    | gated on figuring out what happened with #1.5 |
-| 3    | Bin A — Tier 1 repo clones + notes                              | 5       | clone + `docs/repo-notes/<repo>.md` × 5       | needs Dan authorization for clones             |
-| 4    | Bin B — Tier 2 repo clones + notes                              | 3       | clone + `docs/repo-notes/<repo>.md` × 3       | needs Dan authorization for clones             |
-| 5    | Core-doc staleness — single Worker pass                         | 9 files | edits across CLAUDE/README/VISION/etc.        | gated on Tier 1–4 so counts are stable         |
-| 6    | INDEX backfill for new paper-notes + repo-notes                 | 2 files | INDEX entries added                           | gated on Tier 1+3+4                            |
-| 7    | Curation-log entries for Tier 3+4 clones                        | 1 file  | `docs/curation-log.md` updated                | gated on Tier 3+4                              |
-| 8    | (Decision) Bulk-rename files with spaces — ADR candidate        | TBD     | new ADR + (maybe) rename pass                 | Dan decision needed — see §"Open decisions"    |
-| 9    | (Decision) Git LFS for `context/` — ADR candidate               | TBD     | new ADR + (maybe) `.gitattributes` + migration| Dan decision needed — see §"Open decisions"    |
+| Tier | Family                                                                  | Count   | Output                                        | Gating                                                              |
+| ---- | ----------------------------------------------------------------------- | ------- | --------------------------------------------- | ------------------------------------------------------------------- |
+| 1    | Promote inline-cited papers + Letta-paired paper to paper-notes         | 4       | `docs/paper-notes/<stem>.md` × 4              | task 1.4 needs arxiv PDF download (Dan-authorized 2026-05-10)        |
+| 2    | Investigate + embed orphan pics                                         | 4       | inline embeds + cross-refs                    | gated on figuring out what happened with Bonsai pics                |
+| 3    | Bin A — Tier 1 repo clones + notes                                      | 5       | clone + `docs/repo-notes/<repo>.md` × 5       | **authorized 2026-05-10**; URLs pinned below                        |
+| 4    | Bin B — Tier 2 repo clones + notes                                      | 3       | clone + `docs/repo-notes/<repo>.md` × 3       | **authorized 2026-05-10**; URLs pinned below                        |
+| 5    | Core-doc staleness — single Worker pass                                 | 9 files | edits across CLAUDE/README/VISION/etc.        | gated on Tier 1–4 so counts are stable                              |
+| 6    | INDEX backfill for new paper-notes + repo-notes                         | 2 files | INDEX entries added                           | gated on Tier 1+3+4                                                  |
+| 7    | Curation-log entries for Tier 3+4 clones                                | 1 file  | `docs/curation-log.md` updated                | gated on Tier 3+4                                                    |
+| 10   | Landscape + top-questions accuracy audit (load all syntheses at once)   | 3 files | refresh `total-landscape.md` / `synthesis-landscape.md` / `top-questions.md` | gated on all prior tiers                          |
 
-Total: ~24 sub-tasks, of which 8 are blocked on Dan authorization and 2 are decision items that may not execute
-in PR 30 at all.
+PR 30 total: ~28 sub-tasks (4 paper-notes + 4 pic embeds + 8 repo-note tasks + 9 core-doc files + 2 INDEX +
+1 curation-log + 3 landscape/top-questions = 31 distinct file outputs).
+
+**Deferred to PR 31** (separate branch + separate ADRs):
+
+| Tier | Family                                          | Status                                       |
+| ---- | ----------------------------------------------- | -------------------------------------------- |
+| 8    | Bulk-rename files with spaces — ADR candidate   | **approved 2026-05-10**; PR 31 scope         |
+| 9    | Git LFS for `context/` — ADR candidate          | **approved 2026-05-10**; PR 31 scope         |
 
 ---
 
-## Tier 1 — Promote inline-cited papers to paper-notes (3 tasks)
+## Tier 1 — Promote inline-cited papers + Letta-paired paper to paper-notes (4 tasks)
 
-These three papers were intentionally deferred to inline citation during the original fold-in (per Dan's feedback
-on options A/B/C/D), but the corpus is mature enough now that promoting them to full paper-notes closes a
-"surprised-we-missed-this" gap and gives them durable cross-reference handles.
+The first three papers were intentionally deferred to inline citation during the original fold-in (per Dan's
+feedback on options A/B/C/D), but the corpus is mature enough now that promoting them to full paper-notes closes
+a "surprised-we-missed-this" gap and gives them durable cross-reference handles. Task 1.4 was added 2026-05-10
+when Dan authorized the Letta clone (Tier 3.1) — Letta descends architecturally from MemGPT, so the pair gets
+the hybrid-filename treatment.
 
 | Task | PDF                                                   | Target paper-note                       | Synthesis home(s)                          |
 | ---- | ----------------------------------------------------- | --------------------------------------- | ------------------------------------------ |
 | 1.1  | `context/papers/2509.11420v1.pdf`                     | `docs/paper-notes/2509.11420v1.md`      | agentic-systems (extends TradingAgents)    |
 | 1.2  | `context/papers/2602.03082v1.pdf`                     | `docs/paper-notes/2602.03082v1.md`      | infra-foundations (manifold-ML thread)     |
 | 1.3  | `context/papers/Flow Matching for Generative Modeling.pdf` | `docs/paper-notes/2210.02747.md`*  | infra-foundations (flow-matching origin)   |
+| 1.4  | `context/papers/2310.08560.pdf` (download from arxiv) | `docs/paper-notes/Letta-2310.08560.md`  | memory-synthesis + agentic-systems         |
 
-\*Per the paper's arxiv ID. Filename has spaces; per Tier 8 (below), this could become an argument for the
-bulk-rename decision. Provisional plan: copy/rename PDF to `2210.02747.pdf` to match arxiv convention if Dan
-authorizes a one-off rename, otherwise keep the spaces and use URL-encoded `pdf:` field.
+\*Per the paper's arxiv ID. Filename has spaces; per Tier 8 (PR 31), the bulk-rename pass will normalize this.
+Provisional plan: keep the spaces during PR 30 and use URL-encoded `pdf:` field; PR 31 rename pass will fix it.
 
-**Why these were missed:** all three were folded inline during PR #29 per the fold-in plan (option D / option (a)
-in Dan's feedback). The synthesis prose cites them; no per-paper-note was authored. The "surprise" is that the
-synthesis-fold completion implied paper-note authorship to reviewers. **Resolution:** author the three notes,
+**Task 1.4 specifics — Letta / MemGPT paper:**
+
+- Source: https://arxiv.org/abs/2310.08560 (Packer et al., 2023, *MemGPT: Towards LLMs as Operating Systems*).
+- PDF URL: https://arxiv.org/pdf/2310.08560.pdf
+- Save to: `context/papers/2310.08560.pdf`
+- Paper-note path: `docs/paper-notes/Letta-2310.08560.md` (paired-repo hybrid filename per CLAUDE.md
+  §Paper-note paired-repo variant convention).
+- Frontmatter `pdf:` field: `../../context/papers/2310.08560.pdf`.
+- Pairs with `docs/repo-notes/Letta.md` (Tier 3.1).
+- Synthesis homes: primary in `memory-synthesis.md` (memory-tier architecture comparison); secondary in
+  `agentic-systems-synthesis.md` (agent-OS analogy).
+
+**Why 1.1–1.3 were missed:** all three were folded inline during PR #29 per the fold-in plan (option D / option
+(a) in Dan's feedback). The synthesis prose cites them; no per-paper-note was authored. The "surprise" is that
+the synthesis-fold completion implied paper-note authorship to reviewers. **Resolution:** author the three notes,
 update INDEX, and update the inline citations in the affected syntheses to link the new paper-notes.
 
-**Dispatch pattern:** 3 parallel agents (one per paper). Same prompt template as PR #28 fan-out, paired-paper-note
-versions if applicable.
+**Dispatch pattern:** 4 sequential agents (one per paper) per CLAUDE.md §Worktree fan-out discipline. Same prompt
+template as PR #28 fan-out. Tasks 1.1–1.3 can run in any order; task 1.4 should be ordered after the PDF
+download confirms the paper is available locally — and before Tier 3.1 so the paired repo-note can cross-link.
 
 ---
 
@@ -92,38 +113,38 @@ fold-ins were done in Tier 4.
 
 ## Tier 3 — Bin A: 5 Tier-1 repos (clone + repo-notes)
 
-**Blocked on Dan authorization for clones.** Per CLAUDE.md §Tool Use Policy "Any network operation requires
-confirmation"; `git clone` is a network operation. The clones are explicitly recommended in
-`canteen_blog_landscape_2026-05.md` §Bin A, so this is pre-approved at the planning level — but the actual `git
-clone` invocations need an explicit go-ahead.
+**Authorized 2026-05-10.** URLs pinned below — do not derive URLs from any other source. Clone via
+`git clone --depth=1 <url> repos/<dest-name>` per CLAUDE.md §Repo Layout (read-only reference clones).
 
-| Task | Repo (owner)                          | Target repo-note                          | Probable verdict | Note                                                                          |
-| ---- | ------------------------------------- | ----------------------------------------- | ---------------- | ----------------------------------------------------------------------------- |
-| 3.1  | `letta-ai/letta`                      | `docs/repo-notes/letta.md`                | Study            | **Strongest single recommendation.** Memory-pillar comparison set completer.  |
-| 3.2  | `0xplaygrounds/rig`                   | `docs/repo-notes/rig.md`                  | Study            | Rust-side agent + tool-calling pattern; 7.2k★, MIT, no Ollama / no MCP.       |
-| 3.3  | `microsoft/autogen`                   | `docs/repo-notes/autogen.md`              | Study            | Surprisingly absent; group-chat-pattern reference for g11 / agentic-systems.  |
-| 3.4  | `langchain-ai/langgraph`              | `docs/repo-notes/langgraph.md`            | Study            | Architectural alternative to workgraph-JSONL DAG; canonical reference.        |
-| 3.5  | `coinbase/x402`                       | `docs/repo-notes/x402.md`                 | Watch            | HTTP-402 payment protocol; `@x402/mcp` on roadmap as TODO; intersects DEC-0018 / DEC-0045 / future agent-monetization ADR seed. |
+| Task | Repo (owner)                          | Canonical URL                                          | Clone destination          | Target repo-note                       | Probable verdict | Note                                                                          |
+| ---- | ------------------------------------- | ------------------------------------------------------ | -------------------------- | -------------------------------------- | ---------------- | ----------------------------------------------------------------------------- |
+| 3.1  | `letta-ai/letta`                      | https://github.com/letta-ai/letta                      | `repos/Letta`              | `docs/repo-notes/Letta.md`             | Study            | **Strongest single recommendation.** Memory-pillar comparison set completer. Pairs with paper-note 1.4 (MemGPT). |
+| 3.2  | `0xplaygrounds/rig`                   | https://github.com/0xplaygrounds/rig                   | `repos/rig`                | `docs/repo-notes/rig.md`               | Study            | Rust-side agent + tool-calling pattern; 7.2k★, MIT, no Ollama / no MCP.       |
+| 3.3  | `microsoft/autogen`                   | https://github.com/microsoft/autogen                   | `repos/autogen`            | `docs/repo-notes/autogen.md`           | Study            | Surprisingly absent; group-chat-pattern reference for g11 / agentic-systems.  |
+| 3.4  | `langchain-ai/langgraph`              | https://github.com/langchain-ai/langgraph              | `repos/langgraph`          | `docs/repo-notes/langgraph.md`         | Study            | Architectural alternative to workgraph-JSONL DAG; canonical reference.        |
+| 3.5  | `coinbase/x402`                       | https://github.com/coinbase/x402                       | `repos/x402`               | `docs/repo-notes/x402.md`              | Watch            | HTTP-402 payment protocol; `@x402/mcp` on roadmap as TODO; intersects DEC-0018 / DEC-0045 / future agent-monetization ADR seed. |
 
-**Repo-note discipline:** standard 7-section, cluster-cell `[g4-memory](...)` for letta; `[g11-agent-frameworks](...)`
+**Repo-note discipline:** standard 7-section, cluster-cell `[g4-memory](...)` for Letta; `[g11-agent-frameworks](...)`
 for rig + autogen + langgraph; `—` (no cluster) for x402 since it's not an agent framework — possibly create a
 new "agent-monetization" cluster footnote later if more lands.
 
-**Dispatch pattern:** 5 parallel agents after clones complete. Same template as past repo-note dispatches.
+**Dispatch pattern:** Sequential agent dispatch after Maestro completes the 5 clones. File-level partitioning —
+each agent writes its own repo-note path, no overlap.
 
 ---
 
 ## Tier 4 — Bin B: 3 Tier-2 repos (clone + repo-notes)
 
-**Blocked on Dan authorization for clones (same as Tier 3).**
+**Authorized 2026-05-10.** URLs pinned below — do not derive URLs from any other source. Clone via
+`git clone --depth=1 <url> repos/<dest-name>`.
 
-| Task | Repo (owner)                            | Target repo-note                            | Probable verdict          |
-| ---- | --------------------------------------- | ------------------------------------------- | ------------------------- |
-| 4.1  | `block/goose`                           | `docs/repo-notes/goose.md`                  | Study                     |
-| 4.2  | `deeplearning-wisc/debate-or-vote`      | `docs/repo-notes/debate-or-vote.md`         | Study + spike             |
-| 4.3  | `nikmcfly/MiroFish-Offline`             | `docs/repo-notes/MiroFish-Offline.md`       | Investigate, then Study or Watch |
+| Task | Repo (owner)                            | Canonical URL                                                | Clone destination               | Target repo-note                            | Probable verdict          |
+| ---- | --------------------------------------- | ------------------------------------------------------------ | ------------------------------- | ------------------------------------------- | ------------------------- |
+| 4.1  | `block/goose`                           | https://github.com/block/goose                               | `repos/goose`                   | `docs/repo-notes/goose.md`                  | Study                     |
+| 4.2  | `deeplearning-wisc/debate-or-vote`      | https://github.com/deeplearning-wisc/debate-or-vote          | `repos/debate-or-vote`          | `docs/repo-notes/debate-or-vote.md`         | Study + spike             |
+| 4.3  | `nikmcfly/MiroFish-Offline`             | https://github.com/nikmcfly/MiroFish-Offline                 | `repos/MiroFish-Offline`        | `docs/repo-notes/MiroFish-Offline.md`       | Investigate, then Study or Watch |
 
-**Dispatch pattern:** 3 parallel agents after clones.
+**Dispatch pattern:** Sequential agent dispatch after Maestro completes the 3 clones.
 
 ---
 
@@ -213,114 +234,80 @@ with one-line rationale per repo (citing the Canteen blog landscape note as the 
 
 ---
 
-## Tier 8 (decision item) — Bulk-rename files with spaces
+## Tier 10 — Landscape + top-questions accuracy audit
 
-**Status:** ADR candidate. **Not in PR 30 execution scope; surfaced for Dan's decision.**
+**Added 2026-05-10** at Dan's request. Final accuracy pass before PR 30 closes. Performed by Maestro because
+it requires holding all syntheses in working memory simultaneously to spot inconsistencies — not a Worker task.
 
-**Problem:** Files with spaces in their names (`Anthropic's Responsible Scaling Policy (version 3.0).pdf`,
-`As We May Think.txt`, `Flow Matching for Generative Modeling.pdf`, `Bonsai Energy Use.png`,
-`Bonsai Performance vs Size.png`, `Bush - As We May Think (Life Magazine 9-10-1945).pdf`,
-`How-Anthropic-teams-use-Claude-Code_v2.pdf`, `LLM Wiki GitHub Repos.xlsx`, `Memory makes computation universal,
-remember?.txt`, plus various synthesis-cited threads with spaces in names) require URL-encoding in markdown links
-(`%20` for space, `%27` for apostrophe, etc.). This is fragile — link rot is silent, broken links don't show up
-until someone clicks. Several past fold-ins have hit this (URL-encoded curly apostrophe in Anthropic RSP, etc.).
+**Inputs (all loaded simultaneously):**
 
-**Affected files** (sweep needed; preliminary count from `find context/ docs/ -name '* *' | wc -l`): probably 15–25
-files across `context/notes/`, `context/papers/`, `context/pics/`, `context/threads/`, plus a few paper-notes
-(`Horiike-Orthogonal projections of hypercubes-2025-Physical Review E copy.md`).
+- All 14 thematic syntheses in `docs/syntheses/*.md` (excluding `repo-clusters/`).
+- All 12 cluster syntheses in `docs/syntheses/repo-clusters/g1`–`g12`.
+- `docs/landscapes/total-landscape.md` (cross-corpus rollup).
+- `docs/landscapes/synthesis-landscape.md` (synthesis-doc rollup).
+- `docs/questions/top-questions.md` (current working set).
+- `docs/questions/answered-questions.md` (resolution archive — read for cross-check, not edited).
 
-**Options:**
+**Out of scope (per Dan 2026-05-10):** `docs/landscapes/paper-landscape.md` and `repo-landscape.md` are
+deprecated stubs and stay as-is.
 
-- **(a) Bulk-rename pass**, replacing spaces and special characters with `-` or `_`. Update all references in
-  syntheses, paper-notes, repo-notes, INDEXes, curation-log. Major touch (~50–100 file edits). One-time pain;
-  durable cleanup. Affects historical link integrity in past commits — cherry-pick reconciliation costs are
-  low since the renames are pure substitution.
-- **(b) Half-measure**: rename only the specific files where link breakage has been observed (Anthropic RSP,
-  Flow Matching, etc.). Lower scope but leaves the discipline-debt for next time.
-- **(c) Don't rename**: standardize on URL-encoding everywhere; document in CLAUDE.md §Doc-type conventions.
-  Lowest immediate work; perpetual fragility.
+**Audit checks:**
 
-**Recommendation pending Dan's call.** Lean toward **(a) bulk-rename** with an ADR (DEC-NNNN
-filename-discipline-no-spaces) committing the policy, executed via single Maestro pass after PR 30 closes the
-content drift.
+| Check | Inputs | Failure mode to catch                                                                |
+| ----- | ------ | ------------------------------------------------------------------------------------ |
+| 10.1  | synthesis-landscape vs syntheses dir         | Every synthesis has a row + correct title + cluster cell + "How the syntheses overlap" entry; no orphan rows |
+| 10.2  | total-landscape counts                       | Paper count, repo count, synthesis count all reflect post-PR-30 state (after Tier 1+3+4 land) |
+| 10.3  | total-landscape representation               | New clusters (g12) and new fold-ins (Letta, x402, autogen, langgraph, rig, goose, debate-or-vote, MiroFish-Offline, Letta MemGPT paper, 3 promoted papers) are represented |
+| 10.4  | top-questions vs syntheses                   | No question listed as "open" that a synthesis since closed (cross-reference DECs); no resolved question still showing as top-question |
+| 10.5  | top-questions vs answered-questions          | Promotions to answered-questions.md are reflected — top-questions shows the right working set |
 
----
+**Resolution actions:** fix drift inline as discovered. Each fix gets a brief inline rationale comment so future
+audits can reproduce the reasoning. Single Maestro commit at the end titled
+`[docs] Landscape + top-questions accuracy refresh after PR 30 fold-ins`.
 
-## Tier 9 (decision item) — Git LFS for `context/`
+**Why this matters:** the corpus has ~26 syntheses now and the landscapes drift quickly when fold-ins land
+without explicit rollup updates. Treating "load everything at once and audit" as a recurring discipline (vs
+trusting individual fold-ins to update the rollups correctly) was the gap PR #28/#29 surfaced.
 
-**Status:** ADR candidate. **Not in PR 30 execution scope; surfaced for Dan's decision.**
-
-**Problem:** `context/` is currently `.gitignore`d. Primary sources (paper PDFs, notes, pics, threads) live only
-on Dan's local filesystem with no git history. Future research distribution (the entrepreneurship synthesis
-flagged commercial-surface implications) needs primary-source provenance.
-
-**Solution:** Track `context/` (or selectively, `context/papers/` + `context/notes/` + `context/pics/`) via Git
-LFS. PDFs / images stored remotely on the LFS server; pointers in git history; clones can opt-in to fetch via
-`git lfs pull`.
-
-**Implications:**
-
-- **Storage:** GitHub Free includes 1 GB LFS storage + 1 GB/month bandwidth. `context/` is currently ~50 MB
-  estimated; well within free tier.
-- **Distribution:** with LFS, anyone cloning the repo can pull primary sources. Important for reproducibility,
-  for the entrepreneurship-synthesis commercial-surface story, and for future Worker fan-outs that need primary
-  source access.
-- **Clone size:** non-LFS clones stay small (LFS files are pointer files, ~1 KB each). LFS pull is opt-in.
-- **Setup:** add `.gitattributes` declaring LFS patterns; `git lfs migrate import --include=…` for historical
-  files (if any are already tracked); update `.gitignore` to remove `context/`.
-- **Caveats:** GitHub LFS has bandwidth limits; if Linus eventually distributes broadly, may need to upgrade or
-  move to a dedicated LFS server.
-
-**Recommendation pending Dan's call.** Lean toward **adopt LFS for `context/`** with an ADR (DEC-NNNN
-context-tracked-via-git-lfs) committing the policy, executed in a separate PR before any commercial-surface
-distribution.
+**Dispatch pattern:** single Maestro session with all inputs loaded at once. Estimated 1–2 hours.
 
 ---
 
-## Open decisions Dan needs to make
+## Open decisions — RESOLVED 2026-05-10
 
-1. **Tier 3+4 clone authorization** — go/no-go on Bin A (5 repos) and Bin B (3 repos).
-2. **Tier 8 decision** — bulk-rename files with spaces? (a / b / c above)
-3. **Tier 9 decision** — adopt Git LFS for `context/`?
-4. **PR 30 scope** — execute only Tier 1+2+5+6+7 (no clones, no rename, no LFS), or bundle some/all of the above?
+All four decisions have been confirmed by Dan:
 
-If Dan returns "go on all four," recommended PR 30 scope:
-
-- Tier 1 (3 paper-notes)
-- Tier 2 (4 pic embeds)
-- Tier 3 (5 Bin A repos + repo-notes)
-- Tier 4 (3 Bin B repos + repo-notes)
-- Tier 5 (9 core-doc updates)
-- Tier 6 (INDEX backfill)
-- Tier 7 (curation-log)
-
-Defer Tier 8 (rename) and Tier 9 (LFS) to **PR 31** as separate ADRs + execution because both are policy decisions
-with broad blast radius.
-
-If Dan returns "do the safe stuff in PR 30, defer the rest" — recommended PR 30 scope: Tier 1+2+5+6+7 only.
-Tier 3+4+8+9 deferred to PR 31+.
+| Decision                                            | Resolution        |
+| --------------------------------------------------- | ----------------- |
+| Tier 3+4 clone authorization                        | **Approved**. URLs pinned in Tier 3 + Tier 4 sections above.  |
+| Tier 8 — bulk-rename files with spaces              | **Approved**, deferred to PR 31. ADR + execution there.       |
+| Tier 9 — Git LFS for `context/` (+ `.gitignore` update) | **Approved**, deferred to PR 31. ADR + execution there. |
+| PR 30 scope — split decision                        | **PR 30 = content + Tier 10**; **PR 31 = Tier 8 (rename) + Tier 9 (LFS)**. |
 
 ---
 
 ## Dispatch pattern
 
 **Sequential agent dispatch with file-level partitioning** per CLAUDE.md §Worktree fan-out discipline. Mostly
-Maestro-led for the small-scope tiers (Tier 2, 6, 7); Worker fan-out for the larger tiers (Tier 1 = 3 agents
-in parallel; Tier 3 = 5 agents in parallel; Tier 4 = 3 agents in parallel; Tier 5 = single Worker with tight
-line-range spec). No worktrees — files are interdependent (especially Tier 5).
+Maestro-led for the small-scope tiers (Tier 2, 6, 7, 10); Worker fan-out for the larger tiers (Tier 1 = 4
+sequential agents; Tier 3 = 5 sequential agents after clones; Tier 4 = 3 sequential agents after clones;
+Tier 5 = single Worker with tight line-range spec). No worktrees — files are interdependent (especially
+Tier 5 and Tier 10).
 
-**Canary first** for Tier 3+4 if those execute — clone + repo-note pipeline hasn't been exercised this session
-in this exact shape.
+**Canary first** for Tier 3+4 — clone + repo-note pipeline hasn't been exercised this session in this exact
+shape. Use Tier 3.1 (Letta, the strongest single recommendation, with paired paper-note 1.4) as the canary.
 
 ---
 
 ## PR plan
 
-**PR 30** — Tier 1 + 2 + (3+4 if authorized) + 5 + 6 + 7. Single PR if scope is manageable (~30 commits).
-Branch: `agent/pr30-cleanup`.
+**PR 30 (this branch: `agent/pr30-cleanup`)** — Tiers 1 + 2 + 3 + 4 + 5 + 6 + 7 + 10. Single PR; ~30+
+commits. Open after Tier 10 audit closes.
 
-**PR 31** (if Tier 8/9 advance) — Bulk-rename + LFS migration. Each gets its own ADR. Should land separately
-from PR 30 because both are policy decisions worth their own review windows.
+**PR 31 (separate branch, after PR 30 merges)** — Tier 8 (bulk-rename) + Tier 9 (Git LFS). Each gets its own
+ADR. Branch name TBD when PR 31 is opened. Both are policy decisions with broad blast radius — independent
+review windows protect against rename or LFS introducing edge-case breakage that's hard to isolate inside a
+content-heavy PR.
 
 ---
 
@@ -328,14 +315,15 @@ from PR 30 because both are policy decisions worth their own review windows.
 
 | Tier | Estimate                                                                                                |
 | ---- | ------------------------------------------------------------------------------------------------------- |
-| 1    | 1–2 hours (3 agents, paper-notes for already-cited papers — fast)                                       |
+| 1    | 1–2 hours (4 agents — 3 already-cited papers + 1 paired Letta MemGPT note)                              |
 | 2    | 30 min (Maestro inline)                                                                                 |
 | 3    | 2–3 hours (5 agents after clones)                                                                       |
 | 4    | 1–2 hours (3 agents after clones)                                                                       |
 | 5    | 1–2 hours (single Worker; 9 files, mostly count + list updates)                                         |
 | 6    | 30 min (Maestro mechanical)                                                                             |
 | 7    | 15 min (Maestro single edit)                                                                            |
-| —    | **Total:** ~6–11 hours if all tiers execute; ~3–5 hours if Bin A+B deferred.                            |
+| 10   | 1–2 hours (Maestro audit, all syntheses loaded at once)                                                 |
+| —    | **Total: ~7–13 hours**                                                                                  |
 
 Per the measure-don't-estimate convention, log actual vs estimate at the close of each tier.
 
@@ -344,5 +332,6 @@ Per the measure-don't-estimate convention, log actual vs estimate at the close o
 ## Status
 
 - 2026-05-10: spec authored on `agent/pr30-cleanup` (base SHA `af3eddb`).
-- _Pending: Dan's decision on Tier 3+4 clone authorization, Tier 8 rename, Tier 9 LFS._
-- _Pending: execution after Dan returns from PR #29 review and answers the open decisions._
+- 2026-05-10: open decisions resolved (Tier 3+4 authorized; Tier 8+9 approved, deferred to PR 31; landscape audit
+  added as Tier 10; Letta MemGPT paper added as Task 1.4).
+- _Active: execution beginning with Tier 1 paper-note authoring._
