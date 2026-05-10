@@ -394,6 +394,37 @@ Lower-priority items surfaced by the synthesis-refinement pass. Dip in when cont
 
 ---
 
+## Round 4 sweep promotions (added 2026-05-10)
+
+The 2026-05-10 PR 30 fold-in pass (4 paper-notes + 8 repo-notes) surfaced three new live threads that don't fit existing
+R2 / R3 items. Numbering uses the `R4-NN` prefix.
+
+### Tier 2 — shape Phase 5+ architecture
+
+- **R4-01. Anthropic-compatible HTTP surface as Phase 5+ Linus capability (DEC-0005 amendment).** Three independent
+  signals now point at this: Letta ships both OpenAI- and Anthropic-compatible endpoints (`repo-notes/Letta.md` §3, open
+  question 8); Kimi-K2 deploys with both (`repo-notes/Kimi-K2.md`); the broader open-source agent ecosystem is
+  converging on dual endpoints. DEC-0005 commits Linus to OpenAI-compat-only at v0; a Phase 5+ ADR ("Anthropic-
+  compatible HTTP as a Linus capability") becomes warranted if a fourth confirming signal lands or a concrete client
+  needs Anthropic-shape. _(g7-harnesses; cross-cuts orchestration substrate.)_
+- **R4-02. AGPL-fork posture as a DECISIONS.md entry (not just a per-repo note).** MiroFish-Offline's Watch verdict is
+  gated explicitly on AGPL-3.0 contamination analysis; even pattern-level lifts require careful review with a copyright
+  specialist before code is written that "looks like" the AGPL source. R2-34 (g5 AGPL re-implementation policy) is the
+  existing tracker; PR 30's MiroFish add raises urgency from "convention worth codifying eventually" to "before any
+  Phase 3 KB-tooling lift starts" (origin is also AGPL — partly Apache via subcrate split, but the desktop layer is
+  AGPL). The DECISIONS.md entry should articulate the read-and-design-from-spec policy (what's quarantined, what's
+  reviewed, what's forbidden). _(g4-memory + g5-graph-tools + g7-harnesses.)_
+
+### Tier 3 — reservoir
+
+- **R4-03. `@x402/mcp` graduation from Watch to Spike or Integrate.** x402's `@x402/mcp` shipped (TypeScript + Python +
+  Go); the Canteen-blog mention upgraded from "roadmap-only" to live (`repo-notes/x402.md` §1, §3). Watch- only today;
+  an ADR becomes warranted when a Linus commercial-surface decision forces the question, or when `@x402/mcp` reaches a
+  maturity threshold that makes it a candidate primitive for the entrepreneurship pillar's pay-per-call
+  literature-intelligence offering. Phase 7+ / Phase 8. _(g6-mcp-tools; cross-cuts entrepreneurship.)_
+
+---
+
 ## How to use this document
 
 This document holds only _open_ questions — items that still need a decision. Tier 1 entries change next concrete
