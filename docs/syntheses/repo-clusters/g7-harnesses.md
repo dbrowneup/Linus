@@ -203,6 +203,20 @@ same shape claw-code-local will eventually take: a Rust-native coding agent that
 first-class client. Adding the repo-note (Tier 2, Study) is a small task with a concrete payoff: it gives Linus a
 direct prior-art reference for how the Rust client side of the MCP boundary is wired in a shipped product.
 
+The claw-code project posted a labelled architectural diagram for its orchestration layer that captures the harness
+shape this cluster is converging on — Architect / Executor / Reviewer triad driven by an integrated harness layer
+(`oh-my-codex` + `clawhip` + `oh-my-openagent`) over a development loop of analysis → planning → coding/tools →
+review → verification, with text-based developer input as the primary control surface:
+
+![claw-code key orchestration concept — Architect/Executor/Reviewer triad over a development loop, text-based agent
+orchestration via `$team` and `$ralph` modes (instructkr/claw-code, 2025)](../../../context/pics/HE2psIVbcAA6VLz.jpg)
+
+The diagram is useful as a reference picture of the pattern: a harness layer sitting between the developer's text
+commands and an explicit role triad, with the development loop visible as a closed cycle rather than a one-shot
+generation. Linus's Phase 2a orchestration layer should expose enough surface that an external harness like this
+one (or claw-code-local, or Goose) can plug roles into Linus's MCP tool registry rather than re-implementing the
+review and verification stages internally.
+
 ### gravityfile: Ignore, save the scanner gotcha
 
 gravityfile (`epistates/gravityfile`) is a Rust TUI disk-usage explorer with no LLM dependency and no relevance to
