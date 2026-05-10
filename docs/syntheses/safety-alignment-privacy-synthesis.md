@@ -162,6 +162,52 @@ substitute: once a Worker has produced dangerous content, even a discarded outpu
 Screening happens at the orchestration layer, before any Worker sees the query, and is Worker-invariant — open-weights
 biology Workers with stripped refusal training cannot be trusted to enforce the policy themselves.
 
+### Policy-stance benchmarks: Anthropic RSP and Claude's Constitution
+
+Two Anthropic-published documents — the
+[Responsible Scaling Policy v3.0](../../context/notes/Anthropic%E2%80%99s%20Responsible%20Scaling%20Policy%20%28version%203.0%29.pdf)
+(RSP, effective 2026-02-24) and [Claude's Constitution](../../context/notes/claudes-constitution_webPDF_26-02.02a.pdf)
+(published 2026-01-21) — are not papers Linus borrows mechanism from; they are policy artifacts against which Linus's
+own posture can be calibrated. The framing is **different scope, useful benchmark**, not "more or less rigorous." RSP is
+a frontier-developer voluntary framework for catastrophic-risk management at the level of the global AI ecosystem,
+organized around capability thresholds (e.g., "non-novel chem/bio weapons production," "cyberattacks against critical
+infrastructure," "autonomous AI R&D") that trigger ASL-tiered mitigations, Frontier Safety Roadmaps, and
+external-reviewed Risk Reports. Claude's Constitution is the values-and-behavior specification under which hosted Claude
+is trained — a mostly-judgment-driven document anchored on four prioritized properties (broadly safe, broadly ethical,
+compliant with Anthropic guidelines, genuinely helpful) and a small set of hard constraints. Both speak to problems
+Linus also faces but at a wholly different scale: hosted Claude reaches hundreds of millions of users across operators
+Anthropic does not control; Linus is one user's local orchestration backend with hosted Claude itself as a collaborator.
+The benchmark question is not "should Linus copy these documents" but "which of their disciplines generalize to a
+private orchestration layer, and at what phase do the analogues become load-bearing."
+
+On the RSP side, Linus already has one capability-specific tier framework — the three-tier biosecurity policy (DEC-0047)
+covering residue-level / gene-level / whole-genome biology operations with escalating per-invocation gates. That policy
+is the structural analogue of an ASL-style tier for one capability domain, and the design discipline that produced it
+(name the threshold, name the mitigation, gate at orchestration time, audit-log the decision) is directly RSP-shaped. A
+Frontier Safety Roadmap analogue, capability-thresholds across multiple risk classes (cyber uplift, autonomous-action
+scope, model-weight exfiltration risk on shared hardware), and the "concrete plans we will pursue regardless"
+distinction from "ambitious recommendations we'd want others to adopt" are not yet present in the Linus docs. The open
+question is when the broader RSP-style framework becomes warranted: probably not Phase 2, possibly Phase 6 once
+fine-tunes start producing Linus-specific Workers, plausibly Phase 7 when sandbox autonomy widens. The single
+biosecurity tier is the pilot; the surface area to generalize from is small until Worker capabilities widen materially.
+
+On the Constitution side, Linus's "values" surface is currently distributed across VISION.md (the Pauling/Torvalds
+naming, the local-first ethos, the orchestration-not-replacement framing), CLAUDE.md (the Maestro/Worker discipline, the
+engineering conventions, The Algorithm), and `docs/protocols/maestro-protocol.md` (the L1–L7 behavioral disciplines for
+hosted Claude playing Maestro). Hosted Claude operates under the Constitution; local Workers (Qwen3 today, future
+Linus-flavored variants) do not — they inherit whatever values their pretraining and fine-tuning produced, modulated by
+Linus-specific system prompts. This is benign for Phase 1–2 stateless code-generation and synthesis Workers, where the
+relevant guardrails are sandbox-level rather than values-level. It becomes load-bearing the moment Workers are doing
+agentic action with broader scope, processing sensitive content under stateful contexts, or producing content that
+non-Dan readers may consume. The open question is whether a "Linus Constitution" — a short, Linus-specific
+values-and-behavior document for local Workers, prioritizing the Maestro/Worker hand-off discipline, the privacy ethos,
+and the dual-use refusal posture — should be authored as a Phase 7 / 8 deliverable, or whether the existing distributed
+surface (VISION + CLAUDE + maestro-protocol + SAFETY) plus per-Worker system prompts are sufficient. The Anthropic
+Constitution's core insight — that values-and-judgment generalize better than rules in novel situations, but hard
+constraints are still needed for catastrophic-cost actions — is itself the heuristic that should govern when Linus needs
+to write its own analogue. Until Worker scope widens past the current sandbox envelope, the Linus-Constitution question
+stays open as a Phase 7 / 8 trigger.
+
 ### Connection to the existing security synthesis
 
 The existing [security synthesis](security-synthesis.md) covered supply chain and prompt injection. Group F adds four
@@ -353,7 +399,10 @@ pick up the tensions surfaced above.
 ---
 
 _This synthesis was written 2026-05-03; updated 2026-05-08 to reflect resolved decisions (DEC-0053 KB flow policy,
-DEC-0054 activation hooks stub, DEC-0047 biosecurity tier, S57 maestro-protocol.md, S58 SAFETY.md PR #16). Next revisit
-triggers: Phase 2 activation-hooks feasibility spike result; stylometric-leakage and Maestro-values SAFETY.md additions
-landing; Phase 6 steering-before-fine-tuning ADR; biology Worker first considered for the skill registry; new paper in
-the steering / monitoring / deanonymization / dual-use / values-characterization line in `context/papers/`._
+DEC-0054 activation hooks stub, DEC-0047 biosecurity tier, S57 maestro-protocol.md, S58 SAFETY.md PR #16); refreshed
+2026-05-09 to add the Anthropic RSP v3.0 + Claude's Constitution policy-stance-benchmark thread (Task 4.6 of
+`docs/specs/2026-05-09-context-foldin-fanout.md`). Next revisit triggers: Phase 2 activation-hooks feasibility spike
+result; stylometric-leakage and Maestro-values SAFETY.md additions landing; Phase 6 steering-before-fine-tuning ADR;
+biology Worker first considered for the skill registry; new paper in the steering / monitoring / deanonymization /
+dual-use / values-characterization line in `context/papers/`; Phase 7 / 8 trigger for the Linus-Constitution and broader
+RSP-analogue questions opened above._

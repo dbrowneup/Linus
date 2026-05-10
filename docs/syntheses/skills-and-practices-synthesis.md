@@ -99,6 +99,30 @@ inference wrapper, but a personal AI system shaped by his specific scientific ex
 judgment about what's worth building. The differentiation of any tool Dan builds on top of Linus will come from his
 domain knowledge, not from the underlying models.
 
+**Practitioner cross-check: Anthropic-internal Claude Code usage.** The same ten practices recur — under different
+labels — in [How Anthropic teams use Claude Code (v2)](../../context/notes/How-Anthropic-teams-use-Claude-Code_v2.pdf),
+which collects workflow exemplars from ten Anthropic-internal teams (data infrastructure, product development, security
+engineering, inference, data science, API knowledge, growth marketing, product design, RL engineering, legal). The
+convergence is informative because these are first-party users who built the harness, and their advice overlaps almost
+completely with the X/Twitter practitioner threads above: detailed CLAUDE.md files are the single strongest predictor of
+good Claude Code performance (data infrastructure team), self-sufficient verify-loops where Claude runs
+builds/tests/lints automatically and catches its own mistakes are the way to extend autonomous runtime without
+supervision (Claude Code team), custom slash commands carry an outsized share of repeated workflow value (security
+engineering authored 50% of the entire monorepo's slash-command surface area), and the "treat the session like a slot
+machine — save state, let it run 30 minutes, accept or reset rather than wrestle with context" pattern from the data
+science team is a cleaner statement of Practice 4's plan-before-execution discipline pushed to its operational limit.
+Three additional patterns from the Anthropic playbook are not yet in the practitioner-thread set above but are worth
+folding into Linus's Maestro/Worker discipline: parallel Claude Code instances per repository as the
+cross-day-context-preservation primitive (data infrastructure team — each instance maintains full context across days,
+an alternative to the multi-worktree pattern from claude-squad / Section 4); end-of-session documentation updates as a
+closing-cadence ritual where the agent summarizes completed work and proposes CLAUDE.md refinements based on actual
+usage (data infrastructure team — directly compatible with Linus's session-summary discipline); and auto-accept mode
+plus checkpoint-and-revert-by-git as the "let it run" enabling pair (Claude Code team — Practice 4's plan-then-act,
+restated as a workflow pattern rather than a discipline rule). Open question for Dan, mirrored as Q6 below: should the
+Phase 2a Worker spec format mandate a "verify loop" field (build / test / lint commands the Worker runs as its own
+success signal before reporting done), elevating the Anthropic Claude Code team's self-sufficient-loops tip to a Linus
+convention rather than a recommendation?
+
 ---
 
 ## 3. Skills Worth Incorporating into Linus
@@ -276,6 +300,81 @@ adopt it as the standard format for domain skills in a `src/linus/skills/` direc
 evaluation (promptfoo — measures correctness on known tasks) from observability (lmnr — measures what the system
 actually does during live operation); both are needed and they are not substitutes for each other.
 
+**Worked example of the community harness-pattern catalogue: claude-code-guide.** The
+[claude-code-guide](../repo-notes/claude-code-guide.md) repo (zebbern/claude-code-guide) is the most concrete external
+exemplar of how a community organizes Claude Code patterns at scale, and it occupies a useful niche in the g11 anchor
+that none of pydantic-ai, dspy, superpowers, or gptme cover: it is a markdown-only crowd-curated catalogue rather than a
+runtime, and its scale (106 sub-agent personas, 29 SKILL modules, three CLAUDE.md guideline collections, ~3,700-line
+README mirroring upstream Anthropic releases) makes it a rich quarry for shape-mining without inviting a vendoring
+decision. The repo-note flags two structural lifts directly relevant to Linus. First, the agent-persona file shape (YAML
+frontmatter with `name` / `description` / allowed `tools`, then a "When invoked" procedure list and explicit checklists
+like "Cyclomatic complexity < 10 maintained") is directly applicable to the Phase 3 spawner contract (DEC-0050) and the
+typed AgentReport output (DEC-0051): Linus's own Role definitions can adopt the same frontmatter shape and procedure
+structure, then evolve the output side toward the typed message contract. Second, the orchestration-flavored personas —
+`agent-organizer.md`, `context-manager.md`, `multi-agent-coordinator.md`, `workflow-orchestrator.md`,
+`task-distributor.md` — are the closest external precedent for the Maestro/Worker dispatch surface itself; they are
+worth a focused pass when the spawner moves from stub to implementation. The MUST/SHOULD/SHOULD-NOT rule grammar from
+the `guides/` collection (zebbern's and Sabrina's CLAUDE.md exemplars, modeled on aviation-checklist discipline) is a
+more machine-checkable shape than Linus's current prose-paragraph conventions, and selectively lifting it for the most
+checkable rules (line-length, commit format, smoke-test gating, hook bypass flow) would tighten enforceability without
+forcing the rest of CLAUDE.md to abandon the prose-first voice mandated by §Writing style for docs. Two cautions: the
+106-persona breadth is aspirational rather than a target — Linus needs five to ten Worker shapes, not a stadium — and
+the `skills/` tree is dominated by red-team / pentest workflows that are explicitly out of scope for Phase 1–7 work.
+_Verdict: **Study**_ — mine for shapes, do not vendor; the persona library and rule-grammar selectively, the README's
+harness-surface coverage as a double-check against Linus's own CLAUDE.md and protocol docs.
+
+---
+
+## 4b. ClawBio as a worked example of the skills-as-shippable-bundle archetype (added 2026-05-10)
+
+The [ClawBio](../repo-notes/ClawBio.md) repo (ClawBio/ClawBio) extends the g11 framing in a direction the
+agent-framework cluster does not: it is a working precedent for **what the ship-side of a Linus skill looks like**
+once the bench has been written. Three patterns from ClawBio land directly on the skills-and-practices argument and
+are worth treating as design inputs rather than reference material.
+
+The first is **the Claude Code plugin marketplace as a Phase 5+ distribution channel**. ClawBio installs as
+`/plugin marketplace add ClawBio/ClawBio` followed by `/plugin install clawbio`, after which all 63 skills are
+agent-routable inside Claude Code without any deeper integration work. This is the same surface Linus would use to
+ship its own skill bundles to any Claude Code user — Dan first, a wider audience later if any of Linus's skills
+graduate to a commercial-surface offering. Section 6 already establishes Claude Code as the Maestro harness via
+[DEC-0007](../adr/0007-claude-code-terminal-maestro.md); the plugin marketplace is the paired distribution channel
+for skill bundles that should be addressable from Claude Code without bundling them into the Linus orchestration
+runtime. Importantly, the plugin path does not displace Linus's own internal SKILL.md format or the in-house tool
+registry — it is an _output_ format the orchestration layer can render to alongside MCP and direct in-process
+invocation. Worth surfacing as a Phase 5/7 distribution-channel option in the spec backlog.
+
+The second is **the reproducibility bundle as a candidate output convention for any Linus skill that produces a
+publishable artefact**. Every ClawBio analysis emits `commands.sh` + `environment.yml` + `checksums.sha256`
+alongside the markdown report, not as an afterthought but as part of the standard skill-output contract. The
+argument for adoption generalizes well beyond biology: any Linus skill whose output might end up in a paper, a
+slide, or a downstream pipeline should ship a bundle so a reviewer can reproduce the result in one command without
+contacting Dan. The cost is small — three files written alongside the report — and the value compounds with every
+skill that adopts it. _Seed: DEC-NNNN reproducibility-bundle-output-convention_ — companion to
+[DEC-0023](../adr/0023-output-interface-citations-llm-wiki.md) (output interface citations + LLM Wiki) and
+[DEC-0027](../adr/0027-linus-practice-stance-batch.md) (public APIs + measurement discipline). Phase 7
+finalization is the natural commit point.
+
+The third is **the SKILL.md conformance linter as a worked example of the "schema is the product" framing that
+runs through this synthesis**. ClawBio's `scripts/lint_skills.py` enforces a 17-check checklist on every skill PR:
+YAML frontmatter completeness, required sections, ≥3 trigger keywords, ≥3 gotchas, a safety disclaimer reference,
+the agent-boundary clause, demo data presence, test directory presence, and a 500-line ceiling on SKILL.md size.
+The point is not the specific checks (Linus's own would differ — agent-boundary clauses do not generalize cleanly
+to non-bio skills) but the existence of an _enforced_ schema, machine-checkable at PR time. The progressive-
+disclosure skill format Section 4a flagged as triple-converged across superpowers, gptme, and
+Agent-Skills-for-Context-Engineering becomes a stronger pattern when paired with a linter that prevents drift; a
+SKILL.md-shaped bundle that no one validates is markdown, not a contract. _Seed: DEC-NNNN
+skill-md-conformance-linter_ — Linus's own skill template, regardless of which lineage it descends from
+(Anthropic's, ClawBio's, bioSkills's, or a synthesis), should ship with an equivalent linter from day one of
+Phase 7 prep.
+
+ClawBio also extends Section 4a's claude-code-guide observation about persona library-as-quarry: ClawBio's
+templates/SKILL-TEMPLATE.md plus the conformance linter together are the **engineering shape** for what a Linus
+skill template should look like, while the breadth-of-content question (which skills, in which domain order)
+remains separately answerable from bioSkills, Anthropic's official skills repo, or whatever lineage Linus chooses
+to inaugurate Phase 7 with. The two-axis split — engineering shape from one upstream, content from another — is
+the operational form of the "delete every requirement" discipline applied to skill-library inheritance. _Verdict:
+**Study (with a high prior on later Adapt-as-skill-library-pattern)**_ from [`ClawBio.md`](../repo-notes/ClawBio.md).
+
 ---
 
 ## 5. Entrepreneurial Opportunities
@@ -366,6 +465,32 @@ environmental science) is itself scarce, independent of any architectural skill.
 highest-leverage use of Maestro time is decomposing tasks for Workers, or whether it is applying domain expertise to
 problems that Workers cannot touch — scientific interpretation, hypothesis generation, experimental design. These are
 not the same. The answer shapes how Linus's Maestro/Worker boundary should be drawn.
+
+**Question 6: Should the Phase 2a Worker spec format mandate a "verify loop" field, elevating the Anthropic Claude Code
+team's self-sufficient-loops tip to a Linus convention?** The
+[Anthropic-internal Claude Code playbook](../../context/notes/How-Anthropic-teams-use-Claude-Code_v2.pdf) treats the
+verify loop (build / test / lint commands the agent runs as its own success signal) as the primary mechanism for
+extending autonomous runtime without supervision. This is a stronger statement than Practice 4's plan-before-execution
+discipline: it shifts the human attention point from up-front spec review to post-hoc result review, which only works if
+the agent can self-detect failure. Adopting it as a Linus convention would mean every Worker spec carries an explicit
+verify-loop block, and the orchestration layer refuses to mark a task done if the verify loop has not been exercised.
+The open question is whether this fits Linus's task mix — coding tasks have a natural verify loop (build / test / lint),
+but analysis / research / synthesis tasks (which dominate Dan's current usage) do not, and forcing a verify-loop field
+on every spec might be ceremony without value for the latter class. Possible compromise: mandate the field for
+code-producing Workers, make it optional with a structured rationale for analysis Workers, and record the mode in the
+audit log alongside `memory_mode` and `cot_budget` (DEC-0031).
+
+**Question 7: Of the 106 agent personas in [claude-code-guide](../repo-notes/claude-code-guide.md), which 5–10 map
+cleanly onto Phase 3 Worker roles Linus actually needs?** The orchestration cluster (`agent-organizer.md`,
+`context-manager.md`, `multi-agent-coordinator.md`, `workflow-orchestrator.md`, `task-distributor.md`) is the most
+directly relevant external precedent for the Phase 3 spawner Role catalogue (DEC-0050) and is the right starting quarry.
+Should `docs/specs/phase3-spawner.md` seed its initial Role catalogue from those five, plus a small set of
+domain-specific roles drawn from Dan's actual workflow (a `bioinformatics-engineer` analogue, a `paper-reviewer`
+analogue, etc.), or should the catalogue be derived bottom-up from observed Worker invocations rather than top-down from
+an external persona library? A subordinate question is whether the MUST/SHOULD/SHOULD-NOT rule grammar from the guide's
+`guides/` collection deserves an ADR seed for selective lifting into Linus's own conventions on the most checkable rules
+— line-length, commit format, smoke-test gating, hook bypass flow — without disturbing the prose-first voice that
+CLAUDE.md §Writing style for docs mandates elsewhere.
 
 ---
 

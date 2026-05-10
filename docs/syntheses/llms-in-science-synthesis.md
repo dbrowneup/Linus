@@ -159,6 +159,41 @@ not.
 
 ---
 
+## Translation as the unappreciated corpus moat
+
+A practitioner observation from outside the science domain reframes a load-bearing piece of Linus's KB plan. In a
+2026-05-01 analysis of the prediction-market stack, Canteen argues:
+
+> "Translation between formats is the unappreciated moat: each TradingAgents fork added different data brokers, but
+> the structural translation work — turning a non-English macro event into a well-formed prediction-market question —
+> is the actual scarce resource."
+> — [Canteen, _Unbundling the Prediction Market Stack_, 2026-05-01](../../context/notes/canteen_blog_landscape_2026-05.md).
+
+The claim was made about prediction markets, but it has a direct analog in scientific text corpora work. Turning a
+non-English (Mandarin, German, Japanese, etc.) primary-source paper, technical manual, or domain article into a
+well-formed claim, paper-note, or KB entry _is_ exactly the structural translation work — and it is the bottleneck
+that determines what reaches the corpus at all. Two papers competing for ingest attention rarely differ in their
+underlying findings; they differ in how much structural translation each requires before the claim is in a form
+Linus can store, retrieve, and cite. The KB's growth rate is set less by paper count than by the rate at which
+non-trivial structural translation can be done.
+
+Linus is bilingual-friendly through being claim-typed (DEC-0028 memory pillar; KB claim-typing per the LLM-wiki
+synthesis); the translation-as-moat framing makes the asymmetry explicit. Pure paper-counts scale linearly with
+ingest throughput; structured-translation work scales the corpus where pure paper-counts do not. Two consequences
+follow. First, Worker-side support for structural translation — non-English source → claim-typed KB record with
+preserved attribution — is a higher-leverage ingest investment than yet another retrieval optimization on
+already-translated content. Second, the Marelli accountability requirement (which model translated this claim, from
+which source, with what verification) becomes architecturally non-optional rather than a nice-to-have, because a
+translation is itself a model-mediated transformation that the audit log must capture. The Schulz collaborator frame
+operationalizes this naturally: the translation Worker is a research-assistant-like collaborator whose contribution
+is logged, citation-grounded, and human-verifiable — not a black-box pipeline stage.
+
+This is not a Phase 2 deliverable, but it is the strongest argument the corpus has produced for treating
+non-English-source ingest as a Phase 3+ first-class capability rather than as an afterthought to a primarily
+English-language KB.
+
+---
+
 ## Where Linus stands
 
 By virtue of being built, Linus has already taken a position in the Binz debate that the documentation does not yet make

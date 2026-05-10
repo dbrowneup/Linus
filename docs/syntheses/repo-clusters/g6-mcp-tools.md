@@ -271,6 +271,19 @@ policy details — tool allowlist, transport selection, per-tool permission tier
 rather than architectural unknowns. Transport choice (stdio vs. streamable-http) is promoted to R2-06 in
 `top-questions.md`.
 
+**External corroboration of MCP-as-substrate (Canteen Theme A).** The within-corpus convergence on MCP is independently
+mirrored by an external practitioner survey of the broader 2026 agent landscape. As Canteen put it: _"MCP is basically
+universal. The Model Context Protocol has broadly won across CrewAI, smolagents, AutoGen, LiveKit, Goose (native Rust),
+and OpenAI's SDK." — Canteen, AI Agent Landscape, 2026-01-06_
+([Canteen, _AI Agent Landscape_, 2026-01-06](../../../context/notes/canteen_blog_landscape_2026-05.md)). Nothing in this
+observation changes Linus's commitments — DEC-0018 and DEC-0045 are already in place — but the breadth of the external
+list is worth noting because it covers framework families that do not appear inside the cloned-repo collection (CrewAI,
+smolagents, AutoGen as packaged frameworks; LiveKit's voice-realtime stack; OpenAI's first-party Agents SDK). The Linus
+verdict was reached from a curated set of repos that all happen to be MCP servers; the Canteen observation confirms the
+verdict generalizes to the broader ecosystem. The specific Goose data point — a coding harness whose MCP integration is
+implemented in native Rust — is also a useful reference for any future claw-code-local design discussion, where the
+native-Rust-plus-MCP combination is the same shape Linus's Phase 5c work would take.
+
 ---
 
 ## Phase-tagged implications

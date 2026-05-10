@@ -176,6 +176,33 @@ and `workbench-service/semantic_workbench_service/controller/` before drafting t
 decide whether Linus's Worker registration should look structurally similar — HTTP discovery plus typed event bus —
 rather than reinventing a different protocol.
 
+### Dumb components, smart interaction patterns (Canteen Theme B) and Goose as the Rust+MCP harness entrant
+
+An external practitioner survey of the multi-agent landscape converges on the same engineering taste this cluster
+arrives at empirically. As Canteen frames it: _"Dumb components with smart interaction patterns outperform smart
+components with dumb interaction patterns."_ and _"Heuristic belief updates avoid per-step LLM calls; this is the
+central scalability lever for multi-agent debate." — Canteen, Multi-Agent Landscape, 2026-03-27_
+([Canteen, _Multi-Agent Landscape_, 2026-03-27](../../../context/notes/canteen_blog_landscape_2026-05.md)). The first
+claim is The Algorithm restated for orchestration: do not invest in making each agent smarter when investing in the
+interaction protocol gives larger returns. This validates the existing Linus Worker fan-out preference (DEC-0050: role
+as a first-class type in the agent spawner; DEC-0051: AgentReport as the typed inter-agent message), and it sharpens
+the case for the codebuff-style role specialization noted above — codebuff's measurable gain over Claude Code comes
+from interaction structure (planner → file-picker → editor → reviewer → context-pruner), not from any individual agent
+being more capable than its peers. The second claim — heuristic belief updates as the scalability lever — is concrete
+engineering: when a debate framework needs every agent to update its position based on what other agents said, doing
+that with per-step LLM calls scales as O(N²) per round; doing it with a heuristic update rule (weighted polling, vote
+shift, confidence decay) scales as O(N) per round and removes the LLM from the inner coordination loop entirely.
+**`debate-or-vote` (`deeplearning-wisc/debate-or-vote`)** is the research-code reference implementation of this
+pattern; it is a concrete candidate for the Phase 3 spawner Worker fan-out coordination model and is on the Tier 2
+repo-add list (Study + spike) per the Canteen landscape note.
+
+**Goose** (`block/goose`) is the meaningful Rust+MCP harness entrant currently absent from the per-repo notes. The
+harness-plurality landscape covered above includes `claw-code`, `cline`, `claude-code-guide`, and `openclaw`; Goose
+extends the set with the explicit Rust+native-MCP combination that the Canteen survey calls out. The relevance is the
+same shape claw-code-local will eventually take: a Rust-native coding agent that consumes Linus's MCP surface as a
+first-class client. Adding the repo-note (Tier 2, Study) is a small task with a concrete payoff: it gives Linus a
+direct prior-art reference for how the Rust client side of the MCP boundary is wired in a shipped product.
+
 ### gravityfile: Ignore, save the scanner gotcha
 
 gravityfile (`epistates/gravityfile`) is a Rust TUI disk-usage explorer with no LLM dependency and no relevance to

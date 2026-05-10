@@ -2,6 +2,10 @@
 
 ## What this document is
 
+_Refreshed 2026-05-09 with Trading-R1 (Tauric / UCLA same-lab progression from TradingAgents) and a cross-link to
+Kimi-K2's open-source SOTA agentic-benchmark numbers (primary architectural fold in
+[native-low-bit-apple-silicon](native-low-bit-apple-silicon-synthesis.md))._
+
 A rewrite of the prior Group D synthesis, expanded from seven to ten paper-notes. This rewrite absorbs three new papers
 — the two same-named-but-different _QuantAgent_ papers ([HKUST/IDEA, 2024](../paper-notes/2402.03755v1.md) and
 [Stony Brook et al., 2025](../paper-notes/2509.09995v3.md)) and [WikiAutoGen](../paper-notes/2503.19065v1.md)
@@ -135,6 +139,24 @@ are required to emit, with free-form text confined to a clearly named field. The
 majority-with-confirmation predicate is a generally useful integrator primitive — cheap, auditable, exactly the
 consistency check an orchestration layer should impose before committing to an action.
 
+The same Tauric Research / UCLA group that authored TradingAgents has since published
+[Trading-R1, Xiao et al. 2025](../../context/papers/2509.11420v1.pdf), and the trajectory is itself instructive for the
+typed-output thread. Where TradingAgents distributes the work across seven roles with bull/bear debate as the central
+quality lever, Trading-R1 collapses that orchestration into a single model fine-tuned via supervised reverse-CoT
+distillation followed by a three-stage easy-to-hard reinforcement-learning curriculum on Tauric-TR1-DB — a 100k-sample
+corpus spanning 18 months, 14 equities, and five heterogeneous data sources (technical, fundamental, news, insider
+sentiment, macro). The contribution that matters here is not the trading numbers but the **output shape**: Trading-R1
+emits structured, evidence-based investment theses with a five-tier rating (Strong Buy / Buy / Hold / Sell / Strong
+Sell) carrying volatility-adjusted reward labels, a free-text rationale grounded in the surfaced evidence, and an audit
+trail of which data sources were consulted. That is the BioReason-Pro typed-structured-prediction shape (CLAUDE.md
+§Typed structured prediction for biology skills, S25, 2026-05-06) reached from a different starting point — the
+convention generalizes well beyond biology, and finance is the second domain in the Linus corpus to converge on it
+independently. The pair also draws a methodological line for Linus: a multi-agent debate template (TradingAgents) is the
+right shape when you need to surface and audit reasoning across many roles in one shot; an RL-trained single model
+emitting the same typed structured output (Trading-R1) is the right shape once the structured rubric stabilizes and the
+orchestration cost dominates. Phase 7 skills should default to the multi-agent shape; mature, high-cycle skills become
+candidates for Trading-R1-style single-model RL distillation in Phase 6+.
+
 ### Thread 3: structured shared state as the antidote to multi-step drift
 
 This is the prior synthesis's "structured shared state" thread, now narrowed to the _intra-investigation_ layer (state
@@ -236,6 +258,24 @@ gap between demonstrated hosted-model agent capability and validated local-model
 adopting any architecture wholesale on faith is a mistake.** Each adopted primitive needs its own local-Worker
 evaluation in `benchmarks/dan_tasks/` before being baked into the orchestration layer. The Sketch2Simulation hybrid
 remains the most pragmatic template: route by modality and sensitivity.
+
+The picture has shifted measurably in 2025, and [Kimi-K2](../paper-notes/Kimi-K2-2507.20534.md) is the load-bearing data
+point. The primary architectural fold for Kimi-K2 lives in
+[`native-low-bit-apple-silicon-synthesis.md`](native-low-bit-apple-silicon-synthesis.md) (1T-total / 32B-active MoE
+topology, MuonClip-trained, weight-streaming target for Phase 6d, 1-bit / ternary candidate for Phase 8); the cross-link
+belongs here because the agentic-benchmark numbers Kimi-K2 posts are the strongest single piece of evidence to date that
+the hosted-vs-open-source agent-capability gap is closing fast. The instruct checkpoint scores 70.6 on τ²-Bench retail,
+65.8 on τ²-Bench telecom, 76.5 on ACEBench, and 65.8% on SWE-bench Verified single-attempt agentic — the SWE-bench
+number lands within striking distance of Claude Opus 4's 72.5% in the same single-attempt regime. These are open-source
+SOTA on every agentic axis, achieved through a synthetic agentic-data pipeline (3,000+ real MCP tools
+
+- rubric-paired tasks + RL with verifiable rewards) rather than through hosted-model post-training. For Linus the
+  implication is concrete: the Phase 6 base-swap argument (Qwen3 → Kimi K2 LoRA seed, DEC-0055 seed) is no longer just a
+  weight-streaming feasibility question — it is also a "do we want our local Worker to inherit Kimi K2's tool-use prior
+  before LoRA?" question, and the answer is increasingly yes pending the streaming-feasibility measurements queued in
+  Phase 6d. The architectural primitives this synthesis canonicalizes (typed AgentReport, role-as-first-class, per-stage
+  validation hooks, critic tier) compose with that base swap rather than being orthogonal to it; what changes is the
+  zero-shot floor a local Worker brings to the orchestration.
 
 ### Thread 8: theory shows up — the Bayesian-regret bound and what to make of it
 

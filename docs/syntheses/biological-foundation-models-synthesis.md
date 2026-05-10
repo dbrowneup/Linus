@@ -82,6 +82,125 @@ to which task shapes; the specialists need to know they are not the default.
 
 ---
 
+## Extending the constellation: cell-level FMs as a fresh modality axis
+
+Two recent additions to the corpus pull the specialist roster off its original sequence-and-genome axis and onto a
+qualitatively different one: the **cell** as a foundation-model unit of representation. Group A as originally
+constituted operates exclusively at the sequence level — DNA, RNA, protein residues, ordered protein syntaxes — and the
+finest biological grain any of the eight models touches is the single base or the single amino acid. Neither ProtiCelli
+([2026.03.31.715748v1](../paper-notes/2026.03.31.715748v1.md)) nor TranscriptFormer
+([science.aec8514](../paper-notes/science.aec8514.md)) fits cleanly anywhere on that axis, because the cell is the unit
+both models speak. They extend the specialists-as-Workers framing on a fresh modality axis rather than refining existing
+axes.
+
+**ProtiCelli is the imaging arm of that extension.** A 458 M-parameter Diffusion Transformer Large trained under EDM on
+**1.23 M single-cell crops from the Human Protein Atlas**, generating 512×512 single-cell immunofluorescence images for
+**12,800 human proteins** across **39 cell lines** from only three landmark stains (microtubule, nucleus, ER). The
+headline downstream artifact, **Proteome2Cell**, is a 30.7 M-image synthetic atlas of 2,400 "virtual cells" (200 per
+line × 12 lines) integrated into HPA v26 — proteome-scale spatial proteomics by generation rather than by experiment.
+Operationally ProtiCelli sits alongside Bacformer (whole-bacterial-genome representations) and Evo 2 (DNA) as a
+specialist behind a typed Linus Worker; functionally it does something none of the eight Group A models can — predict
+where a protein is in a cell, conditioned on cellular landmarks, given a closed-vocabulary prompt. The closed
+12,800-protein vocabulary is the load-bearing operational limitation: ProtiCelli silently falls back to a default
+embedding for any out-of-vocabulary protein, which makes it strong on the human proteome and structurally inapplicable
+to the metagenomic novel proteins Dan's LanzaTech work routinely turns up. Vesicular compartments (peroxisomes,
+endosomes, lysosomes) remain hard for all three benchmarked imaging models — a model-class limitation rooted in weak
+spatial correlation with the three landmark channels, not a tunable defect. **There is no existing BFM sibling on the
+imaging axis** in this synthesis; ProtiCelli's arrival opens that axis and the paper-note's "no Linus sibling yet" flag
+is what makes this fold-in materially expand the corpus rather than refine an existing thread.
+
+**TranscriptFormer is the transcriptomic arm.** A family of three generative autoregressive transformers — TF-Sapiens
+(57 M human cells), TF-Exemplar (110 M cells across human + four model organisms), and the headline TF-Metazoa (**112 M
+cells across 12 species spanning 1.53 Bya of evolution**) — that represent each cell as an ordered "cell sentence" of
+(gene, count) pairs and initialize gene tokens from frozen ESM-2 protein embeddings. The ESM-2 initialization is what
+makes the family species-agnostic: homologous genes across species sit nearby in input space without any ortholog
+dictionary, which is exactly the constraint conventional cross-species single-cell analysis bumps against. Cross-species
+cell-typing on previously-unseen species (mouse lemur, sea lamprey, stony coral) holds at macro F1 > 0.65 even at the
+685 Mya stony-coral distance from human, where the prior SOTA single-cell foundation model UCE collapses. Phylogenetic
+structure emerges in the contextualized-gene-embedding space (Spearman r = −0.705 with evolutionary distance, vs r =
+−0.059 for the ESM2-CE attribution baseline) without any phylogenetic supervision. The closest sibling already present
+in this synthesis is [LucaOne](../paper-notes/s42256-025-01044-4.md): both unify a previously-balkanized representation
+by initializing the token space from a model trained at the next level of biological abstraction (LucaOne unifies
+modalities at the sequence level, TranscriptFormer unifies species at the cell level), and both produce emergent
+structure (LucaOne's central-dogma capability, TranscriptFormer's macroevolutionary phylogeny) from joint pretraining
+that no single-axis baseline recovers. The architectural patterns differ — LucaOne is an encoder with token-type
+embeddings disambiguating shared alphabets; TranscriptFormer is a decoder-style autoregressive model with ESM-2
+gene-embedding initialization disambiguating species-specific gene IDs — but the recipe rhymes.
+
+Both models tie directly to the two integration hooks the BFM thread has already committed to. **DEC-0046**
+(`external_api_tool` registry deployment field) tags both as candidates for a hybrid posture: TranscriptFormer is
+local-only (frozen weights, no network call after the checkpoint download, with `--device mps` advertised at the CLI
+level — the first Group A bio FM with explicit Apple-Silicon support documented at the deployment layer rather than left
+as an empirical question), while ProtiCelli is the realistic hybrid case (local for one-off predictions, remote/batch
+for Proteome2Cell-scale 30.7 M-image synthesis given DiT-L's activation footprint at 50-step EDM sampling). **DEC-0048**
+(`model_prediction` first-class KB edge class) is the load-bearing schema commitment for both: each ProtiCelli
+prediction maps to a `model_prediction` edge with protein-id and cell-line-id endpoints, checkpoint hash and landmark
+stains as provenance, predicted localization plus confidence as the edge payload, default `[!unverified]` claim-type tag
+from DEC-0023; each TranscriptFormer query produces TF → target-gene PMI edges and cross-species cell-type-homology
+cosine-similarity edges that fit the same schema. The concrete worked example for the DEC-0046 contract is
+**ProtiCelli's `agent_tools.py`**: a JSON-Schema MCP surface (`PROTICELLI_TOOLS` exposing `validate_inputs`,
+`predict_from_files`, `search_proteins`, `list_cell_lines`) with explicit Anthropic and OpenAI adapter one-liners
+shipped in the README. It is unusually MCP-friendly for a biology-paper release — most bio releases stop at a CLI or a
+notebook — and the Linus tool wrapping should follow the in-house fastmcp + middleware pattern from
+[g6-mcp-tools](repo-clusters/g6-mcp-tools.md) per [DEC-0045](../adr/0045-fastmcp-mcp-framework-default.md), using
+`agent_tools.py` as the schema reference rather than vendoring the helper directly. Proteome2Cell at 30.7 M predicted
+images would also be the largest single bulk import the `model_prediction` schema has yet seen — a real stress-test in a
+way the smaller-scale Evo 2 or Bacformer outputs would not provide.
+
+The framing implication is sharper than a sibling-pair fold-in. **The cell is becoming a foundation-model unit of
+representation in its own right**, alongside genome / sequence / protein, and Linus's Phase 7 biology skill class needs
+a cell-level Worker family — not just sequence-level Workers. ProtiCelli and TranscriptFormer are the two ends of a
+multi-modal cell-state pair: same biological subject (a single human cell), two complementary measurement modalities
+(microscopy image vs RNA expression vector). A future composite Worker could call them together — predict an image with
+ProtiCelli, predict transcriptomic state with TranscriptFormer, cross-reference for consistency — which is the kind of
+specialist composition Phase 3's parallel-agent infrastructure exists to enable.
+
+---
+
+## Specialists-as-Workers at the skill-class layer: ClawBio as working precedent
+
+The constellation argument above is framed at the **model-class layer** — LucaOne as cross-modal default,
+specialists invoked when the task is in their named domain. The [ClawBio](../repo-notes/ClawBio.md) repo
+(ClawBio/ClawBio) is the closest existing implementation of the same dispatch logic at the **skill-class layer**:
+a curated 63-skill bioinformatics library where each skill is a deterministic, versioned specialist, and a
+`bio-orchestrator` skill routes free-text queries to the right downstream skill based on file type and keywords.
+The dispatch surface is exactly the one this synthesis recommends — generalist orchestrator over named
+specialists — except the specialists are deterministic Python tools rather than learned FMs, and the routing
+signal is filename + keyword rather than model-class. ClawBio extends the existing g9-bio cluster prior art
+alongside Bacformer, BioReason, bioSkills, and deepsems, and is the depth-vs-breadth complement to bioSkills:
+~438 broad-but-shallow Anthropic-format skills versus 63 deeply engineered skills with tests, demo data, a
+reproducibility bundle, and a benchmark scorer where ground truth exists (e.g. the v0.5.0 AD ground-truth gene
+set with 168/182 benchmark tests passing across 10 audited skills).
+
+Two ClawBio patterns are load-bearing for the integration hooks this synthesis has already committed to. First,
+the **Galaxy Bridge skill** wraps `BioBlend` to expose the full usegalaxy.org tool catalog (8,000+ external
+bioinformatics tools) through a single Python skill — a working precedent for the
+[DEC-0046](../adr/0046-external-api-tool-registry-deployment-field.md) `external_api_tool` deployment field. The
+pattern (one Linus tool → many external tools, with the registry tagging it as external-API-deployed and the
+audit log capturing every invocation) is no longer aspirational; it is shipping today behind a `/plugin install
+clawbio` command. Second, ClawBio's **cross-platform chaining examples** (Galaxy VEP → ClawBio PharmGx; Galaxy
+Kraken2 → ClawBio metagenomics) are a working precedent for the model-prediction-edge data flow described in
+[DEC-0048](../adr/0048-kb-model-prediction-edge-class.md): a variant scored by one tool flowing as typed
+provenance into the next tool's input is exactly the `model_prediction` edge shape, and the chaining contract
+ClawBio enforces (per-skill `--input` / `--output` / `--demo` plus a per-skill `allowed_extra_flags` allowlist
+filtered before subprocess invocation) is a candidate prior-art template for the agent-spawner's tool dispatch
+contract.
+
+The framing implication for Phase 7 is that **the right Linus dispatch surface is one agent spawner that
+dispatches to both kinds of Worker — deterministic skill _and_ specialist FM — through a uniform interface**.
+ClawBio's `bio-orchestrator` plus per-skill subprocess pattern works for tools that are deterministic and fast;
+this synthesis's recommended layered design (LucaOne anchor + specialist FMs) works for tools that are stochastic
+and inference-heavy. The two are not competing — they are the two ends of the same dispatch contract, and the
+spawner needs to know which dispatch path is active for a given task. Whether Linus extracts ClawBio's specific
+implementation, re-implements over BioBlend directly with Linus's tool-registry conventions, or simply lifts the
+engineering shape (per-skill tests + reproducibility bundle + catalog generator + conformance linter) into a
+Linus-native skill bundle is a Phase 7 planning question — but the pattern itself is no longer a hypothesis. It
+is the closest existing precedent for what a Phase 7 inaugural bio-skills bundle should look like in working
+form, and the depth-vs-breadth complement to bioSkills makes the choice between them an "or both, fork the
+engineering shape from one and the breadth-of-content from the other" question rather than an "or" question.
+
+---
+
 ## Cross-cutting threads
 
 ### Open weights vs hosted-or-restricted release
@@ -411,8 +530,17 @@ The eight Group A paper notes (all in [`docs/paper-notes/`](../paper-notes/)):
 - [gkaf836](../paper-notes/gkaf836.md) — Prabakaran & Bromberg, _Deciphering enzymatic potential in metagenomic reads
   through DNA language models_ (REMME/REBEAN, _Nucleic Acids Research_ 2025).
 
-One directly adjacent paper note now tagged to this synthesis (not a core input but the natural Wave 3 companion):
+Adjacent paper notes now tagged to this synthesis (not core Group A inputs but extending the specialist roster onto the
+cell-level modality axis and the Wave 3 generative direction):
 
+- [2026.03.31.715748v1](../paper-notes/2026.03.31.715748v1.md) — Sun et al., _Generative machine learning unlocks the
+  first proteome-wide image of human cells_ (ProtiCelli, bioRxiv 2026) — DiT-L latent-diffusion model that synthesizes
+  single-cell IF images for 12,800 human proteins from three landmark stains; ships an `agent_tools.py` JSON-Schema MCP
+  surface and the 30.7 M-image Proteome2Cell dataset; the imaging arm of the cell-level FM extension.
+- [science.aec8514](../paper-notes/science.aec8514.md) — Pearce et al., _TranscriptFormer: A generative cell atlas
+  across 1.5 billion years of evolution_ (_Science_ 2026) — three generative autoregressive transformer variants
+  (TF-Sapiens, TF-Exemplar, TF-Metazoa) trained on up to 112 M cells across 12 species; the transcriptomic arm of the
+  cell-level FM extension; first Group A bio FM with `--device mps` advertised at the CLI level.
 - [2025.09.12.675911v1](../paper-notes/2025.09.12.675911v1.md) — King et al., _Generative design of novel bacteriophages
   with genome language models_ (bioRxiv 2025) — first experimental demonstration that a genome LM can design viable
   whole-phage genomes; uses Evo 1/2 as backbone; see R2-57 in `top-questions.md`.
@@ -428,5 +556,6 @@ _This synthesis feeds [synthesis-landscape.md](../landscapes/synthesis-landscape
 [total-landscape.md](../landscapes/total-landscape.md) and the Phase 6/7 spec backlog. The `paper-landscape.md` pointer
 is deprecated; paper-level navigation lives in [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md). Revisit when:
 ProteinReasoner checkpoints appear on BioMap GitHub / `airkingbd` HF (passive watch per S52); the AlphaGenome and Evo 2
-7B local-deployability spikes land; the Wave 3 Evo 2 + generative phage mini-synthesis (R2-57) is written; any new Group
-A paper enters `context/papers/`. Updated 2026-05-08._
+7B local-deployability spikes land; the ProtiCelli and TranscriptFormer M1-Max MPS spikes land; the Wave 3 Evo 2 +
+generative phage mini-synthesis (R2-57) is written; any new Group A paper enters `context/papers/`. Updated 2026-05-10
+(ClawBio specialist-skill-as-Worker fold-in)._

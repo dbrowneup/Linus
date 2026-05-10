@@ -22,6 +22,42 @@ without a memory architecture spec.
 
 ---
 
+## Historical anchor: the memex, 1945
+
+The argument is older than the corpus. In July 1945 Vannevar Bush, then director of the Office of Scientific Research
+and Development, published [_As We May Think_](../../context/notes/As%20We%20May%20Think.txt) in the _Atlantic Monthly_;
+the September 10, 1945 _Life_ reprint
+([Bush, "As We May Think", Life Magazine Sept 10 1945](../../context/pics/Bush%20-%20As%20We%20May%20Think%20%28Life%20Magazine%209-10-1945%29.pdf))
+carried the iconic illustrations — the desk-sized memex with its slanting translucent screens, the head-mounted walnut
+camera, the trail-following levers — that fixed the device in the technical imagination. Bush's diagnosis of the
+post-war scientific predicament reads as if it were written for the Garrison/Mughal thread eighty years later: a
+"growing mountain of research," investigators "staggered by the findings and conclusions of thousands of other workers —
+conclusions which [they] cannot find time to grasp, much less to remember," and methods of consultation that "are the
+same as [were] used in the days of square-rigged ships." The bottleneck is not generation of new knowledge but reliable
+access to the inherited record.
+
+Bush's proposed substrate — the memex, "a device in which an individual stores all his books, records, and
+communications, and which is mechanized so that it may be consulted with exceeding speed and flexibility... an enlarged
+intimate supplement to his memory" — implements both Garrison universality criteria in 1945 typewriter-and-microfilm
+terms. **Recursive state maintenance** is the desk's "transparent platen" and direct entry mechanism: the user inserts
+longhand notes, photographs, and memoranda; "the depression of a lever causes it to be photographed onto the next blank
+space in a section of the memex film." The state is durably read, augmented, and written back. **Reliable history
+access** is the trail mechanism: any two items can be permanently joined by code, trails are named and indexed, "and his
+trails do not fade." Years later, "a touch brings up the code book. Tapping a few keys projects the head of the trail."
+Items are addressable, distinguishable, temporally ordered, and durable — the four sub-requirements Garrison's framework
+spells out, exactly the obligations the Layer-A-through-E decomposition below is designed to satisfy.
+
+The Bush vision sharpens what is and is not new in the corpus. The architectural claim that an intelligent worker
+(scientist, lawyer, physician, chemist) cannot operate at the limit of their capability without an externalised,
+addressable, associatively-linked memory substrate is older than the digital computer. What the eleven papers add is the
+_formal proof_ that the diagnosis applies to transformer-class systems specifically (Garrison/Merrill & Sabharwal/Feng
+et al.) and the _empirical evidence_ that current frontier models are operating without the substrate and visibly
+degrading because of it (Kojima/Bubeck/Mughal). Linus is not inventing the memex. It is — eighty years on, with the
+cheap-complex-devices-of-great-reliability that Bush could only forecast — building the version that runs on Apple
+Silicon for one Oregonian biochemist's scientific record.
+
+---
+
 ## The unifying thesis
 
 Garrison's two-line argument, distilled from the [arXiv proof paper (2412.17794)](../paper-notes/2412.17794v1.md):
@@ -179,6 +215,8 @@ answer different questions — but "which combination is the right substrate for
 
 Two papers make the cost of the no-memory path concrete and quantitative.
 
+![The quadratic wall: attention cost vs. sequence length](../../context/pics/quadratic-wall.png)
+
 [Bertasius, Wang & Torresani 2021 (2102.05095)](../paper-notes/2102.05095v4.md) is the wall-of-attention case study from
 a non-text domain. TimeSformer's joint space-time attention literally runs out of memory on an A100 at 448-pixel crops
 or 32-frame clips. The paper's contribution — _divided space-time attention_ — drops per-block cost from `(NF+1)`
@@ -305,6 +343,8 @@ and the value of consolidation can be measured against it.
 The CRISPR design hint from Garrison's blog is concrete here: recent context should be cheaper to access and more
 aggressively consulted than ancient context, with mechanism for old context to remain reliably retrievable when needed.
 That is a design pattern for retrieval ordering over the episodic store, not a separate substrate.
+
+![CRISPR-as-memory analogy: ordered, append-only, recency-weighted retrieval](../../context/pics/crispr-memory.png)
 
 Mughal's session-handoff file (`.claude/session-handoff.md` — written at session end with modified files, decisions and
 their reasoning, current state, and the exact next step; read at session start) is the hosted-Claude analogue of what
@@ -454,6 +494,13 @@ language of the corpus, a direct violation of reliable-history-access requiremen
 explicitly _forbid_ this pattern: any Worker integration that silently drops reasoning between turns is a non-starter
 for the session memory layer, regardless of how impressive its single-shot benchmarks look. This belongs in the Worker
 protocol spec, not as a preference but as a hard constraint.
+
+![OpenAI o1 context window: reasoning tokens discarded between turns](../../context/pics/oai-o1-context-window.png)
+
+The figure above (per DEC-0032's 16K in-context cap policy) shows the structural problem: reasoning tokens that are not
+durably retained between turns force the next turn to re-derive what was already established, collapsing the worker back
+toward TC0 on whatever residual remains. The Linus episodic substrate is the architectural answer to that silent
+truncation.
 
 ---
 

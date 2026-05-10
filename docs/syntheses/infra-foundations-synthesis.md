@@ -25,6 +25,13 @@ The original five paper-notes:
 - [`s41586-025-08600-3.md`](../paper-notes/s41586-025-08600-3.md) — Kanervisto et al., _World and Human Action Models
   towards Gameplay Ideation_ (WHAM)
 
+Added 2026-05-10 — world-action-models for embodied action (NVIDIA GEAR Lab, 2026-02-19 paper drop):
+
+- [`2602.15922v1.md`](../paper-notes/2602.15922v1.md) — Ye et al., _World Action Models are Zero-shot Policies_
+  (DreamZero)
+- [`2602.16710v1.md`](../paper-notes/2602.16710v1.md) — Zheng et al., _EgoScale: Scaling Dexterous Manipulation with
+  Diverse Egocentric Human Data_
+
 Added 2026-05-05 — transformer substitution components:
 
 - [`1910.07467.md`](../paper-notes/1910.07467.md) — Zhang & Sennrich, _Root Mean Square Layer Normalization_ (RMSNorm)
@@ -218,6 +225,42 @@ polynomials, RoPE's periodicity at base frequency 10000 becomes a problem around
 from MQA is a function of how aggressively KV heads are compressed. For a Phase 6 practitioner doing LoRA on M1 Max,
 Bandaru is the first-stop reference when the math in a model card needs grounding.
 
+### Kimi K2 — backfilling the architectural mention with a substrate
+
+The QK-normalization passage above names Kimi K2 in passing as one of the recent large models that adopts the trick. The
+[Kimi-K2 paper-note](../paper-notes/Kimi-K2-2507.20534.md) now backfills that mention with the durable architectural
+detail. Three claims belong in this synthesis specifically; the deeper Phase 6 / Phase 8 weight-streaming and 1-bit
+implications live in [native-low-bit-apple-silicon-synthesis.md](native-low-bit-apple-silicon-synthesis.md), which is
+the primary fold for Kimi K2 strategically.
+
+First, the **MLA + MoE topology**. Kimi K2 is a 1.04T-parameter MoE with 32B activated per token: 384 experts × 8
+active + 1 always-on shared expert, MLA throughout, 64 attention heads (not 128 as in DeepSeek V3), 61 layers, SwiGLU,
+160K vocab, 128K context. The two deliberate deviations from V3 are scaling-law-driven rather than aesthetic — raising
+sparsity from 8 to 48 cuts FLOPs-to-fixed-loss by 1.69× at fixed activated FLOPs, and halving attention heads buys back
+83% of the long-context inference cost for only 0.5–1.2% loss regression. Both are useful empirical anchors when Phase 6
+LoRA decisions ask whether Linus's base model should follow a denser-MoE-with-fewer-heads pattern at smaller scale. The
+MLA choice extends the practitioner-layer note above: where DeepSeek V2/V3 first established MLA as a KV-cache
+compression alternative to GQA, Kimi K2 is the first publicly documented trillion-parameter validation that MLA + MoE
+composes cleanly at the edge of present-day training compute.
+
+Second, **MuonClip**. Naïve Muon at trillion-parameter MLA-MoE scale produces exploding attention logits (max > 1000 in
+a mid-scale ablation) that destabilize training, and the standard fixes don't apply cleanly to MLA — the keys are never
+fully materialized so a logit soft-cap kicks in too late, and a vanilla QK-Norm interferes with the shared rotary `k_R`.
+MuonClip adds a per-head **QK-Clip** post-update: after each Muon step, compute the per-head max attention logit, and if
+it exceeds threshold τ = 100 rescale that head's `q_C`/`k_C` by `√γ_h` and the per-head rotary `q_R` by `γ_h`, leaving
+the shared `k_R` untouched. The headline empirical claim — _zero loss spikes across 15.5T training tokens at the
+1T-total / 32B-active scale_ — is the strongest stability evidence ever published for the Muon family. For Linus this
+surfaces an independent watch-item: even if Kimi K2 is never the base model, MuonClip's QK-Clip mechanism is a ten-line
+addition to any Muon training step and a candidate Phase 6 fine-tuning convention. A small Apple-Silicon spike can
+falsify generalization to dense models or smaller scales cheaply (open question — see the Kimi-K2 note).
+
+Third, the **token-efficiency framing**. Kimi K2's data pipeline rephrases high-value passages multiple times rather
+than running multiple raw epochs (28.94% SimpleQA at 10 rephrases × 1 epoch beats 23.76% at 10 raw epochs), and its RL
+post-training combines verifiable rewards with self-critic rubric rewards. That is downstream from this synthesis's
+remit but the inversion of "more learning per token, not more parameters" is itself a line worth carrying forward into
+any infra-level discussion of the next scaling coefficient. The architecture/optimizer half belongs here; the
+agentic-data half folds into the agentic-systems synthesis (where the SOTA tool-use numbers also live).
+
 ### Hardware AI research — promoted to its own category
 
 LLM-driven hardware design papers (the QiMeng family, Cheng et al.'s superscalar processor design, and adjacent CPU
@@ -245,6 +288,16 @@ The role is similar to the Transformer paper but for a different vertical. Where
 Linus runs," this book serves "everything generative-biology that crosses Dan's desk." Linus consumes that body of work;
 it does not produce in it. Reading order when Wave 3 arrives: skim §1–§2 for orientation, read §E for notation
 translation, then open §3, §4, §5 in a targeted way the first time a specific protein paper forces the issue.
+
+The textbook is the unified pedagogical anchor; the canonical primary-source reference for the flow-matching half is
+[Flow Matching for Generative Modeling, Lipman et al. 2022](../../context/papers/Flow%20Matching%20for%20Generative%20Modeling.pdf),
+the paper that introduced the conditional-flow-matching objective and its training simulation-free recipe. Holderrieth &
+Erives unify Lipman's continuous-time framework with the Ho/Sohl-Dickstein/Song discrete-time diffusion lineage; when a
+downstream paper cites "flow matching" without further qualification it is usually citing Lipman 2022's specific
+construction (probability paths conditioned on data, marginal vector fields recovered via expectation), and the
+textbook's treatment is best read as a generalization rather than a replacement. For Linus's reading-order purposes
+Lipman 2022 sits in the same REFERENCE category as the textbook itself: kept locally, opened when a Wave-3 paper's
+notation forces a lookup, not summarized into a paper-note.
 
 ### PAN — a watch-the-field reference
 
@@ -308,6 +361,56 @@ imports any leaderboard format. Two smaller carries: the heterogeneous-modality 
 delimiter, learned positional semantics) is a Phase 5–6 reference if Linus ever fuses code, tool-call, and structured
 output through one Worker; and the open-source release of weights, data, and UI is a Phase 4 data-sovereignty datapoint
 — a flagship Nature paper shipping the full stack is not yet the norm.
+
+### World-action-models for embodied action — DreamZero and EgoScale extend the WHAM thread into robotics
+
+WHAM established the world-action-model paradigm at gameplay scale: interleaved image+action tokens, capability-first
+evaluation, an explicit argument that the foundation-model substrate (a tokenized world simulator) is what makes
+action-conditioned generation work. Two NVIDIA GEAR Lab papers from a coordinated 2026-02-19 release —
+[DreamZero](../paper-notes/2602.15922v1.md) and [EgoScale](../paper-notes/2602.16710v1.md) — extend the same paradigm
+into robotics, and together they constitute a **world-action-models for embodied action** sub-thread that grows
+naturally out of the WHAM anchor. The architectural lineage is direct: WHAM's tokenization-as-interface argument (train
+a single transformer on interleaved heterogeneous modalities, let positional embeddings sort it out) is the design
+pattern both follow. EgoScale's flow-matching action expert is a continuous analogue of WHAM's discrete action
+vocabulary; DreamZero's autoregressive flow-matching DiT over video+action latents inherits the joint-prediction shape
+while substituting a 14B Wan2.1-I2V backbone for WHAM's 1.6B decoder-only transformer. The framing also earns its
+deserved pessimism: both papers train and deploy on NVIDIA datacenter hardware (256 GB200 GPUs at batch size 8,192 for
+EgoScale; 2×GB200 with NVFP4 + cuDNN attention for DreamZero's 7Hz real-time inference), which makes them strictly
+**Phase 7/8 watch-the-field material for Linus, not directly liftable**. Robotics is not a current product surface and
+the hardware floor — `flash-attn` with no Metal backend, NVFP4 quantization Blackwell-specific, 14B at fp16 leaving no
+activation headroom on M1 Max — closes the door on near-term deployment.
+
+What survives the hardware constraint is methodological. EgoScale's headline finding — a near-perfect log-linear scaling
+law `L = 0.024 - 0.003 · ln(D)` (R² = 0.9983) between hours of human pretraining data and validation loss, with
+validation loss strongly correlated to downstream task success — is a generalizable template for "**how do I know my
+data is enough**" that ports cleanly to any Phase 6 LoRA loop. The discipline: train at multiple data scales (1×, 2×,
+4×, 10×, 20×), fit a log-linear curve, validate that loss tracks task success, and only then trust extrapolation. This
+is the [Chinchilla](../paper-notes/2203.15556v1.md) move applied to fine-tuning rather than pretraining, and it is the
+most directly transferable component of EgoScale for Linus's Phase 6 planning. The two-stage pretrain-then-align recipe
+(huge noisy unconstrained data with full unfreeze, then small clean alignment data with partial freeze) also rhymes
+structurally with the LoRA-on-Qwen3 / LoRA-on-Kimi-K2 workflow — the discipline lesson is to keep the alignment dataset
+_small and clean_ rather than chasing scale at the alignment stage. DreamZero's contribution to this thread is
+different: its closed-loop ground-truth-replacement trick (clean observations replace predicted latents in the KV cache
+at chunk boundaries, bounding compounding error to one chunk) is a structural cousin of the Layer A/B intra-step
+latent + within-session scratchpad split in the [memory pillar](memory-synthesis.md) (DEC-0028, DEC-0029, DEC-0036).
+Both architectures pay the cost of stateful representation but bound error accumulation by periodically re-grounding
+against ground truth. The "stateful policy with bounded hallucination via observation grounding" pattern is a candidate
+template for any Linus Worker with persistent reasoning state that periodically re-grounds against the KnowledgeBase or
+tool outputs — same shape, different domain.
+
+The deeper meta-claim across all three papers, sharpened by the DreamZero result, is that **the choice of
+foundation-model substrate determines what tasks are tractable**: VLMs are wrong for physical generalization, video
+models are right; gameplay simulation is wrong for novel motion structure, world-action-models trained on
+embodiment-aligned data are right. WHAM raised the "non-LLM Worker substrate" question; DreamZero is now the second
+forcing function, and EgoScale is the third datapoint in 18 months establishing the world-action-model lineage as a
+serious research line that keeps generating transferable methodology. The disposition for Linus is unchanged at the
+deployment level — robotics is outside Phase 1–6 scope, the GPU floor is structural — but the sub-thread now exists as a
+tracked research watch worth carrying alongside the LLM thread, with the explicit destination marker that **if Linus's
+Phase 7+ scope ever opens a lab-instrument-automation or embodied-actor lane** (a 3D printer, a microscope stage, a
+manipulator, a benchtop biotech instrument), the world-action-model paradigm is currently the strongest empirical
+evidence for the right architecture to get there. The cross-thread to
+[llm-hardware-design](llm-hardware-design-synthesis.md) is also explicit: robotics is a third arm of the idea→reality
+spine, alongside QiMeng's LLM→hardware-spec→fab arm and Sketch2Simulation's LLM→flowsheet→engineer arm.
 
 ## Cross-cutting threads
 
@@ -382,6 +485,34 @@ datapoint in the same family — flow matching as the dominant training objectiv
 Group A's PLMs share machinery with the Transformer; Wave 3 generative-biology shares machinery with this textbook and,
 indirectly, with PAN. Both branches matter for evaluating Dan's scientific reading; both sit downstream of Linus's core
 stack rather than inside it.
+
+### Manifold ML — a watch-the-field footnote
+
+Two papers in the corpus argue that the geometry of the prediction space deserves first-class architectural treatment
+rather than being handled as a post-hoc projection. The [JPmHC note](../paper-notes/2602.18308v2.md) (Sengupta et al.,
+JP Morgan Chase, 2026) replaces the Birkhoff-polytope constraint on Hyper-Connection mixers with the orthogonal group
+`O(n)` parametrized via the Cayley transform on the Stiefel manifold, validated on ARC-AGI-1 with a 7M-parameter
+recursive transformer (31.4% exact match vs. 27.9% Sinkhorn, converging in 40% of the budget). The companion piece is
+[Geometry-Preserving Neural Architectures on Manifolds with Boundary, Elamvazhuthi, Biswal et al. 2026](../../context/papers/2602.03082v1.pdf)
+(LANL + Boston College), which proposes a unified class of geometry-aware architectures that interleave ambient-space
+transformations with constraint-preserving updates back onto a target manifold M, with universal-approximation
+guarantees for constrained neural ODEs and demonstrations on dynamics over S² and SO(3) plus diffusion on S^(d−1)-valued
+features. The framing is broader than JPmHC — the constraint set need not be a Lie group; it can be any smooth manifold
+with boundary — and the paper learns projections via small-time heat-kernel limits when the constraint set is unknown,
+explicitly noting that diffusion / flow-matching can serve as data-based projections.
+
+The geometric flavor surfaces tangentially elsewhere. The MLA attention surveyed in the practitioner layer above
+compresses KV tensors into a low-rank latent and reconstructs at inference; some of the down-projection / up-projection
+choices in DeepSeek's MLA implementation have an orthogonality flavor that the geometry-preserving framework would
+formalize, even though the original papers do not present them that way. SE(3)-equivariant networks for protein
+backbones (RFdiffusion, AlphaFold3) are the canonical applied case in Dan's domain.
+
+For now, two papers is not a cluster; both live as a watch-the-field footnote. If the count grows — a third or fourth
+paper cited by something Dan reads in earnest, an MLX implementation of a Cayley layer landing, a generative-biology
+paper that hinges on a non-Lie-group constraint set — these split into their own cluster (provisional name: _manifold ML
+/ geometric deep learning_) and earn full paper-notes. Until then, the JPmHC paper-note is the substrate, the
+Geometry-Preserving paper is its sibling reference, and the connection to JPmHC is the load-bearing link rather than
+either paper independently.
 
 ## Implications for Linus
 

@@ -237,6 +237,47 @@ tumour-microenvironment / spatial- architecture scale. Spatial transcriptomics F
 gaps to _watch for_, not fill speculatively; flagging them on the synthesis backlog improves the chance the next reading
 list closes them deliberately.
 
+### ClawBio: function-annotation-discovery skills at the human-clinical-genomics scale
+
+The [ClawBio](../repo-notes/ClawBio.md) repo (ClawBio/ClawBio) extends this synthesis's modality coverage on a
+specific axis the eight Group C papers do not reach: **human consumer and clinical genomics as
+function-annotation-discovery in working form**. ClawBio ships 63 deeply engineered skills — pharmacogenomics
+(PharmGx, ClinPGx, NutriGx), GWAS lookup against UK Biobank-shaped catalogs, polygenic risk scoring, ancestry
+PCA, fine-mapping, ACMG/AMP clinical-variant reporting, methylation clocks, archaic introgression, plus a
+Galaxy-tools bridge that wraps 8,000+ external bioinformatics tools through a single Python skill via BioBlend.
+Each skill is the same shape Group C's method papers theorize about: given evidence about a variant or a
+genomic region, return a structured prediction with provenance — variant→drug response, variant→disease risk,
+variant→ancestry component, variant→regulatory consequence. The orthogonal modality (clinical genomics rather
+than protein function or KEGG-pathway reasoning) means ClawBio does not directly compete with ProtHGT,
+BioReason-Pro, or Horizyn-1 for the protein-function skill slot, but it _does_ surface specific
+function-annotation-discovery patterns at the human-clinical-genomics scale that the Group C constellation does
+not address.
+
+The engineering shape is liftable independent of which skills Linus inherits. Every ClawBio analysis emits a
+**reproducibility bundle** (`commands.sh` + `environment.yml` + `checksums.sha256`) alongside the markdown
+report, every skill carries **per-skill tests with red/green TDD discipline**, and the v0.5.0 release added an
+**AD ground-truth gene set with mock API server for offline CI** plus swappable fine-mapping backends. The
+benchmark profile (168/182 benchmark tests passing across 10 audited skills) is the kind of operational floor
+this synthesis's Phase 1 benchmarking discussion argues every Linus-shipped skill should ship with — a per-skill
+benchmark scorer where ground truth exists, not just a `pytest` smoke test. The exact pattern translates to
+Group C's protein-function skills directly: BioReason-Pro's pre-computed 240K-protein atlas plus a Dan-authored
+expert-tie-or-exceed eval is the same shape, and ClawBio is a second independent corpus instance of the
+discipline.
+
+The orthogonal-modality caveat matters. ClawBio's domain is **human consumer-genomics + GWAS +
+clinical-genomics**; Dan's domain is **microbial genomics + metagenomics + algal genome assembly + LanzaTech
+bioprocess metagenomics**. Of the 63 skills, perhaps 5–10 (e.g. `claw-metagenomics`, `analyze-fasta`,
+`archaic-introgression`, `variant-annotation`, `galaxy-bridge`) map directly to Dan's day job; the
+pharmacogenomics and ACMG-classification cores are the most polished part of ClawBio and the least relevant to
+Dan's research focus. The clinical-variant-reporter skill is regulated-domain-adjacent and would be Tier B under
+[DEC-0047](../adr/0047-biosecurity-tier-control-generative-biology.md) (explicit Dan sign-off per invocation,
+audit-logged) if Linus ever surfaced it. What is liftable is therefore the **engineering shape** (per-skill
+tests + benchmarks against ground truth + reproducibility bundle + SKILL.md conformance linter), not the
+specific skill catalog. The complementary breadth-vs-depth choice between ClawBio (63 skills, deep) and
+bioSkills (~438 skills, broad) is the same choice the [biological-foundation-models
+synthesis](biological-foundation-models-synthesis.md)'s ClawBio fold-in flagged — the operational form of "fork
+the engineering shape from one and the breadth-of-content from the other" applies as cleanly here.
+
 ### Substrate dependencies on Group A
 
 Several Group C papers consume Group A FMs as substrate, which means a Group A release propagates directly into a Group

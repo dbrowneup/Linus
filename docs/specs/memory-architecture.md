@@ -355,6 +355,27 @@ encoded in DEC-0030/0031/0032, and the measurements from DEC-0033/0035.
 The audit-log telemetry from DEC-0030/0031/0032 supplies the data that makes implicit memory-cost choices ("we'll just
 retry until it works", "let's pad the context budget") legible as memory-budget decisions rather than invisible cost.
 
+## Where this sits in the broader landscape
+
+State management across agent frameworks has fragmented into distinguishable strategies rather than converged on
+a single answer. In a 2026-01-06 survey of the agent-framework landscape, Canteen articulates the taxonomy:
+
+> "State management is now plural: memory-first (explicit tiers), state-first (checkpointed graphs), context-first
+> (intelligent compaction), task-first (execution primary)."
+> — [Canteen, _AI Agent Landscape_, 2026-01-06](../../context/notes/canteen_blog_landscape_2026-05.md).
+
+Linus is explicitly **memory-first** — explicit tiers (Layers A through E per DEC-0028, DEC-0029, and DEC-0052) with
+substrate choices made per layer and a uniform `linus.memory.*` API hiding substrate variation from Workers. The
+state-first alternative (LangGraph's checkpointed graph being the canonical instance) would have made graph-state
+the primary durable artifact and treated memory as state-recovery; the context-first alternative (progressive
+compaction with semantic summaries) would have made the prompt window the primary durable surface; the task-first
+alternative would have made execution lineage the primary durable artifact. Linus's commitment to explicit tiers
+reflects the Garrison framing — recursive state maintenance and reliable history access as the upstream
+requirements — and the Marelli attribution discipline that motivates per-layer addressability and integrity. The
+taxonomy is useful for two purposes: explaining design decisions to future contributors (the alternative was not
+"no architecture"; the alternatives were three other architectures with different trade-offs), and evaluating
+alternative architectures on the same axis when a candidate substrate is being weighed against an in-tree layer.
+
 ## ADR cross-references
 
 The 16 ADRs that ratify this spec:
