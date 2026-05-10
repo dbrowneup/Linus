@@ -260,6 +260,8 @@ deprecated stubs and stay as-is.
 | 10.3  | total-landscape representation               | New clusters (g12) and new fold-ins (Letta, x402, autogen, langgraph, rig, goose, debate-or-vote, MiroFish-Offline, Letta MemGPT paper, 3 promoted papers) are represented |
 | 10.4  | top-questions vs syntheses                   | No question listed as "open" that a synthesis since closed (cross-reference DECs); no resolved question still showing as top-question |
 | 10.5  | top-questions vs answered-questions          | Promotions to answered-questions.md are reflected — top-questions shows the right working set |
+| 10.6  | synthesis-landscape §"What's missing"        | **Specifically** — `docs/maestro-protocol.md` is listed as missing at line ~385 but the doc has since been authored at `docs/protocols/maestro-protocol.md` (~18KB, last modified 2026-05-07). Resolve the path mismatch (the landscape was written before the protocol moved into `docs/protocols/`) and move the entry from §"What's missing" to §"Closed during the resolution arc". Apply the same pattern to any other items in §"What's missing" that have been silently delivered. (Dan flag, 2026-05-10) |
+| 10.7  | tight coupling across the three docs         | total-landscape ↔ synthesis-landscape ↔ top-questions should reference each other consistently (no claim in one that contradicts another); trim stale info aggressively per Dan's "sharp, focused, and current" direction |
 
 **Resolution actions:** fix drift inline as discovered. Each fix gets a brief inline rationale comment so future
 audits can reproduce the reasoning. Single Maestro commit at the end titled
