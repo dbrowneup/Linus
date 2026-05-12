@@ -132,3 +132,54 @@ filename `Kimi-K2-2507.20534.md` per CLAUDE.md §Doc-type conventions paired-rep
 per the curation discipline that index-style meta-resources are tracked in the log rather than via per-repo notes.
 
 **Source review:** context fold-in inventory pass, 2026-05-09 (this session).
+
+### 2026-05-10 — added: 1 paper + 8 repos to `context/papers/` and `repos/` (PR 30 cleanup pass)
+
+**Action:** added **Rationale:** Final coverage pass after the 2026-05-09 fold-in inventory and the
+post-PR-#29 sweep agents (coverage + core-doc staleness) surfaced residual gaps. Spec:
+`docs/specs/2026-05-10-pr30-cleanup-spec.md`. Three discrete sub-batches.
+
+**Sub-batch 1 — paper-note promotions for inline-cited papers (3 papers, no new PDFs).** Three papers
+already in `context/papers/` were folded inline during PR #29 per Dan's option-(a) feedback but never
+received per-paper-notes. Promoted now to give them durable cross-reference handles:
+`docs/paper-notes/2509.11420v1.md` (Trading-R1, Tauric/UCLA/UW/Stanford 2025 — single-model RL distillation
+of multi-agent trading workflow with typed-structured-prediction output, the BioReason-Pro non-biology
+canonical example);
+`docs/paper-notes/2602.03082v1.md` (Geometry-Preserving Neural Architectures on Manifolds with Boundary,
+Elamvazhuthi/Biswal et al., LANL + Boston College 2026 — REFERENCE-category sibling of JPmHC in the
+manifold-ML thread);
+`docs/paper-notes/2210.02747.md` (Flow Matching for Generative Modeling, Lipman et al., Meta AI/FAIR 2022
+ICLR 2023 — REFERENCE-category companion to the Holderrieth & Erives textbook
+`paper-notes/2506.02070v3.md`).
+
+**Sub-batch 2 — Letta paired-repo paper + 5 Bin A clones + 3 Bin B clones (1 paper download + 8 repos).**
+`context/papers/2310.08560.pdf` downloaded from arxiv (MemGPT: Towards LLMs as Operating Systems, Packer et
+al., UC Berkeley 2023 v2 Feb 2024); paired paper-note authored at
+`docs/paper-notes/Letta-2310.08560.md` using the hybrid-filename convention; pairs with the new
+`repos/Letta` clone and `docs/repo-notes/Letta.md`. Additional Bin A clones: `repos/rig`
+(0xplaygrounds/rig — unified Rust LLM-client library across 25 providers including first-class Ollama and
+MCP via `rmcp`, MIT, 7.2k★, Study); `repos/autogen` (microsoft/autogen — multi-agent group-chat framework,
+**now in maintenance mode with development redirected to Microsoft Agent Framework**, MIT, Study as frozen
+reference); `repos/langgraph` (langchain-ai/langgraph — stateful agent framework with typed-graph DAG +
+Pregel bulk-synchronous runtime + first-class checkpointing, MIT, Study as architectural alternative to
+workgraph); `repos/x402` (coinbase/x402 — HTTP-402 payment protocol for pay-per-API-call agent surfaces;
+`@x402/mcp` is shipped, not roadmap-only as the Canteen note suggested; Apache 2.0, Watch). Bin B clones:
+`repos/goose` (block/goose — Block's Rust+MCP coding-agent harness, multi-protocol (native HTTP /
+OpenAI-compat / Anthropic ACP), Apache 2.0, Study); `repos/debate-or-vote`
+(deeplearning-wisc/debate-or-vote — NeurIPS 2025 Spotlight research code, Choi/Zhu/Li UW-Madison;
+demonstrates heuristic O(N) majority-vote often matches per-step-LLM O(N²) debate; MIT, Study + spike for
+Phase 3 spawner coordination model); `repos/MiroFish-Offline` (nikmcfly/MiroFish-Offline — multi-agent
+swarm-intelligence simulator using Ollama + Neo4j + OASIS subprocess; **AGPL-3.0** license blocks code
+incorporation into Linus; Watch with AGPL caveat). Cross-cutting signal: Letta + Kimi-K2 + Goose all
+ship Anthropic-compat HTTP endpoints alongside OpenAI-compat — a three-way confirmation that DEC-0005
+(OpenAI-compatible-protocol) earns a revisit at Phase 2a planning time.
+
+**Sub-batch 3 — orphan pic embeds (no clones; reference housekeeping).** Two genuinely orphan pics from
+`context/pics/` were embedded into existing prose: `Git_Branching_Model.pdf` linked from
+[`BRANCHING.md`](../BRANCHING.md) §Phase 3 Migration as the locally-archived Driessen 2010 reference;
+`HE2psIVbcAA6VLz.jpg` (claw-code orchestration concept diagram) embedded in
+`docs/syntheses/repo-clusters/g7-harnesses.md` near the Goose / claw-code-local discussion. The earlier
+sweep agent's "9 orphan pics" claim was largely an artefact of grep missing URL-encoded paths
+(`%20`-encoded spaces) — 7 of 9 flagged pics were already embedded; only the 2 above were genuine orphans.
+
+**Source review:** PR 30 cleanup spec at `docs/specs/2026-05-10-pr30-cleanup-spec.md`, 2026-05-10.

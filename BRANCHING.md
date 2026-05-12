@@ -419,6 +419,11 @@ gh pr create --title "Add MoE router" --body "..."
 - Tags mark releases on `main`
 - Bugfixes from `release/*` and `hotfix/*` merge back into `develop`
 
+The canonical reference for this model is Vincent Driessen's 2010 article _A successful Git branching model_ — the
+original PDF (figure included) is archived locally at
+[`context/pics/Git_Branching_Model.pdf`](context/pics/Git_Branching_Model.pdf) for offline lookup when the upstream URL
+rots.
+
 The decision to graduate and the migration procedure will be documented as a new ADR in `docs/adr/` (and indexed in
 DECISIONS.md).
 
@@ -447,6 +452,8 @@ See SAFETY.md for the complete autonomy tier and tool use policy. Branch-specifi
 ## Related Reading
 
 - [CLAUDE.md](CLAUDE.md) — session protocol, tool use policy
+- [CLAUDE.md § Worktree fan-out discipline](CLAUDE.md#worktree-fan-out-discipline) — branch preservation, base-SHA
+  pinning, edit-tool path resolution, and worktree-cleanup sequence for parallel agent fan-outs
 - [SAFETY.md](SAFETY.md) — autonomy tiers, branch-level safety, audit log
 - [docs/protocols/maestro-worker-protocol.md](docs/protocols/maestro-worker-protocol.md) — end-to-end workflow for spec
   → implementation → review
