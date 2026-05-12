@@ -576,6 +576,16 @@ for no parallelism gain. The canary costs a minute; debugging six stuck agents c
 Worktrees enable genuine parallel agent work but carry non-obvious failure modes. Apply these rules for any
 `isolation: "worktree"` agent dispatch or manual `git worktree add` fan-out.
 
+**Default to the main checkout.** Worktrees should be the exception, not the default. Most Claude Code sessions —
+strategic analysis, artifact production, single-file refactors, reading the corpus, writing specs for handoff — do not
+need worktree isolation and are actively harmed by it (path-resolution surprises, invisible-filesystem artifacts,
+cleanup overhead). Create a worktree only when one of the genuinely-needed conditions holds: parallel agent fan-out
+where each agent's commits must remain branch-isolated, in-progress PR work that needs to coexist with mainline edits,
+or experiments that mutate state in ways you want to throw away atomically. If none of those apply, work in the main
+checkout. If a session opens in a worktree and the work doesn't actually need one, the right move is to dismantle the
+worktree (see cleanup sequence below) and continue in the main checkout — the cost of staying in a wrong-shaped
+worktree compounds across the session.
+
 **Branch preservation.** `git worktree remove` deletes the working directory but leaves the branch pointer in git. This
 is the desired behavior — preserve it. Do NOT immediately `git branch -D` agent branches after removing their worktrees.
 Retain agent branches in git history for at least as long as the consolidated PR is open; they are the per-agent audit
@@ -595,6 +605,15 @@ worktree. Agents inside worktrees should use Bash with `git -C <worktree-path>` 
 already has this content" or edits appear in the wrong checkout, the root cause is almost always absolute-path
 resolution.
 
+A specific failure mode worth naming: **handoff artifacts written into a worktree are invisible to humans navigating
+the main checkout.** When a session in a worktree produces files intended for handoff to a human, another Claude Code
+session, or another repo (e.g., specs, briefs, drafts staged in `experiments/`), write to the main checkout's absolute
+path explicitly — `/Users/dbrowne/Desktop/Programming/GitHub/Linus/experiments/...` — not to the worktree-relative
+path. The worktree's filesystem is its own private space; persisting an artifact only there is a slow data-loss
+footgun, because worktrees get removed and the human looking at `~/Linus/experiments/...` sees nothing. If the artifact
+must live in the worktree for in-flight reasons, copy it out to the main checkout at the end of the session before
+dismantling.
+
 **When not to use worktrees.** Worktrees earn their complexity only when per-agent isolation is a hard requirement —
 e.g., each agent opens its own PR for independent review, or commits must be cherry-picked selectively. For fan-outs
 where agents write non-overlapping files on a shared branch (filling out N notes, running N analyses), the simpler
@@ -608,6 +627,15 @@ doubt, start with the simpler pattern.
 2. `git worktree remove --force <path>` — removes directory; branch pointer persists
 3. Verify: `git branch | grep agent/` — branches should still appear
 4. Delete branches only after the consolidated PR is merged: `git branch -D agent/<name>`
+
+**End-of-session dismantling, not just post-PR.** The sequence above is canonically written for the
+after-cherry-picks-and-PR-merge case, but the same sequence applies whenever a worktree's purpose is complete —
+including a session ending without commits, a piece of work being abandoned, or the work being completed in a different
+way than the worktree was created for. Lingering worktrees accumulate, get rediscovered weeks later in confusing
+states, and contribute to path-resolution surprises in future sessions. If a worktree exists at end-of-session and the
+next session won't immediately need it, dismantle. Worktrees are cheap to recreate; lingering ones are not cheap to
+debug. For branches with zero unique commits (e.g., a session that produced artifacts but no commits to the worktree's
+branch), the branch-preservation rule above does not apply — delete the empty branch as part of dismantling.
 
 ### Reference-stack maintenance signals (PR 30 fold-ins, 2026-05-09)
 
