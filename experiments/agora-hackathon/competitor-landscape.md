@@ -1,324 +1,494 @@
 # Agent Marketplace — Competitor Landscape
 
-> **Date:** 2026-05-11 (Day 1 of the Agora hackathon)
-> **Audience:** Agent Market hackathon team (Shimon, Marten, Daniel R, Dan, Chuan, +1)
-> **Purpose:** Map the existing agent-marketplace landscape so we (a) don't pitch as if greenfield,
-> (b) find a defensible wedge, and (c) anticipate the comparisons judges will make.
+> **Updated:** 2026-05-12 (Day 2 of the Agora hackathon)
+> **Audience:** Agent Market hackathon team
+> **Purpose:** Map the existing landscape with verifiable sources, identify the genuine wedges,
+> and surface a critical new competitive finding: **Circle has launched its own first-party agent
+> marketplace stack**, which materially changes positioning.
 >
-> **Confidence note:** This brief synthesizes public information as of the author's knowledge
-> through early 2026. The crypto / AI-agent space moves fast and product details (token mechanics,
-> chain choices, feature sets) can shift week-to-week. Before any of this lands in a public pitch
-> deck, **verify the specifics for each named competitor** via their docs or recent posts — this
-> doc is a starting map, not a final reference.
+> **Every claim below carries a primary-source link.** Where I describe product features or market
+> numbers, the link goes to either the company's own documentation, a press release, or a
+> reputable third-party source (CoinMarketCap, Messari, The Block). When in doubt, follow the link.
 
-## TL;DR (pitch-ready positioning)
+## The headline finding nobody on the team has surfaced yet
 
-> The agent marketplace category is real, well-funded, and lacks a clear winner. Most existing
-> players bundle agent listing with **speculative token economics** — users buy an agent's token
-> for upside exposure or stake a protocol token to operate agents. None of them have made
-> hire-an-agent-for-one-job-and-pay-stablecoin the dominant flow. **Agent Market's wedge is
-> pay-per-operation pricing in USDC on Arc, with a verifiable agent passport that bases reputation
-> on what each agent actually did, not on what its token price implies.** Pay-per-op + stablecoin +
-> verifiable history is the combination none of the named competitors currently lead with.
+**Circle launched [Agent Stack](https://decrypt.co/367490/circle-ai-agents-usdc-stablecoin-powers-222m-arc-token-sale) on
+May 11, 2026 — the same week this hackathon began.** Agent Stack is a
+[suite of Circle-native developer tools](https://www.stocktitan.net/news/CRCL/circle-launches-ai-infrastructure-to-power-the-agentic-3j0lw9rke3ev.html)
+that includes:
 
-**One-sentence form** for the pitch deck:
+- **Agent Wallets** — programmable wallets purpose-built for autonomous agents
+- **Agent Marketplace** — a Circle-operated marketplace where agents can browse and pay for
+  services from other agents
+- **Nanopayments** — micropayments down to $0.000001 per transaction via Circle Gateway
+- **Circle CLI** — developer tooling for the agent stack
 
-> "While Olas, Virtuals, Bittensor, and ai16z have built agent ecosystems around speculative
-> tokens, Agent Market is the first marketplace where you simply hire an agent, pay USDC per
-> operation, and see a verifiable record of what it did."
+Circle's marketplace component is the same problem space the hackathon is asking teams to build
+in. Circle [raised $222M in an Arc token presale](https://decrypt.co/367490/circle-ai-agents-usdc-stablecoin-powers-222m-arc-token-sale)
+at a $3B fully-diluted valuation alongside the launch, with BlackRock among the named investors.
+The sponsor of this hackathon is building a first-party version of the product they have asked
+hackathon teams to ship.
+
+**This is not a death knell. It is a positioning constraint.** Agent Market needs to be either
+(a) a thin polished surface that consumes Circle's primitives and adds clear opinionated UX value,
+(b) a vertical or experience that Circle's generalist marketplace won't go deep on, or (c) a
+direct test of whether a community-curated marketplace can outcompete an infrastructure-provider-
+operated one. Pick deliberately. Pitching as if Circle's marketplace doesn't exist will not work
+with these judges.
+
+---
+
+## TL;DR (pitch-ready positioning, revised)
+
+> The "USDC-pay-per-operation AI agent marketplace" thesis is no longer differentiating on its
+> own — Circle ships it as infrastructure, [Swarms](https://swarms.world/) ships it as marketplace,
+> [Olas Pearl](https://olas.network/) ships it with [x402](https://www.x402.org/) integration.
+> What's still genuinely missing in the field: **a curated, verifiable, UX-first agent marketplace
+> where reputation is grounded in machine-readable history rather than token economics**. That's
+> the wedge Agent Market can credibly claim if we ship the agent passport with content-hashed
+> reasoning traces. Without that primitive, we're a thin reskin of products that already exist.
+
+**One-sentence pitch (Day 2 revision):**
+
+> "Circle gave agents wallets and Swarms gave them a token-based marketplace. Agent Market gives
+> users a curated, verifiable place to hire agents with a passport you can audit — and pay USDC
+> per operation without buying anyone's token."
+
+---
 
 ## How to read this brief
 
-For each competitor we cover:
+Each competitor section includes:
 
 - **What they are** — one paragraph
 - **Mechanism** — how an agent gets listed, hired, and paid
-- **Monetization** — where the revenue / value capture sits
+- **Monetization** — value capture
+- **2026 traction signals** — recent numbers with primary-source links
 - **What they're missing** — relative to Agent Market's target wedge
 
-Then a cross-cutting matrix and a positioning recommendation.
+A cross-cutting matrix and positioning recommendation follow.
 
 ---
 
-## Competitor 1 — Olas / Autonolas
+## Competitor 1 — Swarms (kyegomez) — the most direct competitor
 
-**What they are.** A DAO-governed protocol for "autonomous services" — code that runs continuously
-on behalf of an owner (e.g., a prediction-market trading agent, an autonomous DAO contributor).
-Their consumer product is **Pearl**, a desktop app where users stake the OLAS token to run hosted
-services on their own machines.
+**What they are.** [Swarms](https://github.com/kyegomez/swarms) is an enterprise-grade
+multi-agent orchestration framework with a live marketplace at
+[swarms.world](https://swarms.world/). The
+[Swarms Marketplace](https://medium.com/@kyeg/the-swarm-marketplace-ai-agents-for-hire-1015d3c92d87)
+explicitly markets itself as "AI Agents for Hire." Founded and maintained by Kye Gomez; the
+GitHub repo has [~6.7K stars and 911 forks](https://github.com/kyegomez/swarms).
 
-**Mechanism.** A developer publishes a service spec (a Docker image plus a manifest) to the
-protocol registry. Users stake OLAS tokens to activate a service; once activated, the service runs
-24/7 on node operators' machines and the user earns rewards in OLAS for keeping it active. Services
-are not "hired per operation" — they are continuously-running entities.
+**Mechanism.** Developers build agents with the Swarms framework (or list standalone prompts and
+tools), publish to swarms.world, and earn when other users hire/buy them. The marketplace supports
+"prompts, agents, and tools" as listable item categories. As of
+[June 2025](https://medium.com/@kyeg/swarms-marketplace-payments-are-live-monetize-your-agents-prompts-and-tools-a50b93a7720a),
+marketplace payments are live.
 
-**Monetization.** Native OLAS token emissions reward service operators. Protocol revenue
-(currently) is implicit in token economics rather than a direct fee.
+**Monetization.** Dual: the native `$swarms` token serves as the primary marketplace currency
+(buying, selling, subscriptions, auctions), AND
+[x402 integration](https://medium.com/@kyeg/how-to-monetize-your-agents-with-swarms-and-x402-a-simple-step-by-step-tutorial-e56bacc2daf2)
+lets developers monetize per-API-call in stablecoins. Swarms supports MCP natively.
 
-**What they're missing.** Pay-per-operation pricing — the model is staking-based, not job-based.
-Stablecoin-native settlement — value capture is entirely in the protocol's native token. The
-"continuously running service" framing is also a heavier user commitment than "hire this agent to
-do one thing for me."
+**2026 traction.** ~6.7K GitHub stars; live marketplace with payments; active Medium presence
+documenting feature launches. The platform spans framework, marketplace, and payment layer in
+a single ecosystem.
 
-**Reading for our positioning.** Olas owns the "autonomous service" vertical. We're explicitly
-NOT competing for that user — we want the user who has a discrete job and wants it done once.
-Different audience, different unit of consumption.
+**What they're missing relative to Agent Market.**
 
----
+- **UX simplicity for non-crypto users.** Swarms is developer-and-crypto-native; the marketplace
+  layer is wrapped in the `$swarms` token economy.
+- **Curation.** Swarms.world is open-listing; anyone can publish. Quality varies enormously, and
+  the marketplace doesn't gate on demonstrated quality.
+- **Verifiable per-job history.** Reputation appears to be based on listing metadata and ratings
+  rather than per-job content-hashed traces.
+- **A non-token settlement path.** Although x402 is supported, the primary marketplace economy
+  is `$swarms`-token-mediated, which doesn't appeal to users who want to just pay $10 and get a
+  job done.
 
-## Competitor 2 — Virtuals Protocol
-
-**What they are.** A protocol on Base (and other EVM chains) that tokenizes individual AI agents.
-Each agent gets its own ERC-20 token; holders effectively own a share of the agent's future
-revenue. Best-known agents on Virtuals include AIXBT, Luna, and a long tail of consumer agents.
-Through 2024–2025 this protocol had significant attention and a large market cap concentrated in
-its flagship agent tokens.
-
-**Mechanism.** A developer launches a new agent and a bonding curve mints the agent's token. Users
-who believe in the agent buy the token; the agent then "earns" revenue (often advertising or
-content-creation revenue) which flows back to token holders via a share-of-revenue mechanism. Users
-don't hire the agent for jobs — they own it.
-
-**Monetization.** Protocol fees on bonding-curve transactions, token-launch fees, and a share of
-agent revenue captured by the protocol.
-
-**What they're missing.** A simple hire-this-agent-for-one-job flow. The Virtuals model is
-investment-shaped, not consumption-shaped. Users who want to USE an agent (rather than HOLD its
-token) get a strictly worse UX. USDC-stable pricing is also absent — agents are priced in their own
-volatile tokens.
-
-**Reading for our positioning.** Virtuals is the loudest comp and the one judges are most likely
-to bring up. The fair contrast: **Virtuals lets you bet on an agent; Agent Market lets you hire
-one.** Different fundamental relationship to the agent. Their unit economics depend on speculation;
-ours depend on the agent actually doing useful work that users will pay for.
+**Honest read for our positioning.** Swarms is the most threatening direct comp. They have
+shipped what we're proposing. Our wedge against them is **curation + pure-stablecoin pricing +
+verifiable passport** — opinionated quality, simpler UX, no token to learn. If our demo is just
+"a marketplace where you pay USDC for agent work," they will be the comparison every judge makes,
+and we will lose on shipped-product maturity.
 
 ---
 
-## Competitor 3 — Bittensor
+## Competitor 2 — Circle Agent Stack (the sponsor)
 
-**What they are.** A decentralized AI / agent network organized into "subnets" — each subnet is
-its own specialized service (image generation, text generation, prediction markets, etc.). Validators
-and miners on each subnet are rewarded in the network's native TAO token based on the quality of
-work they produce.
+**What they are.** [Circle Agent Stack](https://www.stocktitan.net/news/CRCL/circle-launches-ai-infrastructure-to-power-the-agentic-3j0lw9rke3ev.html)
+is Circle's first-party suite of agent-economy primitives, launched May 11, 2026. Components:
+**Circle CLI**, **Agent Wallets**, **Agent Marketplace**, and **Nanopayments powered by
+[Circle Gateway](https://www.arc.network/)**. Sits on top of
+[Arc](https://www.arc.network/), Circle's stablecoin-native L1 (public testnet, no mainnet date
+announced yet).
 
-**Mechanism.** Operators run miners on a subnet, producing model outputs in response to queries.
-Validators score the miners and TAO emissions flow accordingly. Subnet owners design the
-incentive function for their subnet. End-user-facing applications consume subnets through API
-adapters.
+**Mechanism.** Developers register agents through Circle CLI; agents get programmable wallets;
+the marketplace component lets agents discover and pay each other. Nanopayments allow transfers
+down to $0.000001 — true micropayments for high-frequency agent operations.
 
-**Monetization.** Token emissions (TAO) to validators, miners, and subnet owners. Subnet owners can
-charge inference fees in TAO.
+**Monetization.** Circle's platform economics — USDC issuance fees, Arc settlement fees, Gateway
+infrastructure fees. The
+[$222M ARC token presale at $3B FDV](https://decrypt.co/367490/circle-ai-agents-usdc-stablecoin-powers-222m-arc-token-sale)
+indicates how seriously Circle takes the agent-economy thesis.
 
-**What they're missing.** Consumer-facing marketplace UX — Bittensor's audience is researchers,
-miners, and operators, not "I need this job done today" users. Stablecoin pricing is absent.
-End-to-end "I hire an agent and see results" is not the design center.
+**2026 traction.** Launched same week as the hackathon. Reported partnerships including Kyriba
+for [enterprise treasury USDC capabilities](https://www.circle.com/pressroom/kyriba-and-circle-bring-usdc-capabilities-to-enterprise-treasury-unlocking-a-path-toward-more-intelligent-treasury-decisioning).
+$77B USDC in circulation as of Q1 2026 (28% YoY growth) per
+[Circle's earnings call](https://www.tickerreport.com/banking-finance/13436902/circle-internet-group-q1-earnings-call-highlights.html).
 
-**Reading for our positioning.** Bittensor is upstream infrastructure (decentralized AI inference)
-where Agent Market is downstream consumer surface (hire an agent for a job). The right comparison
-is "Bittensor is to AI inference what AWS is to compute; Agent Market is to AI agents what Fiverr
-is to freelancers." We could in principle use Bittensor subnets as backing infrastructure for some
-Agent Market agents in v2.
+**What they're missing.** Circle's marketplace is infrastructure-first; it appears to target
+agent-to-agent commerce (machine-to-machine), not the human-hires-an-agent-for-a-job consumer
+UX. The actual product surface for end-user discovery, comparison, and trust is open. Circle is
+also unlikely to make opinionated curation decisions — they're a neutral infrastructure provider.
+
+**Honest read for our positioning.** Circle is **infrastructure**; Agent Market should be
+**experience**. We consume their Wallets, Nanopayments, and Gateway. We compete with their
+Marketplace component on UX, curation, and human-facing trust signals — places where Circle's
+neutral-infrastructure posture limits them. The framing in the pitch: "Circle gave agents
+wallets; we give users a marketplace they can trust."
 
 ---
 
-## Competitor 4 — Fetch.ai / ASI Alliance
+## Competitor 3 — Olas (Autonolas) Pearl
 
-**What they are.** One of the original "autonomous economic agent" protocols. As of late 2024,
-Fetch.ai merged into the **ASI (Artificial Superintelligence) alliance** with SingularityNET and
-Ocean Protocol, consolidating three older agent / AI tokens. Their consumer-facing agent
-marketplace (DeltaV) has had mixed traction historically.
+**What they are.** [Olas](https://olas.network/) operates Pearl, an "AI Agent App Store" for
+consumer-runnable autonomous services. Originally launched as a staking-based protocol, Pearl
+has evolved significantly — most importantly,
+[Pearl v1 integrated x402](https://x.com/autonolas/status/1837325890579222712), enabling agents
+to pay for off-chain services in stablecoins.
 
-**Mechanism.** Agents register on the network with a service description; users (or other agents)
-discover agents via a search/dispatch layer; transactions settle in the alliance's native FET (now
+**Mechanism.** Developers publish services to the Olas registry as Docker-image manifests; users
+download Pearl ([Mac + Windows](https://olas.network/blog/the-3-step-guide-to-start-running-agents-with-pearl))
+and stake OLAS to run agents on their own machine, earning rewards as the agent meets its
+work targets. With x402 integration, those agents can now pay external service APIs in USDC
+on a per-call basis.
+
+**Monetization.** OLAS token emissions to operators; protocol fees implicit in tokenomics; x402
+enables per-call API monetization for service providers (a separate revenue layer outside the
+OLAS economy).
+
+**2026 traction.** [$13.8M raised in Feb 2025](https://www.theblock.co/post/338713/olas-raises-13-8-million-to-launch-pearl-an-app-store-for-autonomous-ai-agents-in-crypto)
+to launch Pearl. **700,000+ transactions/month, growing ~30% MoM**; 3.5M total transactions
+across 9 chains, with 2M of those being agent-to-agent. Olas agents power 75%+ of Safe
+transactions on Gnosis on some days, driven heavily by prediction-market trading.
+
+**What they're missing.**
+
+- **Consumer simplicity.** Pearl still requires users to stake the OLAS token to run agents.
+  Hiring an agent for a single job, paying USDC, and walking away is not the design center.
+- **Curation.** Pearl's app-store framing implies broad-listing rather than curated quality.
+
+**Honest read for our positioning.** Olas is operationally further ahead than the Day-1 brief
+gave them credit for. The 700K tx/month + 30% MoM growth + x402 integration means they are
+**not just "staking-based" anymore**. They are a legitimate adjacent competitor for any vertical
+that benefits from "always-on" autonomous service framing. We're different because **we're
+hire-for-a-job, they're stake-and-run-the-service** — but the difference is narrower than
+described in the Day-1 draft and judges may treat them as a near-comp.
+
+---
+
+## Competitor 4 — Virtuals Protocol
+
+**What they are.** [Virtuals Protocol](https://www.virtuals.io/) is an AI agent launchpad
+where each agent is represented by an ERC-20 token paired with VIRTUAL in locked liquidity pools.
+Built initially on Base; expanded to [Ethereum, Solana, and Ronin](https://www.coingecko.com/en/coins/virtual-protocol).
+
+**Mechanism.** A developer launches an agent and an associated bonding-curve-priced ERC-20
+token mints. Holders earn share of agent revenue. Users don't "hire" agents — they own them.
+
+**Monetization.** Protocol fees on bonding-curve transactions and token-launch events.
+
+**2026 traction.** **18,000+ agents listed**;
+[$470M+ aGDP (Agentic GDP)](https://coinmarketcap.com/cmc-ai/virtual-protocol/latest-updates/);
+$578M market cap as of recent CMC snapshot (down from a ~$5B peak in early 2025). In
+[February 2026 launched Virtuals Revenue Network](https://www.prnewswire.com/news-releases/virtuals-protocol-launches-first-revenue-network-to-expand-agent-to-agent-ai-commerce-at-internet-scale-302686821.html)
+for agent-to-agent commerce.
+
+**What they're missing.** Per-operation hire flow in stablecoins. Their model is investment-
+shaped: buy the token, hold for upside. Discrete-job hiring with USDC is absent.
+
+**Honest read for our positioning.** Virtuals is the loudest competitor by mindshare. Many
+judges and crypto-native commentators will frame "agent marketplace" through Virtuals' lens. We
+need a sharp one-liner: **"Virtuals lets you bet on an agent; Agent Market lets you hire one."**
+Different fundamental relationship to the agent. Our unit economics depend on the agent doing
+useful work; theirs depend on speculation that someone will want exposure to the agent's future.
+
+---
+
+## Competitor 5 — Theoriq
+
+**What they are.** [Theoriq](https://www.theoriq.ai/) is a decentralized protocol coordinating
+"AI agent collectives" for DeFi-native automation (liquidity provision, yield optimization,
+treasury management). Their distinguishing feature is **on-chain attestation of agent reasoning**
+via "Proof of Collaboration" and "Proof of Contribution" — verifiable encrypted certificates
+attesting to what agents did.
+
+**Mechanism.** Agents register with typed interfaces, can be composed into Collectives, and
+produce attested outputs. The
+[OpenLedger partnership announced Jan 2026](https://www.prnewswire.com/news-releases/openledger-partners-with-theoriq-to-bring-verifiable-ai-agents-into-live-defi-markets-302664498.html)
+brings these attestations onchain for live DeFi markets.
+
+**Monetization.** Native THQ token.
+
+**What they're missing.** Consumer simplicity (their "modular agent collectives" framing is
+developer-attractive but user-confusing). Stablecoin per-op pricing. Pure-hire flow.
+
+**Honest read for our positioning.** **Theoriq is the closest competitor on the verifiable-trace
+axis** — they have shipped what we are proposing to build (the agent passport). The difference:
+their attestations live inside their protocol's typed-interface abstraction with the THQ token;
+ours would live in content-hashed reasoning traces anchored to standard infrastructure and paid
+in USDC. **If they ship a consumer-facing surface before we do, the verifiable-trace differentiation
+disappears.** Worth tracking.
+
+---
+
+## Competitor 6 — Fetch.ai / ASI Alliance
+
+**What they are.** Fetch.ai is one of the originals; merged with SingularityNET and Ocean into
+the ASI (Artificial Superintelligence) alliance in late 2024. Historical product
+DeltaV has been in transition since the merger.
+
+**Mechanism.** Agent registration, discovery via search/dispatch, transactions in native FET (now
 ASI) token.
 
-**Monetization.** Native-token fees on agent transactions; broader protocol economics tied to the
-ASI merger.
+**2026 traction.** Strategic uncertainty post-merger. Consumer-marketplace traction has been
+modest historically.
 
-**What they're missing.** Recent consumer traction is uncertain post-merger. Stablecoin pricing
-is absent. The agent-to-agent framing is more developer-facing than user-facing.
+**What they're missing.** Stablecoin pricing. Consumer-facing hire flow. Recent breakout
+traction.
 
-**Reading for our positioning.** Fetch.ai is the closest historical analog to what Agent Market is
-trying to do (agent registry + discovery + settlement), but their model has been native-token-only
-and the consumer hire-flow has not been the dominant use case. The merger creates strategic
-uncertainty. We don't need to be unkind about it — just observe that the "FET-priced agent
-transactions" pattern hasn't broken out to mainstream users in five years, and there's likely a
-reason (volatility, complexity, lack of consumer UX).
+**Honest read for our positioning.** Fetch's five-year history is instructive: **the
+"agent-priced-in-native-token" pattern has not broken out to mainstream users in half a decade**.
+That observation supports our "USDC instead of native token" wedge. We can cite Fetch as evidence
+that the token-pricing-marketplace approach has a ceiling for consumer adoption.
 
 ---
 
-## Competitor 5 — ai16z / ElizaOS
+## Competitor 7 — ai16z / ElizaOS
 
-**What they are.** **Eliza** is an open-source agent framework (TypeScript, very large GitHub
-star count, broad community) maintained by the ai16z DAO. The framework lets developers build and
-deploy autonomous agents with personalities, memory, and tool use. The **ai16z** token is the DAO's
-governance / treasury token. There is no canonical "marketplace" product yet, though many ecosystem
-projects layer marketplace-like features on top of Eliza.
+**What they are.** [Eliza](https://github.com/elizaOS/eliza) is a popular open-source agent
+framework (TypeScript) maintained by the ai16z DAO. The `ai16z` token is the DAO governance and
+treasury token; **there is no canonical first-party marketplace product yet**, though ecosystem
+projects build marketplace-like features on top.
 
-**Mechanism.** Developers build agents using the Eliza framework and deploy them where they like
-(X/Twitter, Discord, custom UIs). The ai16z DAO holds a treasury that invests in agent projects
-built on Eliza, and the token represents exposure to that portfolio.
+**Mechanism.** Build agents with Eliza framework; deploy where you want (X, Discord, custom).
+The DAO invests in agent projects; the token represents portfolio exposure.
 
-**Monetization.** Token-based; treasury-investment-shaped rather than fee-on-transaction.
+**Monetization.** Token + DAO treasury, not transactional.
 
-**What they're missing.** A first-party marketplace product. Eliza is **framework**, not
-**marketplace**. Stablecoin per-op pricing is absent.
+**What they're missing.** A first-party marketplace. Stablecoin per-op pricing.
 
-**Reading for our positioning.** Eliza is potentially a **partner** more than a **competitor** —
-many agents listed on Agent Market could be built using Eliza. We don't compete with the framework
-layer; we compete with whoever ships a great marketplace built ON frameworks like Eliza. The pitch
-position: "Eliza, AutoGen, LangGraph — pick your framework. Agent Market is where you bring the
-agent and start earning."
+**Honest read for our positioning.** **Eliza is potentially a partner, not a competitor.** Agents
+listed on Agent Market could be built using Eliza. Our wedge isn't against the framework layer;
+it's against the marketplace layer. Pitch position: "AutoGen, LangGraph, Eliza, Swarms — pick
+your framework. Agent Market is where you bring the agent and start earning USDC."
 
 ---
 
-## Competitor 6 — Theoriq
+## Competitor 8 — Bittensor
 
-**What they are.** A protocol for "modular agent collectives" — composable agents that can be
-combined into multi-agent workflows, with cryptographic attestations of reasoning steps. Theoriq
-has emphasized **verifiable agent collectives** as their core thesis.
+**What they are.** [Bittensor](https://bittensor.com/) is a decentralized AI network organized
+into "subnets," each producing specialized AI outputs (image gen, text gen, prediction markets,
+etc.). Miners and validators earn TAO based on output quality.
 
-**Mechanism.** Agents register with a typed interface, can be composed into workflows, and produce
-attested outputs that can be verified against the protocol's specification.
+**Mechanism.** Operators run miners; validators score them; TAO emits to performers. Subnet
+owners design incentive functions.
 
-**Monetization.** Native-token economy.
+**Monetization.** TAO emissions, subnet inference fees.
 
-**What they're missing.** Consumer-facing simplicity — the framing of "modular collectives" is
-developer-attractive but user-confusing. Stablecoin pricing is absent.
+**What they're missing.** Consumer-facing marketplace. Stablecoin pricing.
 
-**Reading for our positioning.** Theoriq is the closest competitor on the **verifiable reasoning**
-axis — they emphasize attested outputs in a similar spirit to what we're doing with the agent
-passport. The difference: their attestation lives in their own protocol's typed-interface
-abstraction; ours lives in content-hashed reasoning traces anchored to standard infrastructure.
-Worth tracking. If they ship something we don't, we should know quickly.
+**Honest read for our positioning.** Bittensor is **upstream infrastructure**, not a competitor.
+Some Agent Market agents in v2 could plausibly be backed by Bittensor subnets. The right framing:
+"Bittensor is to AI inference what AWS is to compute; Agent Market is to AI agents what Fiverr
+is to freelancers." Adjacent layer, not the same layer.
 
 ---
 
-## Competitor 7 — MyShell
+## Competitor 9 — MyShell
 
-**What they are.** A consumer-facing AI agent app store, primarily Asian-market-focused. Each
-agent has a native token; users buy/hold the token for usage rights and a share of agent revenue.
-Strong on voice agents, chat agents, and entertainment use cases.
+**What they are.** [MyShell](https://myshell.ai/) is a consumer-facing AI agent app store
+primarily focused on entertainment, voice, and chat use cases. Token-gated access; each agent
+can have its own token.
 
-**Mechanism.** Developers publish agents; users buy `$SHELL` token or per-agent tokens for usage.
-The model is closer to "freemium app store" than to pay-per-op.
+**Mechanism.** Developers publish; users buy `$SHELL` or per-agent tokens for usage rights and
+revenue share.
 
-**Monetization.** Native token economy, app-store fees.
+**Monetization.** Token economy + app-store fees.
 
-**What they're missing.** Financial / utility verticals (their lane is entertainment + consumer
-AI). Stablecoin pricing. B2B-style hire-for-a-job flow.
+**What they're missing.** Financial/utility verticals (their lane is entertainment). Stablecoin
+pricing. B2B hire-for-a-job flow.
 
-**Reading for our positioning.** Different vertical, different audience. Less directly comparable
-to Agent Market. Useful to acknowledge in the deck only if a judge brings them up.
+**Honest read for our positioning.** Different vertical, different audience. Useful only as a
+comparison if a judge brings them up; not a direct comp.
 
 ---
 
-## Honorable mentions (not deep-dived)
+## Honorable mentions (frameworks and adjacent, not marketplaces)
 
-- **AutoGen / LangGraph / CrewAI** — multi-agent **frameworks**, not marketplaces. Like Eliza,
-  these are upstream of what Agent Market lists, not competitive with it.
-- **HuggingFace Spaces** — model hosting platform, not agent marketplace, but increasingly hosts
-  agent demos. Different category; worth noting for completeness.
-- **Anthropic / OpenAI agent products** — first-party hosted agents from foundation-model providers.
-  Different value proposition: their agents are bound to their models; ours are model-agnostic and
-  use MCP to plug into any tool surface.
-- **Polymarket / Hyperliquid leaderboards** — referenced by Canteen as inspiration for the slash-
-  bond / copy-trading RFB ideas. These are venues for SPECIFIC kinds of agent activity, not
-  marketplaces. If a copy-trading vertical were ever Agent Market's lead, these would become
-  reference points; for now they're context.
+- **[AutoGen](https://github.com/microsoft/autogen)** — Microsoft's multi-agent framework; now
+  largely in maintenance mode with active development moved to
+  [Microsoft Agent Framework](https://github.com/microsoft/agent-framework). Framework layer.
+- **[LangGraph](https://github.com/langchain-ai/langgraph)** — LangChain's agent-orchestration
+  framework. Framework layer.
+- **[CrewAI](https://github.com/joaomdmoura/crewAI)** — popular multi-agent framework. Framework
+  layer.
+- **[Letta (formerly MemGPT)](https://github.com/letta-ai/letta)** — long-running agent runtime
+  with persistent memory. Infrastructure layer.
+- **Anthropic Claude / OpenAI agent products** — first-party hosted agents from foundation-model
+  providers. Bound to their models, not framework-agnostic. Different category.
+
+These are not marketplaces; they're the upstream framework and runtime layer. **If our pitch
+positions us as framework-agnostic + MCP-native, we should mention them by name to demonstrate
+we understand the landscape.**
+
+## Non-competitors that share a name (avoid confusion)
+
+- **[Unanimous AI Swarm](https://unanimous.ai/swarm/)** — a human-collaboration platform that
+  uses "swarm intelligence" to facilitate group decisions. **Not** an agent marketplace; the
+  name overlap with Kye Gomez's Swarms is coincidental.
+- **[swarm-ai.org / ResearchSwarmAI](https://www.swarm-ai.org/)** — open-source academic AI
+  safety research framework studying emergent risks in multi-agent systems. Reference
+  implementation of [Soft-Label Governance for Distributional Safety in Multi-Agent Systems
+  (Aiersilan & Savitt, 2026)](https://arxiv.org/abs/2604.19752). MIT-licensed safety research,
+  **not** a commercial marketplace. Useful as a reference if we want to talk credibly about
+  multi-agent safety risks in the deck.
 
 ---
 
 ## Cross-cutting positioning matrix
 
-| Competitor    | Pricing model         | Settlement asset    | Reputation primitive    | Primary audience           |
-| ------------- | --------------------- | ------------------- | ----------------------- | -------------------------- |
-| Olas          | Staking-based         | OLAS token          | Stake-weighted          | Operators, prediction nerds|
-| Virtuals      | Token ownership       | Agent's ERC-20      | Token price (proxy)     | Crypto speculators         |
-| Bittensor     | Validator emission    | TAO                 | Validator scoring       | Researchers, operators     |
-| Fetch / ASI   | Per-transaction       | FET / ASI           | Self-reported           | Developers (mostly)        |
-| ai16z / Eliza | Token treasury        | ai16z token         | (Framework, not market) | Builders                   |
-| Theoriq       | Per-transaction       | Native token        | Cryptographic attestation| Developers                |
-| MyShell       | Token-gated           | $SHELL + agent tokens| Usage-weighted         | Consumer (entertainment)   |
-| **Agent Market** | **Pay-per-operation** | **USDC on Arc**  | **Verifiable history (passport)** | **People with a job to do** |
+| Competitor          | Pricing model                       | Settlement asset     | Reputation primitive                    | Primary audience          |
+| ------------------- | ----------------------------------- | -------------------- | --------------------------------------- | ------------------------- |
+| Swarms              | Pay-per-use (x402) + token-mediated | `$swarms` + USDC     | Open listings, ratings                  | Crypto + AI developers    |
+| Circle Agent Stack  | Per-operation (nanopayments)        | USDC                 | (No first-party reputation primitive)   | Agent developers (a2a)    |
+| Olas Pearl          | Staking-based; x402 for service pay | OLAS + USDC (x402)   | Stake-weighted                          | Operators, prediction nerds |
+| Virtuals            | Token ownership                     | VIRTUAL + agent ERC-20 | Token price (proxy)                   | Crypto speculators        |
+| Theoriq             | Per-transaction                     | THQ                  | Proof of Collaboration + Contribution   | DeFi developers           |
+| Fetch / ASI         | Per-transaction                     | FET / ASI            | Self-reported                           | Developers (legacy)       |
+| ai16z / Eliza       | Token treasury                      | ai16z token          | (Framework, not market)                 | Builders                  |
+| Bittensor           | Validator emission                  | TAO                  | Validator scoring                       | Researchers, operators    |
+| MyShell             | Token-gated                         | $SHELL + per-agent   | Usage-weighted                          | Consumer (entertainment)  |
+| **Agent Market (proposed)** | **Pay-per-operation**       | **USDC on Arc**      | **Verifiable history (agent passport)** | **People with a job to do** |
 
-The bottom row is the clean differentiation story. Four columns, four wedges. No single competitor
-matches the four-way combination.
+The bottom row is the differentiation story. The wedge that survives the new findings:
+**curated marketplace + pure-USDC pricing (no token to learn) + verifiable on-chain-anchored
+reasoning trace**. Each of the three is genuinely missing in at least one major competitor; the
+combination is missing in all of them.
 
 ---
 
-## Where Agent Market wedges (the three honest claims we can make)
+## Where Agent Market wedges (revised, post-research)
 
-1. **Pay-per-operation pricing in stablecoins.** Nobody named above leads with this. The closest is
-   Fetch.ai's per-transaction model, but it settles in a volatile native token, which is not the
-   same product. Stablecoin per-op + Arc's cheap fast settlement is the unlock that makes
-   small-dollar agent hires viable.
+1. **Curated, not open-listing.** Swarms.world is open and quality varies; Virtuals and Olas are
+   technically open with token-gated quality signals. Agent Market positions as **opinionated
+   curation** — we vet agents before listing for the v1 demo, and only let through ones that
+   have demonstrated quality. This is the simplest differentiation to ship in two weeks because
+   we control the curation policy ourselves.
 
-2. **Verifiable agent passport.** Theoriq is the only direct competitor on this axis and they
-   couch it inside a protocol-specific typed-interface abstraction; we anchor it in content-hashed
-   reasoning traces that any user can verify against an off-chain store. The passport-as-history
-   discipline (we report what happened, not what we predict will happen) is a positioning
-   commitment we can make confidently.
+2. **Pure USDC pricing, no token to learn.** Swarms uses `$swarms`; Virtuals uses VIRTUAL +
+   per-agent tokens; Olas uses OLAS to run agents; MyShell uses `$SHELL`. Every meaningful
+   marketplace except possibly Circle's first-party one ties value capture to a native token.
+   The simple consumer pitch: **"You don't need to buy any token. Just USDC."** This wedge
+   depends on us not launching a token of our own.
 
-3. **Framework-agnostic listing.** We don't tie agents to a single framework (Eliza, AutoGen,
-   LangGraph, or our own). Developers bring whatever stack they like, expose tools via MCP, and
-   list. This is a defensible position **only if we commit to real MCP** (not "MCP-style"), because
-   MCP is what makes the framework-agnostic promise concrete rather than marketing.
+3. **Verifiable reasoning trace as agent passport.** Theoriq has shipped attestations but inside
+   their THQ-token DeFi-focused stack. Swarms ratings are self-reported metadata. Virtuals
+   reputation is token-price proxy. **A content-hashed reasoning trace, anchored to Arc storage,
+   tied to each completed job, queryable by future buyers** is genuinely missing in the field
+   among consumer-facing products. If we ship this primitive in the demo, it's the most
+   defensible piece of the pitch.
+
+4. **UX simplicity for non-crypto users.** Every competitor above except Circle assumes the user
+   is crypto-native. Agent Market positions for a user who would never buy `$swarms` or VIRTUAL —
+   they have a job, they want it done, they pay USDC. This is also the wedge against Circle's
+   first-party marketplace: Circle is infrastructure-shaped, not experience-shaped.
+
+---
 
 ## Risks the landscape implies
 
-- **Virtuals is the elephant in the room.** Their market cap means many judges will benchmark
-  against them. Be ready with a sharp "they let you bet, we let you hire" line.
-- **Verifiable-trace claims need to be backed by actual implementation.** Theoriq has been talking
-  about attestation longer than we have. If the agent passport in our demo is a stub, the
-  differentiation collapses. The passport schema + at least one trace-verification flow needs to
-  ship by demo day.
-- **"Pay-per-operation in stablecoins" sounds obvious in 2026.** Someone is likely already
-  building this; we should monitor the hackathon's other submissions and recent Crypto-AI launches.
-  Differentiation may need to be sharpened mid-hackathon as the landscape clarifies.
-- **MCP commitment matters for the framework-agnostic claim.** Without real MCP, the framework-
-  agnostic argument is weakened to "you can integrate however you like" — true of every API. With
-  real MCP, the argument is "the protocol AI providers are converging on as the tool standard is
-  what we natively speak." Different conversation.
+- **Circle's Agent Marketplace is the existential question.** If Circle's marketplace
+  component ships strong consumer UX in the next 60–90 days, we are competing with the
+  infrastructure provider on their own rails. Pitch positioning needs to acknowledge this
+  directly — being asleep on it would read as un-serious to these judges.
+- **Swarms has shipped what we propose.** They're crypto-native and developer-focused, but
+  saying "no one has done this" is now factually wrong. The honest framing: "Swarms shipped a
+  developer-and-crypto-native version. Agent Market is the version for users who don't want
+  to buy `$swarms` first."
+- **Theoriq is the closest on verifiable trace.** If they expose a consumer-facing surface
+  before we do, the verifiable-passport differentiation evaporates. The defense is to ship the
+  passport visibly in our demo (a "see the trace" UI element, not just a backend table).
+- **x402 is rapidly maturing.** v2 [shipped Dec 2025](https://docs.cdp.coinbase.com/x402/welcome)
+  with reusable sessions and multi-chain. [Amazon Bedrock](https://news.bitcoin.com/coinbase-gives-amazon-bedrock-agents-wallet-tools-with-usdc-settlement/)
+  integrated it May 7, 2026. Olas Pearl integrated it for off-chain payments. **We should plan
+  to use x402 directly rather than build our own payment primitive.** Building our own when x402
+  exists is the kind of NIH that's pitch-fatal.
+- **"USDC pay-per-op" is no longer differentiating on its own.** Multiple players ship it. Our
+  pitch cannot rest on it; it needs the curation + passport + UX-simplicity stack on top.
 
 ---
 
-## Open data points worth confirming before pitch day
+## Open data points still worth confirming
 
-- Virtuals' current top-agent market cap (was multi-hundred-million peak; check recent state).
-- Whether Olas has shipped or signaled any per-op or stablecoin-pricing direction.
-- Theoriq's current product surface and whether their attestation feature is shipped vs. specced.
-- Recent Crypto-AI hackathon winners (search "Coinbase agent hackathon" / "Circle agent hackathon"
-  / "x402 hackathon" for the last 6 months) — is there a winner we should know about?
-- Whether `@x402/mcp` has shipped a stable spec yet (relevant for our MCP positioning and
-  monetization-via-MCP story).
-- Whether anyone has launched a "stablecoin pay-per-op AI agent marketplace" in the last 90 days
-  that would invalidate the "nobody leads with this" claim.
+- Whether Circle Agent Stack's Marketplace component has a public alpha or just a roadmap
+  positioning slide.
+- Whether `@x402/mcp` has shipped a stable spec (mentioned as a roadmap item; recent
+  [Cryptorefills launch](https://www.wingerdaily.com/2026/05/11/cryptorefills-launches-x402-payments-for-ai-agents-publishes-agentic-commerce-reference/)
+  may indicate further-along status). The
+  [Coinbase x402 + MCP integration](https://docs.cdp.coinbase.com/x402/welcome) is live in
+  Agentcore Gateway.
+- Recent Crypto-AI hackathon winners that overlap our thesis.
+- Whether Theoriq's verifiable-trace UX is end-user-facing or developer-tool-facing.
 
-A two-hour focused search before the pitch deck is final would confirm or refute each of these.
+A focused 1-2 hour validation pass before pitch day is warranted.
 
 ---
 
-## Recommended pitch-deck slide (one slide, three columns)
+## Recommended pitch-deck competitive-landscape slide
 
 ```
-HOW PEOPLE BUY AGENTS TODAY                  HOW PEOPLE SHOULD BUY AGENTS
-─────────────────────────────                ────────────────────────────
-Virtuals — buy the agent's token             Agent Market — hire the agent for one job
-Olas — stake the protocol's token            Pay USDC. Watch it work. See what it did.
-Bittensor — run a miner                      Verifiable history, not token-price proxy.
-Eliza/ai16z — buy the framework's token      Framework-agnostic, MCP-native.
-MyShell — buy the agent's token              No speculation required.
-Fetch/ASI — pay in volatile native token
+TODAY'S AGENT MARKETPLACES                       AGENT MARKET'S WEDGE
+─────────────────────────────                    ────────────────────
+Swarms — buy $swarms, browse open listings       Curated. We vet agents before listing.
+Virtuals — buy the agent's ERC-20 for exposure   Hire-shaped, not own-shaped.
+Olas Pearl — stake OLAS to run autonomous svcs   Pay USDC per job. No tokens to learn.
+MyShell — buy $SHELL, agent-specific tokens      Pure stablecoin pricing.
+Theoriq — verifiable DeFi agent attestations     Consumer-facing verifiable passport.
+Circle Agent Stack — agent wallets + a2a market  We're the experience layer Circle won't build.
+Fetch / ASI — native token, modest traction      Five years of FET-priced marketplaces have
+                                                 not broken out. We pick stablecoin from day 1.
 
-→ Speculation as the access model            → Consumption as the access model
+→ Speculation, tokens, developer-first             → Consumption, USDC, user-first
 ```
 
-The frame: most of the landscape is "buy upside exposure to agents." Our frame is "buy a job
-done." That's the wedge, and it's clean to draw on a single slide.
+The slide tells the truth: the category is real, the competition is serious, and we have a
+narrow but defensible wedge that depends on shipping a specific architectural primitive (the
+verifiable passport) plus an opinionated curation policy plus genuine consumer UX.
 
 ---
 
-_Maintainer note: this brief should be re-validated before the pitch deck is final. The crypto
-landscape moves fast; a 2-week-old competitor analysis can be obsolete. Treat this as the starting
-map, not the final reference._
+## Bottom line for the team
+
+The Day-1 draft framed this as a wide-open category with no clear winner. **Day-2 research
+revises that materially.** The category has at least one direct comp shipping (Swarms), at
+least one infrastructure-provider-as-competitor with massive resources (Circle), at least one
+attestation-shipping comp (Theoriq), and a $222M Arc presale that signals serious money
+flowing into the agent-economy thesis.
+
+This is not a reason to back off — it's confirmation the thesis is right. But the pitch needs
+to be **honest about the landscape and sharp about the wedge**. Three honest claims we can
+defend:
+
+1. Curated quality, not open listings
+2. Pure-USDC pricing, no token to learn
+3. Verifiable on-chain-anchored agent passport
+
+Ship those three and the pitch is credible. Skip any of them and we're a thin reskin of a
+shipped product.
+
+---
+
+_Maintainer note: this brief is live as of 2026-05-12 (Day 2). Re-validate before pitch day —
+the agent-economy landscape is moving in weeks, not months._

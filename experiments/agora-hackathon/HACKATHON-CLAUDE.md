@@ -46,25 +46,46 @@ and earn nothing when they don't.
 | Payments         | USDC on Arc, **initially mocked**, real settlement W2 |
 | Agent Tools      | **MCP — protocol vs. "MCP-style" pending decision**   |
 
-## Team (6 members; timezone spread)
+## Team (6 members; timezone spread; age range ~early-20s to early-40s)
 
-| Name                       | Location  | TZ (May DST) | Role / strengths                                                                                    |
-| -------------------------- | --------- | ------------ | --------------------------------------------------------------------------------------------------- |
-| **Shimon Navon**           | Tel Aviv  | UTC+3        | Backend, DBA, originator. PostgreSQL, Django REST, Docker, CI/CD, cloud (GCP/Azure/AWS).            |
-| **Marten Windler**         | Bremen    | UTC+2        | Systems Engineering student. ML/uncertainty (B.Sc. thesis), ROS, Python/C++/Rust. Coordinator lean. |
-| **Daniel Reis dos Santos** | Brazil    | UTC-3        | Backend engineer. Go / Java / TypeScript, distributed systems, Kafka, AWS, Terraform.               |
-| **Dan Browne**             | Chicago   | UTC-5        | Senior Scientist (LanzaTech). Python / bioinformatics, agentic systems. Day job — evenings/weekends.|
-| **Chuan Bai**              | TBD       | TBD          | Crypto / on-chain engineer. **Scope TBD** — likely owns Solidity + Arc integration.                 |
-| **\<member 6\>**           | TBD       | TBD          | TBD                                                                                                 |
+Roughly balanced bios. Ages are author estimates pending team confirmation; the ~20-year span is
+itself a feature — early-career energy meets multi-decade quant-finance and product depth.
 
-Two team members (Dan, Daniel R) have day jobs and can only commit evenings + weekends. The
-remaining four have more flexible time but are still students or contracting.
+| Name                       | Age (est.) | Location  | TZ (May DST) | Role / strengths                                                                                            |
+| -------------------------- | ---------- | --------- | ------------ | ----------------------------------------------------------------------------------------------------------- |
+| **Shimon Navon**           | late 20s   | Tel Aviv  | UTC+3        | Backend + DBA, project originator. Shipped the live infra Day 1. PostgreSQL, Django REST, Docker, CI/CD, cloud (GCP/Azure/AWS). |
+| **Marten Windler**         | ~31        | Bremen    | UTC+2        | Systems Engineering at U. Bremen, finishing B.Sc. on ML uncertainty quantification. ROS, Python/C++/Rust. Coordinator instincts. |
+| **Daniel Reis dos Santos** | early 20s  | Brazil    | UTC-3        | Backend engineer. Go / Java / TypeScript, distributed systems, Kafka, AWS, Terraform. Healthcare-ERP day role. |
+| **Dan Browne**             | 37         | Chicago   | UTC-5        | Senior Scientist at LanzaTech, PhD biochemistry. Python / bioinformatics / agentic systems. Evenings + weekends only. |
+| **Chuan Bai**              | ~early 40s | London    | UTC+1        | CTO @ [Gyld Finance](https://www.gyld.fi/) (institutional staking). Built CoinShares' next-gen digital-asset trading platform. RWA tokenization expertise. PhD HPC. Owns smart contracts + Arc. |
+| **Önder Akkaya**           | ~21        | Ankara    | UTC+3        | Statistics @ Hacettepe; [ASA Statistical Insight World Champion](https://www.linkedin.com/in/onder-akkaya/); President of [TİD-Genç](https://www.tid.org.tr/) (Young Statisticians). Owns the math engine (stochastic processes, Kelly Criterion). |
 
-**Proposed daily sync window:** 13:00 UTC = 8am Chicago / 10am São Paulo / 15:00 Bremen /
-16:00 Tel Aviv. Pending Chuan's confirmation and the 6th member's timezone.
+Three team members (Dan, Daniel R, Chuan) have demanding day roles and commit
+evenings/weekends or partial days; Önder and Marten are students with flexible time; Shimon
+is currently self-employed with the most flexibility.
+
+**Proposed daily sync window:** 13:00 UTC = 8am Chicago / 10am São Paulo / 14:00 London /
+15:00 Bremen / 16:00 Ankara + Tel Aviv. Works for the full team without anyone in unsocial
+hours.
 
 **Proposed schedule/flow owner:** Marten (showing coordinator instincts in early threads). Open to
 discussion; the role is "runs daily standup, tracks blockers, owns demo-prep narrative."
+
+**Role allocation (working draft, refine as the team aligns):**
+
+- **Shimon** — backend + infra ownership; the marketplace runtime and job pipeline.
+- **Marten** — schedule/flow owner; demo-agent build with Dan; ML/uncertainty patterns where
+  they apply to reputation modeling.
+- **Daniel R** — backend support; MCP server implementations; reliability and observability.
+- **Dan** — architecture, agent passport spec, pitch-deck strategy, demo-script narrative;
+  domain credibility for scientific-intelligence vertical extension story in the deck.
+- **Chuan** — smart contracts (escrow + passport anchor) on Arc; on-chain integration;
+  Q&A primary for custody, settlement, and Arc questions; RWA-contextual framing in the
+  pitch.
+- **Önder** — agent decision-making math (stochastic processes, Kelly Criterion for any
+  +EV/risk-modeled agents); statistical rigor for the reputation/passport metrics; native
+  Turkish gives him an angle on the Canteen RFB iv translation-as-alpha vertical if we
+  pursue it.
 
 ## Scope — what we are and aren't building
 
@@ -244,6 +265,13 @@ overhead:
 - **Coordination across timezones.** Mitigated by a single daily sync (13:00 UTC) and async-first
   defaults outside that window. Marten is proposed schedule owner.
 - **"MCP-style" hedging.** Decision pending; default toward real MCP per recommendation above.
+- **Mature competitive landscape.** As of Day 2 research, the category is more crowded than the
+  Day-1 hypothesis assumed. Direct comps include
+  [Swarms](https://swarms.world/) (shipped marketplace + payments), Circle Agent Stack (launched
+  May 11, 2026 — the same week as this hackathon), [Olas Pearl](https://olas.network/) with
+  [x402](https://www.x402.org/) integration, and [Theoriq](https://www.theoriq.ai/) for
+  verifiable agent attestations in DeFi. See `competitor-landscape.md` for the full read. **Pitch
+  positioning must acknowledge these — "no competition" is factually wrong.**
 
 ## What this file deliberately does not cover
 
