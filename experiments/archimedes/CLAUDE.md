@@ -89,6 +89,13 @@ Bremen / 16:00 Ankara. Works across the whole team without anyone in unsocial ho
 Backend ownership is the one un-filled slot since Shimon left. The team should decide by
 end of Day 3 whether to spread it across the four engineers or hire externally.
 
+## Setup
+
+Read [`README.md`](README.md) for the full setup walkthrough — Python conda env via
+[`environment.yml`](environment.yml), Node.js frontend, Foundry for contracts, the
+[arc-canteen CLI](https://github.com/the-canteen-dev/ARC-cli) for traction tracking.
+Platform-specific notes for macOS / Linux / Windows (WSL2 recommended for Marten).
+
 ## Tech Stack
 
 Refer to [`docs/design.md` § 6](docs/design.md) for the full table. Headline choices:
@@ -190,8 +197,11 @@ rules:
 - Touching `docker-compose*.yml`, deployment configs, or CI/CD wiring without team alignment
 - Any smart contract change (needs Chuan's review)
 - Editing `.env.example` (signals an env contract change for everyone)
+- Editing [`environment.yml`](environment.yml) (every team member rebuilds their env on a change)
 - Anything that touches the strategy-passport / reasoning-trace data flow once it lands
 - Anything that touches the on-chain vault contract once it lands
+- Anything that touches `~/.arc-canteen/` files (those are individual team-member credentials —
+  see [`README.md` "Security notes"](README.md#security-notes))
 
 ## When NOT to ask
 

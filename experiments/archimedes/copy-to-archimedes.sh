@@ -79,6 +79,10 @@ echo ""
 echo "Root-level files:"
 # CLAUDE.md at repo root (Claude Code session-startup convention)
 copy_file "$SOURCE_DIR/CLAUDE.md" "$TARGET_DIR/CLAUDE.md"
+# README.md — overwrites the empty stub
+copy_file "$SOURCE_DIR/README.md" "$TARGET_DIR/README.md"
+# environment.yml — conda env for Python backend
+copy_file "$SOURCE_DIR/environment.yml" "$TARGET_DIR/environment.yml"
 
 echo ""
 echo "docs/ — strategic + analytical docs:"
