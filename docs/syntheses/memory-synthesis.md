@@ -206,7 +206,20 @@ adjacent to o3's parallel search but spending the compute on parameter updates i
 plausible candidate for **episodic memory consolidation**: a session transcript becomes a transient LoRA adapter, stored
 as a per-project memory module, loaded back when the project resumes.
 
-These three substrates are not mutually exclusive. The interesting architectural question is not "which one wins" — they
+**Multi-timescale update as the unifying frame (added 2026-05-16).** A fourth 2025-2026 candidate substrate has now
+landed in the corpus: [Behrouz et al. 2025 (2512.24695)](../paper-notes/2512.24695v1.md) — _Nested Learning_ — which
+generalizes the long-term/short-term memory dichotomy to a **Continuum Memory System** with a spectrum of MLP-as-memory
+blocks at logarithmically-spaced update frequencies, plus a self-modifying-Titans adaptive front-end. The Hope
+architecture clears Transformer baselines on RULER MK-NIAH and BABILong at 1M-10M token contexts and matches Llama3-3B/
+8B + RAG on class-incremental learning (CLINC / Banking / DBpedia). Nested Learning's contribution is conceptual as
+much as architectural: it names "multi-timescale update" as the unifying primitive that organizes the Layer A-E
+vocabulary Linus already commits to, with optimizers (Adam, AdaGrad, momentum-SGD) re-derived as nested associative-
+memory problems at different frequencies. The MemGPT paper-note ([`Letta-2310.08560`](../paper-notes/Letta-2310.08560.md))
+is the 2023 historical anchor for hierarchical memory at the prompt-engineering / orchestration layer; Nested Learning
+is the 2025 architectural-internal generalization. Together with Coconut, minGRU, and TTT they form a four-candidate
+constellation for Linus's Phase 6+ / Phase 8 substrate experiments (see DEC-0041, DEC-0042; ranking deferred).
+
+These four substrates are not mutually exclusive. The interesting architectural question is not "which one wins" — they
 answer different questions — but "which combination is the right substrate for which layer of Linus's memory pillar."
 
 ---

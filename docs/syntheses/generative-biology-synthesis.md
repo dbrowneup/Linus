@@ -123,10 +123,28 @@ joins TranscriptFormer as the imaging-and-transcriptomics extension of the speci
 fold here is to install it as a new rung at the cell-scale level, orthogonal to but composable with the residue→genome
 ladder.
 
+**Whole-circuit topology design (Gallup & Steel CVAE).** A 2026 Wave-2 fold-in
+([Gallup & Steel 2026](../paper-notes/s41540-026-00683-6.md), npj Systems Biology and Applications) that adds a
+**circuit-design** rung between sequence-scale and pathway-scale generation. A small conditional VAE — encoder/decoder
+each just 3 linear-32-leakyReLU layers — generates three-node RNA gene circuits with prescribed **adaptation behavior**
+(sensitivity ≥10 + precision ≥1, the integral-feedback signature) plus an **evolutionary property** (low ruggedness
+around the circuit in the binding-energy landscape). IntaRNA 2.0 supplies the physics-based validator that turns the
+generative output into ground truth. Two methodologically important findings: (a) **~1500 training samples suffice**
+for high prompt adherence ($R^2 = 0.97$), undercutting the field's assumption that whole-circuit generative design
+requires massive curated datasets; (b) the CVAE's latent space recapitulates the **Ma et al. 2009** adaptation motifs
+(buffer / balancer / proportioner classes) — the model rediscovers known biological structure without being told. The
+circuit-design rung is structurally distinct from the sequence-design rungs above it: the artefact is a topology +
+parameter vector, not a base/residue sequence, and the validator is a deterministic physics simulator rather than a
+learned predictor. The same generate→score→filter→wet-lab workflow shape carries over, with the validator step
+performed by IntaRNA + ODE simulation rather than by AlphaFold or ESMFold. For Linus's Phase 7 biology skills, this is
+the canonical exemplar of typed-structured-prediction wrapping free-text rationale (S25 / BioReason-Pro convention) at
+the circuit level.
+
 The ladder is not just descriptive. Every cross-cutting thread — local deployability, validation cost, dual-use weight,
 foundation model dependence, KG schema choice — shifts monotonically along the residue→genome axis. Bigger artefacts
 cost more to generate, more to validate, more to deploy locally, and more to gatekeep. ProtiCelli sits off-axis at the
-cell-image scale and inherits a different concern profile — the dual-use section below treats this directly.
+cell-image scale and Gallup-Steel sits off-axis at the topology-level abstraction; both inherit different concern
+profiles than the residue→genome rungs — the dual-use section below treats both directly.
 
 ---
 

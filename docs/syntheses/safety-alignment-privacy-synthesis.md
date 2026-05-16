@@ -162,6 +162,20 @@ substitute: once a Worker has produced dangerous content, even a discarded outpu
 Screening happens at the orchestration layer, before any Worker sees the query, and is Worker-invariant — open-weights
 biology Workers with stripped refusal training cannot be trusted to enforce the policy themselves.
 
+A complementary threat-model framing landed in the Wave 2 fold-in:
+[Marler & Gerstein 2022](../paper-notes/marler_gerstein_biotechnology_warfighter.md) (RAND) names **democratization** as
+an orthogonal axis to knowledge-asymmetric uplift. CRISPR is available in some high schools; individual DNA can be
+mapped, stored, and used for disease/endurance/strength assessments; the cost barrier to biological manipulation is
+falling rapidly. The implication: the dual-use threat model must assume **low-skill-threshold adversaries** in addition
+to the state-level and knowledgeable-adversary cases. For DEC-0047's biosecurity-tier defaults, this argues conservative
+defaults — any tool whose biosecurity risk exceeds the CRISPR-in-high-schools threshold is broadly accessible already;
+any tool below that threshold warrants explicit tier gating. The Marler/Gerstein piece also surfaces the **biological
+data itself as a weaponization target** ("potential efforts to weaponize various aspects of biological data"), which
+foreshadows the 2026 AI-bio nexus framing in the
+[Holko/Wilbanks/Howell biodata commentary](../paper-notes/holko_wilbanks_howell_ai_ready_biodata.md) (folded into the
+entrepreneurship synthesis biodata-sovereignty thread). Together the two pieces form the strategic-policy substrate
+that DEC-0047 can cite as its external policy lineage.
+
 ### Policy-stance benchmarks: Anthropic RSP and Claude's Constitution
 
 Two Anthropic-published documents — the
