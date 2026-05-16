@@ -1,0 +1,131 @@
+{
+  "schema_version": "v0",
+  "suite": "dan_tasks",
+  "model": "qwen2.5-coder:7b",
+  "ollama_host": "http://localhost:11434",
+  "started_at": "2026-05-16T19:46:42.389492+00:00",
+  "finished_at": "2026-05-16T19:47:38.137986+00:00",
+  "wall_time_s": 55.75,
+  "results": [
+    {
+      "task": "fasta-gc-content",
+      "status": "ok",
+      "error": null,
+      "elapsed_s": 19.23,
+      "output": {
+        "raw_output": "```python\nimport sys\n\ndef parse_fasta(file_path):\n    sequences = []\n    with open(file_path, 'r') as file:\n        sequence = ''\n        header = None\n        for line in file:\n            if line.startswith('>'):\n                if header is not None:\n                    sequences.append((header, sequence))\n                header = line.strip()[1:].split()[0]\n                sequence = ''\n            else:\n                sequence += line.strip().upper()\n        if header is not None and sequence != '':\n            sequences.append((header, sequence))\n    return sequences\n\ndef calculate_gc(sequence):\n    gc_count = sum(1 for base in sequence if base in 'GC')\n    total_count = sum(1 for base in sequence if base in 'ACGTN')\n    return 0.00 if total_count == 0 else round(100 * gc_count / total_count, 2)\n\ndef main():\n    if len(sys.argv) != 2:\n        print(\"Usage: python script.py <fasta_file>\")\n        sys.exit(1)\n    \n    file_path = sys.argv[1]\n    sequences = parse_fasta(file_path)\n    \n    overall_gc = 0\n    total_bases = 0\n    \n    for header, sequence in sequences:\n        gc_percent = calculate_gc(sequence)\n        print(f\"{header}\\t{gc_percent}\")\n        overall_gc += gc_percent * len(sequence)\n        total_bases += len(sequence)\n    \n    if total_bases == 0:\n        overall_gc_percentage = 0.00\n    else:\n        overall_gc_percentage = round(overall_gc / total_bases, 2)\n    \n    print(f\"OVERALL\\t{overall_gc_percentage}\")\n\nif __name__ == \"__main__\":\n    main()\n```",
+        "extracted_python": "import sys\n\ndef parse_fasta(file_path):\n    sequences = []\n    with open(file_path, 'r') as file:\n        sequence = ''\n        header = None\n        for line in file:\n            if line.startswith('>'):\n                if header is not None:\n                    sequences.append((header, sequence))\n                header = line.strip()[1:].split()[0]\n                sequence = ''\n            else:\n                sequence += line.strip().upper()\n        if header is not None and sequence != '':\n            sequences.append((header, sequence))\n    return sequences\n\ndef calculate_gc(sequence):\n    gc_count = sum(1 for base in sequence if base in 'GC')\n    total_count = sum(1 for base in sequence if base in 'ACGTN')\n    return 0.00 if total_count == 0 else round(100 * gc_count / total_count, 2)\n\ndef main():\n    if len(sys.argv) != 2:\n        print(\"Usage: python script.py <fasta_file>\")\n        sys.exit(1)\n    \n    file_path = sys.argv[1]\n    sequences = parse_fasta(file_path)\n    \n    overall_gc = 0\n    total_bases = 0\n    \n    for header, sequence in sequences:\n        gc_percent = calculate_gc(sequence)\n        print(f\"{header}\\t{gc_percent}\")\n        overall_gc += gc_percent * len(sequence)\n        total_bases += len(sequence)\n    \n    if total_bases == 0:\n        overall_gc_percentage = 0.00\n    else:\n        overall_gc_percentage = round(overall_gc / total_bases, 2)\n    \n    print(f\"OVERALL\\t{overall_gc_percentage}\")\n\nif __name__ == \"__main__\":\n    main()",
+        "execution_attempted": false,
+        "execution_result": null,
+        "expected_per_sequence_lines": 5,
+        "_meta": {
+          "ollama_eval_count": 358,
+          "ollama_total_duration_ns": 19212320625
+        }
+      }
+    },
+    {
+      "task": "paper-summarization",
+      "status": "ok",
+      "error": null,
+      "elapsed_s": 10.51,
+      "output": {
+        "raw_output": "1. MemGPT introduces a technique for managing extended context in large language models (LLMs) by leveraging function calls, allowing LLM agents to read from and write to external data sources and modify their own context.\n2. By treating context windows as a constrained memory resource and designing a memory hierarchy analogous to traditional OS memory tiers, MemGPT enables LLMs to effectively utilize limited context for tasks like document analysis and multi-session chat.\n3. Function calls in MemGPT manage control flow between context management, response generation, and user interactions, allowing agents to iteratively modify their context for single tasks, thereby more efficiently utilizing the limited context provided by fixed-length models.",
+        "parsed_findings": [
+          "MemGPT introduces a technique for managing extended context in large language models (LLMs) by leveraging function calls, allowing LLM agents to read from and write to external data sources and modify their own context.",
+          "By treating context windows as a constrained memory resource and designing a memory hierarchy analogous to traditional OS memory tiers, MemGPT enables LLMs to effectively utilize limited context for tasks like document analysis and multi-session chat.",
+          "Function calls in MemGPT manage control flow between context management, response generation, and user interactions, allowing agents to iteratively modify their context for single tasks, thereby more efficiently utilizing the limited context provided by fixed-length models."
+        ],
+        "expected_finding_count": 3,
+        "_meta": {
+          "pdf_path": "context/papers/2310.08560.pdf",
+          "pdf_chars_sent": 12000,
+          "ollama_eval_count": 137,
+          "ollama_total_duration_ns": 10347427500
+        }
+      }
+    },
+    {
+      "task": "title-clustering",
+      "status": "ok",
+      "error": null,
+      "elapsed_s": 26.01,
+      "output": {
+        "raw_output": "## Cluster 1: Natural Language Processing & Transformers  \n- Automated Superscalar Processor Design by Learning Data Dependencies  \n- Root Mean Square Layer Normalization  \n- GLU Variants Improve Transformer  \n- RoFormer: Enhanced Transformer with Rotary Position Embedding  \n- Training Compute-Optimal Large Language Models  \n- Large Language Models are Zero-Shot Reasoners  \n- Retrieval-efficiency trade-off of Unsupervised Keyword Extraction  \n- Flow Matching for Generative Modeling  \n- Sparks of Artificial General Intelligence: Early experiments with GPT-4  \n- Emergent autonomous scientific research capabilities of large language models  \n- GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints  \n- BitNet — Scaling 1-bit Transformers for Large Language Models  \n- Advancing Transformer Architecture in Long-Context Large Language Models: A Comprehensive Survey  \n- LLM in a Flash — Efficient Large Language Model Inference with Limited Memory  \n- QuantAgent: Seeking Holy Grail in Trading by Self-Improving Large Language Model  \n- The Era of 1-bit LLMs — All Large Language Models are in 1.58 Bits  \n- Training Large Language Models to Reason in a Continuous Latent Space\n\n## Cluster 2: Protein & Biological Modeling  \n- QiMeng-GEMM: Automatically Generating High-Performance Matrix Multiplication Code by Exploiting Large Language Models  \n- Multimodal foundation model predicts zero-shot functional perturbations and cell fate dynamics  \n- ProtHGT: Heterogeneous Graph Transformers for Automated Protein Function Prediction Using Biological Knowledge Graphs  \n- A contextualised protein language model reveals the functional syntax of bacterial evolution  \n- ProteinReasoner: A Multi-Modal Protein Language Model with Chain-of-Thought Reasoning for Efficient Protein Design  \n- BioReason-Pro: Advancing Protein Function Prediction with Multimodal Biological Reasoning  \n\n## Cluster 3: Machine Learning & AI  \n- Pushing the Limits of Machine Design: Automated CPU Design with AI  \n- The Expressive Power of Transformers with Chain of Thought  \n- Memory Makes Computation Universal, Remember?  \n- Interpreting the Curse of Dimensionality from Distance Concentration and Manifold Effect  \n\n## Cluster 4: Computational Biology & Biotechnology  \n- mCSM-metal: A Deep Learning Resource to Predict Effect of Mutations on Metal Ion Binding  \n- Generative design of novel bacteriophages with genome language models  \n- The FineWeb Datasets — Decanting the Web for the Finest Text Data at Scale  \n- LAB-Bench: Measuring Capabilities of Language Models for Biology Research  \n\n## Cluster 5: Applications & Innovations  \n- A generative language model decodes contextual constraints on codon choice for mRNA design  \n- Generative machine learning unlocks the first proteome-wide image of human cells  \n- CodeV: Empowering LLMs with HDL Generation through Multi-Level Summarization  \n- ARC Prize 2024: Technical Report  \n- TradingAgents: Multi-Agents LLM Financial Trading Framework",
+        "parsed_clusters": [
+          {
+            "name": "Natural Language Processing & Transformers",
+            "titles": [
+              "Automated Superscalar Processor Design by Learning Data Dependencies",
+              "Root Mean Square Layer Normalization",
+              "GLU Variants Improve Transformer",
+              "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+              "Training Compute-Optimal Large Language Models",
+              "Large Language Models are Zero-Shot Reasoners",
+              "Retrieval-efficiency trade-off of Unsupervised Keyword Extraction",
+              "Flow Matching for Generative Modeling",
+              "Sparks of Artificial General Intelligence: Early experiments with GPT-4",
+              "Emergent autonomous scientific research capabilities of large language models",
+              "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+              "BitNet — Scaling 1-bit Transformers for Large Language Models",
+              "Advancing Transformer Architecture in Long-Context Large Language Models: A Comprehensive Survey",
+              "LLM in a Flash — Efficient Large Language Model Inference with Limited Memory",
+              "QuantAgent: Seeking Holy Grail in Trading by Self-Improving Large Language Model",
+              "The Era of 1-bit LLMs — All Large Language Models are in 1.58 Bits",
+              "Training Large Language Models to Reason in a Continuous Latent Space"
+            ]
+          },
+          {
+            "name": "Protein & Biological Modeling",
+            "titles": [
+              "QiMeng-GEMM: Automatically Generating High-Performance Matrix Multiplication Code by Exploiting Large Language Models",
+              "Multimodal foundation model predicts zero-shot functional perturbations and cell fate dynamics",
+              "ProtHGT: Heterogeneous Graph Transformers for Automated Protein Function Prediction Using Biological Knowledge Graphs",
+              "A contextualised protein language model reveals the functional syntax of bacterial evolution",
+              "ProteinReasoner: A Multi-Modal Protein Language Model with Chain-of-Thought Reasoning for Efficient Protein Design",
+              "BioReason-Pro: Advancing Protein Function Prediction with Multimodal Biological Reasoning"
+            ]
+          },
+          {
+            "name": "Machine Learning & AI",
+            "titles": [
+              "Pushing the Limits of Machine Design: Automated CPU Design with AI",
+              "The Expressive Power of Transformers with Chain of Thought",
+              "Memory Makes Computation Universal, Remember?",
+              "Interpreting the Curse of Dimensionality from Distance Concentration and Manifold Effect"
+            ]
+          },
+          {
+            "name": "Computational Biology & Biotechnology",
+            "titles": [
+              "mCSM-metal: A Deep Learning Resource to Predict Effect of Mutations on Metal Ion Binding",
+              "Generative design of novel bacteriophages with genome language models",
+              "The FineWeb Datasets — Decanting the Web for the Finest Text Data at Scale",
+              "LAB-Bench: Measuring Capabilities of Language Models for Biology Research"
+            ]
+          },
+          {
+            "name": "Applications & Innovations",
+            "titles": [
+              "A generative language model decodes contextual constraints on codon choice for mRNA design",
+              "Generative machine learning unlocks the first proteome-wide image of human cells",
+              "CodeV: Empowering LLMs with HDL Generation through Multi-Level Summarization",
+              "ARC Prize 2024: Technical Report",
+              "TradingAgents: Multi-Agents LLM Financial Trading Framework"
+            ]
+          }
+        ],
+        "coverage": {
+          "parse_failed": false,
+          "n_clusters_parsed": 5,
+          "n_titles_assigned": 36,
+          "n_titles_input": 50
+        },
+        "_meta": {
+          "ollama_eval_count": 615,
+          "ollama_total_duration_ns": 25977376958
+        }
+      }
+    }
+  ]
+}
