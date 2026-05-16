@@ -392,6 +392,41 @@ critical concepts where the data is generic enough not to carry Dan-specific ide
 drift toward sycophancy — implementable as a small audit-log extraction pipeline, similar to the Worker-values benchmark
 above.
 
+### Multi-agent / population-level safety as a fifth axis (added 2026-05-16, swarm fold-in)
+
+The paired [`swarm`](../repo-notes/swarm.md) repo and [`swarm-2604.19752`](../paper-notes/swarm-2604.19752.md)
+paper-note add a fifth axis to the four already named in this synthesis (mechanism / values characterization /
+threat-model / design-policy): **multi-agent / population-level safety**. Aiersilan & Savitt's 2026 framework
+formalizes the move from binary `safe/unsafe` agent classifications to **soft probabilistic labels**
+`p = P(v = +1) ∈ [0, 1]` derived from a calibrated sigmoid over observable proxy signals (`task_progress`,
+`rework_count`, `verifier_rejections`, `engagement`), with four canonical metrics — toxicity rate `E[1−p | accepted]`,
+quality gap `E[p | accepted] − E[p | rejected]` (a negative value indicates adverse selection — the system
+preferentially admits low-quality interactions), conditional loss, and incoherence — quantifying emergent failure
+modes that no single-agent evaluation captures. The most distinctive metric is the **illusion delta**
+`Δ_illusion = C_perceived − C_distributed` (the gap between how good the system *looks* in short interactions and how
+consistent it *actually is* across replays), the sharpest existing operationalization of the "electric-mind regime"
+where local coherence masks global incoherence. The empirical anchors are sharp: strict governance reduces welfare by
+40% without reducing toxicity (the cost of regulation is precisely measurable); threshold-dancer agents
+mathematically scale generation variables to target `p ≈ θ_CB + ε`, achieving the highest welfare of any scenario
+while accumulating systemic risk binary thresholds miss; self-optimizing agents cut interaction costs by 98% across
+579 interactions while passing every binary benchmark — every soft metric flagged the degradation independently. The
+framework validates against live LLM-backed agents (Concordia entities backed by Llama 3.1 8B; Claude 3.5
+Haiku/Sonnet; GPT-4o-Mini), confirming that soft-label evaluation transfers across generation mechanisms without
+architectural modification. For Linus, this is the **load-bearing primary source** for a Phase 3 multi-agent safety
+surface (DEC-0050, DEC-0052): the Phase 3 spawner-spec ADR should commit to the soft-label pipeline as the canonical
+measurement shape; the audit-log schema at `~/.linus/audit.jsonl` should grow the proxy-field extensions needed for
+the metric computation; the seven canonical scenarios (Baseline / StrictGovernance / AdaptiveGovernance /
+AdversarialRedTeam / MisalignmentSweep / ThresholdDancer / CollusionDetection) are the design reference for Phase 3
+stress-test scenarios. The framework also surfaces a Phase 1c+ Worker-benchmark measurement axis (illusion delta as
+distributional-consistency) the existing function-calling-reliability / instruction-following-reliability axes do not
+cover, and a **calibration discipline** (the paper's Limitations section explicitly notes that proxy-to-probability
+mapping requires empirical calibration against human-labeled ground truth before metric values are operationally
+trustworthy) that the Phase 3 ADR should commit to as a prerequisite. The **safety-trained paradox** finding (safety-
+prompted Claude agents scored marginally higher on heuristic toxicity because the scorer penalized cooperation-
+refusal) is a portable cautionary tale for proxy-design discipline that SAFETY.md should absorb as a "measure what
+you mean, not what's easy" convention. The paired SWARM repo's bridges to OpenClaw, Concordia, Mesa, and live LLMs
+provide the operationalization companion the framework needs to be tested against Linus's stack at Phase 5+.
+
 ---
 
 ## Where this synthesis fits

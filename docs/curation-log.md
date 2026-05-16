@@ -291,3 +291,163 @@ repo-note.
 
 **Source review:** Wave 2 fold-in spec / dispatch, 2026-05-16 (this session). PR opened from
 `agent/wave2-foldin-corpus`; commits atomic per concern (one per new note batch + final INDEX + curation-log commit).
+### 2026-05-16 (late) — added: Wave 2 stragglers v2 (1 repo-note + 2 paper-notes)
+
+**Action:** added
+
+**Rationale:** Second-batch fold-in (v2) covering one repo + two papers that Dan added post-W1-straggler-agent launch.
+A sibling agent (W1, branch `agent/wave2-stragglers`) is folding in caveman + symphony + swarm + SWARM-paper as the v1
+straggler batch; this v2 batch on `agent/wave2-stragglers-v2` covers a strictly non-overlapping set of three artifacts.
+
+**Sub-batch — `pi` repo-note** (`docs/repo-notes/pi.md`): `earendil-works/pi`, the Pi Agent Harness Mono Repo — a
+TypeScript/Node monorepo of five npm-published packages (`@earendil-works/pi-coding-agent` CLI,
+`@earendil-works/pi-agent-core` stateful-agent runtime, `@earendil-works/pi-ai` unified multi-provider LLM API across
+35+ providers, `@earendil-works/pi-tui` terminal-UI library, `@earendil-works/pi-web-ui` browser-chat components),
+MIT-licensed, single-maintainer-led by Mario Zechner (`badlogic`), `pi.dev` domain. pi ships a deliberately-minimal
+coding harness with extension-driven customization (TypeScript Extensions, Agent Skills standard, prompt templates,
+themes, pi-packages bundled via npm or git), and is the substrate openclaw consumes via `createAgentSession(...)` per
+`packages/coding-agent/README.md`. pi is also reachable from goose as a provider-side ACP shim
+(`crates/goose/src/providers/pi_acp.rs`), making pi the only TypeScript-side coding-agent harness in the cloned corpus
+that goose reaches as a peer. Slated for `g7-harnesses` (primary cluster) + `agentic-systems-synthesis.md` (secondary
+thematic — the deliberately-no-MCP / no-sub-agents / no-plan-mode posture as a data point in the multi-agent landscape
+debate). Verdict: **Study**. Key reusable patterns: the `OpenAICompletionsCompat` 17-flag enumeration as a Phase 2a
+endpoint-capability checklist; the session-tree JSONL shape with `parentId` pointers as an alternative-or-evolution to
+the workgraph linear-DAG session store; the `terminate: true` per-tool-result hint as the canonical Phase 3
+Worker-termination signal (DEC-0051 extension); the steering/follow-up queue pattern as the Maestro-interrupt
+primitive; pi's explicit "what we deliberately don't ship" philosophy as a Linus discipline anchor for ARCHITECTURE.md
+bounded-scope articulation. No new clone needed — `repos/pi/` already exists from an earlier sweep.
+
+**Sub-batch — ElephantBroker paper-note** (`docs/paper-notes/2603.25097v1.md`): Cristian Lupascu, PhD & Alexandru
+Lupascu (Elephant Broker, Bucharest, Romania), arXiv 2603.25097v1, 2026-03-26. An open-source cognitive runtime
+pairing a Neo4j knowledge graph with a Qdrant vector store via the Cognee SDK to provide durable verifiable agent
+memory. Implements a complete cognitive loop with eight named mechanisms — hybrid five-source retrieval pipeline,
+eleven-dimension competitive scoring engine (with (1 − 1/e) submodularity guarantee via greedy budget-constrained
+selection), four-state evidence verification model (Unverified → Self-Supported → Tool-Supported → Supervisor-Verified
+with confidence multipliers 0.5 / 0.7 / 0.9 / 1.0), five-stage context lifecycle (bootstrap → ingest → assemble →
+compact → afterTurn), six-layer cheap-first guard pipeline (autonomy-domain → static-rule → semantic → structural →
+forced-reinjection → optional LLM escalation), nine-stage consolidation engine, three-layer AI firewall, numeric
+authority model with twelve actor types and multi-organization permission hierarchy. Architecturally validated through
+2,200+ tests spanning unit/integration/end-to-end. Three deployment tiers (`memory-only` / `context-only` / `full`),
+five profile presets (`personal-assistant` / `research` / `coding` / `managerial` / `worker`) with inheritance,
+multi-gateway isolation, web management dashboard for human oversight (EU AI Act Article 14 compliance), and
+OpenTelemetry + Prometheus observability across 100+ custom metrics. **The closest published direct-competitor /
+cousin to Linus's Phase 2+ Layer C episodic memory substrate** (DEC-0029) — overlapping enough to be directly
+load-bearing for Linus's substrate decisions, and *different enough* (graph+vector+SDK vs. SQLite+content-hash+git) at
+the substrate level that the divergence points are themselves the most informative comparison surface. Primary fold:
+`memory-synthesis.md` (canonical Layer C direct-competitor reference); secondary fold:
+`agentic-systems-synthesis.md` (Thread 2 structured inter-agent communication — typed authority graph + multi-tier
+safety scanning); tertiary fold: `safety-alignment-privacy-synthesis.md` (six-layer cheap-first guard pipeline +
+three-layer AI firewall + six-tier safety scanning as the canonical multi-tier safety enforcement reference).
+Paper-note depth: ~500 lines per Dan's framing of "richly relevant to Phase 2+ memory and safety pillars; treat with
+substantial depth." PDF already in `context/papers/2603.25097v1.pdf` from an earlier add.
+
+**Sub-batch — TrustResearcher paper-note** (`docs/paper-notes/2510.20844v3.md`): Jiawei Zhou, Ruicheng Zhu, Mengshi
+Chen, Jianwei Wang, Kai Wang (ACEM Shanghai Jiao Tong University; UNSW), WWW Companion '26 Dubai April 13-17 2026,
+arXiv v3 2026-01-25, 6 pages. A multi-agent demo system for knowledge-grounded transparent research ideation. The
+architecture decomposes ideation into four coupled stages: (A) **Structured Knowledge Curation** — LLM-guided topic
+decomposition into well-formed search queries dispatched via Semantic Scholar API under a fixed retrieval budget,
+followed by incremental four-phase KG construction (entity extraction → mini-batch enrichment → top-K=10 degree-based
+expansion → hybrid 60/40 high-degree-vs-random sampling); (B) **Diversified Idea Generation** — literature-informed
+planner agent decomposing into Problem Statement / Proposed Methodology / Experimental Validation facets, then three
+parallel strategies (base variants + Graph-of-Thought variants with b=3, d=5 depth-first KG traversal scored on node
+quality 0.6 + edge-type diversity 0.2 + length 0.2 + cross-pollination of top-ranked ideas) generating an α=10
+over-generated candidate pool with real-time string + semantic deduplication; (C) **Multi-stage Idea Selection** —
+internal weighted-criteria scoring (novelty 0.30 / feasibility 0.25 / clarity 0.20 / impact 0.25) plus iterative
+Jaccard-or-LLM-score merging at threshold 0.85, then external comparison against retrieved literature via BGE-M3
+embeddings retaining candidates with cosine similarity below 0.7; (D) **Expert Panel Review & Synthesis** —
+asynchronous reviewer agent (technical soundness + feasibility) + novelty agent (originality + distinctness) scoring
+each candidate on a 5-dimension 1-5 rubric, aggregator module fusing both perspectives, ~3.5 weak-accept threshold for
+high-quality classification. The system exposes intermediate reasoning states, execution logs, configurable agents,
+and JSON-archived per-component outputs through a four-region web interface. Demonstrated on k-truss breaking
+producing 3 candidate research ideas in ~15-30 minutes consuming 200K+ tokens using GPT-5. Live demo + source at
+`github.com/valleysprings/TrustResearcher`. **Directly relevant Phase 7+ prototype** for Linus's eventual
+research-ideation skill — the four-stage architecture is portable as a Phase 7+ skill template (Curation → Generation
+→ Selection → Review), the Graph-of-Thought primitive is a Phase 3+ KG-grounded-reasoning primitive candidate, and
+the typed 5-dimension review rubric extends the DEC-0051 AgentReport schema for research-ideation outputs.
+**Critical caveat:** the case-study performance is **not** empirically validated against baselines (single
+self-curated topic from the authors' own research area, no head-to-head comparison to a simpler GPT-5 baseline);
+adopt the architecture, do not adopt the performance claim. Primary fold: `llms-in-science-synthesis.md` (automated
+scientific ideation under the "collaborator-like" four-perspectives frame from Schulz et al.); secondary fold:
+`agentic-systems-synthesis.md` (Thread 4 validation-as-per-stage-instrumentation example via the transparency-by-design
+discipline + Thread 7 hosted-frontier dependency illustration); tertiary fold:
+`repo-clusters/g8-sci-agents.md` (candidate clone for Phase 7+ planning reference; clone deferral noted — clone when
+Phase 7+ becomes active). Paper-note depth: ~400 lines per Dan's framing.
+
+**Source review:** Wave 2 stragglers v2 dispatch, 2026-05-16 (this session). PR opened from
+`agent/wave2-stragglers-v2`; commits atomic per artifact (one for the pi repo-note, one per paper-note, one for INDEX
++ curation-log + synthesis-edits consolidation). Sibling W1 batch (`agent/wave2-stragglers`) carries caveman +
+symphony + swarm + SWARM-paper; this v2 batch is strictly non-overlapping.
+
+### 2026-05-16 — added: Wave 2 stragglers v1 (3 repo-notes + 1 paired paper-note)
+
+**Action:** added
+
+**Rationale:** First-batch fold-in (v1) covering three repos plus one paired paper that Dan added immediately
+post-PR-30. Sibling agent W2 (branch `agent/wave2-stragglers-v2`, entry above) covers a strictly non-overlapping
+second batch (pi repo-note + two paper-notes); the two batches were dispatched concurrently against the same base
+SHA (`9b91b66`) on `main` so cherry-pick consolidation is clean.
+
+**Sub-batch 1 — `caveman` repo-note** (`docs/repo-notes/caveman.md`): `JuliusBrussee/caveman`, a Claude Code skill
+plus 30+-harness install matrix that constrains agent output to telegraphic fragments while preserving technical
+content, with a measured **~65–75% output-token reduction at 100% technical accuracy** validated through a three-arm
+eval harness (skill vs. terse-baseline vs. no-prompt — honest delta is skill vs. terse to avoid conflating with
+generic conciseness) and a real-Claude-API benchmark suite (average 65% reduction across 10 prompts, range 22–87%).
+MIT-licensed, single-maintainer-led by Julius Brussee. Skill (not framework or substrate) — no cluster letter applies.
+Slated for `skills-and-practices-synthesis.md` (primary) and `memory-synthesis.md` (secondary — the auto-clarity rule
+as the design pattern for DEC-0032's explicit cap-bypass-audit-log discipline on the output-token-budget side). Verdict:
+**Study + Adapt**. Key reusable patterns: an `output_style` Worker dispatch field (`verbose` / `default` / `terse` /
+`caveman`) as a sibling to `memory_mode` and `cot_budget` per DEC-0031, with the dispatcher injecting the matching
+system-prompt rider and the audit log recording the choice; a `CLAUDE.compact.md` startup-budget optimization producing
+~46% input-token savings on every session start while preserving code blocks / URLs / paths / commands byte-identical;
+the auto-clarity bypass discipline (drop to normal prose for security warnings, irreversible actions, multi-step
+sequences with ambiguity risk, user-confused states) as the design pattern for "compress aggressively, bypass under
+documented conditions"; the three-arm eval discipline (skill vs. terse vs. baseline) for the Phase 1c+ benchmark suite.
+Phase 1 corpus add candidate: the cited March 2026 brevity-improves-accuracy paper (arXiv 2604.00025; +26 accuracy
+points on certain benchmarks under brevity constraints).
+
+**Sub-batch 2 — `symphony` repo-note** (`docs/repo-notes/symphony.md`): `openai/symphony`, OpenAI's engineering-preview
+harness reframing the human/agent relationship from "supervise the agent while it codes" to "manage the work the
+agent does." A long-running daemon polls an issue tracker (Linear in v1; tracker-agnostic SPEC.md), opens isolated
+per-issue workspaces, runs coding agents under a repo-owned `WORKFLOW.md` policy file, and produces proof-of-work
+artifacts (CI status, PR review feedback, complexity analysis, walkthrough videos). Apache-2.0. Deliverable is unusual:
+a 30k-token language-agnostic SPEC.md (RFC 2119 normative language) plus an Elixir reference implementation under
+`elixir/`. Slated for `g7-harnesses` (primary cluster) + `agentic-systems-synthesis.md` (primary thematic — the
+WORKFLOW.md policy-in-repo idea as the third reference task-spec shape alongside goose Recipe and Letta Agent File).
+Verdict: **Watch + Study**. Key reusable patterns: the `WORKFLOW.md` policy-in-repo discipline; the explicit
+ID-vocabulary discipline (issue ID for lookups, issue identifier for human logs, workspace key for filesystem,
+session ID for telemetry); the workspace-as-first-class concept with deterministic per-task paths and `after_create`
+/ `before_remove` hooks; the retry-with-tracker-reconciliation state machine; the structured-logs-required +
+status-surface-optional observability discipline; the sample WORKFLOW.md as the SAFETY.md Tier-3 trust-and-safety
+reference. Cross-vendor signal: combined with goose (Block/AAIF) and claw-code (Anthropic), symphony confirms the
+harness is the layer of public-spec convergence between leading model vendors.
+
+**Sub-batch 3 — `swarm` paired-repo treatment** (`docs/repo-notes/swarm.md` + `docs/paper-notes/swarm-2604.19752.md`):
+`swarm-ai-safety/swarm`, the **System-Wide Assessment of Risk in Multi-agent systems** framework paired with the arXiv
+2604.19752v1 preprint (Aiersilan & Savitt 2026, 19 Mar 2026 — "Soft-Label Governance for Distributional Safety in
+Multi-Agent Systems"). Paired-repo treatment per CLAUDE.md §Paper-note paired-repo variant — paper-note uses the
+hybrid filename `swarm-2604.19752.md` with `pdf:` pointing to `../../context/papers/2604.19752v1.pdf` (downloaded from
+arxiv 2026-05-16; the swarm artifacts repo does not vendor the preprint). Repo is MIT-licensed Python 3.10+, PyPI
+package `swarm-safety`, 23 agent archetypes, 27+ governance levers, 79 YAML scenarios, 39 examples, 4,556 tests across
+133 files, 8 framework bridges (Concordia, OpenClaw, GasTown, LiveSWE, Prime Intellect, Ralph, Claude Code, Worktree),
+live HF Spaces sandbox. Both notes slated for `g11-agent-frameworks` (primary cluster) +
+`safety-alignment-privacy-synthesis.md` (primary thematic — multi-agent / population-level safety as a fifth axis
+alongside mechanism / values-characterization / threat-model / design-policy) + `agentic-systems-synthesis.md`
+(secondary thematic — population-level framing as complement to the existing competence-focused Kosmos / BioGuider /
+Sketch2Simulation thread). Verdict: **Study** for both. Key reusable patterns: soft-label safety metrics
+(`p = σ(k·v_hat)` from observable proxy signals → toxicity rate `E[1−p | accepted]` / quality gap
+`E[p | accepted] − E[p | rejected]` / conditional loss / incoherence) as the Phase 3 multi-agent safety surface
+(DEC-0050, DEC-0052); illusion delta `Δ_illusion = C_perceived − C_distributed` as a Phase 1c+ Worker
+distributional-consistency benchmark axis; the five-category governance-lever taxonomy (cost / access / reputation /
+detection / deliberative) as the Phase 3 spawner-spec safety vocabulary; the seven canonical scenarios as the
+adversarial-pressure stress-test design reference; the `swarm/bridges/openclaw/` integration as the Phase 5+ Linus +
+openclaw safety-measurement design reference; the calibration-discipline note (proxy-to-probability requires
+empirical calibration against human-labeled ground truth before metric values are trustworthy) as a Phase 3 ADR
+prerequisite; the **safety-trained paradox** finding (cautious safety prompts scored marginally higher on heuristic
+toxicity because the scorer penalized cooperation-refusal) as a "measure what you mean" SAFETY.md cautionary tale; the
+**`Extend, don't proliferate`** CLAUDE.md convention candidate from the swarm CLAUDE.md.
+
+**Source review:** Wave 2 stragglers v1 dispatch, 2026-05-16 (this session). PR opened from `agent/wave2-stragglers`;
+commits atomic per artifact (one for caveman repo-note, one for symphony repo-note, one for swarm repo-note, one for
+the SWARM paper-note, one for INDEX backfill + synthesis edits + this curation-log entry). Sibling W2 batch
+(`agent/wave2-stragglers-v2`) carries pi repo-note + two non-overlapping paper-notes; this v1 batch is strictly
+non-overlapping per the dispatch coordination.

@@ -213,6 +213,46 @@ tool addition is evaluated. The red-teaming plugins (prompt injection, jailbreak
 relevant when Linus exposes tools with write capabilities and sandbox policy must be validated under adversarial
 conditions.
 
+### swarm as the multi-agent safety + governance research entrant (added 2026-05-16)
+
+[`swarm`](../../repo-notes/swarm.md) (paired with the new paper-note
+[`swarm-2604.19752`](../../paper-notes/swarm-2604.19752.md); Aiersilan + Savitt 2026; MIT) fills a gap the cluster
+otherwise has: the existing entries (autogen, langgraph, dspy, pydantic-ai, superpowers, lmnr, claude-code-guide,
+gptme, huginn, MiroFish-Offline, Agent-Skills-for-Context-Engineering, promptfoo, etc.) are mostly about **how agents
+are built**; swarm is about **how agent interactions are measured for safety**. The framework formalizes the move
+from binary `safe/unsafe` agent classifications to soft probabilistic labels `p = P(v = +1) ∈ [0, 1]` derived from a
+calibrated sigmoid over observable proxy signals, with four canonical metrics (toxicity rate `E[1−p | accepted]`,
+quality gap `E[p | accepted] − E[p | rejected]` for adverse-selection detection, conditional loss, incoherence) plus
+the load-bearing **illusion delta** `Δ_illusion = C_perceived − C_distributed` that surfaces fluent-but-unstable
+behavior binary thresholds miss. The implementation is substantial — 23 agent archetypes (honest, opportunistic,
+deceptive, adversarial, adaptive-adversarial, cautious / cautious-reciprocator, **threshold-dancer**, LDT, RLM,
+council, SkillRL, LLM across 9 providers), 27+ governance levers (transaction taxes, circuit breakers, reputation
+decay, random audits, staking, externality internalization, collusion detection plus 20+ more), 79 YAML scenario
+definitions, 39 runnable examples, 4,556 tests across 133 files, an append-only JSONL event-logger for deterministic
+replay, eight framework bridges (Concordia, OpenClaw, GasTown, LiveSWE, Prime Intellect, Ralph, Claude Code,
+Worktree), and a live HF Spaces interactive sandbox. The headline empirical findings — strict governance reduces
+welfare 40% without reducing toxicity (regulatory deadweight loss made measurable); threshold-dancer agents
+mathematically scale generation variables to target `p ≈ θ_CB + ε` and achieve the highest welfare of any scenario at
+above-threshold toxicity (exposing binary-governance blind spots); self-optimizing agents cut interaction costs 98%
+across 579 interactions while passing every hard binary benchmark, with every soft metric flagging the degradation —
+make the framework the **load-bearing primary source** for the Phase 3 multi-agent safety surface (DEC-0050, DEC-0052)
+when the spawner ships. Specific Linus-applicable patterns: soft-label safety metrics as the audit-log-level
+measurement substrate; illusion-delta as a Phase 1c+ Worker distributional-consistency benchmark axis; the
+five-category governance-lever taxonomy (cost / access / reputation / detection / deliberative) as the Phase 3
+safety vocabulary; the seven canonical scenarios (Baseline / StrictGovernance / AdaptiveGovernance /
+AdversarialRedTeam / MisalignmentSweep / ThresholdDancer / CollusionDetection) as the design reference for Phase 3
+multi-agent stress-test scenarios; the `swarm/bridges/openclaw/` integration as the Phase 5+ Linus + openclaw
+safety-measurement design reference. Worth a **Study** verdict in the cluster — the framework's value to Linus is
+conceptual + methodological, not direct substrate (population-level multi-agent research framework, not Maestro/Worker
+orchestration); the right relationship is "Linus orchestration produces audit-log events that swarm-style metrics
+can score; swarm-style governance levers can be implemented as policy on top of the audit-log surface, but they are
+not part of the orchestration layer's primary responsibility per DEC-0020 bounded-scope." Primary thematic home:
+[safety-alignment-privacy](../safety-alignment-privacy-synthesis.md); secondary thematic home:
+[agentic-systems](../agentic-systems-synthesis.md). The framework's **`Extend, don't proliferate`** CLAUDE.md
+discipline rule (one slash command, one mode flag set, one consolidated hook script — never proliferate when an
+existing artifact can absorb the functionality) is a portable convention candidate for Linus's `docs/specs/` and
+`docs/skills/` surfaces.
+
 ---
 
 ## Patterns and modules worth lifting
