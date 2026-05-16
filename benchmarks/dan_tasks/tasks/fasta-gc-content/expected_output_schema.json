@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FastaGcContentOutput",
+  "description": "A Python script (as a string) produced by the Worker. The runner stores raw_output verbatim; future scoring extracts the script and runs it against sample.fasta.",
+  "type": "object",
+  "required": ["raw_output", "extracted_python", "execution_attempted"],
+  "properties": {
+    "raw_output": {
+      "type": "string",
+      "description": "Verbatim model output. Authoritative."
+    },
+    "extracted_python": {
+      "type": "string",
+      "description": "Heuristic extraction of just the Python source (strips markdown fences if present). May equal raw_output."
+    },
+    "execution_attempted": {
+      "type": "boolean",
+      "description": "Whether the runner attempted to execute the extracted script. v0 leaves this false; scoring pass flips it."
+    },
+    "execution_result": {
+      "type": ["object", "null"],
+      "description": "Populated only when execution_attempted is true. v0: null.",
+      "properties": {
+        "returncode": { "type": "integer" },
+        "stdout": { "type": "string" },
+        "stderr": { "type": "string" }
+      }
+    },
+    "expected_per_sequence_lines": {
+      "type": "integer",
+      "const": 5,
+      "description": "sample.fasta contains 5 sequences."
+    }
+  }
+}
