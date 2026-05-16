@@ -257,7 +257,7 @@ Process notes from this side quest:
 
 - **I duplicated the article unnecessarily.** Started by saving a synthesised note as
   `mughal_context_window_management.md` in `context/notes/` before noticing Dan had already
-  saved the raw article as `Why Claude Gets Dumber the Longer Your Session Run.txt` in the
+  saved the raw article as `Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt` in the
   same folder. Deleted my duplicate immediately when Dan flagged it, then proceeded with the
   three sub-agent integrations against the raw article only.
 - **Three parallel sub-agents handled the integration into `memory-synthesis.md`,

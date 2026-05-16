@@ -56,7 +56,7 @@ the hybrid-filename treatment.
 | ---- | ----------------------------------------------------- | --------------------------------------- | ------------------------------------------ |
 | 1.1  | `context/papers/2509.11420v1.pdf`                     | `docs/paper-notes/2509.11420v1.md`      | agentic-systems (extends TradingAgents)    |
 | 1.2  | `context/papers/2602.03082v1.pdf`                     | `docs/paper-notes/2602.03082v1.md`      | infra-foundations (manifold-ML thread)     |
-| 1.3  | `context/papers/Flow Matching for Generative Modeling.pdf` | `docs/paper-notes/2210.02747.md`*  | infra-foundations (flow-matching origin)   |
+| 1.3  | `context/papers/Flow-Matching-for-Generative-Modeling.pdf` | `docs/paper-notes/2210.02747.md`*  | infra-foundations (flow-matching origin)   |
 | 1.4  | `context/papers/2310.08560.pdf` (download from arxiv) | `docs/paper-notes/Letta-2310.08560.md`  | memory-synthesis + agentic-systems         |
 
 \*Per the paper's arxiv ID. Filename has spaces; per Tier 8 (PR 31), the bulk-rename pass will normalize this.
@@ -89,17 +89,17 @@ download confirms the paper is available locally — and before Tier 3.1 so the 
 
 | Pic                                  | Status                                       | Action                                                                  |
 | ------------------------------------ | -------------------------------------------- | ----------------------------------------------------------------------- |
-| `Bonsai Energy Use.png`              | Embed reportedly attempted in Tier 4.4       | Verify + re-embed in `native-low-bit-apple-silicon-synthesis.md`         |
-| `Bonsai Performance vs Size.png`     | Same                                         | Same                                                                     |
+| `Bonsai-Energy-Use.png`              | Embed reportedly attempted in Tier 4.4       | Verify + re-embed in `native-low-bit-apple-silicon-synthesis.md`         |
+| `Bonsai-Performance-vs-Size.png`     | Same                                         | Same                                                                     |
 | `Git_Branching_Model.pdf`            | Orphan; user previously said `BRANCHING.md`  | Embed link in `BRANCHING.md`                                            |
 | `HE2psIVbcAA6VLz.jpg` (claw-code)    | Orphan; was flagged for g7-harnesses earlier | Embed in `docs/syntheses/repo-clusters/g7-harnesses.md`                  |
 
-**The Software Factory.png:** intentionally deferred per Dan's earlier note ("haven't created more content around
+**The-Software-Factory.png:** intentionally deferred per Dan's earlier note ("haven't created more content around
 it; future fold"). Skip in PR 30.
 
 **Why the Bonsai pics were missed:** the Tier 4.4 agent reported embedding "Intelligence Density, Benchmark
-Performance, Performance vs Size, Energy Use" but the orphan check found `Bonsai Energy Use.png` and
-`Bonsai Performance vs Size.png` not actually referenced. **Investigation step before fixing:** grep the synthesis
+Performance, Performance vs Size, Energy Use" but the orphan check found `Bonsai-Energy-Use.png` and
+`Bonsai-Performance-vs-Size.png` not actually referenced. **Investigation step before fixing:** grep the synthesis
 for the actual filenames vs nearby titles. If the agent embedded different filenames (e.g., the PrismML pair which
 share similar titles), there's a naming mismatch to resolve. Otherwise re-embed.
 

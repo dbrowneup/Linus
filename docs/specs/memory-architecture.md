@@ -399,5 +399,5 @@ The 16 ADRs that ratify this spec:
 - [DEC-0043](../adr/0043-memory-mode-finetuning-targets-phase6.md) — Phase 6a memory-mode-aware fine-tuning targets
 
 Synthesis input: [docs/syntheses/memory-synthesis.md](../syntheses/memory-synthesis.md). Practitioner anchor:
-[Mughal context-window article](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt).
+[Mughal context-window article](../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt).
 Theoretical anchor: [Garrison synthesis](../../context/notes/garrison_memory_makes_computation_universal.md).

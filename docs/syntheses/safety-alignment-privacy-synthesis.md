@@ -165,7 +165,7 @@ biology Workers with stripped refusal training cannot be trusted to enforce the 
 ### Policy-stance benchmarks: Anthropic RSP and Claude's Constitution
 
 Two Anthropic-published documents — the
-[Responsible Scaling Policy v3.0](../../context/notes/Anthropic%E2%80%99s%20Responsible%20Scaling%20Policy%20%28version%203.0%29.pdf)
+[Responsible Scaling Policy v3.0](../../context/notes/Anthropic-Responsible-Scaling-Policy-v3.0.pdf)
 (RSP, effective 2026-02-24) and [Claude's Constitution](../../context/notes/claudes-constitution_webPDF_26-02.02a.pdf)
 (published 2026-01-21) — are not papers Linus borrows mechanism from; they are policy artifacts against which Linus's
 own posture can be calibrated. The framing is **different scope, useful benchmark**, not "more or less rigorous." RSP is
