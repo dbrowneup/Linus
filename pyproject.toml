@@ -62,6 +62,8 @@ dev = [
     "pytest>=7.4",
     "pytest-cov>=4.1",
     "pre-commit>=3.6",
+    # TestClient lives in starlette under fastapi; httpx is required for it.
+    "httpx>=0.26",
 ]
 all = [
     "linus[ui,mlx,knowledge,eval,dev]",
@@ -73,8 +75,10 @@ Repository = "https://github.com/dbrowneup/Linus"
 Issues = "https://github.com/dbrowneup/Linus/issues"
 
 [project.scripts]
-# Placeholder; implemented in Phase 2+
-# linus = "linus.cli:main"
+# Phase 2a bootstrap: `linus serve` launches the FastAPI orchestration backend
+# (uvicorn on $LINUS_HOST:$LINUS_PORT, defaults 127.0.0.1:8000). A full
+# Typer-backed CLI lands in a follow-up; for now `serve` is the only command.
+linus-serve = "linus.server:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
@@ -139,7 +143,7 @@ exclude = [
 # --- Pytest configuration ----------------------------------------------------
 
 [tool.pytest.ini_options]
-testpaths = ["src/linus/tests", "benchmarks", "experiments"]
+testpaths = ["tests", "src/linus/tests", "benchmarks", "experiments"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "-ra --strict-markers"
 markers = [
