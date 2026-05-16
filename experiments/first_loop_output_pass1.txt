@@ -1,0 +1,67 @@
+```python
+import os
+from typing import Any, Optional
+
+class PermissionError(Exception):
+    pass
+
+class SandboxFS:
+    """
+    A class that wraps read and write operations with sandbox path-prefix validation.
+    """
+
+    def __init__(self, repo_root: str):
+        self.repo_root = repo_root
+        self.allowlist = ["src/", "benchmarks/", "experiments/", "docs/"]
+
+    def _validate_path(self, path: str) -> None:
+        """
+        Validates the given path against the allowlist.
+        Raises PermissionError if the path is not allowed for write operations.
+        """
+        if any(path.startswith(prefix) for prefix in self.allowlist):
+            return
+        raise PermissionError(f"Write operation not allowed for path: {path}")
+
+    def read(self, path: str) -> Any:
+        """
+        Reads the content of the file at the given path.
+        Raises FileNotFoundError if the file does not exist.
+        """
+        full_path = os.path.join(self.repo_root, path)
+        with open(full_path, 'r') as file:
+            return file.read()
+
+    def write(self, path: str, data: Any) -> None:
+        """
+        Writes the given data to the file at the given path.
+        Raises PermissionError if the path is not allowed for write operations.
+        """
+        self._validate_path(path)
+        full_path = os.path.join(self.repo_root, path)
+        with open(full_path, 'w') as file:
+            file.write(data)
+
+# Unit tests
+def test_read_success():
+    fs = SandboxFS(repo_root="/tmp")
+    with open("/tmp/test.txt", "w") as f:
+        f.write("hello")
+    assert fs.read("test.txt") == "hello"
+
+def test_write_allowed_prefix():
+    fs = SandboxFS(repo_root="/tmp")
+    fs.write("src/x.txt", "hello")
+    with open("/tmp/src/x.txt", "r") as f:
+        assert f.read() == "hello"
+
+def test_write_disallowed_prefix():
+    fs = SandboxFS(repo_root="/tmp")
+    try:
+        fs.write("../../etc/passwd", "evil")
+    except PermissionError:
+        pass
+    else:
+        raise AssertionError("PermissionError not raised for disallowed write path")
+
+```

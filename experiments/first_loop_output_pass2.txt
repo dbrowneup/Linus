@@ -1,0 +1,62 @@
+```python
+from pathlib import Path
+import pytest
+
+class PermissionError(Exception):
+    pass
+
+class SandboxFS:
+    """
+    A class that wraps read and write operations with sandbox path-prefix validation.
+    """
+
+    def __init__(self, repo_root: str):
+        """
+        Initialize the SandboxFS instance with the repository root.
+
+        :param repo_root: The root directory of the repository.
+        """
+        self.repo_root = Path(repo_root).resolve()
+
+    def read(self, path: str) -> str:
+        """
+        Read the content of a file at the given path.
+
+        :param path: The path to the file relative to the repository root.
+        :return: The content of the file as a string.
+        :raises PermissionError: If the path is outside the allowed prefix.
+        """
+        resolved_path = self.repo_root / Path(path).resolve()
+        if not resolved_path.is_relative_to(self.repo_root):
+            raise PermissionError(f"Access denied to {path}")
+        return resolved_path.read_text()
+
+    def write(self, path: str, data: str) -> None:
+        """
+        Write the given data to a file at the specified path.
+
+        :param path: The path to the file relative to the repository root.
+        :param data: The data to write to the file.
+        :raises PermissionError: If the path is outside the allowed prefix.
+        """
+        resolved_path = self.repo_root / Path(path).resolve()
+        if not resolved_path.is_relative_to(self.repo_root):
+            raise PermissionError(f"Access denied to {path}")
+        resolved_path.parent.mkdir(parents=True, exist_ok=True)
+        resolved_path.write_text(data)
+
+def test_write_allowed_prefix():
+    fs = SandboxFS(repo_root="/tmp")
+    fs.write("src/x.txt", "hello")
+    assert Path("/tmp/src/x.txt").read_text() == "hello"
+
+def test_write_disallowed_prefix():
+    fs = SandboxFS(repo_root="/tmp")
+    with pytest.raises(PermissionError):
+        fs.write("../../etc/passwd", "evil")
+
+def test_read_round_trip():
+    fs = SandboxFS(repo_root="/tmp")
+    fs.write("src/x.txt", "hello")
+    assert fs.read("src/x.txt") == "hello"
+```
