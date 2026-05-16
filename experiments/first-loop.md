@@ -88,3 +88,35 @@ The Worker is NOT expected to run tests itself. The Maestro review pass runs `py
 - SAFETY.md — Tier 1 write allowlist, sandbox-enforcement contract.
 - `docs/protocols/maestro-worker-protocol.md` — the protocol this loop is exercising.
 - `docs/specs/2026-05-12-linus-implementation-plan.md` — Item 3.
+
+## Revision 1 feedback (Maestro, post pass-1)
+
+Pass 1 produced code that AST-parsed and ran 2/3 tests, but failed the Maestro review with the
+following defects. The Worker is being re-invoked with the spec verbatim plus this feedback section.
+
+1. **READ is not gated.** The spec said "Read is allowed anywhere under the repo root (Tier 0
+   default)" but the pass-1 implementation used `os.path.join(repo_root, path)` which silently
+   discards `repo_root` when `path` is absolute, so `read("/etc/passwd")` succeeded. Tighten:
+   `read` must reject absolute paths AND paths that resolve outside `repo_root` after `..`
+   normalization. Use `Path(repo_root).resolve()` plus `Path(repo_root, path).resolve()` and
+   check `is_relative_to`.
+
+2. **Write does not create parent directories.** The pass-1 `test_write_allowed_prefix` failed
+   with `FileNotFoundError: /tmp/src/x.txt` because `/tmp/src/` did not exist. `write` must
+   `mkdir(parents=True, exist_ok=True)` on the parent of the resolved path before opening.
+
+3. **Path-traversal bypass.** The pass-1 validator used `path.startswith("src/")` which lets
+   `src/../../etc/passwd` slip through. Use the resolve-and-check-prefix pattern instead of
+   string prefix matching. The check is "the resolved write target lives inside one of the
+   resolved allowlist dirs under `repo_root`."
+
+4. **Shadowed builtin.** Pass 1 declared its own `class PermissionError(Exception)` which
+   shadows Python's builtin. Use the builtin `PermissionError` directly.
+
+5. **Type hints can be sharper.** `read` returns `str` (not `Any`); `write` takes `data: str`.
+   Keep the API string-only for v0 — binary mode is a separate item.
+
+Re-emit a single Python file with these fixes. Keep the same three test names so the diff is
+auditable. The tests themselves must also be updated so that each test passes against the
+corrected implementation (i.e., `test_write_allowed_prefix` no longer needs to pre-create
+the parent dir).
