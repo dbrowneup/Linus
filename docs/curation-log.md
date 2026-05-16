@@ -200,3 +200,94 @@ that cross-references the 370 awesome arxiv IDs against Linus's 70 arxiv-style p
 20 high-priority gaps for follow-up Wave-3 ingestion. **No paper PDFs downloaded and no paper-notes authored in this
 sweep** — the gap-triage spec is the durable tracker; HIGH-priority candidates flow into a follow-up PR. Cluster cell:
 g11-agent-frameworks. **Source review:** Wave-2 fan-out, 2026-05-16.
+
+### 2026-05-16 — added: Wave 2 fold-in batch (6 paper-notes + 7 external repo-notes + 4 Dan-own repos noted)
+
+**Action:** added
+
+**Rationale:** Targeted fold-in pass for the Linus corpus covering (a) 2 uncovered papers in `context/papers/` whose
+PDFs had been added but not yet write-up'd; (b) 3 biomed/policy briefs in `context/notes/`; (c) Sutton's bitter_lesson
+as foundational substrate; (d) triage of 11 new repos cloned into `repos/` since the previous curation pass.
+
+**Detail:**
+
+**Sub-batch 1 — 2 uncovered paper-notes** (`docs/paper-notes/`):
+
+- `2512.24695v1.md` (Behrouz et al., _Nested Learning: The Illusion of Deep Learning Architecture_, Google Research +
+  Columbia, NeurIPS 2025) — Continuum Memory System + Hope architecture + Delta Gradient Descent + Multi-Scale
+  Momentum Muon. Folded into [`memory-synthesis.md`](../syntheses/memory-synthesis.md) as the 2025-era theoretical
+  scaffold for the multi-timescale-update story; added to the four-candidate substrate-experiment constellation
+  alongside Coconut, minGRU, and TTT.
+- `s41540-026-00683-6.md` (Gallup & Steel, _Generative design of synthetic gene circuits for functional and
+  evolutionary properties_, Oxford, npj Systems Biology and Applications 2026) — CVAE for whole-circuit topology
+  design with paired IntaRNA physics-based validator. Folded into
+  [`generative-biology-synthesis.md`](../syntheses/generative-biology-synthesis.md) as the circuit-design rung between
+  sequence-design and pathway-design.
+
+**Sub-batch 2 — 3 notes-derived paper-notes from `context/notes/`** (`docs/paper-notes/`):
+
+- `holko_wilbanks_howell_ai_ready_biodata.md` (War on the Rocks, March 2026) — AI-Ready Biodata is America's Next
+  Strategic Infrastructure. Strategic-policy commentary on biodata as the binding AI-bio constraint. Primary fold:
+  [`entrepreneurship-synthesis.md`](../syntheses/entrepreneurship-synthesis.md) biodata-sovereignty thread; secondary:
+  [`biological-foundation-models-synthesis.md`](../syntheses/biological-foundation-models-synthesis.md).
+- `love_reynolds_goldston_frye_biomanufacturing_us.md` (MIT Policy Brief, 2024) — biomanufacturing capacity as the
+  production-layer constraint companion to the biodata commentary. Primary fold:
+  [`entrepreneurship-synthesis.md`](../syntheses/entrepreneurship-synthesis.md) biomanufacturing-policy thread.
+- `marler_gerstein_biotechnology_warfighter.md` (RAND commentary, October 2022) — foundational dual-use threat-model
+  framing for biotechnology. Primary fold:
+  [`safety-alignment-privacy-synthesis.md`](../syntheses/safety-alignment-privacy-synthesis.md) democratization-as-
+  orthogonal-axis; secondary: [`entrepreneurship-synthesis.md`](../syntheses/entrepreneurship-synthesis.md).
+
+The three policy pieces together form the strategic substrate for the entrepreneurship synthesis's new
+biodata-sovereignty / biomanufacturing-policy thread (added 2026-05-16).
+
+**Sub-batch 3 — bitter_lesson** (`docs/paper-notes/sutton_bitter_lesson.md`): Sutton's 2019 essay as the foundational
+methodological substrate for the Algorithm (CLAUDE.md), Maestro/Worker discipline, parallel-by-default convention, and
+the broader "scale-with-compute beats encoded-human-knowledge" engineering discipline (DEC-0027 substrate). Folded
+into both [`agentic-systems-synthesis.md`](../syntheses/agentic-systems-synthesis.md) and
+[`infra-foundations-synthesis.md`](../syntheses/infra-foundations-synthesis.md).
+
+**Sub-batch 4 — 7 external repo-notes for new clones** (`docs/repo-notes/`):
+
+- `swarms.md` (kyegomez/swarms — Python multi-agent orchestration framework with 17 swarm types; Apache 2.0; Study as
+  design-vocabulary cross-reference for the Phase 3 multi-agent spawner per DEC-0050).
+- `AgentPrometheus.md` (chuan-gyld/AgentPrometheus — Python+Docker workspace runtime built on the "system executes,
+  AI consults" design rule; license unspecified — license investigation needed before any code lift; Study as
+  design-rule reference for Phase 2a/2b backend).
+- `vellum-assistant.md` (vellum-ai/vellum-assistant — TypeScript+Bun personal AI assistant with four-pillar
+  framing (memory/identity/proactivity/security); MIT; Study as design-vocabulary cross-reference for Phase 5+
+  interface refinement and the manifest-driven `SKILL.md` + `TOOLS.json` skill format).
+- `MoneyPrinterV2.md` (FujiwaraChoki/MoneyPrinterV2 — Python content-marketing-automation CLI; **AGPL-3.0** strongly
+  copyleft license blocks code incorporation into Linus; Watch with AGPL caveat — independent confirmation of
+  Ollama-direct over LiteLLM is the most useful Linus calibration data point).
+- `local-whisper.md` (t2o2/local-whisper — Swift+SPM Apple-Silicon-optimized speech-to-text menu-bar app; MIT;
+  **Adapt** recommendation — the canonical Apple-Silicon-native Linus reference app for Phase 5+ frontend work).
+- `algebrica.md` (antoniolupetti/algebrica — Markdown+LaTeX+SVG university mathematics knowledge base; CC BY-NC 4.0
+  non-commercial-only restricts content reuse but patterns portable; Study as content-organization pattern reference
+  for the Linus KB per DEC-0015 dual-graph and DEC-0048 model-prediction edges).
+- `prologue.md` (aegntic/prologue — TypeScript+Bun durable AI agent memory library with compression ladder +
+  visibility boundaries + FPEF v2.0 4-phase gate discipline; MIT; Study as memory-architecture pattern reference for
+  DEC-0028 memory pillar and DEC-0052 Layer D investigation memory).
+
+**Sub-batch 5 — 4 Dan-own repos (noted but no repo-note written per discipline).** The following four repos in
+`repos/` are Dan's own work clones (Agora hackathon adjacent + AI-firm exploration), not external reference material;
+they appear in `repos/` for development convenience and are tracked separately via `experiments/` artifacts:
+
+- `repos/archimedes/` — Dan's Agora hackathon Archimedes project (per `experiments/archimedes/`).
+- `repos/hackathon/` — Dan's Agora hackathon working repo (per `experiments/agora-hackathon/`).
+- `repos/ai-firm/` — `chuan-gyld/ai-firm`, an AI-company-of-agents exploration that Dan cloned for reference; minimal
+  active engagement, kept for potential Phase 3 multi-agent precedent reference.
+- `repos/openclaw-workflow/` — Dan's openclaw-adjacent workflow exploration (per the openclaw repo-note thread).
+
+Repo-notes for these four are intentionally **not** written: archimedes/hackathon/openclaw-workflow are Dan's own
+work-in-progress and don't fit the external-reference repo-note shape; ai-firm is third-party but kept as a low-stakes
+reference rather than a fully audited integration candidate. If `ai-firm` becomes a more substantive Phase 3+
+reference, a full repo-note can be authored at that time.
+
+**Sub-batch 6 — INDEX backfill.** [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md) backfilled with all 6 new
+paper-notes (alphabetical insertion). [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md) backfilled with all 7 new
+external repo-notes (alphabetical insertion). Dan-own repos are not in the repo-notes INDEX since they have no
+repo-note.
+
+**Source review:** Wave 2 fold-in spec / dispatch, 2026-05-16 (this session). PR opened from
+`agent/wave2-foldin-corpus`; commits atomic per concern (one per new note batch + final INDEX + curation-log commit).
