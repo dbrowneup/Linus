@@ -13,8 +13,8 @@ For Linus the value is not in any single paper but in **using this list as an in
 refreshed surface where the 2026-vintage agent literature already filtered for relevance to the agent ecosystem can be
 mined for gaps in Linus's existing corpus. The companion gap-triage spec
 ([`docs/specs/2026-05-16-awesome-papers-gap-triage.md`](../specs/2026-05-16-awesome-papers-gap-triage.md)) is the
-operational artifact — it cross-references the 370 awesome arxiv IDs against Linus's 71 arxiv-style paper-notes (out of
-125 total), confirms zero overlap (the awesome list is entirely 2026-Q1/Q2 arxiv, Linus's existing arxiv notes are
+operational artifact — it cross-references the 370 awesome arxiv IDs against Linus's 70 arxiv-style paper-notes (out of
+118 total), confirms zero overlap (the awesome list is entirely 2026-Q1/Q2 arxiv, Linus's existing arxiv notes are
 mostly 2023–2025), and ranks the top ~20 high-priority gaps for follow-up ingestion.
 
 This note positions awesome-ai-agent-papers **similarly to but slightly differently from** `repos/awesome-ml`, which is
