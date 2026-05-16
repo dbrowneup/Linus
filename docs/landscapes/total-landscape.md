@@ -333,8 +333,13 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
   hardware-friendly recurrent + 1-bit cross-product. **OPEN.**
 - **An MLX Cayley parametrization layer.** JPmHC validated on 7M TRM at 8× B200; no MLX implementation yet. Phase 6
   architecture decision; not phase-blocking. **OPEN.**
-- **An ANE serving binary that is both production-quality and officially supported.** pmetal uses private APIs. No
-  public-API ANE serving path currently performs comparably. **OPEN.**
+- **A Phase 1b performance verdict on pmetal vs Ollama for ANE serving on M1 Max.** pmetal is the production-quality
+  public-API ANE serving path Linus is leaning toward adopting — it uses supported Apple APIs (CoreML, MLX, Metal) per
+  DEC-0027, not private/reverse-engineered ones. The reverse-engineering work lives in [`repos/ANE`](../repo-notes/ANE.md)
+  (Maderix), which is methodology reference only, not vendored or imitated. What remains open is the empirical
+  question: does pmetal beat Ollama on Linus's M1 Max hardware, and by enough to make adoption the right call?
+  Phase 1b evaluation per DEC-0006 and DEC-0049 will produce the throughput numbers. The licensing/maintainability
+  story is genuinely good; only the performance story is unmeasured. **OPEN (Phase 1b evaluation pending).**
 
 **New 2026-05-04, status updates 2026-05-10:**
 

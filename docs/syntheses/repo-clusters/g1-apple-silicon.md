@@ -88,10 +88,12 @@ clean answer: PrismML's `llama-server` from their llama.cpp fork, which ships wi
 the Metal backend. This is a zero-new-code path to a local 1-bit endpoint during Phase 1c benchmark sweeps.
 
 **The ANE is a first-class capability Linus should treat as real, not deferred.** The ANE repo demonstrates training on
-an M4's Neural Engine via reverse-engineered private APIs; pmetal hardens those same patterns into a maintained
-codebase. The implication for Phase 1b is that "ANE prefill + GPU decode" should be a named benchmark configuration
-alongside plain Ollama versus pmetal-GPU, not a deferred Phase 7+ curiosity. The software capability exists; the
-question is throughput numbers on M1 Max specifically.
+an M4's Neural Engine via reverse-engineered private APIs — methodology reference only, not vendored. pmetal independently
+provides a maintained, supported-public-API path to the same hardware (CoreML/MLX/Metal per DEC-0027), which is why
+Linus is strongly leaning toward adopting it. The two repos converge on "use the ANE seriously" while staying on opposite
+sides of the public/private API line; Linus's own code follows pmetal's posture. The implication for Phase 1b is that
+"ANE prefill + GPU decode" should be a named benchmark configuration alongside plain Ollama versus pmetal-GPU, not a
+deferred Phase 7+ curiosity. The software capability exists; the question is throughput numbers on M1 Max specifically.
 
 **The cluster has a notable gap: no production-quality combined path for 1-bit plus flash streaming.** BitNet and Bonsai
 cover in-RAM 1-bit inference. mlx-flash covers >RAM dense streaming at native precision. No repo combines them. A
