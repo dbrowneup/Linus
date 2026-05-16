@@ -5,9 +5,11 @@ endpoint that routes to a local Ollama instance (default: http://localhost:11434
 
 This is the v0 scaffold called out as Item 1 in
 ``docs/specs/2026-05-12-linus-implementation-plan.md`` and per DEC-0005
-(OpenAI-compatible protocol for Maestro/Worker + front-end/backend). It is
-deliberately tiny: no streaming, no tool registry, no router intelligence, no
-sandbox, no session store, no audit log. Those land in separate items.
+(OpenAI-compatible protocol for Maestro/Worker + front-end/backend). The Item 6
+slice (this revision) adds the tool-registry roundtrip: the server now accepts
+``tools=[...]`` in the request body and resolves any ``tool_calls`` the model
+emits against :data:`linus.tools.default_registry`, looping until the model
+returns plain assistant content (or hits ``LINUS_MAX_TOOL_ITERATIONS``).
 
 Design notes
 ------------
@@ -24,10 +26,15 @@ Design notes
 - Ollama is reached via the ``ollama`` Python client (already pinned in
   ``environment.yml`` / ``pyproject.toml``). The client honors ``OLLAMA_HOST``
   for non-default hosts; we do not override it here.
+- Tool-call iteration is bounded by ``LINUS_MAX_TOOL_ITERATIONS`` (default 6).
+  Reaching the bound finishes the response with ``finish_reason="length"`` and
+  returns whatever the last assistant turn produced — better to surface the
+  tool-loop spin than hang the request.
 """
 
 from __future__ import annotations
 
+import json
 import os
 import time
 import uuid
@@ -36,6 +43,9 @@ from typing import Any
 import ollama
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+
+from linus.tools import ToolRegistry, default_registry
+from linus.tools.registry import ToolError
 
 # Preference order for v0. The first locally-available model wins when the
 # request's ``model`` field does not name an installed model. The list is
@@ -48,16 +58,64 @@ _MODEL_PREFERENCES: tuple[str, ...] = (
     "qwen2.5-coder:7b",
 )
 
+# Cap on the number of tool-call → tool-response cycles per request. A
+# well-behaved model needs 1–2 cycles; the safety bound exists to surface
+# pathological loops (model keeps re-calling the same tool with the same args)
+# rather than burn through compute silently.
+_MAX_TOOL_ITERATIONS = int(os.environ.get("LINUS_MAX_TOOL_ITERATIONS", "6"))
+
 
 # --- OpenAI-compatible request/response models ------------------------------
 
 
+class ToolCallFunction(BaseModel):
+    """The ``function`` field inside a single tool call."""
+
+    name: str
+    # OpenAI's wire format ships ``arguments`` as a JSON string; some Ollama
+    # builds emit a dict instead. Accept either — the registry's call_tool
+    # tolerates both shapes.
+    arguments: str | dict[str, Any] = ""
+
+
+class ToolCall(BaseModel):
+    """One model-emitted tool call in OpenAI shape."""
+
+    id: str = Field(default_factory=lambda: f"call_{uuid.uuid4().hex[:24]}")
+    type: str = "function"
+    function: ToolCallFunction
+
+
 class ChatMessage(BaseModel):
-    """One message in a chat completion request or response."""
+    """One message in a chat completion request or response.
+
+    ``content`` is optional because tool-call assistant turns and tool-result
+    turns may legitimately have empty content (the structured fields carry the
+    payload instead).
+    """
 
     role: str = Field(..., description="One of: 'system', 'user', 'assistant', 'tool'.")
-    content: str = Field(..., description="The message text.")
+    content: str | None = Field(default=None, description="The message text.")
     name: str | None = None
+    # Present on assistant messages that requested tools.
+    tool_calls: list[ToolCall] | None = None
+    # Present on role=tool messages; references the matching tool_call id.
+    tool_call_id: str | None = None
+
+
+class ToolFunctionSpec(BaseModel):
+    """OpenAI tool advertisement — the ``function`` half of a tool spec."""
+
+    name: str
+    description: str | None = None
+    parameters: dict[str, Any] | None = None
+
+
+class ToolDefinition(BaseModel):
+    """OpenAI tool advertisement — the outer envelope."""
+
+    type: str = "function"
+    function: ToolFunctionSpec
 
 
 class ChatCompletionRequest(BaseModel):
@@ -66,6 +124,11 @@ class ChatCompletionRequest(BaseModel):
     Unused-but-accepted fields (``temperature``, ``top_p``, ``max_tokens``,
     ``stream``) are forwarded as Ollama ``options`` when set. ``stream`` is
     accepted but ignored — streaming lands in a follow-up item.
+
+    The ``tools`` field is treated as an *additive* advertisement: any tools the
+    client lists are merged with the server-side :data:`linus.tools.default_registry`
+    (server-side names win on collision). This lets harnesses extend the menu
+    per-request without having to redeclare the KB tools every time.
     """
 
     model: str
@@ -74,6 +137,10 @@ class ChatCompletionRequest(BaseModel):
     top_p: float | None = None
     max_tokens: int | None = None
     stream: bool = False
+    tools: list[ToolDefinition] | None = None
+    # OpenAI permits ``"auto"`` / ``"none"`` / ``"required"`` / a forced-tool
+    # object here; v0 accepts and forwards the string forms verbatim.
+    tool_choice: str | dict[str, Any] | None = None
 
 
 class ChatCompletionChoice(BaseModel):
@@ -168,6 +235,122 @@ def _build_options(req: ChatCompletionRequest) -> dict[str, Any]:
     return options
 
 
+def _merge_tool_specs(
+    registry: ToolRegistry,
+    request_tools: list[ToolDefinition] | None,
+) -> list[dict[str, Any]]:
+    """Combine the server-side registry's tools with any request-supplied ones.
+
+    Server-side names take precedence on collision: the registry is the
+    audit-of-record for what Linus actually executes, and silently shadowing
+    a registered tool with a client-supplied advertisement of the same name
+    would defeat that. Client-only tools are forwarded as-is; the model gets
+    to see them, but if it tries to call them the registry will raise
+    :class:`KeyError` and the loop surfaces a tool-not-found error to the
+    model — which is the right way to fail.
+    """
+    specs: dict[str, dict[str, Any]] = {}
+    if request_tools:
+        for td in request_tools:
+            specs[td.function.name] = td.model_dump(exclude_none=True)
+    for spec in registry.openai_specs():
+        specs[spec["function"]["name"]] = spec
+    return [specs[name] for name in sorted(specs)]
+
+
+def _extract_tool_calls(message_obj: Any) -> list[ToolCall]:
+    """Pull ``tool_calls`` out of an Ollama response message in either shape.
+
+    Ollama's typed Message has ``tool_calls: list[Message.ToolCall]`` where each
+    item is ``{function: {name, arguments}}``. Older / dict-shape responses use
+    the same structure but as dicts. Either path produces a list of our pydantic
+    :class:`ToolCall` records (which auto-generate ``id`` when the upstream
+    didn't provide one — Ollama typically doesn't).
+    """
+    if message_obj is None:
+        return []
+
+    raw = (
+        message_obj.get("tool_calls")
+        if isinstance(message_obj, dict)
+        else getattr(message_obj, "tool_calls", None)
+    )
+    if not raw:
+        return []
+
+    out: list[ToolCall] = []
+    for entry in raw:
+        if isinstance(entry, dict):
+            fn = entry.get("function") or {}
+            name = fn.get("name") if isinstance(fn, dict) else getattr(fn, "name", None)
+            args = fn.get("arguments") if isinstance(fn, dict) else getattr(fn, "arguments", None)
+            call_id = entry.get("id")
+        else:
+            fn = getattr(entry, "function", None)
+            name = getattr(fn, "name", None) if fn is not None else None
+            args = getattr(fn, "arguments", None) if fn is not None else None
+            call_id = getattr(entry, "id", None)
+
+        if not name:
+            continue
+        tc = ToolCall(
+            id=call_id or f"call_{uuid.uuid4().hex[:24]}",
+            function=ToolCallFunction(name=name, arguments=args or ""),
+        )
+        out.append(tc)
+    return out
+
+
+def _format_tool_result(result: Any) -> str:
+    """Render a tool result as the string body of a ``role=tool`` message.
+
+    Tries JSON first since most tool outputs are plain dicts / lists; falls
+    back to ``str(result)`` for anything that doesn't serialize cleanly.
+    """
+    if result is None:
+        return "null"
+    if isinstance(result, str):
+        return result
+    try:
+        return json.dumps(result, default=str)
+    except (TypeError, ValueError):
+        return str(result)
+
+
+def _message_to_ollama(msg: ChatMessage) -> dict[str, Any]:
+    """Convert a :class:`ChatMessage` into the dict shape Ollama expects.
+
+    Filters out ``None`` values so optional fields don't confuse older client
+    versions, and renormalizes ``tool_calls`` to the ``{function: {name,
+    arguments}}`` dict form Ollama accepts.
+    """
+    out: dict[str, Any] = {"role": msg.role}
+    if msg.content is not None:
+        out["content"] = msg.content
+    elif msg.role in ("system", "user", "tool"):
+        # Ollama can be strict about empty content on non-assistant messages;
+        # always send something. Assistant tool-call turns may have empty
+        # content legitimately.
+        out["content"] = ""
+    if msg.name:
+        out["name"] = msg.name
+    if msg.tool_call_id:
+        out["tool_call_id"] = msg.tool_call_id
+    if msg.tool_calls:
+        out["tool_calls"] = [
+            {
+                "id": tc.id,
+                "type": tc.type,
+                "function": {
+                    "name": tc.function.name,
+                    "arguments": tc.function.arguments,
+                },
+            }
+            for tc in msg.tool_calls
+        ]
+    return out
+
+
 # --- app --------------------------------------------------------------------
 
 
@@ -177,13 +360,14 @@ app = FastAPI(
         "Phase 2a bootstrap. OpenAI-compatible /v1/chat/completions routing to "
         "a local Ollama instance. See docs/specs/2026-05-12-linus-implementation-plan.md."
     ),
-    version="0.0.1.dev0",
+    version="0.0.2.dev0",
 )
 
 
 @app.get("/healthz")
 def healthz() -> dict[str, Any]:
-    """Lightweight liveness probe. Reports the locally-available model list."""
+    """Lightweight liveness probe. Reports the locally-available model list and
+    the registered tool names so harnesses can introspect what's wired up."""
     try:
         models = _list_local_models()
         ollama_reachable = True
@@ -195,6 +379,7 @@ def healthz() -> dict[str, Any]:
         "ollama_reachable": ollama_reachable,
         "models": models,
         "default_model_preference": list(_MODEL_PREFERENCES),
+        "tools": default_registry.names(),
     }
 
 
@@ -202,12 +387,16 @@ def healthz() -> dict[str, Any]:
 def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
     """OpenAI-compatible chat-completions endpoint.
 
-    The v0 implementation:
+    The v0+Item6 implementation:
     - Resolves the requested model against locally-available Ollama models.
-    - Forwards the message list verbatim.
+    - Forwards the message list verbatim, with the merged tool advertisement
+      (server registry + any request-supplied tools).
+    - When the model returns ``tool_calls``, routes each through
+      :data:`linus.tools.default_registry` and appends a ``role=tool`` response
+      message per call. Loops until the model returns plain assistant content
+      or :data:`_MAX_TOOL_ITERATIONS` is hit.
     - Translates ``temperature``, ``top_p``, ``max_tokens`` into Ollama
       ``options``. Other sampling fields are not yet honored.
-    - Returns the response in OpenAI ChatCompletion shape.
 
     Streaming (``stream=true``) is accepted but ignored in v0 — the response
     is always materialized in full before returning.
@@ -217,33 +406,108 @@ def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
 
     resolved = _resolve_model(req.model)
     options = _build_options(req)
+    tool_specs = _merge_tool_specs(default_registry, req.tools)
 
-    try:
-        result = ollama.chat(
-            model=resolved,
-            messages=[m.model_dump(exclude_none=True) for m in req.messages],
-            stream=False,
-            options=options or None,
+    # Running transcript. Each model turn appends its assistant message; each
+    # tool execution appends one role=tool message.
+    transcript: list[ChatMessage] = list(req.messages)
+
+    final_message: ChatMessage | None = None
+    finish_reason: str | None = None
+    prompt_tokens_total = 0
+    completion_tokens_total = 0
+
+    for iteration in range(_MAX_TOOL_ITERATIONS + 1):
+        try:
+            # ``tools=None`` is intentional when nothing is registered — Ollama
+            # treats an empty list as "no tools" but some builds get confused
+            # by an empty array. Passing None drops the field entirely.
+            result = ollama.chat(
+                model=resolved,
+                messages=[_message_to_ollama(m) for m in transcript],
+                stream=False,
+                options=options or None,
+                tools=tool_specs or None,
+            )
+        except ollama.ResponseError as exc:
+            raise HTTPException(status_code=502, detail=f"Ollama returned an error: {exc!s}") from exc
+        except Exception as exc:  # pragma: no cover - network/daemon failure path
+            raise HTTPException(status_code=502, detail=f"Ollama call failed: {exc!r}") from exc
+
+        # Read the assistant message + token counts out of the ollama response
+        # in a version-tolerant way (dict vs typed object).
+        if isinstance(result, dict):
+            message_obj = result.get("message", {}) or {}
+            content = message_obj.get("content", "") if isinstance(message_obj, dict) else ""
+            prompt_tokens = int(result.get("prompt_eval_count", 0) or 0)
+            completion_tokens = int(result.get("eval_count", 0) or 0)
+            done_reason = result.get("done_reason") or ("stop" if result.get("done") else None)
+        else:
+            message_obj = getattr(result, "message", None)
+            content = getattr(message_obj, "content", "") if message_obj is not None else ""
+            prompt_tokens = int(getattr(result, "prompt_eval_count", 0) or 0)
+            completion_tokens = int(getattr(result, "eval_count", 0) or 0)
+            done_reason = getattr(result, "done_reason", None) or (
+                "stop" if getattr(result, "done", False) else None
+            )
+
+        prompt_tokens_total += prompt_tokens
+        completion_tokens_total += completion_tokens
+
+        tool_calls = _extract_tool_calls(message_obj)
+
+        assistant_msg = ChatMessage(
+            role="assistant",
+            content=content or "",
+            tool_calls=tool_calls or None,
         )
-    except ollama.ResponseError as exc:
-        raise HTTPException(status_code=502, detail=f"Ollama returned an error: {exc!s}") from exc
-    except Exception as exc:  # pragma: no cover - network/daemon failure path
-        raise HTTPException(status_code=502, detail=f"Ollama call failed: {exc!r}") from exc
 
-    # The ollama client returns a ChatResponse object (or, on older builds, a
-    # dict). Read the assistant message text out in a version-tolerant way.
-    if isinstance(result, dict):
-        message = result.get("message", {}) or {}
-        content = message.get("content", "") if isinstance(message, dict) else ""
-        prompt_tokens = int(result.get("prompt_eval_count", 0) or 0)
-        completion_tokens = int(result.get("eval_count", 0) or 0)
-        finish_reason = result.get("done_reason") or ("stop" if result.get("done") else None)
-    else:
-        message_obj = getattr(result, "message", None)
-        content = getattr(message_obj, "content", "") if message_obj is not None else ""
-        prompt_tokens = int(getattr(result, "prompt_eval_count", 0) or 0)
-        completion_tokens = int(getattr(result, "eval_count", 0) or 0)
-        finish_reason = getattr(result, "done_reason", None) or ("stop" if getattr(result, "done", False) else None)
+        if not tool_calls:
+            # Plain content — we're done.
+            final_message = assistant_msg
+            finish_reason = done_reason or "stop"
+            break
+
+        # Model requested tool(s). Record the assistant turn, execute each tool,
+        # and append role=tool messages with the results.
+        transcript.append(assistant_msg)
+
+        if iteration >= _MAX_TOOL_ITERATIONS:
+            # We did our last allowed model turn and still got tool_calls.
+            # Surface the assistant turn with the unfulfilled calls and stop.
+            final_message = assistant_msg
+            finish_reason = "length"
+            break
+
+        for tc in tool_calls:
+            try:
+                tool_result = default_registry.call_tool(tc.function.name, tc.function.arguments)
+                payload = _format_tool_result(tool_result)
+            except KeyError:
+                payload = json.dumps(
+                    {"error": f"Tool {tc.function.name!r} is not registered"}
+                )
+            except ToolError as exc:
+                payload = json.dumps({"error": str(exc)})
+            except Exception as exc:  # pragma: no cover - defensive
+                payload = json.dumps(
+                    {"error": f"Unexpected tool error: {type(exc).__name__}: {exc}"}
+                )
+
+            transcript.append(
+                ChatMessage(
+                    role="tool",
+                    name=tc.function.name,
+                    tool_call_id=tc.id,
+                    content=payload,
+                )
+            )
+
+    # Defensive: the loop above always assigns final_message before breaking,
+    # but mypy can't see that and a future refactor might.
+    if final_message is None:
+        final_message = ChatMessage(role="assistant", content="")
+        finish_reason = "stop"
 
     return ChatCompletionResponse(
         id=f"chatcmpl-{uuid.uuid4().hex}",
@@ -252,14 +516,17 @@ def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
         choices=[
             ChatCompletionChoice(
                 index=0,
-                message=ChatMessage(role="assistant", content=content or ""),
-                finish_reason=finish_reason,
+                message=final_message,
+                finish_reason=(
+                    "tool_calls" if final_message.tool_calls and finish_reason == "length"
+                    else finish_reason
+                ),
             )
         ],
         usage=ChatCompletionUsage(
-            prompt_tokens=prompt_tokens,
-            completion_tokens=completion_tokens,
-            total_tokens=prompt_tokens + completion_tokens,
+            prompt_tokens=prompt_tokens_total,
+            completion_tokens=completion_tokens_total,
+            total_tokens=prompt_tokens_total + completion_tokens_total,
         ),
     )
 
