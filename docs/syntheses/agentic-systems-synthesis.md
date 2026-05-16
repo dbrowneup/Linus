@@ -384,6 +384,24 @@ judge for open-answer grading; hybrid escalation pattern is deferred (S12). **Pe
 WikiAutoGen's critic-stronger-than-writer pattern survive when both are local (larger Qwen2.5 critiquing smaller
 Qwen2.5)? Each is hours of work and informs weeks of architecture.
 
+**First empirical Worker-throughput data point (2026-05-16, PR #33).** The Phase 1d Dan task suite v0 collected its
+first baseline against `qwen2.5-coder:7b` (qwen3:8b not yet pulled): three tasks completed in 55.75s wall — paper-
+summarization (10.5s, full-credit on the MemGPT paper), fasta-gc-content (19.2s, partial — script counts `N` in the
+denominator where the rubric says exclude), and title-clustering (26.0s, partial — only 36/50 input titles got assigned
+to a cluster, a ~28% drop). Three observations relevant to the agentic-systems thread: (1) a 7B local Worker handles
+short-context summarization at full quality, which is the easy regime; (2) the rubric-edge failure on FASTA (counting N)
+is exactly the kind of partial-credit failure a critic-tier review pass would catch — a smoke-test for the
+critic-stronger-than-writer pattern; (3) the 28% drop on title-clustering is a real coverage-vs-throughput signal — some
+inputs got silently dropped rather than misclassified, suggesting an output-completeness check is a useful validation
+gate for any classify-N-into-K task. Each becomes a real prior for spawner-stage validation-gate design.
+
+**First Phase 2a orchestration runtime (2026-05-16, PR #32).** `src/linus/server.py` now ships an OpenAI-compatible
+FastAPI bootstrap with an Ollama backend — the Worker-dispatch surface this synthesis has been writing against now
+exists in code. The Anthropic-compat surface per DEC-0056 is the immediate next deliverable; combined the two endpoint
+families share the same internal `LinusRequest`/`LinusResponse` pair and the same Worker dispatch beneath, so the Phase
+3 spawner work (DEC-0050 Role, DEC-0051 AgentReport, DEC-0052 investigation memory) builds on a runtime that is no
+longer hypothetical.
+
 ---
 
 ## Tensions and open questions

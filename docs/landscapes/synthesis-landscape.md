@@ -32,7 +32,11 @@ member of the g9-bio cluster — depth-vs-breadth complement to bioSkills and th
 7 inaugural bio-skills bundle in working form. Refreshed 2026-05-10 (Tier 10 audit, PR 30) to fold 4 paper-notes
 (Trading-R1, Geometry-Preserving NA, Lipman Flow Matching, Letta/MemGPT) and 8 repo-notes (Letta, rig, autogen,
 langgraph, x402, goose, debate-or-vote, MiroFish-Offline) into the relevant cluster rows; correct the maestro-protocol
-path mismatch in §"What's missing".)
+path mismatch in §"What's missing". Refreshed 2026-05-16 (Wave 2 landings) — memory-synthesis Layer C v0 substrate
+(SQLite + content-hashing + audit log) now implemented per DEC-0029 via PR #35; agentic-systems-synthesis sees the first
+Worker-throughput evidence point from the Phase 1d Dan task suite v0 baseline (PR #33); the DEC-0005 single-protocol
+commitment is amended by DEC-0056 (Anthropic-compat HTTP) and the AGPL/x402-mcp gaps are closed by DEC-0057/0058 via PR
+#36. ADR ceiling moves to DEC-0058.)
 
 ---
 
@@ -45,7 +49,7 @@ path mismatch in §"What's missing".)
 | [`security`](../syntheses/security-synthesis.md)                                            | Supply chain + dependency surface + endpoint security + prompt-injection threat model. Triggered by litellm.                                                                                                                                                                                                                                                                                                                                                    |
 | [`llm-wiki`](../syntheses/llm-wiki-synthesis.md)                                            | LLM Wiki pattern: compile-not-retrieve, schema-as-product, claim typing, content hashing, write-back, hot cache.                                                                                                                                                                                                                                                                                                                                                |
 | [`skills-and-practices`](../syntheses/skills-and-practices-synthesis.md)                    | Practitioner collaboration patterns + Claude skills filtered for Dan's profile. Primary cluster anchor remapped to g11 (agent frameworks) 2026-05-05. (Entrepreneurship content extracted to its own synthesis 2026-05-05.)                                                                                                                                                                                                                                     |
-| [`memory`](../syntheses/memory-synthesis.md)                                                | Garrison thread + Mughal practitioner article: memory as Phase 2 first-class pillar, five-layer architecture (A–E) per DEC-0028–DEC-0043 + DEC-0052.                                                                                                                                                                                                                                                                                                            |
+| [`memory`](../syntheses/memory-synthesis.md)                                                | Garrison thread + Mughal practitioner article: memory as Phase 2 first-class pillar, five-layer architecture (A–E) per DEC-0028–DEC-0043 + DEC-0052. Layer C v0 substrate (SQLite + SHA-256 content-hashing + JSONL audit log; DispatchEvent validates router primitives at construction per DEC-0031) landed 2026-05-16 via PR #35; 35 unit tests pass.                                                                                                        |
 | [`humans-teams-performance`](../syntheses/humans-teams-performance-synthesis.md)            | Güllich on multidisciplinary expertise + Harvey on team rhythm; Maestro/Worker analogy at three timescales. VISION.md design practice adopted (S39, 2026-05-06).                                                                                                                                                                                                                                                                                                |
 | [`infra-foundations`](../syntheses/infra-foundations-synthesis.md)                          | Foundational references (attention paper, flow matching, PAN, Google AI energy, WHAM) + benchmarks (LAB-Bench, BixBench moved here 2026-05-05) + KG/network tooling (g5 anchor) — methodology + watch-the-field.                                                                                                                                                                                                                                                |
 | [`native-low-bit-apple-silicon`](../syntheses/native-low-bit-apple-silicon-synthesis.md)    | BitNet + Bonsai + bitnet.cpp + flash-streaming on Apple Silicon — research → engineering → productization arc.                                                                                                                                                                                                                                                                                                                                                  |
@@ -389,7 +393,8 @@ The Phase 2 KB schema must encode, before the first Worker writes back:
 ## What's missing
 
 The 2026-05-04 / 2026-05-05 / 2026-05-06 sweeps closed most of the gaps the prior version of this section listed. After
-PR #22 + the 2026-05-10 PR 30 audit, the only remaining open writing item is:
+PR #22 + the 2026-05-10 PR 30 audit + the 2026-05-16 Wave 2 implementation landings, the only remaining open writing
+item is:
 
 - **`docs/EPISTEMIC-STANDARDS.md`** defining claim categories Linus distinguishes (Marelli operationalized; generalizes
   the LLM-wiki KB categories — S22). Phase 2a deliverable; needs KB schema (DEC-0048) and claim types (DEC-0023) live
@@ -408,6 +413,23 @@ Closed during the resolution arc:
   implementation spec is a Phase 3 Maestro task per Dan's direction.
 - **Phase 7 biology sub-roadmap**: closed 2026-05-07 as `docs/specs/biology-phase7-roadmap.md` (Task F.3 in the
   planning-update spec).
+- **Phase 2a orchestration HTTP backend bootstrap**: closed 2026-05-16 via PR #32 — `src/linus/server.py` ships an
+  OpenAI-compatible `/v1/chat/completions` endpoint backed by Ollama. The Anthropic-compat surface per DEC-0056 (PR #36)
+  is the immediate follow-on.
+- **Phase 2c KnowledgeBase read-only adapter**: closed 2026-05-16 via PR #34 — `src/linus/knowledge/adapter.py` opens
+  the upstream metadata.db via `file:?mode=ro`; first DEC-0044 paper-qa integration is the next step.
+- **Phase 2h memory v0 substrate**: closed 2026-05-16 via PR #35 — SQLite episodic store + audit log + content-hashing
+  for the Layer C substrate per DEC-0029; Worker-dispatch integration is the next open item.
+- **Phase 1d Dan task suite v0**: closed 2026-05-16 via PR #33 — first baseline run against `qwen2.5-coder:7b`
+  collected; three-task suite operational; qwen3:8b rerun pending.
+- **Anthropic-compat HTTP ADR (DEC-0056)**: closed 2026-05-16 via PR #36 — amends DEC-0005 to commit Phase 2a
+  orchestration HTTP to dual OpenAI- and Anthropic-compatible surfaces.
+- **AGPL-fork posture ADR (DEC-0057)**: closed 2026-05-16 via PR #36 — clean-room study, no code lifts without
+  project-level license commitment. Resolves the MiroFish-Offline-driven open gap and R2-34.
+- **x402-mcp graduation pathway ADR (DEC-0058)**: closed 2026-05-16 via PR #36 — Watch → Spike → Integrate progression
+  with concrete triggers; Watch today.
+- **DEC-0055 filename discipline ADR**: closed 2026-05-16 via PR #31 — codifies the ASCII-safe `context/` filename
+  convention applied during the bulk rename of 23 files; 16 markdown files updated to reference the new paths.
 
 ---
 

@@ -42,7 +42,12 @@ was harvested from the agent reports and lives in [`top-questions.md`](../questi
 2026-05-09 to add the 15th thematic synthesis `llm-hardware-design` and the 12th cluster `g12-llm-hardware-design`
 (QiMeng family + Sketch2Simulation cross-thread reference). Refreshed 2026-05-10 after PR 30 fold-ins: 4 paper-notes
 (Trading-R1, Geometry-Preserving NA, Lipman Flow Matching, Letta/MemGPT) and 8 repo-notes (Letta, rig, autogen,
-langgraph, x402, goose, debate-or-vote, MiroFish-Offline) added; counts brought to 118/117/27 (15+12)._
+langgraph, x402, goose, debate-or-vote, MiroFish-Offline) added; counts brought to 118/117/27 (15+12). Refreshed
+2026-05-16 after Wave 2 implementation landings: Phase 2a FastAPI orchestration backend bootstrap (PR #32), Phase 1d Dan
+task suite v0 with first qwen2.5-coder:7b baseline (PR #33), Phase 2c KnowledgeBase read-only adapter v0 (PR #34), and
+Phase 2h memory v0 (SQLite episodic store + audit log + content-hashing) (PR #35) all land; three new R4 ADRs (DEC-0056
+amending DEC-0005 to add Anthropic-compat HTTP, DEC-0057 AGPL-fork posture, DEC-0058 x402-mcp graduation pathway) via PR
+#36, plus DEC-0055 filename discipline via PR #31. ADR index now extends through DEC-0058._
 
 ---
 
@@ -233,14 +238,19 @@ The product, in `src/linus/`. OpenAI-compatible endpoint, session store, audit l
 sandbox. Speaks to inference backends below it (pmetal-serve / Ollama / bitnet.cpp / mlx-flash) and to harnesses above
 it (cline / claw-code-local / openclaw / Claude Code / claude-squad).
 
-**Updated Phase 2 scope (2026-05-04, with 2026-05-10 fold-ins):**
+**Updated Phase 2 scope (2026-05-04, with 2026-05-10 and 2026-05-16 fold-ins):**
 
 - **MCP framework** — fastmcp adopted as default; Phase 2a tool registry built MCP-shape from the start (CLAUDE.md
   update + S3 + DEC-0026 status).
+- **OpenAI-compat HTTP endpoint** — Phase 2a bootstrap landed 2026-05-16 via PR #32 (`src/linus/server.py` + Ollama
+  backend + smoke test; `linus-serve` console script). The Anthropic-compat surface per DEC-0056 (PR #36) is the
+  immediate Phase 2a follow-on.
 - **Session store and audit log** — workgraph-style JSONL DAG + dispatch as recommended shape (CLAUDE.md update + g7
-  synthesis).
+  synthesis); audit-log scaffolding (JSONL append, lazy `iter_events`) landed 2026-05-16 via PR #35.
 - **Memory primitives** — `cot_budget` and `memory_mode` as router primitives; episodic substrate API
-  (`linus.memory.episodic.*`); scratchpad as first-class durable artifact (DEC-0030/0031/0032).
+  (`linus.memory.episodic.*`); scratchpad as first-class durable artifact (DEC-0030/0031/0032). v0 scaffolding landed
+  2026-05-16 via PR #35: SQLite episodic store + JSONL audit log + SHA-256 content-hashing + `DispatchEvent` validation
+  at construction.
 - **Tool registry** — `external_api_tool` class for non-locally-deployable tools (S4, ADR pending).
 - **Activation observability** — API stub in Phase 1, feasibility spike in Phase 2 against mlx-lm/Llama-3.1-8B-4bit
   (S17).
@@ -257,9 +267,13 @@ Worker models and the kernels that run them. pmetal is the top candidate by brea
 mlx-flash is the >RAM dense path; Bonsai's `llama-server` is an interim 1-bit serving path. The autoresearch loop drives
 optimization of this layer.
 
-**Updated Phase 1c shape (2026-05-04, with 2026-05-09 fold-ins):**
+**Updated Phase 1c shape (2026-05-04, with 2026-05-09 and 2026-05-16 fold-ins):**
 
 - Phase 1b pmetal verdict still gates inference-backend lock-in.
+- **Phase 1d baseline collected 2026-05-16 (PR #33):** first run of the Dan task suite v0 against `qwen2.5-coder:7b`
+  (qwen3:8b not yet pulled) — paper-summarization full-credit, fasta-gc-content partial (counts N in denominator),
+  title-clustering partial (36/50 titles assigned, ~28% drop). Sets the first empirical anchor for the four-way
+  methodology and surfaces a real coverage-vs-throughput signal on the title-clustering task class.
 - Phase 1c unified four-way methodology (Bonsai 8B 1-bit + ternary + BitNet 2B4T + FP16 baseline) under one harness
   (S7).
 - pmetal Rust kernels vs. MLX-native PrismML fork ADR before the inference layer hardens (S8).
@@ -278,8 +292,11 @@ embeddings + Curse-of-Dimensionality form the theoretical substrate. The llm-wik
 art (wikiloom's chunk-id formula, atomic-knowledge's get_context walker, llm-research-wiki's typed page schema,
 obsidian-llm-wiki-local's 3-tier JSON fallback for Ollama Workers).
 
-**Updated Phase 2 scope (2026-05-04):**
+**Updated Phase 2 scope (2026-05-04, with 2026-05-16 landing):**
 
+- **Linus → KB read path** — Phase 2c read-only adapter landed 2026-05-16 via PR #34 (`src/linus/knowledge/adapter.py`
+  opens `modules/KnowledgeBase/data/metadata.db` via `file:?mode=ro`; AND-of-LIKE keyword search; SHA-256-keyed
+  `get_paper`; 20 tests including 3 against the real submodule DB).
 - **paper-qa** as candidate substrate for the paper-corpus side of KB (S1).
 - **`model_prediction` edge class** with producing-model + version + confidence + content-hash provenance before Group A
   Wave 1 skills start writing back (S6).
@@ -325,8 +342,12 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
 
 **Open from prior list:**
 
-- **A Linus episodic-memory implementation.** v0 substrate (SQLite + content-hashes + git) is specified (DEC-0029) but
-  not yet implemented. Phase 2 deliverable. **OPEN.**
+- **A Linus episodic-memory implementation.** v0 substrate (SQLite + content-hashes + git) specified (DEC-0029) and
+  **scaffolding landed 2026-05-16 via PR #35** — `src/linus/memory/` ships the SQLite episodic store, JSONL audit log,
+  SHA-256 content-hashing (Keccak deferred), and `DispatchEvent` that validates router primitives (`memory_mode` ∈
+  {stateless, session_stateful, project_stateful}; `cot_budget` ∈ {logarithmic, linear, polynomial}) at construction per
+  DEC-0031. 35 unit tests pass. **CLOSED (v0 scaffolding); Phase 2h.3+ integration with Worker dispatch is the next open
+  item.**
 - **Orchestration-surface context-management primitives.** `/context`, `/clear`, `/compact`, `/rewind` analogues
   - PreCompact-hook-style "capture critical state before lossy compression" pattern. Phase 2 deliverable. **OPEN.**
 - **A unified BitNet × MoE × Streaming codebase.** Phase 8 research direction; minGRU + BitLinear gates as the
@@ -335,11 +356,12 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
   architecture decision; not phase-blocking. **OPEN.**
 - **A Phase 1b performance verdict on pmetal vs Ollama for ANE serving on M1 Max.** pmetal is the production-quality
   public-API ANE serving path Linus is leaning toward adopting — it uses supported Apple APIs (CoreML, MLX, Metal) per
-  DEC-0027, not private/reverse-engineered ones. The reverse-engineering work lives in [`repos/ANE`](../repo-notes/ANE.md)
-  (Maderix), which is methodology reference only, not vendored or imitated. What remains open is the empirical
-  question: does pmetal beat Ollama on Linus's M1 Max hardware, and by enough to make adoption the right call?
-  Phase 1b evaluation per DEC-0006 and DEC-0049 will produce the throughput numbers. The licensing/maintainability
-  story is genuinely good; only the performance story is unmeasured. **OPEN (Phase 1b evaluation pending).**
+  DEC-0027, not private/reverse-engineered ones. The reverse-engineering work lives in
+  [`repos/ANE`](../repo-notes/ANE.md) (Maderix), which is methodology reference only, not vendored or imitated. What
+  remains open is the empirical question: does pmetal beat Ollama on Linus's M1 Max hardware, and by enough to make
+  adoption the right call? Phase 1b evaluation per DEC-0006 and DEC-0049 will produce the throughput numbers. The
+  licensing/maintainability story is genuinely good; only the performance story is unmeasured. **OPEN (Phase 1b
+  evaluation pending).**
 
 **New 2026-05-04, status updates 2026-05-10:**
 
@@ -357,20 +379,46 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
 
 **New 2026-05-10 (PR 30 fold-in implications):**
 
-- **An Anthropic-compatible HTTP surface ADR.** Three independent signals now point at this: Letta ships both OpenAI-
-  and Anthropic-compatible endpoints; Kimi-K2 deploys with both; the broader open-source agent ecosystem is converging
-  on dual endpoints. DEC-0005 commits Linus to OpenAI-compat-only at v0; a Phase 5+ ADR ("Anthropic- compatible HTTP as
-  a Linus capability") becomes warranted if a fourth confirming signal lands. **OPEN.**
-- **A `@x402/mcp` graduation ADR (Phase 7+ / Phase 8).** x402's `@x402/mcp` shipped (TypeScript + Python + Go); the
-  Canteen-blog mention upgraded from "roadmap-only" to live. Watch-only today; an ADR becomes warranted when a Linus
-  commercial-surface decision forces the question (per `repo-notes/x402.md` §6). **OPEN.**
-- **An AGPL-fork posture entry in DECISIONS.md.** MiroFish-Offline's Watch verdict is gated explicitly on AGPL-3.0
-  contamination analysis. R2-34 (g5 AGPL re-implementation policy) is the existing tracker; PR 30's MiroFish add raises
-  the urgency from "convention worth codifying eventually" to "before any Phase 3 KB-tooling lift starts." **OPEN.**
+- **An Anthropic-compatible HTTP surface ADR.** Three independent signals pointed at this: Letta ships both OpenAI- and
+  Anthropic-compatible endpoints; Kimi-K2 deploys with both; Goose ships full ACP. **CLOSED 2026-05-16 via PR #36**
+  (DEC-0056): Phase 2a orchestration HTTP layer exposes both an OpenAI-compatible surface (`/v1/chat/completions` +
+  Responses) and an Anthropic-compatible surface (`/v1/messages` + `/v1/anthropic/...`), sharing routing/dispatch/audit
+  underneath. Amends DEC-0005. The Phase 2a FastAPI bootstrap (PR #32) lands the OpenAI side; the Anthropic side is the
+  next Phase 2a deliverable.
+- **A `@x402/mcp` graduation ADR (Phase 7+ / Phase 8).** **CLOSED 2026-05-16 via PR #36** (DEC-0058): Watch → Spike →
+  Integrate pathway with concrete triggers documented; x402-mcp remains Watch today, graduates to Spike when a Linus
+  commercial-surface decision forces the question.
+- **An AGPL-fork posture entry in DECISIONS.md.** **CLOSED 2026-05-16 via PR #36** (DEC-0057): clean-room study, no code
+  lifts without project-level license commitment. MiroFish-Offline and the R2-34 g5 AGPL re-implementation policy
+  question both fall under this canonical posture.
 - **An autogen-as-cautionary-tale documentation point.** AutoGen is in maintenance mode (Microsoft Agent Framework is
   the live successor). PR 30's AutoGen fold-in plus the Kimi-K2 / Letta / Goose fold-ins together raise the
   reference-stack-staleness concern: any reference repo can shift to maintenance mode without notice. CLAUDE.md's
   "Reference-stack maintenance signals" engineering convention (added 2026-05-10) is the codification.
+
+**New 2026-05-16 (Wave 2 implementation landings + Wave 2 stragglers):**
+
+- **Phase 2a FastAPI orchestration backend.** **CLOSED 2026-05-16 via PR #32** — `src/linus/server.py` ships an
+  OpenAI-compatible `/v1/chat/completions` endpoint backed by Ollama, with a `linus-serve` console script entry point in
+  `pyproject.toml` and a smoke test in `src/linus/tests/`. The Anthropic-compat surface (DEC-0056) is the immediate
+  follow-on.
+- **Phase 1d Dan task suite v0.** **CLOSED 2026-05-16 via PR #33** — three-task baseline in `benchmarks/dan_tasks/` with
+  first run against `qwen2.5-coder:7b` (qwen3:8b not yet pulled). Concrete results: `paper-summarization` full-credit on
+  MemGPT (10.5s); `fasta-gc-content` partial (19.2s, includes `N` in denominator — rubric says exclude);
+  `title-clustering` partial (26.0s, only 36/50 titles assigned, ~28% drop). All three completed in 55.75s wall. Phase
+  1c Worker-selection methodology now has its first empirical anchor.
+- **Phase 2c KnowledgeBase read-only adapter.** **CLOSED 2026-05-16 via PR #34** — `src/linus/knowledge/adapter.py`
+  opens `modules/KnowledgeBase/data/metadata.db` via `file:?mode=ro`, with keyword search and SHA-256-keyed lookup; 17
+  unit tests + 3 integration tests against the real submodule DB (skip cleanly when absent). First DEC-0044 paper-qa
+  integration is the next step.
+- **Phase 2h memory v0.** **CLOSED 2026-05-16 via PR #35** — SQLite episodic store + JSONL audit log + content-hashing
+  in `src/linus/memory/`; SHA-256 algorithm (Keccak deferred per `_resolve_algorithm`); `DispatchEvent` validates
+  `memory_mode` and `cot_budget` at construction per DEC-0031, also recording cap-override audit-noise per DEC-0032. 35
+  unit tests pass. The Layer C substrate per DEC-0029 is implemented; Worker-dispatch integration is the next step.
+- **Wave 2 stragglers (W1 agent in flight).** A separate W1 agent is consolidating the caveman + symphony + swarm repos,
+  the SWARM paper (arxiv 2604.19752), and the newly added `earendil-works/pi` repo (agent harness, added 2026-05-16).
+  When those land they fold into safety-alignment-privacy (caveman safety patterns) and skills-and-practices (symphony +
+  swarm + pi harness primitives) syntheses; this landscape will refresh again.
 
 ---
 
@@ -410,7 +458,9 @@ Specs and ADRs live alongside:
   covering Tier 1–7 fold-ins plus this Tier 10 audit.
 - [`docs/session-summaries/2026-05-04-fan-out-session-summary.md`](../session-summaries/2026-05-04-fan-out-session-summary.md)
   — read-out from the Section 7 fan-out.
-- `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0054 as of 2026-05-06; no new ADRs in PR 30).
+- `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0058 as of 2026-05-16; DEC-0055 codifies filename
+  discipline via PR #31; DEC-0056/0057/0058 land Wave 2 R4 ADRs via PR #36 — Anthropic-compat HTTP amending DEC-0005,
+  AGPL-fork posture, x402-mcp graduation pathway).
 
 The intended workflow is: walk `top-questions.md` Tier 1 in conversation, with `total-landscape.md` open as the map,
 `synthesis-landscape.md` open for cross-synthesis context, and the relevant per-synthesis or per-note file open for
