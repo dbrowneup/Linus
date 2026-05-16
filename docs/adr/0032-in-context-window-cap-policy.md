@@ -8,7 +8,7 @@ simulation of memory inside attention — what Garrison's framework critiques as
 the unusual freedom (relative to a hosted single-model assistant) to actually have a separate episodic store, and the
 only way that freedom delivers value is if the orchestration layer prefers the store over the long context as a matter
 of policy rather than as an after-the-fact optimization. Mughal's
-[_Why Claude Gets Dumber_](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+[_Why Claude Gets Dumber_](../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt)
 sharpens this with operational evidence: lost-in-the-middle attention degradation makes attention degrade _inside_ the
 window even when the window is large, so the cap is justified by both the formal-complexity argument and the
 operational-degradation argument.

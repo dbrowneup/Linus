@@ -73,11 +73,11 @@ ROADMAP.md resolve correctly in repo structure.
 ### OK citations (sample, not exhaustive)
 
 - **Section 1, Overview:** All five source threads named correctly:
-  - "17 Best Practices For Claude Cowork.txt" ✓
-  - "Stop Staring at the Files.txt" ✓
-  - "17 Claude Skills → $312:Day → $10K:Month.txt" ✓
+  - "17-Best-Practices-For-Claude-Cowork.txt" ✓
+  - "Stop-Staring-at-the-Files.txt" ✓
+  - "17-Claude-Skills-to-312-Day-to-10K-Month.txt" ✓
   - "Top 50 Claude Skills & GitHub Repos for AI.txt" ✓
-  - "Cline description.txt" ✓
+  - "Cline-description.txt" ✓
 
 - **Section 2, Practice 2:** "This is exactly the behavior CLAUDE.md is modeling..." — direct reference to internal
   project doc ✓

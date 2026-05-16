@@ -4,7 +4,7 @@ source: Physical Review E 112, 045304 (2025); doi 10.1103/v291-9hxy
 authors: Yoshiaki Horiike, Shin Fujishiro
 affiliation: Nagoya University; University of Copenhagen; Kyoto University
 date: 2025-10
-pdf: ../../context/papers/Horiike-Orthogonal projections of hypercubes-2025-Physical Review E copy.pdf
+pdf: ../../context/papers/Horiike-Orthogonal-projections-of-hypercubes-2025-Physical-Review-E.pdf
 tags: [hypercubes, pca, visualization, ising-model, energy-landscapes, gene-regulation, biology, geometry]
 ---
 

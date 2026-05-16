@@ -411,7 +411,7 @@ _See [`../paper-notes/2401.00422v3.md`](../paper-notes/2401.00422v3.md) for curr
 
 ## Horiike Hypercube Projections
 
-_See [`../paper-notes/Horiike-Orthogonal projections of hypercubes-2025-Physical Review E copy.md`](<../paper-notes/Horiike-Orthogonal projections of hypercubes-2025-Physical Review E copy.md>) for current open questions; resolved items moved to [answered-questions.md](answered-questions.md)._
+_See [`../paper-notes/Horiike-Orthogonal-projections-of-hypercubes-2025-Physical-Review-E.md`](<../paper-notes/Horiike-Orthogonal-projections-of-hypercubes-2025-Physical-Review-E.md>) for current open questions; resolved items moved to [answered-questions.md](answered-questions.md)._
 
 1. **Why is this paper in your `context/papers/` folder?** Is it for the geometry methodology (visualization tool), the
    biology applications (Ising-as-Boltzmann ↔ gene regulation), or because of the surface-level "hypercube" word overlap

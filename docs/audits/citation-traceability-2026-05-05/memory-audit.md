@@ -55,8 +55,8 @@ These are citations to sources outside the paper-notes / repo-notes ecosystem bu
    - Status: This is the primary nucleus of the synthesis; citation is correct.
 
 2. **Lines 640–643: Ayesha Mughal article file path**
-   - Citation path in synthesis: `../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt`
-   - Actual file: `/Users/dbrowne/Desktop/Programming/GitHub/Linus/context/notes/Why Claude Gets Dumber the Longer Your Session Run.txt`
+   - Citation path in synthesis: `../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt`
+   - Actual file: `/Users/dbrowne/Desktop/Programming/GitHub/Linus/context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt`
    - Status: File exists but the synthesis uses a URL-encoded filename (`%20` for spaces). The markdown link is valid
      (browsers and GitHub handle this correctly), but consistency with other context-note links (which use descriptive
      text rather than encoded filenames) would be stronger. Not broken, but inconsistent with synthesis style.
@@ -134,7 +134,7 @@ These represent the substantive backbone of the synthesis and are all properly c
 
 13. **Lines 271–274: Mughal session quality degradation and compaction effects**
     - Citation: (Implicit in line 271 reference; explicit at line 640) to Mughal article
-    - File exists: `/Users/dbrowne/Desktop/Programming/GitHub/Linus/context/notes/Why Claude Gets Dumber the Longer Your Session Run.txt`
+    - File exists: `/Users/dbrowne/Desktop/Programming/GitHub/Linus/context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt`
     - Specific claim: 40–60% quality by hour 3; 80–85% with compaction; SFEIR Institute reference
     - Status: OK
 

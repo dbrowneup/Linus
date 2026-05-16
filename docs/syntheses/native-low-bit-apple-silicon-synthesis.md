@@ -298,9 +298,9 @@ earns interest in concurrent-Worker capacity.
 
 ![1-bit Bonsai 8B raw benchmark scores vs 8B-class models at radically smaller footprint — PrismML announcement, Fig II](../../context/pics/PrismML_Benchmark_Performance.png)
 
-![1-bit Bonsai family Pareto frontier shift — performance vs size across 20 leading instruct models, PrismML announcement, Fig IV](../../context/pics/Bonsai%20Performance%20vs%20Size.png)
+![1-bit Bonsai family Pareto frontier shift — performance vs size across 20 leading instruct models, PrismML announcement, Fig IV](../../context/pics/Bonsai-Performance-vs-Size.png)
 
-![1-bit Bonsai 8B energy consumption (mWh/tok) across hardware platforms — PrismML announcement, Fig III](../../context/pics/Bonsai%20Energy%20Use.png)
+![1-bit Bonsai 8B energy consumption (mWh/tok) across hardware platforms — PrismML announcement, Fig III](../../context/pics/Bonsai-Energy-Use.png)
 
 ---
 

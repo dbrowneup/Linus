@@ -449,7 +449,7 @@ Workers. → [DEC-0051](../adr/0051-agent-report-typed-inter-agent-message.md).
 ## Memory Pillar (resolved 2026-05-03)
 
 The eleven Garrison-thread papers, the
-[Mughal practitioner article](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+[Mughal practitioner article](../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt)
 on context-window management, and the [memory synthesis](../syntheses/memory-synthesis.md) collectively shaped 17
 prioritised items (M1–M17), all resolved in a follow-up Maestro/Dan planning session on 2026-05-03. ADRs land per-file
 in [`docs/adr/`](../adr/); the full memory architecture spec drafted alongside this resolution log lives at
@@ -549,7 +549,7 @@ store via summarization-or-retrieval; cap bypass is explicit, annotated, and aud
 are a Phase 8 explicit-bypass capability, not a Phase 2 default. **The 16K cap is a floor we move with confidence as
 Linus matures and Worker context windows grow, not a permanent ceiling**; the episodic store, overflow contract, and
 explicit-bypass mechanism stay regardless because attention degrades inside the window even when the window is large
-([Mughal](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+([Mughal](../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt)
 lost-in-the-middle finding). → [DEC-0032](../adr/0032-in-context-window-cap-policy.md).
 
 **Rationale:** Llama 3's 128K window proves the simulation works and also costs gigawatt-class compute at the scale

@@ -290,7 +290,7 @@ it does not produce in it. Reading order when Wave 3 arrives: skim §1–§2 for
 translation, then open §3, §4, §5 in a targeted way the first time a specific protein paper forces the issue.
 
 The textbook is the unified pedagogical anchor; the canonical primary-source reference for the flow-matching half is
-[Flow Matching for Generative Modeling, Lipman et al. 2022](../../context/papers/Flow%20Matching%20for%20Generative%20Modeling.pdf),
+[Flow Matching for Generative Modeling, Lipman et al. 2022](../../context/papers/Flow-Matching-for-Generative-Modeling.pdf),
 the paper that introduced the conditional-flow-matching objective and its training simulation-free recipe. Holderrieth &
 Erives unify Lipman's continuous-time framework with the Ho/Sohl-Dickstein/Song discrete-time diffusion lineage; when a
 downstream paper cites "flow matching" without further qualification it is usually citing Lipman 2022's specific

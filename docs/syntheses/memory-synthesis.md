@@ -25,9 +25,9 @@ without a memory architecture spec.
 ## Historical anchor: the memex, 1945
 
 The argument is older than the corpus. In July 1945 Vannevar Bush, then director of the Office of Scientific Research
-and Development, published [_As We May Think_](../../context/notes/As%20We%20May%20Think.txt) in the _Atlantic Monthly_;
+and Development, published [_As We May Think_](../../context/notes/As-We-May-Think.txt) in the _Atlantic Monthly_;
 the September 10, 1945 _Life_ reprint
-([Bush, "As We May Think", Life Magazine Sept 10 1945](../../context/pics/Bush%20-%20As%20We%20May%20Think%20%28Life%20Magazine%209-10-1945%29.pdf))
+([Bush, "As We May Think", Life Magazine Sept 10 1945](../../context/pics/Bush-As-We-May-Think-Life-Magazine-9-10-1945.pdf))
 carried the iconic illustrations — the desk-sized memex with its slanting translucent screens, the head-mounted walnut
 camera, the trail-following levers — that fixed the device in the technical imagination. Bush's diagnosis of the
 post-war scientific predicament reads as if it were written for the Garrison/Mughal thread eighty years later: a
@@ -90,7 +90,7 @@ architecture, not by parameter count, training data, or attention engineering tr
 this synthesis unpacks.
 
 A practitioner-side anchor on the same finding lands from the opposite direction. Ayesha Mughal's March 2026 piece
-[_Why Claude Gets Dumber the Longer Your Session Runs_](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+[_Why Claude Gets Dumber the Longer Your Session Runs_](../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt)
 documents the operational degradation visible inside a single hosted-Claude session — the same architectural deficit,
 observed at the keyboard rather than proved on paper. Her mechanism is two-part: "lost in the middle" attention
 degradation (instructions buried under hours of tool output get weighted a fraction of what they were when fresh) and a
@@ -587,7 +587,7 @@ The biggest move: lift the memory architecture from Phase 3+ to Phase 2 as a fir
 - In-context window cap policy: deliberately limit Worker context windows to 8–16K and route beyond that through the
   episodic store. Prevents the long-context-as-memory-substitute anti-pattern.
 - A first-class diagnostic command in the orchestration surface (the Linus analogue of
-  [`/context`](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)) that reports
+  [`/context`](../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt)) that reports
   per-call context fill at dispatch time, broken down by layer (scratchpad, episodic, investigation, semantic, system).
   Visibility is the precondition for active management; without it, every "context is full" decision is folklore.
 - A session-handoff record written to the episodic store at session end and read at session start. The Linus-native
@@ -703,7 +703,7 @@ Cross-references that were load-bearing without being in the eleven-paper set:
 - Boyle, Komargodski & Vafa's "Memory checking requires logarithmic overhead" (STOC 2024) supplies the tight lower bound
   used by Garrison's Theorem 1.
 - Ayesha Mughal,
-  [_Why Claude Gets Dumber the Longer Your Session Runs (and the Exact Fix)_](../../context/notes/Why%20Claude%20Gets%20Dumber%20the%20Longer%20Your%20Session%20Run.txt)
+  [_Why Claude Gets Dumber the Longer Your Session Runs (and the Exact Fix)_](../../context/notes/Why-Claude-Gets-Dumber-the-Longer-Your-Session-Run.txt)
   (Medium, March 2026) — the practitioner-side companion to the Garrison thread; documents lost-in-the-middle attention
   degradation, real-vs- nominal token budgets, and the four operational primitives (clear / compact / rewind /
   diagnostic-context) plus the PreCompact hook and session-handoff patterns that map onto the M2/M3/M4 substrate.
