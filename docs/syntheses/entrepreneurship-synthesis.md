@@ -347,6 +347,57 @@ Goose, debate-or-vote, MiroFish-Offline) are pending clones — a separate decis
 not folded in here. The Canteen blog corpus is a stable snapshot; its themes can be batched into the existing
 synthesis-update spec convention rather than handled one at a time.
 
+## The biodata-sovereignty / biomanufacturing-policy thread (added 2026-05-16)
+
+A second commercial-substrate signal, structurally distinct from the Canteen / Agora prediction-market thread, has
+crystallized through three policy pieces folded into the corpus during the Wave 2 batch. The triad:
+
+- [Holko, Wilbanks & Howell 2026](../paper-notes/holko_wilbanks_howell_ai_ready_biodata.md), _AI-Ready Biodata Is
+  America's Next Strategic Infrastructure_ (War on the Rocks, March 2026) — the strategic argument that **biodata is
+  the binding constraint** on U.S. AI-bio leadership. Five policy recommendations (treat biodata as critical national
+  infrastructure; secure national compute-to-data portal; convert NDAA pilots to binding standards; align the Genesis
+  Mission EO with biodata generation; sustained tens-of-billions-over-a-decade investment). NSCB 2025 final report
+  framing: a roughly three-year window.
+- [Love, Reynolds, Goldston & Frye 2024](../paper-notes/love_reynolds_goldston_frye_biomanufacturing_us.md),
+  _Biomanufacturing in the U.S.: A MIT Policy Brief_ — the parallel argument that **biomanufacturing capacity is the
+  binding constraint** on translating AI-bio innovation into product. 80% of U.S. biopharmaceutical companies rely on
+  Chinese biomanufacturers; small-footprint continuous biomanufacturing ("leapfrog technologies") sits at TRL 4-7
+  without commercial transition; three recommendations (transformative large-scale initiatives, CHIPS-style regional
+  bioeconomy innovation hubs, ITC + low-interest loans). Sub-recommendation 1.3 is the most directly Linus-aligned: AI/
+  ML-based design tools for biomanufacturing process design.
+- [Marler & Gerstein 2022](../paper-notes/marler_gerstein_biotechnology_warfighter.md), _Biotechnology and Today's
+  Warfighter_ (RAND) — the foundational dual-use framing that underpins both 2024+ pieces. Biology is inherently
+  dual-use; democratization (CRISPR in high schools, falling cost barriers) widens the threat surface; near-peer
+  competition (China, Russia, North Korea, Iran biotechnology programs) creates urgency; better federal coordination is
+  the policy recommendation.
+
+The combined argument has two structural implications for Linus's commercial positioning. First, **the AI-bio nexus is
+bottlenecked at both the data layer (biodata) and the production layer (biomanufacturing)** — winning on either alone
+is insufficient; both must be addressed. Second, **the policy direction is converging on coordination + auditability +
+federated learning + compute-to-data + tiered access frameworks** — independently named by Holko/Wilbanks/Howell
+(Recommendation 2) and Love/Reynolds/Goldston/Frye (federated-learning data-modeling). Linus's local-first auditable
+architecture is structurally aligned with this direction.
+
+The thread is structurally distinct from the Canteen / Agora prediction-market thread in scope and timeline. Canteen /
+Agora is a near-term inbound (May 2026 hackathon, immediate commercial-surface signal); the biodata-sovereignty thread
+is a multi-year policy substrate (NSCB 2025's three-year window; Genesis EO implementation rolling out 2026+; NDAA
+provisions converting to standards over multiple cycles). The two threads are complementary, not competing.
+
+The most directly actionable consequence: **DEC-0047 biosecurity-tier-control framework** earns external policy
+alignment by citing this triad as its strategic substrate. Currently DEC-0047 is internally-motivated. With these
+three policy pieces in the corpus, DEC-0047 can be re-grounded as the **operational realization** of the policy
+framework the triad articulates (tiered access, auditability, compute-to-data, federated learning). This is a small
+DEC update with disproportionate strategic-narrative weight.
+
+The cybersecurity-notes folder ([`docs/cybersecurity-notes/`](../cybersecurity-notes/)) is the regulatory companion to
+this strategic-policy thread — NIST CSF, SP 800-207 Zero Trust, SP 800-171r2 CUI, NCSC China genomics, HHS biotech
+cyberthreats, Foley biotech IP, NCCoE genomics workshop, NIST SP 800-160v1. Together the policy triad + the regulatory
+folder constitute a substantial strategic substrate for Linus's eventual commercial positioning at the AI-bio nexus.
+
+A consolidated "Linus and the U.S. AI-bio policy stack" session-summary write-up is the natural next deliverable (open
+question 1 in each of the three policy paper-notes' "Open questions for Dan" sections). The 2026-Q3 or Q4 timing is
+appropriate; before then the substrate stabilizes and the relevant DEC updates accumulate.
+
 ---
 
 ## What this synthesis intentionally does not cover

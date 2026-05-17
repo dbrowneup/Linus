@@ -221,6 +221,16 @@ The Role tuple should carry a `model_tier` field so the dispatcher knows whether
 This sharpens the hosted-model-fallback question into something operational: not "do we ever call hosted Claude?" but
 "which Roles are tagged as critic-tier, and what is the budget policy for them?"
 
+The underlying methodological substrate for the Maestro/Worker discipline — and for the broader engineering-discipline
+threads in this synthesis (parallel-by-default, push-well-specified-tasks-to-Workers, trust-the-OS-page-cache) — is
+[Sutton 2019, _The Bitter Lesson_](../paper-notes/sutton_bitter_lesson.md). Sutton's argument that general methods that
+leverage computation are ultimately the most effective is the underlying methodology for both the Algorithm (CLAUDE.md;
+Musk via McNeill) and the Maestro/Worker discipline: Maestro attention is the scarce, expensive resource (analogous to
+human-knowledge engineering); Worker compute is the abundant, cheap resource (analogous to search and learning at
+scale). The discipline of preferring Worker dispatch where possible is the bitter-lesson discipline applied to Dan's
+time. The Phase 3 multi-agent spawner (DEC-0050) and the parallel-by-default convention (CLAUDE.md) are the operational
+realization.
+
 ### Thread 6: tool binding via per-tool documentation, not just function signatures
 
 [Boiko/Gomes](../paper-notes/2304.05332v1.md) introduced the docs-searcher pattern: index hardware documentation with

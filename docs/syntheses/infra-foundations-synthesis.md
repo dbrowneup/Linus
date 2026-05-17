@@ -175,7 +175,14 @@ Four surveys — [Huang et al. on long-context architectures](../paper-notes/231
 [Kim et al.'s operation-level audit](../paper-notes/2410.11381.md),
 [Shao et al.'s taxonomy](../paper-notes/2412.03220.md), and
 [Sun et al.'s efficiency survey](../paper-notes/2508.09834.md) — collectively confirm that the Llama recipe is the 2025
-baseline without meaningful dissent. Tan's 53-model dataset (Era III, 2023–2024) quantifies adoption rates: 77% of
+baseline without meaningful dissent. The convergence is itself an instance of
+[Sutton's 2019 _Bitter Lesson_](../paper-notes/sutton_bitter_lesson.md): the architectural primitives that have won
+(general attention, rotary position embedding, mean-free normalization, gated FFN, grouped-query KV reduction) are the
+ones that **scale arbitrarily with compute** rather than encoding domain-specific human knowledge. Earlier architectures
+that tried to encode linguistic structure (parse-tree-augmented attention, syntax-aware embeddings, etc.) plateaued; the
+generic attention + scaled-compute approach won. Sutton's argument predates the Llama recipe by years but organizes the
+post-2017 architectural convergence as a single observation: the architectural choices that scale are the ones that
+survive. Tan's 53-model dataset (Era III, 2023–2024) quantifies adoption rates: 77% of
 surveyed models use RMSNorm, 70% use RoPE, 72% use SwiGLU, and GQA or MQA are standard in every recent decoder-only
 system. The operation-level audit (Kim et al.) adds an important nuance: FFN layers account for ~60–65% of inference
 time in a Transformer block, not attention, so the SwiGLU substitution's quality improvement is more valuable than its
