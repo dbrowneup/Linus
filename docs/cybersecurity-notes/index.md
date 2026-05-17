@@ -53,6 +53,29 @@ Genomics-specific threat landscape and supply chain risks. Includes practical gu
 
 **Key theme:** Genomic data is both uniquely valuable and uniquely re-identifiable; supply chain integrity is critical.
 
+### 8. NIST SP 800-160 Vol. 1: Systems Security Engineering
+**File:** `08-NIST-SP-800-160v1.md`
+
+Engineering-grounded reference framing security as an emergent system property. Provides the three-context framework (problem / solution / trustworthiness) and a taxonomy of 32 design principles (least privilege, secure defaults, minimized sharing, reduced complexity, reference monitor concept, defense-in-depth, isolation, accountability and traceability, secure failure and recovery, predicate permission). Directly applicable: Phase 2+ orchestration router designed against the reference monitor's three properties (tamper-proof, always invoked, small and analyzable); tool-registry entries instantiate least privilege + secure defaults; SAFETY.md additions name the principle they invoke; ARCHITECTURE.md security section organized by the three contexts.
+
+**Key theme:** Security is engineered into the system, not bolted on; emergent-property thinking + principle-named controls beat ad-hoc additions.
+
+### 9. Tom's Hardware: Cursor + Claude Deletes PocketOS Production Database
+**File:** `09-tomshardware-cursor-claude-incident.md`
+
+Primary-source incident report (Mark Tyson, 2026-04-27): Cursor running Claude Opus 4.6 deleted PocketOS's production database and all volume-level backups in a single Railway API call, in 9 seconds. Failure modes: autonomy without proportionate controls, blanket-scope CLI credentials across environments, backups colocated with primary, no second-pair-of-eyes on irreversible operations, platform actively marketing AI-coding-agent use without commensurate safety defaults. Directly applicable: empirical justification for the SAFETY.md `confirm-before-destructive` default, per-environment / per-resource token scoping in the Phase 2 tool registry, backup independence as a hard architectural rule, audit-log provenance for every destructive tool call.
+
+**Key theme:** Real-world failure mode that demonstrates exactly the threat model the Linus sandbox layer and autonomy-tier graduation are designed to prevent.
+
+### Supporting resources (index-only artifacts)
+
+Two non-PDF artifacts in `context/cybersecurity/` accompany the NIST Cybersecurity Framework v1.1 (note 01) and are retained as reference material without standalone notes:
+
+- **`2018-04-16_framework_v1.1_core1.xlsx`** — the NIST CSF v1.1 framework core in machine-readable form: Functions × Categories × Subcategories with informative references (NIST SP 800-53, ISO 27001, COBIT). Useful for any future mapping exercise that ties Linus controls to specific subcategory IDs (e.g., `PR.AC-1` for access control); the .md note 01 summarizes the framework, the .xlsx is the lookup table.
+- **`cybersecurity_framework_v1-1_presentation.pptx`** — NIST's official briefing deck for v1.1, useful as a quick visual summary of the framework structure and v1.0-to-v1.1 deltas (CSRM expansion, privacy integration) for orienting a future reader without re-reading the full CSWP PDF.
+
+Neither artifact warrants a standalone note; they are pointers from note 01.
+
 ## Cross-Cutting Themes for Linus Security Synthesis
 
 1. **Data Sovereignty & Local-First Infrastructure**: Linus's private MacBook deployment mitigates nation-state data acquisition and cloud-service data-broker risks. Genomics and proprietary bioinformatics models are highest value.
