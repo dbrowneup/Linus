@@ -217,6 +217,55 @@ generation. Linus's Phase 2a orchestration layer should expose enough surface th
 one (or claw-code-local, or Goose) can plug roles into Linus's MCP tool registry rather than re-implementing the
 review and verification stages internally.
 
+### pi as the deliberately-minimalist TypeScript counterpoint and the substrate openclaw consumes (added 2026-05-16)
+
+**pi** (`earendil-works/pi`) is the meaningful TypeScript-side minimalist harness entrant added in the Wave 2
+stragglers v2 fold-in batch — the philosophical opposite of Goose's "kitchen-sink Rust+MCP product" posture and the
+deliberately-bounded counterpart to cline's "everything in the harness" approach (per [pi.md](../../repo-notes/pi.md)).
+A monorepo of five npm-published packages (MIT, single-maintainer Mario Zechner / `badlogic`) shipping a coding
+harness with conservative defaults (four built-in tools: `read`, `write`, `edit`, `bash`) and extending exclusively
+through TypeScript Extensions, Agent Skills, prompt templates, themes, and pi-packages. The README's Philosophy
+section is unusually explicit about what pi **deliberately does not ship** — no MCP, no sub-agents, no permission
+popups, no plan mode, no built-in to-dos, no background bash — each accompanied by a one-line "build it as an
+extension or install a package" answer. This is The Algorithm restated for harness design: question every feature;
+delete every step; simplify before adding more.
+
+Three properties make pi load-bearing for the Phase 5+ Linus picture even though Linus's MCP posture (DEC-0018,
+DEC-0045) is non-negotiable. First, **pi is the substrate openclaw consumes** — explicitly named in
+`packages/coding-agent/README.md` as the "real-world SDK integration" reference. The chain is pi (npm package) →
+openclaw (Phase 5+ Linus front-end per [openclaw.md](../../repo-notes/openclaw.md)) → Linus (Phase 2+ orchestration
+backend), with pi handling TUI / session-tree / extension surface and Linus handling provider-routing / Worker-
+spawning / MCP-tool surface. The Phase 5+ ADR on openclaw integration should reference pi's SDK shape as
+load-bearing. Second, **pi is reachable from Goose** as a provider-side ACP shim
+(`crates/goose/src/providers/pi_acp.rs` per [goose.md](../../repo-notes/goose.md) §2), making pi the only
+TypeScript-side coding-agent harness in the cloned corpus that Goose reaches as a peer. The fourth confirming signal
+of Anthropic-compatible HTTP endpoints shipping alongside OpenAI-compatible ones — Letta, Kimi-K2, Goose, and now pi
+(via Goose's ACP integration) — makes the case for a Phase 5+ Linus ADR on ACP-as-second-endpoint-shape much sharper.
+Third, **`@earendil-works/pi-ai`'s `OpenAICompletionsCompat` 17-flag enumeration** is the most thorough cross-provider
+compatibility surface in the cloned-repo collection (covering store-field support, developer-role-vs-system,
+reasoning-effort, max-tokens field name, strict-mode tool defs, six different thinking-format wire shapes,
+Anthropic-style cache-control, OpenRouter and Vercel AI Gateway routing). Linus's Phase 2a `/v1/chat/completions`
+endpoint should document which of these flags it advertises so pi (and any other compat-flag-aware client) can
+configure correctly out of the box — a one-paste reference with concrete interop upside.
+
+The other specific patterns worth lifting from pi without contradicting any DEC: the session-tree JSONL with
+`parentId` pointers (an alternative-or-evolution to workgraph's linear DAG, costing one extra column for the
+`/tree` / `/fork` / `/clone` UX upside); the `terminate: true` per-tool-result hint as the canonical Worker-
+termination signal (cleaner than openai's stop-reasons, more granular than goose's recipe-level `max_turns`); the
+steering / follow-up queue pattern (`agent.steer(message)` delivered after current tool batch; `agent.followUp(message)`
+delivered after agent fully settles) as the Maestro-interrupt primitive that the dispatch struct currently leaves
+open per Letta-2310.08560's Open Question 5. None require code lift — they are schema-shape patterns adapted to
+Linus idioms.
+
+The fundamental relationship is the same asymmetric one Goose has with Linus: pi consumes model providers and tool
+extensions; Linus is the model provider (via DEC-0005's OpenAI-compatible endpoint) and the MCP extension host (via
+DEC-0045). Pi's MCP-skepticism (per Mario Zechner's
+[2025-11-02 blog post](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/)) is a data point in the
+harness-landscape debate, not a position Linus should adopt — DEC-0018 / DEC-0045 are locked in for
+orchestration-side reasons (typed schemas, host-side capability discovery, cross-language compatibility) that pi's
+harness-side analysis does not weigh equally. The two positions can coexist: Linus exposes MCP servers; pi consumers
+can opt to wrap them via pi extensions, or skip them entirely. The asymmetry is fine.
+
 ### gravityfile: Ignore, save the scanner gotcha
 
 gravityfile (`epistates/gravityfile`) is a Rust TUI disk-usage explorer with no LLM dependency and no relevance to
@@ -224,6 +273,33 @@ orchestration or model routing. It sits in G7 as the designated outlier slot. Th
 `jwalk::WalkDirGeneric` scanner caps at 4 threads on macOS via a `#[cfg(target_os = "macos")]` branch because APFS
 contention degrades throughput past that point. If Linus's Phase 3 KnowledgeBase indexer walks the `context/papers/`
 directory with parallel workers, that cap should be respected. Otherwise the file closes here.
+
+### symphony as the issue-tracker-driven autonomous-dispatch entrant (added 2026-05-16)
+
+[`symphony`](../../repo-notes/symphony.md) (OpenAI, Apache-2.0) joins the harness cluster as the **issue-tracker-driven
+autonomous-dispatch** entrant the cluster was previously missing. Where [goose](../../repo-notes/goose.md) is the
+shipped Rust+MCP coding-agent harness and [openclaw](../../repo-notes/openclaw.md) / [claw-code-local](../../repo-notes/claw-code-local.md)
+are claw-shaped terminal harnesses, symphony brings a different shape: a long-running daemon that polls an issue
+tracker (Linear in v1, tracker-agnostic spec), opens isolated per-issue workspaces, and runs coding agents under a
+repo-owned `WORKFLOW.md` policy file. The deliverable is unusual in cluster: it is a **language-agnostic SPEC.md**
+plus an Elixir reference implementation, explicitly inviting consumers to build symphony in their language of choice
+against the spec rather than vendor the reference. The cross-vendor signal matters: combined with claw-code
+(Anthropic) and the OpenAI harness-engineering blog post the README references, symphony confirms that **the harness
+is the layer of public-spec convergence between leading model vendors**. The specific patterns worth lifting: the
+**`WORKFLOW.md` policy-in-repo idea** (third reference for the Phase 3 task-spec format alongside goose's Recipe and
+Letta's Agent File — the Phase 3 spawner-spec ADR should motivate the Linus shape against all three); the **explicit
+ID-vocabulary discipline** from SPEC §4.2 (issue ID for map lookups, issue identifier for human logs, workspace key
+for filesystem names, session ID for agent telemetry — directly portable to the Phase 2a session-store spec); the
+**workspace-as-first-class concept** with deterministic per-task paths and `after_create` / `before_remove` hooks
+(complementing CLAUDE.md's worktree-fan-out convention for sequential Worker isolation); the **retry-with-tracker-
+reconciliation** state-machine shape for Phase 3 Worker-failure handling; and the **structured-logs-required +
+status-surface-optional** observability discipline rule (`SPEC §8`) that matches DEC-0020's bounded-orchestration-
+scope commitment. Sample WORKFLOW.md (`approval_policy: never`, `thread_sandbox: workspace-write`,
+`turn_sandbox_policy: workspaceWrite`, `max_turns: 20`) is the cleanest published worked reference for a
+trusted-autonomous-sandboxed configuration — useful as the SAFETY.md Tier-3 reference when the autonomy-tier
+graduation gets a Phase 3+ rewrite. The Elixir implementation is not portable to the Linus Python stack, but the
+spec is durable design content; the right relationship is **Watch + Study** the spec, lift the named patterns, do
+not vendor the reference.
 
 ---
 

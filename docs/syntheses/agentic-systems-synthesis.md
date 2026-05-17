@@ -451,6 +451,34 @@ regret bound is the first formal result in the group. Assumptions don't hold str
 coverage growth as dominant lever on suboptimality) is worth promoting to a design constraint. A brief "applicable
 theory" note in the Phase 3 spawner ADR.
 
+### Industry harness-engineering signals and the multi-agent safety surface (added 2026-05-16, wave-2 stragglers fold-in)
+
+Three wave-2 additions extend the agentic-systems thread along two independent axes. On the **harness-engineering**
+axis, [`symphony`](../repo-notes/symphony.md) (OpenAI, Apache-2.0) is the cleanest modern published reference for a
+polling-tracker-plus-isolated-workspace agent dispatch loop: a language-agnostic SPEC.md with RFC 2119 normative
+language, a full domain model (Issue / WorkflowDefinition / Workspace / RunAttempt / LiveSession / RetryEntry /
+OrchestratorState), and an Elixir reference implementation. The load-bearing innovation is keeping workflow policy
+in-repo as a single `WORKFLOW.md` file with typed YAML front matter plus a Liquid-templated prompt body, with the
+orchestrator trusting the repo's policy over any external config; this joins
+[`goose`](../repo-notes/goose.md)'s Recipe DSL and [`Letta`](../repo-notes/Letta.md)'s Agent File as the three
+reference task-spec shapes the Phase 3 spawner-spec ADR should motivate against. Cross-vendor signal: combined with
+goose (Block / AAIF) and claw-code (Anthropic), symphony's existence and its explicit reference to OpenAI's published
+"harness engineering" framing confirms that the harness is the layer of public-spec convergence between the leading
+model vendors. On the **multi-agent safety** axis, [`swarm`](../repo-notes/swarm.md) (paired with the new paper-note
+[`swarm-2604.19752`](../paper-notes/swarm-2604.19752.md)) introduces the population-level / soft-label framework
+explicitly missing from the existing competence-focused thread (Kosmos, BioGuider, Sketch2Simulation): every agent
+interaction carries a soft probabilistic label `p = P(v = +1) ∈ [0, 1]` derived from a calibrated sigmoid over four
+observable proxy signals (`task_progress`, `rework_count`, `verifier_rejections`, `engagement`), and the population-
+level metrics (toxicity rate `E[1−p | accepted]`, quality gap `E[p | accepted] − E[p | rejected]`, illusion delta
+`Δ_illusion = C_perceived − C_distributed`) surface emergent failure modes binary `safe/unsafe` thresholds miss. The
+seven canonical scenarios with five-seed replication are the worked methodology for Phase 3 multi-agent stress-tests
+once the spawner ships. The **`AdversarialRedTeam`** scenario (welfare collapses from 181 to 110 as the ecosystem
+fractures) and the **`ThresholdDancer`** scenario (welfare 354.80 — highest of any scenario — at toxicity 0.353,
+exposing binary-threshold blind spots agents mathematically exploit) are the canonical adversarial-pressure tests the
+Phase 3 spawner-spec stress-test suite should crib. Together the three additions confirm that Phase 3+ Linus needs
+both a published task-spec contract (symphony's `WORKFLOW.md` shape) and a published safety-measurement contract
+(swarm's soft-label pipeline); both are Phase 3 spawner-spec ADR inputs from complementary angles.
+
 ---
 
 ## Where this synthesis fits

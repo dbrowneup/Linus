@@ -375,6 +375,27 @@ to inaugurate Phase 7 with. The two-axis split — engineering shape from one up
 the operational form of the "delete every requirement" discipline applied to skill-library inheritance. _Verdict:
 **Study (with a high prior on later Adapt-as-skill-library-pattern)**_ from [`ClawBio.md`](../repo-notes/ClawBio.md).
 
+### Output-token-budget compression as a first-class skill (added 2026-05-16, caveman fold-in)
+
+[`caveman`](../repo-notes/caveman.md) (Julius Brussee, MIT) adds a new sub-thread to the skills column: a Claude Code
+skill plus 30+-harness install matrix that constrains agent output to telegraphic fragments while preserving
+technical content, with a measured **~65–75% output-token reduction at 100% technical accuracy** validated through a
+disciplined three-arm eval harness (skill vs. plain `Answer concisely.` vs. baseline; the honest delta is skill vs.
+terse, not skill vs. verbose). The pattern is directly applicable to DEC-0032's in-context-window-cap policy — caveman
+is the output-side complement to the input-side cap. The Phase 2a Worker spec should absorb an explicit `output_style`
+field (`verbose` / `default` / `terse` / `caveman`) alongside the existing `memory_mode` and `cot_budget` (DEC-0031),
+with the dispatcher injecting the corresponding system-prompt rider and the audit log recording the choice. The
+load-bearing discipline rule is caveman's **auto-clarity carve-out** (drop to normal prose for security warnings,
+irreversible-action confirmations, multi-step sequences with ambiguity risk, user-confused states) — the design
+pattern for "compress aggressively, bypass under documented conditions" that DEC-0032's cap-bypass-audit-log rule
+already commits to on the input side. A secondary opportunity is `caveman-compress`-style memory-file compaction: a
+derived `CLAUDE.compact.md` variant that Linus's dispatcher selects when the calling Worker's `output_style` is
+`terse`, yielding measurable per-invocation input-token reduction across every Worker call. The
+[March 2026 brevity-improves-accuracy paper (arXiv 2604.00025)](https://arxiv.org/abs/2604.00025) cited in the caveman
+README is a Phase 1 corpus add candidate alongside the Lost-in-the-Middle and Toolformer adds flagged in the
+[Letta-MemGPT paper-note](../paper-notes/Letta-2310.08560.md) §Open Question 7; if the brevity-improves-accuracy
+correlation holds on Dan's task suite, `output_style: terse` is not just a cost optimization but a quality one.
+
 ---
 
 ## 5. Entrepreneurial Opportunities
