@@ -183,3 +183,20 @@ sweep agent's "9 orphan pics" claim was largely an artefact of grep missing URL-
 (`%20`-encoded spaces) — 7 of 9 flagged pics were already embedded; only the 2 above were genuine orphans.
 
 **Source review:** PR 30 cleanup spec at `docs/specs/2026-05-10-pr30-cleanup-spec.md`, 2026-05-10.
+
+### 2026-05-16 — added: 1 awesome-list repo-note + gap-triage spec (no clones, no paper-note fold-ins)
+
+**Action:** added repo-note + spec for an existing-but-unnoted reference resource. **Rationale:** `repos/awesome-ai-agent-papers`
+(VoltAgent/awesome-ai-agent-papers — MIT-licensed curated list of 370 arxiv papers published from January 2026 onward,
+organized into Multi-Agent / Memory & RAG / Eval & Observability / Agent Tooling / AI Agent Security buckets) was
+present in `repos/` but unannotated. Unlike `repos/awesome-ml` — logged indexed-only on 2026-05-09 because its
+multi-domain breadth made per-paper ingestion uneconomic — awesome-ai-agent-papers is **agent-themed, 2026-vintage,
+and topically tight to Linus's active syntheses** (memory, agentic-systems, safety-alignment-privacy, MCP). The Wave-2
+triage authored a repo-note positioning it as a **Watch verdict / ingestion source** for periodic mining on
+quarterly curation reviews ([`docs/repo-notes/awesome-ai-agent-papers.md`](repo-notes/awesome-ai-agent-papers.md))
+plus a paired gap-triage spec ([`docs/specs/2026-05-16-awesome-papers-gap-triage.md`](specs/2026-05-16-awesome-papers-gap-triage.md))
+that cross-references the 370 awesome arxiv IDs against Linus's 70 arxiv-style paper-notes, confirms zero overlap
+(the awesome list is entirely 2026-Q1/Q2 arxiv, Linus's existing arxiv notes are mostly 2023–2025), and ranks the top
+20 high-priority gaps for follow-up Wave-3 ingestion. **No paper PDFs downloaded and no paper-notes authored in this
+sweep** — the gap-triage spec is the durable tracker; HIGH-priority candidates flow into a follow-up PR. Cluster cell:
+g11-agent-frameworks. **Source review:** Wave-2 fan-out, 2026-05-16.
