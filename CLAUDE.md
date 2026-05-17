@@ -466,6 +466,14 @@ JavaScript/TypeScript (openclaw, some npm tooling), and Bash (stringing CLI tool
 content recorded in `docs/curation-log.md` with rationale and timestamp. Apply The Algorithm at each review: question
 every requirement; delete what no longer earns its keep. Next scheduled review: 2026-08-01.
 
+**Factual-grep audit clause** (added 2026-05-16 from the pmetal/ANE finding). At each quarterly curation review,
+grep landscape + synthesis + ADR docs for any claim about Apple private APIs, unsupported APIs, reverse-engineering,
+or license-incompatibility. Cross-check every match against the source of truth (CLAUDE.md for project-level claims,
+the cited repo's actual license for license claims, the referenced ADR for design claims). Factual errors propagate
+silently as docs are folded into syntheses — the 2026-05-16 wave-2 audit found "pmetal uses private APIs" had
+propagated to two landscape locations when CLAUDE.md is unambiguous that pmetal uses supported public APIs and only
+`repos/ANE/` uses reverse-engineering. Only a directed grep catches this class of drift.
+
 ### Planning write-back cadence
 
 Every multi-question Maestro/Dan planning session closes with explicit time allocated for core-file write-back:
@@ -535,6 +543,13 @@ The safe pattern is cherry-pick first to a known-good branch, then reset; never 
 Task A redo (2026-05-06), where a "cleanup" reset destroyed the only copy of the cherry-pickable commit. The reflog
 rescue worked but the discipline rule is cheaper.
 
+Cherry-pick recovery is also the load-bearing discipline when shared-checkout parallel agents collide — validated
+3-for-3 across the 2026-05-16 wave-2 fanout (A3 recovered to `agent/phase2c-kb-adapter-final`, C1 recovered to
+`agent/r4-adrs-take2`, B1 recovered mid-stream). When an agent reports "my commits landed on the wrong branch,"
+the recovery flow is: identify the agent's commits by scope tag (`[orch]`, `[memory]`, `[kb]`, `[bench]`,
+`[docs]`, `[adr]`), `git checkout -b <agent-rescue-branch> origin/main`, `git cherry-pick <sha>...`, push, open
+PR. Never `git reset --hard` the contaminated branch; let it linger as audit trail until the rescue PR merges.
+
 ### PR summary discipline
 
 PR descriptions are the durable record of what a change does and why. They should follow a uniform template so a
@@ -575,6 +590,16 @@ for no parallelism gain. The canary costs a minute; debugging six stuck agents c
 
 Worktrees enable genuine parallel agent work but carry non-obvious failure modes. Apply these rules for any
 `isolation: "worktree"` agent dispatch or manual `git worktree add` fan-out.
+
+**HARD RULE: parallel Maestro-dispatched agents MUST run in isolated worktrees.** When dispatching N>1 agents
+concurrently from Maestro, every agent gets its own physical checkout (`isolation: "worktree"` parameter on the
+Agent tool, or manual `git worktree add` for each). Shared-checkout parallel agents COLLIDE on the single
+`.git/HEAD` pointer: branch switches revert mid-command, commits land on sibling agents' branches, and recovery
+requires the cherry-pick discipline below. The 2026-05-16 wave-2 fanout validated this empirically: 7 agents on
+shared checkout produced 1 outright failure (B2) and 2 recoveries-via-cherry-pick (A3, C1) with multiple
+`-v2`/`-clean`/`-final`/`-take2` branch-proliferation artifacts; subsequent 9 agents in isolated worktrees
+landed clean (zero collisions). The CLAUDE.md §"When not to use worktrees" exception below applies only to
+SEQUENTIAL agent dispatch with file-level partitioning, NOT to parallel dispatch.
 
 **Default to the main checkout.** Worktrees should be the exception, not the default. Most Claude Code sessions —
 strategic analysis, artifact production, single-file refactors, reading the corpus, writing specs for handoff — do not
@@ -719,6 +744,36 @@ Use the accumulated record to refine future estimates. If session-summary measur
 parallel fan-out + consolidate + PR" consistently overruns 2-hour estimates by 50%, the next plan starts from the
 empirical 3-hour anchor, not the optimistic 2-hour one. This is the flash-moe pattern (DEC-0027) applied to time itself:
 measurement wins over intuition, even on workflow estimates.
+
+### ADR numbering atomic reservation
+
+When authoring an ADR, the agent reserves the next-free DEC-NNNN number atomically by writing the file before any
+other agent can claim it. On collision (two agents both attempt to author the same DEC-NNNN), the agent that
+wrote-then-committed first wins; the late agent picks the next-free number. "Seed" labels in synthesis prose
+(`DEC-NNNN seed: ...`) are placeholders, NOT reservations — they get reconciled at consolidation when the actual
+ADRs land. The 2026-05-16 wave-2 fanout surfaced this: `native-low-bit-apple-silicon-synthesis.md` had
+"DEC-0055 seed" and "DEC-0056 seed" placeholders for Kimi-K2 fold seeds, but those numbers were claimed by
+landed ADRs (DEC-0055 filename discipline, DEC-0056 Anthropic-compat amendment). The Kimi-K2 seeds need
+re-renumbering at the next consolidation. To prevent recurrence: when a planning session reserves an ADR number
+in prose, treat the reservation as soft; the actual DEC-NNNN is whatever the file-writing agent claims first.
+
+### Session usage budgeting
+
+Maestro cannot see Claude Code usage % directly; Dan reports it at planning checkpoints. Target ceiling **92%**
+(soft); hard ceiling **95%** (beyond which incurs Extra usage costs). Calibration anchors from 2026-05-16
+wave-2 fanout: **~2-2.5% burn per agent dispatch**, **~0.5-0.8% per Maestro turn** (crude — agents vary widely
+in run length; refine anchors after every 2-3 sessions).
+
+Planning formula at any session checkpoint:
+
+```
+remaining_budget_pct = ceiling_pct - current_usage_pct
+agent_slots ≈ remaining_budget_pct / 2.5
+maestro_turn_slots ≈ remaining_budget_pct / 0.7
+```
+
+Pick the mix that fits the work shape. Defer the lowest-priority items if the dispatch would exceed the ceiling.
+When in doubt, undersize the batch and have agents land before the ceiling rather than risk overflow.
 
 ### Branch discipline
 
