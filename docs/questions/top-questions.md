@@ -84,10 +84,9 @@ These eight items each block a Phase 1 spike or a Phase 2a architectural decisio
   that context quality, not model size, is the primary determinant of Worker effectiveness. When does session history
   get summarized vs. passed verbatim? When does a KB query result get truncated vs. passed in full? Phase 2a spec needs
   an explicit context-routing policy or commits to deferred empirical tuning. _(g11-agent-frameworks.)_
-- **R2-05. Open Responses vs Chat Completions for the Phase 2a serving protocol.** Ollama serves the legacy Chat
-  Completions shape; the Open Responses spec adds stateful response threading and the SSE event catalog. Cline and
-  openclaw speak both; claw-code-local speaks OpenAI-compat generically. Locks in client compatibility for Phase 2a;
-  short spike against the Open Responses spec is recommended before commit. _(g7-harnesses.)_
+- **R2-05.** _RESOLVED 2026-05-16 (N6 janitorial). Phase 2a shipped Chat Completions (see `src/linus/server.py`, PR
+  #32); Open Responses is deferred until a concrete client demands the SSE event catalog. See
+  [answered-questions.md](answered-questions.md#n6-janitorial-resolved-2026-05-16)._
 - **R2-06. Stdio or streamable-http transport for the Phase 2 MCP launch.** g6 recommends streamable-http on localhost
   from day one (Cline + Claude Code want simultaneous access; spawning N stdio children is fragile). Counter-arguments:
   startup latency, process isolation, dependency simplicity. Phase 2a transport-level decision. _(g6-mcp-tools.)_
@@ -241,11 +240,10 @@ sweep round.
 
 These eight items each block a Phase 1 spike, a Phase 2a deliverable, or an ADR amendment. Walk first.
 
-- **R3-01. Has the supply chain architecture actually been executed?** DEC-0024 resolved 2026-05-03 (architecture
-  decided: hash-pinned lock file + monthly pip-audit + uv envs for experimental packages), but no lock file has been
-  generated and the first pip-audit pass has not run. The synthesis flags this as overdue. Concrete next action: a
-  30-minute lock-file generation + pip-audit drill run before any further Phase 2 service dependencies are added.
-  _(security; no cluster anchor — pre-condition for everything else.)_
+- **R3-01.** _PARTIALLY RESOLVED 2026-05-16 (N6 janitorial). First `pip-audit` drill complete (21 findings, none
+  CRITICAL); see [security-log.md](../security-log.md). Lockfile generation (`requirements-locked.txt`) remains
+  outstanding and is queued in the v2 implementation plan. See
+  [answered-questions.md](answered-questions.md#n6-janitorial-resolved-2026-05-16)._
 - **R3-02. agentmemory hook taxonomy as the Phase 2a episodic-memory lifecycle spec.** The 13-hook taxonomy
   (`SessionStart` through `TaskCompleted`) is the most complete worked answer to "which Claude Code lifecycle events
   does Layer C subscribe to?" in the entire corpus. DEC-0029 specifies the record shape but leaves hook-to-write mapping
@@ -267,15 +265,13 @@ These eight items each block a Phase 1 spike, a Phase 2a deliverable, or an ADR 
   committing the variant-scoring skill. Not yet done. The answer determines whether AlphaGenome is a local Worker or
   must use the non-commercial API path (DEC-0046's `external_api` registry field already reserves the latter), with
   direct entrepreneurial implications. _(biological-foundation-models; cluster anchor: g9-bio.)_
-- **R3-06. DEC-0047 amendment: DeepSeMS BGC→SMILES is Tier B for novel-BGC generation, not Tier A.** DEC-0047 classifies
-  DeepSeMS as Tier A (residue-level, no pre-authorization), but the synthesis correctly puts BGC→SMILES calls under Tier
-  B when generating from novel/cryptic BGCs. Tier A is appropriate as a lookup against known MIBiG; Tier B is
-  appropriate for de-novo metabolite proposals. The ADR should be amended with a conditional assignment before any Phase
-  7 DeepSeMS skill ships. _(generative-biology; cluster anchor: g9-bio.)_
-- **R3-07. Worktree fan-out vs sequential dispatch as Phase 3 default.** The CLAUDE.md "Worktree fan-out discipline"
-  convention now documents both patterns. When the Phase 3 multi-agent fan-out is designed, an explicit decision is
-  needed: does `src/linus/orchestration/workspace.py` need per-task worktree management, or is sequential dispatch with
-  file-level partitioning sufficient for parallel-Worker workflows? Shapes the spawner spec. _(g7-harnesses.)_
+- **R3-06.** _RESOLVED 2026-05-16 (N6 janitorial). False premise: DEC-0047 already lists "BGC-to-SMILES routes" and
+  "DeepSeMS BGC→SMILES" under Tier B (see ADR text). No amendment needed. See
+  [answered-questions.md](answered-questions.md#n6-janitorial-resolved-2026-05-16)._
+- **R3-07.** _PARTIALLY RESOLVED 2026-05-16 (N6 janitorial). Dispatch policy resolved via CLAUDE.md wave-2 lessons
+  (parallel Maestro-dispatched agents MUST run in isolated worktrees; sequential dispatch with file-level partitioning
+  for the non-parallel case). Orchestration code shape for `src/linus/orchestration/workspace.py` still open and tracked
+  for Phase 3 spawner spec. See [answered-questions.md](answered-questions.md#n6-janitorial-resolved-2026-05-16)._
 - **R3-08. Benchmarking ADR codifying the open-answer-headline + coverage/accuracy/precision-triple convention.** Three
   independent papers (BixBench, LAB-Bench, the tokens-per-second paper 2502.16721v1) converge on "measure the
   operational thing, not the surrogate." S12 partially resolved the FutureHouse evaluation philosophy, but the specific
@@ -301,10 +297,10 @@ proceeds.
   enumerate ~30 event types with per-type weights (0.05 file*summary → 3.0 constraint/reminder) and per-type Jaccard
   dedup thresholds. Decision before the first DEC-0029 migration: seed with OMEGA-style typed taxonomy from day one
   (adds a `type_weight` column + lookup table) or stay schema-flat and add types empirically. *(g4-memory.)\_
-- **R3-12. Model weight integrity verification status.** SHA-256 verification of model weight files before any model
-  runs in Linus is in Section 6 of the security synthesis but no implementation target is recorded. Ollama and mlx-lm
-  downloads have already happened. 10-minute check: are checksums available for every model in `~/.ollama/models/`?
-  _(security; cluster anchor: g1-apple-silicon.)_
+- **R3-12.** _RESOLVED 2026-05-16 (N6 janitorial). Ollama blobs are content-addressed by SHA-256; all 10 local blobs
+  pass on-disk integrity check (mistral:7b-instruct + qwen2.5-coder:7b). See
+  [security-log.md](../security-log.md). Registry-side provenance verification (HTTP fetch of manifest + comparison)
+  remains a follow-up. See [answered-questions.md](answered-questions.md#n6-janitorial-resolved-2026-05-16)._
 - **R3-13. Keppi `build_context_pack` as Phase 3 retrieval entry point.** Keppi's greedy-fill
   `keyword_search → blast_radius → degree-centrality re-rank` is the most complete graph-aware retrieval pipeline in the
   surveyed repos (~100 lines NetworkX, no Apple Silicon dependency). Phase 3 default, or does paper-corpus retrieval
