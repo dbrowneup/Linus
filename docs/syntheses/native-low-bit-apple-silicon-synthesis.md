@@ -556,6 +556,15 @@ identical generation parameters, no per-model prompt tuning, sandboxed code exec
 fallback only on extraction failure). Report joint cost / quality / latency Pareto position; do not pick a winner on a
 single metric. The spike's output becomes the Phase 2 Worker-selection basis.
 
+**Phase 1d — first baseline collected 2026-05-16 (PR #33).** The Dan task suite v0 produced its first run against
+`qwen2.5-coder:7b` (qwen3:8b not yet pulled locally — the runner correctly failed loud and the baseline was collected
+against the best locally-available model). All three tasks completed in 55.75s wall: `paper-summarization` full-credit
+(10.5s; three numbered findings on MemGPT, grounded in the paper), `fasta-gc-content` partial (19.2s; stdlib-only script
+with divide-by-zero guard, but counts `N` in the denominator where the rubric says exclude — a real rubric-edge
+failure), and `title-clustering` partial (26.0s; five named clusters but only 36/50 input titles got assigned, ~28% drop
+— a coverage-vs-throughput signal worth carrying forward into the Phase 1c four-way methodology). This is the first
+empirical anchor for the Worker-selection arc and will be re-run once `qwen3:8b` is pulled.
+
 **Phase 2 — Worker selection and orchestration fan-out.** Bonsai 8B is a strong candidate for the default Linus Worker.
 The crucial architectural consequence is footprint: at 1.15 GB (1-bit) or 1.75 GB (ternary) on disk, with 2.16 GiB
 resident in the MLX 2-bit deployment path, **multiple parallel Bonsai Workers fit comfortably in 32 GB unified memory**.

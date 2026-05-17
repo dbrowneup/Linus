@@ -576,7 +576,13 @@ The biggest move: lift the memory architecture from Phase 3+ to Phase 2 as a fir
 - v0 episodic store implementation: SQLite + content hashes + git as persistence substrate. Wired into the
   Maestro/Worker protocol so that every Worker invocation reads relevant episodic context on entry and writes the
   resulting (reasoning trace, answer, tool outputs) tuple on exit. CRISPR-style temporal ordering (recent ranked higher,
-  ancient retrievable on demand).
+  ancient retrievable on demand). **Scaffolding landed 2026-05-16 via PR #35 (Phase 2h.1-2):** `src/linus/memory/` ships
+  the SQLite episodic store with idempotent schema migration, a JSONL audit-log writer with lazy `iter_events`, SHA-256
+  content-hashing (Keccak deferred via the `_resolve_algorithm` hook), and a `DispatchEvent` type that validates the
+  `memory_mode` ∈ {`stateless`, `session_stateful`, `project_stateful`} and `cot_budget` ∈ {`logarithmic`, `linear`,
+  `polynomial`} router primitives at construction per DEC-0031, plus records cap-override audit-noise per DEC-0032. 35
+  unit tests pass. The next step is wiring this v0 substrate into Worker dispatch so episodic context-read on entry and
+  tuple-write on exit become the default Worker behavior, not an opt-in.
 - Scratchpad retention as a default in the orchestration layer; addressed by `(session_id, turn_id)`, hashed for
   integrity.
 - Router gains two new primitives: per-call CoT budget, per-call memory mode (stateless / session-stateful /
