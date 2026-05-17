@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PaperSummarizationOutput",
+  "description": "Three key findings extracted from a research paper, returned by the Worker model as a numbered Markdown list. The runner does NOT auto-parse; it stores raw output verbatim. A future scoring pass parses against this schema.",
+  "type": "object",
+  "required": ["raw_output", "parsed_findings"],
+  "properties": {
+    "raw_output": {
+      "type": "string",
+      "description": "Verbatim model output. Authoritative."
+    },
+    "parsed_findings": {
+      "type": "array",
+      "description": "Best-effort parse of the numbered list. May be empty if parsing failed; the rubric still grades against raw_output.",
+      "minItems": 0,
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 10
+      }
+    },
+    "expected_finding_count": {
+      "type": "integer",
+      "const": 3
+    }
+  }
+}

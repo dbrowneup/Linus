@@ -1,0 +1,9 @@
+{
+  "task_id": "paper-summarization",
+  "version": "v0",
+  "pdf_path": "context/papers/2310.08560.pdf",
+  "pdf_title": "MemGPT: Towards LLMs as Operating Systems",
+  "pdf_arxiv_id": "2310.08560",
+  "prompt": "You will be shown the extracted text of a research paper. Read it and extract the THREE most important key findings from the paper. Return your answer as a numbered Markdown list with exactly three items. Each item must be a single self-contained sentence stating a concrete finding (e.g., a quantitative result, a mechanism that worked, or a capability the authors demonstrated). Do NOT include any preamble, summary paragraph, caveat, or trailing prose. Just the three numbered items.",
+  "extraction_notes": "Use pypdf to extract text. Per CLAUDE.md Known Library Quirks, set sys.setrecursionlimit(sys.maxsize) before extracting. Truncate the extracted text to the first 12000 characters before sending to the model to keep latency tractable on M1 Max."
+}

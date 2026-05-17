@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TitleClusteringOutput",
+  "description": "Five named clusters covering all 50 input titles. The runner stores raw_output verbatim; the scoring pass parses against this schema.",
+  "type": "object",
+  "required": ["raw_output", "parsed_clusters", "coverage"],
+  "properties": {
+    "raw_output": {
+      "type": "string",
+      "description": "Verbatim model output. Authoritative."
+    },
+    "parsed_clusters": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["name", "titles"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "titles": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "description": "Diagnostic counts from the best-effort parse; v0 may report parse_failed=true and leave the numeric fields at 0.",
+      "required": ["parse_failed", "n_clusters_parsed", "n_titles_assigned", "n_titles_input"],
+      "properties": {
+        "parse_failed": { "type": "boolean" },
+        "n_clusters_parsed": { "type": "integer", "minimum": 0 },
+        "n_titles_assigned": { "type": "integer", "minimum": 0 },
+        "n_titles_input": { "type": "integer", "const": 50 }
+      }
+    }
+  }
+}
