@@ -394,34 +394,23 @@ Lower-priority items surfaced by the synthesis-refinement pass. Dip in when cont
 
 ---
 
-## Round 4 sweep promotions (added 2026-05-10)
+## Round 4 sweep promotions — RESOLVED (2026-05-16)
 
-The 2026-05-10 PR 30 fold-in pass (4 paper-notes + 8 repo-notes) surfaced three new live threads that don't fit existing
-R2 / R3 items. Numbering uses the `R4-NN` prefix.
+The 2026-05-10 PR 30 fold-in pass (4 paper-notes + 8 repo-notes) surfaced three new live threads that didn't fit
+existing R2 / R3 items. Numbering used the `R4-NN` prefix. All three resolved 2026-05-16 via DEC-0056, DEC-0057, and
+DEC-0058 (see [`answered-questions.md`](answered-questions.md#round-4-sweep-resolved-2026-05-16)).
 
-### Tier 2 — shape Phase 5+ architecture
-
-- **R4-01. Anthropic-compatible HTTP surface as Phase 5+ Linus capability (DEC-0005 amendment).** Three independent
-  signals now point at this: Letta ships both OpenAI- and Anthropic-compatible endpoints (`repo-notes/Letta.md` §3, open
-  question 8); Kimi-K2 deploys with both (`repo-notes/Kimi-K2.md`); the broader open-source agent ecosystem is
-  converging on dual endpoints. DEC-0005 commits Linus to OpenAI-compat-only at v0; a Phase 5+ ADR ("Anthropic-
-  compatible HTTP as a Linus capability") becomes warranted if a fourth confirming signal lands or a concrete client
-  needs Anthropic-shape. _(g7-harnesses; cross-cuts orchestration substrate.)_
-- **R4-02. AGPL-fork posture as a DECISIONS.md entry (not just a per-repo note).** MiroFish-Offline's Watch verdict is
-  gated explicitly on AGPL-3.0 contamination analysis; even pattern-level lifts require careful review with a copyright
-  specialist before code is written that "looks like" the AGPL source. R2-34 (g5 AGPL re-implementation policy) is the
-  existing tracker; PR 30's MiroFish add raises urgency from "convention worth codifying eventually" to "before any
-  Phase 3 KB-tooling lift starts" (origin is also AGPL — partly Apache via subcrate split, but the desktop layer is
-  AGPL). The DECISIONS.md entry should articulate the read-and-design-from-spec policy (what's quarantined, what's
-  reviewed, what's forbidden). _(g4-memory + g5-graph-tools + g7-harnesses.)_
-
-### Tier 3 — reservoir
-
-- **R4-03. `@x402/mcp` graduation from Watch to Spike or Integrate.** x402's `@x402/mcp` shipped (TypeScript + Python +
-  Go); the Canteen-blog mention upgraded from "roadmap-only" to live (`repo-notes/x402.md` §1, §3). Watch- only today;
-  an ADR becomes warranted when a Linus commercial-surface decision forces the question, or when `@x402/mcp` reaches a
-  maturity threshold that makes it a candidate primitive for the entrepreneurship pillar's pay-per-call
-  literature-intelligence offering. Phase 7+ / Phase 8. _(g6-mcp-tools; cross-cuts entrepreneurship.)_
+- **R4-01. Anthropic-compatible HTTP surface (DEC-0005 amendment).** Resolved by
+  [DEC-0056](../adr/0056-orchestration-speaks-openai-and-anthropic-compat.md): Phase 2a's orchestration layer exposes
+  both an OpenAI-compatible and an Anthropic Messages-compatible surface, sharing the underlying routing, sandbox, and
+  audit-log machinery. The three confirming signals (Letta + Kimi-K2 + Goose) were sufficient.
+- **R4-02. AGPL-fork posture as a DECISIONS.md entry.** Resolved by [DEC-0057](../adr/0057-agpl-fork-posture.md):
+  three-tier policy (Quarantined / Reviewed / Forbidden) for AGPL reference repos. Project-license-of-Linus question
+  (R2-45) stays open and acts as the escape hatch for the Forbidden tier.
+- **R4-03. `@x402/mcp` graduation from Watch to Spike or Integrate.** Resolved by
+  [DEC-0058](../adr/0058-x402-mcp-graduation-pathway.md): three-step pathway (Watch → Spike → Integrate) with concrete
+  triggers for each transition. Spike is pre-specified as a one-week deliverable; Integrate ADR scope is pre-specified;
+  negative-graduation paths (Dismiss, Re-evaluate) documented so Watch cannot drift into indefinite deferral.
 
 ---
 

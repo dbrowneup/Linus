@@ -15,6 +15,7 @@ Sister documents:
 
 ## Table of contents
 
+- [Round 4 sweep (resolved 2026-05-16)](#round-4-sweep-resolved-2026-05-16)
 - [Sweep Tier 3 + Entrepreneurship (resolved 2026-05-06)](#sweep-tier-3--entrepreneurship-resolved-2026-05-06)
 - [Sweep Tier 2 — S11–S31 (resolved 2026-05-06)](#sweep-tier-2--s11s31-resolved-2026-05-06)
 - [Sweep Tier 1 — S1–S10 (resolved 2026-05-06)](#sweep-tier-1--s1s10-resolved-2026-05-06)
@@ -30,6 +31,59 @@ Sister documents:
 - [Source-archive items propagated and resolved (from open-questions.md)](#source-archive-items-propagated-and-resolved-from-open-questionsmd)
 - [Uncovered resolutions](#uncovered-resolutions)
 - [Resolution sessions log](#resolution-sessions-log)
+
+---
+
+<a id="round-4-sweep-resolved-2026-05-16"></a>
+
+## Round 4 sweep (resolved 2026-05-16)
+
+The Round 4 sweep promoted three live threads surfaced by the 2026-05-10 PR 30 fold-in pass (4 paper-notes + 8
+repo-notes). All three resolved 2026-05-16 via DEC-0056, DEC-0057, and DEC-0058 — a Wave-2 ADR batch authored on a
+single agent branch.
+
+#### R4-01. Anthropic-compatible HTTP surface as Phase 5+ Linus capability (DEC-0005 amendment)
+
+**Resolution:** Resolved by [DEC-0056](../adr/0056-orchestration-speaks-openai-and-anthropic-compat.md): Phase 2a's
+orchestration layer exposes **both** an OpenAI-compatible surface (preserving DEC-0005's commitment) and an Anthropic
+Messages-compatible surface, with the two endpoint families sharing the underlying routing, sandbox, audit-log, and
+memory-mode (DEC-0031) machinery. Decision earlier than the original "Phase 5+" framing because three independent
+confirming signals — Letta (`repo-notes/Letta.md` §3, §7-Q8); Kimi-K2
+(`paper-notes/Kimi-K2-2507.20534.md` §Key results, §What's reusable); Goose (`repo-notes/goose.md` §1, §3) — established
+the dual-protocol norm within a six-month window. Scope is bounded to the Anthropic Messages API surface; full ACP
+support stays deferred for a Phase 5+ ADR amendment if a concrete ACP client surfaces. The Kimi-K2 temperature-mapping
+quirk (`real_temperature = request_temperature × 0.6`) is documented as a cautionary tale; the Phase 2a spec must
+explicitly handle system-field placement, content-block shape, tool-call format, and the streaming-event catalog
+translation.
+
+#### R4-02. AGPL-fork posture as a DECISIONS.md entry (not just a per-repo note)
+
+**Resolution:** Resolved by [DEC-0057](../adr/0057-agpl-fork-posture.md): three-tier policy for AGPL reference repos.
+**Quarantined** (read for architectural description only, no source-level transcription); **Reviewed** (Linus
+implementations of patterns described in Quarantined notes must be designed from upstream specs, not from re-reading
+AGPL source); **Forbidden** (direct code lifts blocked until and unless Linus commits to AGPL-3.0 at the project level —
+which is currently unsettled and serves as the conditional escape hatch). Pattern-level lifts require an explicit
+clean-room procedure documented in `docs/curation-log.md` with the author-boundary discipline (Author A reads source +
+writes Quarantined description; Author B writes implementation without seeing source). The subcrate-split case
+(origin's Apache `goose` crate vs. AGPL desktop layer) follows the per-artefact license, not the repo-level license.
+Supersedes the R2-34 "convention worth codifying eventually" framing in `g5-graph-tools.md`. The project-license-of-
+Linus question itself stays open under R2-45 ("AGPL stance before Phase 8") — DEC-0057 governs AGPL **reference** repos;
+the Linus-itself license decision is separate.
+
+#### R4-03. `@x402/mcp` graduation from Watch to Spike or Integrate
+
+**Resolution:** Resolved by [DEC-0058](../adr/0058-x402-mcp-graduation-pathway.md): three-step pathway with explicit
+triggers. **Watch → Spike** fires on any one of (a) a Phase 5+ commercial-surface decision lands; (b) a Canteen-class
+partnership names x402 in its requirements; (c) `@x402/mcp` reaches v3.x stable with the MCP-SDK-limitation workaround
+resolved upstream **and** at least one visible production deployment. The Spike is time-boxed at one week with a
+pre-specified deliverable contract (one paid skill wrapped with `createPaymentWrapper`, test facilitator, latency +
+surface-area + audit-log compatibility measurements). **Spike → Integrate** graduates the
+`DEC-NNNN agent-monetization-via-x402-mcp` seed in DECISIONS.md to a real ADR with the Spike measurements as evidence;
+the Integrate ADR commits to a specific MCP-payment substrate, facilitator posture, scope of paid tools, fiat-vs-crypto
+position, and deployment phase. **Negative-graduation paths** documented: Dismiss to Ignore if the Spike measurements
+show the integration is unviable; Re-evaluate without committing if the Spike runs without an Integrate trigger having
+fired. The MCP-SDK-limitation workaround pattern (`{"x402/error": {"code": 402, "data": {...}}}` JSON-serialized
+payload) is folded into Linus's MCP convention library independent of the x402 graduation pathway.
 
 ---
 
@@ -1266,6 +1320,15 @@ during the next planning session. The remaining uncovered items are correctly un
 The metadata about when and how questions were resolved. Promotes the `Resolution Log` headers that previously sat at
 the top of `top-questions.md` into one place at the bottom of this archive, so the reader's first impression is the
 resolved Q&A pairs (most relevant) rather than session bookkeeping.
+
+### 2026-05-16 — Wave 2 R4 ADR batch (Worker fan-out)
+
+Three R4-promoted items resolved via a single agent-branch fan-out. R4-01 closed by DEC-0056 (orchestration speaks
+OpenAI- and Anthropic-compatible HTTP from Phase 2a; amends DEC-0005). R4-02 closed by DEC-0057 (AGPL-fork posture:
+clean-room study, no code lifts without project-level license commitment). R4-03 closed by DEC-0058 (`@x402/mcp`
+graduation pathway: Watch → Spike → Integrate with concrete triggers). Two of the three (DEC-0056, DEC-0058) define
+phase-explicit triggers that lift the otherwise-vague "Phase 5+" framing into operational discipline. DEC-0057's
+license-commitment escape hatch is conditional on the still-open R2-45 (Linus project license posture).
 
 ### 2026-05-06 — Sweep Tier 3 + Entrepreneurship S32–S60, E1–E12 planning session (Maestro/Dan)
 
