@@ -1,94 +1,140 @@
 # link (`gowtham0992/link`)
 
+_Refreshed 2026-05-18 against upstream HEAD 88f07ba; 333 commits / 129 files reviewed._
+
 ## 1. Purpose and scope
 
-Link is a single-file, stdlib-only Python implementation of Karpathy's "LLM Wiki" pattern: drop sources into `raw/`,
-have an LLM agent compile them into structured Wikipedia-style markdown pages under `wiki/`, and let the wiki compound
-over time. It ships three artifacts in one repo — `link.py` (CLI for `demo`, `doctor`, `rebuild-backlinks`), `serve.py`
-(local HTTP API + Wikipedia-style web viewer with a force-directed graph at `/graph`), and a separately-published PyPI
-package `link-mcp` (registered on the official MCP Registry as `io.github.gowtham0992/link`) that exposes the wiki to
-agents over MCP. Everything is local-first, MIT-licensed, no telemetry, no external API calls, no vector store, no
-embedding model — pure Python stdlib plus the `mcp` SDK on the server side. For Linus this is the most "shippable today"
-of the eleven sibling LLM-wiki engines and the closest fit to a Phase 2 KnowledgeBase companion.
+Link has materially repositioned itself between the prior repo-note and 2026-05-18: it is no longer "the most shippable
+LLM-wiki engine" but **local agent memory** for MCP clients, with the markdown wiki recast as the inspectable storage
+layer behind that memory. The 1.1.0 release (2026-05-08) added a full memory lifecycle — `remember`, `recall`, `propose`,
+`capture-session`, `accept-capture`, `redact-capture`, `archive-memory`, `restore-memory`, `forget-memory`,
+`explain-memory`, `update-memory`, `memory-audit`, `memory-inbox`, `review-memory` — exposed via CLI, the `link-mcp` PyPI
+package, and `serve.py`'s HTTP API. The README pitch is "give Codex, Claude, Cursor, Kiro, VS Code, Copilot, and other
+MCP clients the same durable memory about you and your work," with sources, backlinks, graph context, review state, and
+an audit trail. For Linus this changes the framing entirely: Link is now a candidate substrate for the memory pillar's
+Layer C (cross-session episodic) and Layer E (semantic knowledge), not just a Phase 2 KB companion. Still single-file
+stdlib-only Python plus the `mcp` SDK; still local-first, MIT, no telemetry, no external calls; now Homebrew-installable
+via `gowtham0992/link/link` tap.
 
 ## 2. Architecture summary
 
-The wiki is just markdown files in a directory tree: `wiki/sources/`, `wiki/concepts/`, `wiki/entities/`,
-`wiki/comparisons/`, `wiki/explorations/`, plus `index.md` (master catalog), `log.md` (append-only audit trail), and
-`_backlinks.json` (auto-generated reverse + forward link index). The schema lives in `LINK.md` at repo root — a single
-prose document instructing the LLM how to write pages with YAML frontmatter, confidence tags
-(`[confidence: high/medium/low]`), wikilink cross-references, and a `maturity: seed | growing | mature | established`
-lifecycle field per page. Search is an in-memory inverted token index built lazily on first request and invalidated by
-mtime; ranking is hand-tuned (title 20pts, alias 8pts, tag 5pts, fulltext 2pts) — no embeddings, no ANN. The MCP server
-in `mcp_package/link_mcp/server.py` is ~500 lines using `FastMCP` and exposes six tools — `search_wiki`, `get_context`
-(the headline "topic + full graph neighborhood in one call"), `get_pages`, `get_backlinks`, `get_graph`,
-`rebuild_backlinks`. `serve.py` re-exposes the same surface as a `127.0.0.1`-bound HTTP API. Integrations under
-`integrations/` are bash installers that wire Link into Claude Code, Cursor, Codex, Copilot, VS Code, Kiro, and
-Antigravity by dropping the `LINK.md` schema into the agent's session context and registering `link-mcp` in the relevant
-MCP config — the explicit insight being that the agent itself is the maintenance loop.
+Same plain-markdown-in-a-directory substrate as before — `wiki/sources/`, `wiki/concepts/`, `wiki/entities/`,
+`wiki/comparisons/`, `wiki/explorations/`, `wiki/index.md`, `wiki/log.md`, `_backlinks.json` — plus a new
+`wiki/memories/` tree carrying typed memory pages (`memory_type: preference | decision | project | fact | note`,
+`scope: user | project | global`, `status: active | stale | archived`, `review_status: pending | reviewed | needs_update`,
+`update_count`, `last_update_source`). The `LINK.md` schema document at repo root has grown to cover memory page
+templates alongside source/concept/entity templates. The MCP server in `mcp_package/link_mcp/server.py` (still FastMCP)
+now exposes a much larger surface — the prior 6 tools plus `query_link` (the headline budgeted answer-ready packet with
+relevant memories, pages, graph neighborhood, reasons, and follow-up actions), `memory_brief`, `ingest_status`,
+`remember_memory`, `recall_memory`, `update_memory`, `archive_memory`, `restore_memory`, `forget_memory`,
+`explain_memory`, `memory_profile`, `memory_inbox`, `review_memory`, `memory_audit`, `propose_memories`,
+`capture_session`, `accept_capture`, `redact_capture`, `delete_capture`, `capture_inbox`, `starter_prompts`,
+`link_status`, `validate_wiki`, `rebuild_index`, `rebuild_backlinks`, `migrate_wiki`, `backup_wiki`. Search has been
+hardened: optional in-memory SQLite FTS acceleration with token-index fallback, persistent `.link-cache/` for unchanged
+large wikis, precomputed search word indexes, cache-backed graph edge construction. The local web viewer at
+`serve.py` got a meaningful security pass — CSP headers, browser isolation/permissions-policy, `X-Link-Local-Action`
+header required for mutations, `Origin`/`Referer` checks, rate limiting on local write APIs, bounded path parsing,
+hardened `405`/`HEAD`/`TRACE`/`CONNECT` handling — plus dark/light theme, fullscreen graph mode, large-graph controls
+(node search, type filtering, neighborhood depth), bounded graph summaries, `/inbox`, `/memory`, `/profile`, `/audit`,
+`/captures`, `/explain-memory`, `/propose`, `/ingest`, `/prompts`. CI now enforces a tool-contract check, a
+runtime-duplication guard, release hygiene checks (no outbound HTTP in tracked Python/shell), MCP stdio smoke against
+the built wheel, and large-wiki performance smoke (timing thresholds for search/query/graph). Schema migration framework
+(`link migrate`, MCP `migrate_wiki`) is in place for future format changes.
 
 ## 3. What's reusable in Linus
 
-The whole thing is small enough to read in an afternoon and dependency-light enough to vendor or run unmodified. The
-most directly reusable artifact is the `LINK.md` schema — a battle-tested prompt for "you are the wiki maintainer" with
-explicit page templates, confidence-tag conventions, and a maturity lifecycle. Linus's Phase 2 KnowledgeBase has the
-same shape (papers as immutable sources, derived structured notes), and Link's `wiki/sources/` + `wiki/concepts/` split
-maps cleanly onto KnowledgeBase's paper-vs-synthesis distinction. The `_backlinks.json` graph + `get_context` "page plus
-neighborhood in one call" idiom is precisely the agent-optimized retrieval API the security synthesis gestures at when
-it argues for claim-typing and content-hashed cross-references — Link doesn't content-hash, but the backlink format
-would extend cleanly. The `doctor` command (orphans, dead links, stale `source_count` metadata, missing TLDRs, isolated
-graph nodes, and a secrets-in-filenames/contents scan) is a lint pattern Linus's KnowledgeBase should copy verbatim.
-Unlike `wikiloom` (git-as-substrate) or hypothetical sibling engines that bet on SQLite, Qdrant, or a custom binary
-format, `link` keeps everything as plain markdown in a directory — meaning Obsidian opens the wiki as a vault for free
-and Linus's KnowledgeBase corpus could in principle share the substrate without conversion.
+Link is now the strongest candidate substrate Dan's reference stack has for the Phase 2 memory pillar. The most
+directly portable pieces:
+
+- **Memory schema with lifecycle.** `wiki/memories/` with typed memory pages (preference/decision/project/fact/note) +
+  scope (user/project/global) + status (active/stale/archived) + review_status (pending/reviewed/needs_update) +
+  `update_count` + `last_update_source` is exactly the shape the memory-architecture spec needs for Layer C episodic
+  storage. Adopt the page schema near-verbatim.
+- **`query_link` agent-facing packet.** Returns memory + ranked pages + graph neighborhood + reasons + budget report +
+  follow-up actions in one call with explicit token/character counts. This is the budgeted-retrieval API shape DEC-0032
+  (16K in-context cap) wants — agent-side calls into Linus's KB/memory should return packets with budget headroom and
+  next-action hints, not raw chunks.
+- **Memory review/audit/inbox/explain pattern.** `memory-inbox` for pending review, `memory-audit` for health/risk
+  factors, `explain-memory` for provenance and recall readiness. Linus's memory architecture needs a parallel surface —
+  Workers should be able to ask "what memories are pending review?" and "why does this memory exist?"
+- **Conflict + duplicate detection on memory writes.** Strong duplicates refused unless explicitly allowed, contradictory
+  active memories surfaced before saving, review gate on proposals. Directly portable to Linus's episodic-memory
+  insert path.
+- **`capture-session` + `propose-memories` + `accept-capture` workflow.** Save long session notes locally as raw
+  captures, surface proposal-only memory candidates, require explicit accept, support redact/delete with confirmation,
+  block ingest of secret-bearing content. Linus's session-end flow (Layer B scratchpad → Layer C episodic promotion)
+  needs exactly this gate.
+- **`doctor`, `validate_wiki`, release-hygiene checks.** The lint-and-ingest-gate pattern (frontmatter, type/directory
+  alignment, required sections, dead links, stale backlinks, unreadable pages, secret content) is a Worker-side
+  validation discipline Linus's KB and memory layers should copy.
+- **MCP tool contract enforcement in CI.** Tool-contract guard + runtime-duplication guard prevent CLI/HTTP/MCP drift.
+  Pattern worth lifting into Linus's eventual MCP server.
+
+Plain-markdown-in-a-directory substrate still means Obsidian opens the wiki as a vault for free, and the schema is
+human-readable. Bounded payloads (page lists, backlinks, graph summaries) are explicitly designed for agent context
+budgets rather than browser display — directly aligned with Linus's Worker-call shape.
 
 ## 4. What's inspiration only
 
-Two things stay inspirational rather than adopted. First, `serve.py`'s web viewer with the force-directed `/graph` is a
-nicely-built local Wikipedia clone, but Linus has Streamlit for Phase 2 chat UI and openclaw later — a second web UI
-isn't worth maintaining. Second, the integration installer pattern (one bash script per agent harness, each writing into
-the agent's config) is clever but redundant for Linus, which intends to own the harness-facing endpoint itself rather
-than registering as a third-party tool in someone else's config. The ranked-by-token-overlap search is an honest
-baseline but Linus's Phase 3 hybrid retrieval will want BM25 + dense embeddings + graph re-ranking; Link's search is a
-fine starting point but not the destination. Compared to `link-mcp`, the sibling MCP-shipping engines in this group
-differentiate mostly on storage substrate and agent-integration story — `link`'s choice of "PyPI-installable MCP server
-pointing at a directory of markdown" is the most operationally simple of the bunch and the easiest to swap out later if
-a sibling proves to have a better retrieval story.
+The web viewer at `serve.py` is more polished than before (CSP, dark mode, fullscreen graph, memory dashboard,
+audit/inbox/explain pages) and now ships a GitHub Pages product site under `docs/`, but Linus still has Streamlit /
+openclaw on the front-end track and shouldn't run a second web UI. The Homebrew tap (`gowtham0992/homebrew-link`) is a
+nice operational detail but not a Linus integration vector. The per-agent install scripts (codex / claude-code / cursor
+/ kiro / copilot / vscode / antigravity each get their own `integrations/<agent>/install.sh`) remain a clever
+configure-someone-else's-config pattern, but Linus owns the harness-facing endpoint itself and won't register as a
+third-party MCP tool in other agents' configs. The starter-prompt machinery (`link prompts`, MCP `starter_prompts`,
+`/prompts`) is a nice onboarding shape — likely Linus's eventual `linus doctor` / `linus prompts` equivalent should
+expose similar guidance, but the actual prompts are Link-specific.
 
 ## 5. What's incompatible or out of scope
 
-Link assumes a single human curator and a single agent maintainer; there is no concept of multi-agent concurrent writes,
-no locking on `wiki/index.md` or `_backlinks.json`, and the `log.md` audit trail is append-only-by-convention rather
-than enforced. Phase 3 multi-agent fan-out would either need to serialize wiki writes through Linus's orchestration
-layer or pick a different substrate. There is no notion of content-hashing or claim-level provenance beyond
-`[confidence: high/medium/low]` strings and `*Source: [[source-page]]*` links in prose — the security synthesis's
-claim-typing and hash-stable identifiers would be a layer Linus adds on top, not something Link provides. The MCP server
-requires the `mcp` SDK, Python 3.10+, and works against a local directory only; no remote wiki, no authentication on
-`serve.py` (binds `127.0.0.1` and the README warns explicitly against exposing it). Single-maintainer project, four
-commits of history visible in the clone, beta status — operational risk if Linus depends on it deeply.
+Single-maintainer project, beta status, still no concept of multi-agent concurrent writes — `wiki/index.md` and
+`_backlinks.json` are still single-writer artifacts, and the new memory lifecycle assumes one human curator + one agent
+maintainer. Phase 3 parallel-Worker fan-out (DEC-0022) would need to serialize memory writes through Linus's
+orchestration layer or pick a different substrate. There is still no content-hashing or claim-level provenance beyond
+`[confidence: high/medium/low]` strings and `*Source: [[source-page]]*` links — the security-synthesis claim-typing
+work is a layer Linus would add on top. The local web viewer is `127.0.0.1`-bound with explicit "do not expose without
+adding auth" warnings; Linus's orchestration layer would replace, not extend, the HTTP surface. The atomic-write helpers
+are good but the lock model is per-file not per-resource — `gather → compile → cache` parallelism (beever-atlas style)
+isn't here. Python 3.10+ minimum for the MCP package.
 
-## 6. Recommendation: **Study**
+## 6. Recommendation: **Adapt** _(was "Study")_
 
-Read `LINK.md`, `mcp_package/link_mcp/server.py` end-to-end, and the `doctor` implementation in `link.py` before
-designing the Phase 2 KnowledgeBase write/maintenance interface. Adopt the page-template + confidence-tag + maturity
-conventions wholesale unless there's a reason not to. Adopt the `get_context` "page plus graph neighborhood in one call"
-API shape for KnowledgeBase's agent-facing retrieval. Do not vendor the code; the value is in the conventions and the
-API shape, not in 2,800 lines of Python that Linus will want to rewrite to share the orchestration layer's session
-store, audit log, and sandbox policy. Revisit after the Group 2 sweep: if a sibling engine offers a better retrieval
-story (BM25, embeddings, claim-typing) with comparable simplicity, prefer that one. If not, `link` is the reference.
+Verdict promoted from Study to Adapt. The 1.1.0 memory-mode pivot gives Linus's memory pillar a much closer fit than
+prior assessments allowed — the schema, lifecycle, agent-facing packet shape, and review/audit/explain surfaces are all
+candidates for direct adoption into the Phase 2 memory-architecture spec rather than just inspirational read-arounds.
+Adapt rather than Integrate because (a) Linus's Worker memory writes must flow through orchestration-layer policy (audit
+log, sandbox, cot_budget / memory_mode dispatch fields), which Link's single-writer model doesn't support out of the
+box; (b) Linus's episodic store has SQLite + content hashes + git as durable substrate per DEC-0029, not pure markdown;
+(c) the MCP server should be Linus's, not a third-party tool registered into Linus. Concrete next move: lift Link's
+`wiki/memories/` schema, the `query_link` packet shape, and the review/inbox/audit/explain surfaces into the
+memory-architecture spec; vendor the `LINK.md` schema document into a `docs/specs/memory-page-schema.md` as a starting
+point; keep `link-mcp` running locally on Dan's machine while the Linus memory layer is built so the pattern stays
+present in daily use. Revisit at Phase 2b consolidation.
 
 ## 7. Questions for Dan
 
-1. **Substrate choice for KnowledgeBase write layer.** Link bets on plain markdown in a directory, no DB. KnowledgeBase
-   today uses SQLite for metadata and a vector store for embeddings. Should Phase 2's wiki-style synthesis layer sit on
-   top of KnowledgeBase's existing storage, or should it adopt Link's directory-of-markdown substrate (with KB
-   continuing to handle papers and embeddings)?
-2. **Confidence tags vs. claim-typing.** The security synthesis argues for typed claims with content-hashed identifiers;
-   Link uses inline `[confidence: high/medium/low]` strings in prose. Are those compatible — confidence as a field on a
-   typed claim — or does adopting claim-typing mean abandoning Link's prose-friendly tagging?
-3. **Wiki maintenance as a Worker job.** The Link model is "agent ingests, agent compiles, agent maintains." On Linus
-   that's a Worker loop running on Qwen2.5-Coder or a future fine-tuned Linus. Is wiki maintenance a good first
-   long-running Worker task to design around in Phase 3, or does it belong later?
-4. **Sibling sweep verdict.** Of the eleven Group-2 engines, only the rest of the sweep will tell us whether Link's
-   stdlib-only / markdown-only minimalism is the right baseline or whether a sibling with embeddings + BM25 + graph
-   re-ranking is closer to what Phase 3 needs. Hold the integration decision until the full Group 2 read is in?
+1. **Memory schema adoption depth.** Should Linus's Layer C episodic-memory page schema be a near-verbatim port of
+   Link's `wiki/memories/` YAML frontmatter (`memory_type`, `scope`, `status`, `review_status`, `update_count`,
+   `last_update_source`), or do you want Linus's schema to diverge for content-hash + claim-typing reasons?
+2. **`query_link` packet shape as Linus's MCP retrieval contract.** Link's bounded-budget agent-facing packet (memory +
+   ranked pages + graph neighborhood + reasons + budget report + follow-up actions in one call) is a strong shape for
+   Linus's eventual KB/memory MCP tools. Adopt as the canonical packet contract in Phase 2a planning, or treat as one
+   candidate among others?
+3. **Memory review workflow as Worker job.** Link's review-pending / inbox / audit / explain surfaces imply a periodic
+   maintenance loop (an agent reviews pending memories, marks reviewed, flags conflicts). On Linus that's a Worker
+   running on Qwen3 against the episodic store. Is "memory review as a long-running Worker task" a Phase 3 design
+   target or later?
+4. **Run `link-mcp` against Dan's local machine in the meantime?** The most concrete way to surface Link's patterns into
+   Linus design decisions is to actually use it daily — `link-mcp` registered in Claude Code with a personal wiki. Worth
+   doing as a Phase 1 background activity (~30 min setup), or premature?
+
+   _Prior Q1 (KB write-layer substrate): partially superseded — DEC-0029 chose SQLite + content hashes + git for Layer
+   C; Link's markdown-only substrate now informs schema, not durable storage._
+
+   _Prior Q2 (confidence vs claim-typing): unchanged — still an open layering question, deferred to Phase 2b._
+
+   _Prior Q3 (wiki maintenance as Worker job): folded into new Q3 above._
+
+   _Prior Q4 (sibling-sweep verdict): closed — Group 2 sweep complete; Link's pivot to memory makes it a primary
+   reference rather than one engine among eleven._

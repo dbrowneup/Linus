@@ -1,5 +1,7 @@
 # beever-atlas (`Beever-AI/beever-atlas`)
 
+_Refreshed 2026-05-18 against upstream HEAD 63be2e0; 219 commits / 619 files reviewed._
+
 ## 1. Purpose and scope
 
 Beever Atlas is an "LLM-first wiki knowledge base" whose unique source of truth is **team chat** — Slack, Discord,
@@ -8,83 +10,105 @@ history through a TypeScript bot service, runs a six-stage Google-ADK ingestion 
 atomic facts, entities, and relationships, persists them into a dual semantic-plus-graph memory (Weaviate + Neo4j +
 MongoDB + Redis), and continuously rebuilds a per-channel auto-maintained wiki on top. Two consumer surfaces hang off
 that memory: a React dashboard with a streaming QA agent and a `fastmcp`-served MCP endpoint exposing 16 tools to
-Claude Code / Cursor. The README is explicit that the design quotes Karpathy's "LLMs read wikis, not chat logs"
-observation — making this a Group 3 sibling of agentic-wiki-builder, AgenticResearchWiki, llm-research-wiki,
-llm-wikidata, atomic-knowledge, and obsidian-llm-wiki-local — but the chat-as-source axis sets it apart from every
-  other repo in that group, which all assume a document/file/URL ingest pattern. It is also the only repo in the group
-  that ships as a multi-service Docker Compose product (backend + bot + web + four datastores) targeted at small teams.
+Claude Code / Cursor. The 0.1.2 release (2026-04-30) hardened the MCP surface (auth middleware, principal-keyed rate
+limits, Redis-backed sliding-window counters for multi-worker deploys, `/api/admin/mcp-metrics`), tightened security
+(retired legacy unauth `/mcp` mount, CodeQL hardening sweep, SSRF hardening, HMAC-signed loader tokens, dependency CVE
+patches), and unified ADK-tool + MCP-tool implementations under a shared `capabilities/` layer. The Unreleased work
+toward 0.2.0 is the provider-agnostic LLM configuration system (`agent-llm-provider-pluggable`) — a unified
+Endpoint+Assignment data model with 19 endpoint presets, 4 apply presets (`gemini-balanced`, `openai-quality`,
+`claude-quality-gemini-fast`, **`fully-local`**), AES-256-GCM-encrypted credentials, LiteLLM single-funnel routing, and
+per-Endpoint circuit breakers. The README explicitly quotes Karpathy's "LLMs read wikis, not chat logs" framing, which
+keeps Beever a Group 2 (LLM-Wiki) sibling, but the chat-as-source axis still differentiates it from every other engine
+in the cluster.
 
 ## 2. Architecture summary
 
 Three services, four datastores. The Python backend (`src/beever_atlas/`) is a FastAPI app built on **Google ADK**
 (`google-adk>=1.28.1`) with `litellm` as the model router and Gemini as the default LLM; embeddings come from Jina v4
-(2048-dim). The chat-source layer is a `BaseAdapter` abstraction in `src/beever_atlas/adapters/base.py` that normalises
-every platform message into a `NormalizedMessage` dataclass (content, author, platform, channel_id, message_id,
-thread_id, attachments, reactions). Concrete adapters live alongside (`bridge.py`, `file_adapter.py`, `mock.py`);
-platform-specific protocol work — websocket subscriptions, OAuth, rate-limit handling, Slack mrkdwn, Block Kit
-formatting — is pushed out to a separate Node/TypeScript bot service in `bot/src/` with files like `bridge.ts`,
-`slack-mrkdwn.ts`, `chat-manager.ts`, `webhook-buffer.ts`, plus SSRF tests for Slack and Mattermost. The Python adapter
-then talks to the bot over an HTTP bridge with `BRIDGE_API_KEY` shared-secret auth. The ingestion pipeline
-(`agents/ingestion/pipeline.py`) is an ADK `SequentialAgent` with explicit `ParallelAgent` fan-outs: stage 1
-preprocesses, stage 2 fans out fact extraction and entity extraction in parallel, stage 3 fans out embedding and
-cross-batch contradiction validation in parallel, stage 4 persists into Weaviate (3-tier: channel / topic / atomic fact)
-and Neo4j (entity graph). The wiki layer (`src/beever_atlas/wiki/`) is a `gather → compile → cache` pipeline guarded by
-a module-level per-channel `asyncio.Lock` so only one regeneration runs per channel at a time regardless of target
-language; the QA layer (`agents/query/qa_agent.py`) streams answers over SSE and a smart router picks semantic vs graph
-retrieval per question. An `agents/mcp_registry.py` and `fastmcp` server expose a curated 16-tool surface for external
-code agents.
+(2048-dim) by default but are now provider-pluggable (Jina / OpenAI / Cohere / Voyage / Gemini / Mistral / Ollama) via
+LiteLLM through PR #154 and the Endpoint+Assignment model. The chat-source layer is the `BaseAdapter` abstraction in
+`src/beever_atlas/adapters/base.py` normalising every platform message into a `NormalizedMessage` dataclass; concrete
+adapters live alongside (`bridge.py`, `file_adapter.py`, `mock.py`), with platform-specific protocol work pushed out to
+a separate Node/TypeScript bot service in `bot/src/` and HTTP-bridge shared-secret auth. The ingestion pipeline
+(`agents/ingestion/pipeline.py`) is an ADK `SequentialAgent` with `ParallelAgent` fan-outs: preprocess → (extract facts
+‖ extract entities) → (embed ‖ contradiction validation) → persist (Weaviate 3-tier + Neo4j entity graph). The wiki
+layer (`src/beever_atlas/wiki/`) is `gather → compile → cache` with per-channel `asyncio.Lock`; the 2026-05 graph
+overhaul (PR #168) typed entities, added a classifier and co-mention edges, and updated the React UI. The QA layer
+streams answers over SSE with a smart router picking semantic vs graph per question. The MCP `/mcp` mount is now the
+single bearer-auth-required endpoint, with the legacy unauth mount removed and CodeQL alerts #1–#60 hardened —
+least-privilege workflow permissions, static-dictionary error messages at HTTP sinks, exact-host URL substring
+matching, per-platform host allowlists, strict UUID validation, double-HTML-entity-decoding fix, SSRF host allowlists
+on bridge file fetches. New ops scaffolding includes a Makefile, GitHub Actions CI (backend ruff/pytest, web/bot
+lint/test/build), CodeQL on push/PR/weekly cron, NebulaGraph as a second graph backend (`GRAPH_BACKEND` env var, Neo4j
+default), Apache-2.0 license + NOTICE, comprehensive runbooks (`docs/runbooks/ai-setup.md`,
+`docs/runbooks/atlas-yaml.md`, `docs/runbooks/litellm-cutover.md`), and an `atlas` installer with three install modes
+(interactive Step-2 picker, `BEEVER_ENDPOINTS` env JSON, declarative `atlas.yaml` via `atlas apply`).
 
 ## 3. What's reusable in Linus
 
-For Dan's single-user PDF/paper-corpus workflow, the directly portable parts are architectural rather than connector
-code. The wiki-first-RAG thesis itself — distil the corpus into a structured per-source wiki at ingestion, then retrieve
-against the wiki rather than raw chunks — is the same Karpathy idea agentic-wiki-builder embodies, but beever-atlas
-demonstrates it at production scale with a real graph store and a real query router on the back. The
-`gather → compile → cache` shape with per-resource async locks (`wiki/builder.py`) is a clean pattern Linus's
-KnowledgeBase wiki layer can copy outright. The 6-stage ADK pipeline shows a concrete way to express "preprocess →
-(extract facts ‖ extract entities) → (embed ‖ validate) → persist" as a typed pipeline, including the ParallelAgent
-placement — Linus's Phase 3 parallel-agents design can lift this skeleton directly. The dual semantic + graph memory
-with a smart router is the strongest answer in the Group 3 cohort to the "vector RAG can't do relational questions"
-problem; KnowledgeBase v2 likely wants this shape. The `fastmcp` 16-tool MCP surface is a good reference for the
-eventual Linus MCP server.
+The wiki-first-RAG thesis (distil the corpus into a per-source wiki at ingestion, retrieve against the wiki rather than
+raw chunks) and the dual semantic+graph memory with a smart router remain the headline architectural patterns to lift —
+unchanged from the prior note. New for the 2026-05-18 refresh:
 
-The chat-as-source axis is what differentiates beever-atlas from every Group 3 sibling: agentic-wiki-builder ingests
-single source files, llm-research-wiki and AgenticResearchWiki ingest research outputs, llm-wikidata targets the
-Wikidata schema, atomic-knowledge focuses on ontology, obsidian-llm-wiki-local lives inside an Obsidian vault. None of
-those translate to Dan's papers/PDFs corpus directly, and neither does beever-atlas's chat ingest — but the
-`BaseAdapter` + `NormalizedMessage` shape is itself a reusable template if Linus ever wants a single PDF / paper / note
-/ clipboard adapter API in front of KnowledgeBase.
+- **`fully-local` LLM apply preset.** The Endpoint+Assignment model explicitly ships a `fully-local` preset alongside
+  Gemini/OpenAI/Claude presets, and LiteLLM is the single funnel for every completion. This is direct precedent for
+  Linus's "no paid APIs required for operation" north star — the same ADK-based ingestion can run against an Ollama or
+  pmetal endpoint via LiteLLM, with provider switching declarative through `atlas.yaml`. Worth studying for how
+  multi-agent ADK systems can be made model-pluggable without rewriting agent code.
+- **Capability-layer extraction.** The 0.1.2 work that moved ADK tools and MCP tools into a shared
+  `src/beever_atlas/capabilities/` layer is the pattern Linus's tool registry should adopt — write the capability once,
+  expose it through whatever surface a given Worker needs. Directly parallel to the planned Linus tool-registry shape.
+- **MCP auth + rate-limit hardening.** Per-tool channel-access checks, bearer auth, principal-keyed rate limits with
+  Redis-backed sliding-window counters across worker processes, principal ACL fallback, HMAC-signed loader tokens, the
+  `/api/admin/mcp-metrics` operator view. Linus's eventual MCP server needs all of this; Beever's `/mcp` mount is a
+  good reference implementation.
+- **Long-running job pattern over MCP.** Documented in `docs/mcp-server.md` along with error codes and rate-limit
+  shapes. Worth lifting verbatim.
+- **CodeQL + supply-chain hardening as a release gate.** The hardening sweep (#1–#60) is concrete and worth replicating
+  on Linus's own Python/TypeScript surfaces once the orchestration layer is real.
+
+The 6-stage ADK SequentialAgent + ParallelAgent ingestion skeleton, the `gather → compile → cache` wiki builder with
+per-resource async locks, and the `BaseAdapter` + `NormalizedMessage` source-abstraction shape remain directly liftable
+patterns from the prior note.
 
 ## 4. What's inspiration only
 
 The four-datastore footprint (Weaviate + Neo4j + MongoDB + Redis), the React dashboard, the bot service, docker-compose
 orchestration, OAuth/encryption infrastructure for stored platform credentials, the rate-limit and SSRF-protection
-plumbing, the per-agent MCP auth and rate limits — none of this is appropriate for Linus's single- user local context.
-The Gemini + Jina API dependency is a clean architectural choice for Beever's hosted scenario but the opposite of
-Linus's "no paid APIs required for operation" north star; ADK with `litellm` would in principle let the same pipeline
-run against an Ollama or pmetal endpoint, but verifying that is real work and the wiki/QA prompts are tuned for
-Gemini-class models. Compared to sibling **agentic-wiki-builder** specifically: agentic-wiki-builder is ~140 lines of
-glue around OpenCode and uses git itself as the citation log; beever-atlas is a 30+ KLOC product with explicit citations
-linked back to source messages in a managed wiki cache. Dan's KnowledgeBase scale sits closer to the
-agentic-wiki-builder end, but Beever's compile-and-cache discipline is what to copy as KnowledgeBase grows.
+plumbing across web/bot/backend, and the per-agent MCP auth — none of this is appropriate for Linus's single-user local
+context. The Endpoint+Assignment data model is sophisticated (UUIDs, AES-256-GCM-encrypted creds, RPM budgets, curated
+model lists, AWS-IAM/Google-SA auth types, declarative `atlas.yaml`) but more ceremony than Dan's single-machine setup
+needs. The 16-tool MCP surface is comprehensive but channel-scoped; Linus's eventual MCP server should be paper- and
+note-scoped instead, so the tool list is a structural reference rather than a portable contract. The atlas installer
+with interactive Step-2 LLM picker is well-built but solves a multi-provider, multi-key, hosted-deployment configuration
+problem Linus has explicitly chosen to avoid (DEC-0027: local-first, no paid APIs required). NebulaGraph as a second
+graph backend is interesting but neither Neo4j nor NebulaGraph is on Linus's substrate roadmap (rdflib + property graph
+per DEC-0015).
 
 ## 5. What's incompatible or out of scope
 
-Chat platforms aren't a Linus ingest target. Slack/Discord/Teams/Mattermost connectors, the bot service, OAuth flows,
-Block Kit formatters, and the encrypted credential vault are zero-utility for Dan's workflow and represent the bulk of
-the codebase. Google ADK is a defensible choice but adds a heavy dependency and a programming model that doesn't align
-with Linus's planned orchestration layer. Weaviate and Neo4j are both Docker-resident JVM/Go services — fine for a team
-appliance, but Linus has been deliberately keeping its data plane in Qdrant + SQLite + filesystem, and neither swap is
-free. The Apache 2.0 license is permissive, but the chat-platform nature of the codebase means there are very few files
-where lifting code wholesale makes sense — patterns are the value here, not source.
+Unchanged from the prior note: chat platforms aren't a Linus ingest target. Slack/Discord/Teams/Mattermost connectors,
+the bot service, OAuth flows, Block Kit formatters, and the encrypted credential vault are zero-utility for Dan's
+workflow and represent the bulk of the codebase. Google ADK remains a heavy dependency and a programming model
+distinct from Linus's planned orchestration layer; the new LiteLLM funnel and `fully-local` preset make it _possible_
+to point ADK at a Linus endpoint, but the agent-prompts are still tuned for Gemini-class models and the dependency
+weight argues against adoption. Weaviate and Neo4j are still Docker-resident JVM/Go services; Linus keeps its data
+plane in Qdrant + SQLite + filesystem per DEC-0015. The Apache 2.0 license is permissive but the chat-platform nature
+of the codebase means there are very few files where lifting code wholesale makes sense — patterns are the value, not
+source. The Docker Compose multi-service shape (backend + bot + web + 4 datastores) is a team-appliance product, not a
+personal-AI product.
 
 ## 6. Recommendation: **Study**
 
-Read for the wiki-first-RAG architecture, the ADK SequentialAgent + ParallelAgent shape of the ingestion pipeline, the
-`gather → compile → cache` wiki builder with async per-resource locks, and the dual semantic+graph memory + smart
-router. Lift those patterns into KnowledgeBase v2 design. Do not adopt the codebase, the dependency stack (ADK,
-Weaviate, Neo4j, Gemini, Jina), or the chat connectors. Revisit if Linus ever grows a "team mode" or if Dan wants
-chat-history ingest from his own DMs/Discords (unlikely on the current roadmap).
+Verdict unchanged. Read for the wiki-first-RAG architecture, the ADK SequentialAgent + ParallelAgent shape, the
+`gather → compile → cache` wiki builder with async per-resource locks, the dual semantic+graph memory + smart router,
+the capability-layer extraction pattern, and the MCP auth/rate-limit hardening. Lift those patterns into Linus's
+Phase 2/3 KB and MCP-server designs. The 0.1.2 + Unreleased work materially strengthens the "Study" recommendation —
+LiteLLM-funnel + `fully-local` preset + Endpoint+Assignment is precedent for how a multi-agent ADK system stays
+provider-pluggable, and the MCP hardening is directly applicable to Linus's eventual MCP server. Do not adopt the
+codebase, the dependency stack (ADK, Weaviate, Neo4j, Gemini default, Jina default), or the chat connectors. Still
+earns its G2-cluster wiki-engine spot — the chat-as-source differentiator is intact, and the wiki-first-RAG thesis is
+now backed by a production-grade hardening pass.
 
 ## 7. Questions for Dan
 
@@ -108,3 +132,12 @@ chat-history ingest from his own DMs/Discords (unlikely on the current roadmap).
    the bytes come from" from "what the pipeline does with them." Even ignoring chat, Dan has papers, threads, notes, and
    pics. Is there value in defining a similar `BaseSource` abstraction in KnowledgeBase before more source types
    accumulate, or is that premature?
+
+5. **LiteLLM as the single completion funnel.** Beever's Unreleased work routes every completion through LiteLLM with a
+   `fully-local` preset that targets Ollama. Worth adopting LiteLLM as Linus's own provider-routing layer (so a single
+   `linus.yaml` declarative config switches between pmetal / Ollama / future hosted models), or is that more
+   indirection than a personal-AI orchestration backend warrants?
+
+6. **Capability-layer pattern for the Linus tool registry.** Beever's `src/beever_atlas/capabilities/` shares a single
+   implementation across ADK tools and MCP tools. Worth designing Linus's tool registry around the same shape —
+   write-once, expose-everywhere — from Phase 2a, or wait for the MCP surface to land first?
