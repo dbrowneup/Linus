@@ -1,5 +1,7 @@
 # goose (`block/goose`)
 
+_Refreshed 2026-05-18 against upstream HEAD 60c482d; 138 commits / 383 files reviewed._
+
 ## 1. Purpose and scope
 
 goose is a **production Rust+MCP coding agent** — a desktop app, CLI, and embeddable agent server originally shipped by
@@ -104,14 +106,47 @@ variables. The recipe shape is essentially "a portable, reviewable agent task sp
 but task-scoped rather than full agent-state, and oriented around human authoring rather than agent serialization.
 
 The **Anthropic Agent Client Protocol (ACP) bridge** at `crates/goose/src/acp/` is goose's interop layer with
-Anthropic's emerging client protocol (the protocol Claude Code, Cursor, Codex, and Zed converge on). The module provides
-server-side ACP support (so goose can present its agent surface as an ACP server consumable by ACP-aware clients) and
-provider-side ACP shims (`providers/{claude,codex,gemini,copilot,amp,cursor,pi}_acp.rs`) so goose can **consume external
-ACP-shaped agents as if they were LLM providers** — this is how goose bridges to existing Claude Code subscription auth,
-Codex CLI, Gemini CLI, GitHub Copilot, Amp, and Pi. The `goose-acp-macros` crate provides proc macros that generate the
-protocol's request/response plumbing. Combined with the OpenAI-compatible shim, this gives goose three protocol shapes
-simultaneously: native HTTP per provider, OpenAI-compatible HTTP via `OpenAiCompatibleProvider`, and ACP via the
-`*_acp.rs` providers — a multi-protocol stance worth noting against DEC-0005's OpenAI-only commitment.
+Anthropic's emerging client protocol (the protocol Claude Code, Cursor, Codex, and Zed converge on). As of 2026-05-18
+the module has grown into a full subsystem: `acp/server/` (eleven submodules covering `config`, `custom_dispatch`,
+`dictation`, `dispatch`, `extensions`, `onboarding`, `providers`, `resources`, `sessions`, `sources`, `tools`) and
+`acp/transport/` (`connection`, `http`, `websocket`, plus `mod`) — the WebSocket transport landed alongside HTTP as a
+first-class option. Crucially, PR #9097 ("mount acp in the goosed server to migrate using acp protocols iteratively",
+2026-05-18) commits goose to a **planned iterative migration from the OpenAPI HTTP surface to ACP** — the goosed server
+now mounts ACP endpoints natively and the ACP-migration spike docs in `ui/desktop/spike-doc/` (`acp-migration-spike.md`,
+`acp-config-extensions-first-spike.md`) lay out the long-term direction. This is a substantive escalation from the
+earlier "ACP is an extra protocol shape" framing: goose is treating ACP as the **destination** protocol, with OpenAPI
+preserved transitionally. Provider-side ACP shims (`providers/{amp,claude,codex,copilot,pi,cursor,gemini}_acp.rs`,
+backed by a new `providers/acp_tooling.rs` helper) let goose consume external ACP-shaped agents as if they were LLM
+providers — this is how goose bridges to existing Claude Code subscription auth, Codex CLI, Gemini CLI, GitHub Copilot,
+Amp, and Pi. The `goose-acp-macros` crate provides proc macros that generate the protocol's request/response plumbing.
+Combined with the OpenAI-compatible shim, this gives goose three protocol shapes simultaneously and an explicit
+directional bet on ACP — a multi-protocol stance worth noting against DEC-0005's OpenAI-only commitment, and a sharpened
+signal for the DEC-0056 Anthropic-compat-amendment direction.
+
+The **Hooks subsystem** (`crates/goose/src/hooks/mod.rs`, 555 lines, landed 2026-05-11 in PR #9093) is a new shipped
+surface that runs user-defined shell hooks at agent-lifecycle events — `session_start`, `pre_tool_call`,
+`post_tool_call`, `session_end`, and similar — declared in plugin-provided `hooks.json` files. Hooks are discovered via
+a new `plugins/discovery.rs` module that scans well-known plugin directories and parses the `open-plugins` format
+(`plugins/formats/open_plugins.rs`); `plugin.json` declares each plugin and what hooks (or skills) it ships. The
+companion **Skills surface** (`feat: Dynamically refresh skill instructions each turn` #9217 +
+`plugins: add open plugins (just skills for now)` #9063 + `Add Location column to CLI skills table` #8785) treats skills
+as another plugin artifact alongside hooks, with skill instructions re-loaded each turn rather than cached. Together
+hooks + skills + recipes form goose's three-tier extensibility stack: recipes are full task specs; skills are reusable
+instruction bundles; hooks are imperative shell escape hatches at lifecycle boundaries. The
+`examples/plugins/hello-hooks/` shipped plugin is the canonical reference.
+
+Other notable 2026-Q2 deltas: a new `goose review` CLI command (`feat(cli): add goose review local code review command`
+#9114) that runs a local code-review pass against staged changes — directly parallel to Claude Code's review skill. A
+**TUI diff viewer** (`feat(tui): diff viewer` #9260) renders structured diffs in the terminal. The provider catalog grew
+(~5 new declarative providers: Atomic Chat, oMLX, routstr, FuturMix, SaladCloud, plus Venice migrated from custom to
+declarative) and the local-inference path was refactored around a backend abstraction
+(`refactor local inference around backends` #9137). The Filesystem MCP extension was **removed from the catalog**
+(#9225) in favor of goose's built-in `developer` platform extension. `feat: support GOOSE_OAUTH_CALLBACK_PORT` (#9209)
+plus proactive OAuth token refresh (#8386) hardened the OAuth story.
+`feat(providers): strip chain-of-thought markers from custom provider output` (#8635) ships a CoT-stripping pass for
+custom providers. A `worktree-aware directory switcher` (#8450) recognizes git worktrees as first-class CWDs — relevant
+to Linus's worktree-fanout discipline. The pre-commit / pre-push hooks at the repo level were removed (#9157) in favor
+of CI-only enforcement.
 
 The **goose-server (goosed)** binary at `crates/goose-server/src/main.rs` is the OpenAPI-spec'd HTTP backend. Three
 subcommands: `Agent` (the full chat server with axum routers under `routes/`), `Mcp` (runs one of the bundled MCP
@@ -199,15 +234,49 @@ The `goose-mcp` crate shipping its own MCP servers also means a Linus-side MCP s
 config-file edit; goose's bundled servers (`developer`, `memory`, `computercontroller`, `autovisualiser`) are useful
 comparison points for what a Linus equivalent should expose.
 
-**Phase 5+ — Anthropic ACP support as a third confirming signal for revisiting DEC-0005's OpenAI-only commitment.** Per
-the [Letta repo-note](Letta.md) §3 and the [Kimi-K2 repo-note](Kimi-K2.md) §3, Anthropic-compatible HTTP endpoints are
-shipping alongside OpenAI-compatible endpoints in modern open-source agent products. goose's full ACP integration — both
-server-side (goose presents an ACP surface) and client-side (goose consumes Claude Code, Cursor, Codex, Gemini, Copilot,
-Amp, Pi as ACP-shaped providers) — adds a **third** confirming signal that the protocol landscape is moving plural
-rather than single. DEC-0005 commits Linus to OpenAI-compatible-only at v0; the third signal sharpens the case for a
-Phase 5+ ADR on Anthropic-compatible (or full ACP) HTTP as a Linus capability. The natural shape: Linus exposes
-OpenAI-compatible HTTP as the v0 contract per DEC-0005, and Phase 5+ adds ACP as a second endpoint shape so any
-ACP-aware Rust harness (goose included) can talk to Linus natively without going through the OpenAI shim.
+**Phase 2a / Phase 5+ — Anthropic ACP support, now a directional-not-just-confirming signal (DEC-0056 sharpens).** As of
+the 2026-05-18 refresh, goose has escalated ACP from "an additional provider shape" to "the destination protocol the
+goosed server is iteratively migrating onto" (PR #9097,
+`mount acp in the goosed server to migrate using acp protocols iteratively`). The ACP module now ships a server subtree
+(`acp/server/{config,custom_dispatch,dictation,dispatch, extensions,onboarding,providers,resources,sessions,sources,tools}.rs`)
+plus a transport subtree with **WebSocket alongside HTTP** (`acp/transport/{connection,http,websocket}.rs`), and the
+`ui/desktop/spike-doc/acp-migration-spike.md` spike document lays out a multi-quarter migration plan. Combined with
+Letta ([Letta.md](Letta.md) §3), Kimi-K2 ([Kimi-K2.md](Kimi-K2.md) §3), and openclaw's protocol-negotiation support
+landing in promptfoo ([promptfoo.md](promptfoo.md) §3), the cluster of independent ACP-adopter products is now four —
+and goose's directional bet is the strongest of the four. This puts the DEC-0056 amendment work (Anthropic-compat HTTP
+as a Phase 2a-or-later endpoint shape) on firmer empirical ground; the relevant question is no longer "should Linus
+support ACP?" but "what's the right phasing for the Linus ACP endpoint relative to OpenAI-compat?" goose's
+iterative-migration posture is the most directly liftable precedent: ship OpenAI-compat at v0 per DEC-0005, mount an ACP
+surface alongside in Phase 5+, retire one of them only after both have measured production usage. The WebSocket
+transport in particular is worth lifting design-wise — for any LAN-side multi-turn agent session the WebSocket shape
+carries cleaner back-pressure semantics than long-polling HTTP streaming.
+
+**Phase 2+ — Hooks subsystem (PR #9093) as a design reference for Linus lifecycle hooks.** Goose's new
+`crates/goose/src/hooks/mod.rs` ships a declarative `hooks.json` schema that runs user-defined shell hooks at
+`session_start` / `pre_tool_call` / `post_tool_call` / `session_end` lifecycle events, discovered via the `plugins/`
+subsystem (`plugins/discovery.rs` + `plugins/formats/open_plugins.rs`). The shape (plugin.json declares a plugin;
+hooks.json declares hooks; plugins are discovered from well-known directories at startup) is directly analogous to
+Linus's existing PostToolUse hook chain in `.claude/settings.json` (formatters, linters) — but at the **agent**
+lifecycle rather than the Claude Code harness lifecycle. For Linus Phase 2+ orchestration, a plugin-discovered hooks
+substrate is the natural way to let Dan plug in custom guards (e.g., a Phase 7+ biosecurity tier check at
+`pre_tool_call`) without forking the orchestration core. Worth lifting the shape; the implementation is Rust-side and
+Linus's orchestration core is Python.
+
+**Phase 2+ — Skills plugin format and per-turn refresh as the skills-substrate reference.** The
+`feat: Dynamically refresh skill instructions each turn` (#9217) + `plugins: add open plugins (just skills for now)`
+(#9063) commits ship a declarative skill format (instructions + metadata) loaded from plugin directories with the
+explicit design choice of **re-loading instructions every turn** rather than caching them at agent boot. This matters
+for Linus Phase 7+ skills (DEC-0046 external-API tool registry, DEC-0047 biosecurity tier control): per-turn refresh
+means a skill manifest update propagates within one agent turn, no restart required. Linus's eventual skill substrate
+should match this property; the Linus equivalent of the `Location` column in goose's CLI skills table (which surfaces
+the discovery directory each skill came from) is also a useful auditability win.
+
+**Phase 5+ — `goose review` (PR #9114) as a Rust-product reference for a Linus-side review subcommand.** The new
+`goose review` CLI runs a local code-review pass against staged changes in the working directory — a natural-language
+equivalent of Linus's `simplify` skill or Claude Code's `/review`. Surface area is narrow (one subcommand, one
+recipe-shaped task spec under the hood) but it's a clean reference for what a `linus review` subcommand would look like
+once Phase 5+ ships a CLI surface — and the implementation choice (review-as-recipe rather than review-as-special-case)
+is the right pattern: a review pass is just another recipe, exposed as a CLI shortcut.
 
 **Phase 5+ — local-inference path as a confirming signal for the multi-tier provider story.** goose's `local-inference`
 Cargo feature (on by default) loads GGUF models via `llama-cpp-2` plus `candle` for tensor ops, supports Metal on macOS,
@@ -318,7 +387,7 @@ the Linus substrate." goose is too large and too organizationally-coupled to ven
 cost (tracking upstream churn, merging Block/AAIF feature work into a Linus fork) outweighs any code-reuse benefit. The
 lift is at the design level only.
 
-## 6. Recommendation: **Study**
+## 6. Recommendation: **Study** _(unchanged 2026-05-18; see refresh note)_
 
 Read goose's MCP-side and provider-side architecture as the canonical Rust+MCP harness reference. Specifically: read
 `crates/goose/src/agents/mcp_client.rs` (the `McpClientTrait` full surface and the `GooseMcpHostInfo` capability struct)
@@ -333,6 +402,15 @@ as the design reference for any Linus Phase 5+ Rust harness's plugin surface. Re
 `crates/goose/src/agents/ subagent_handler.rs` for the Worker-fan-out shape goose's subagent machinery implements. Read
 `crates/goose-server/src/main.rs` for the `goose agent` / `goose mcp <server>` CLI dispatch pattern as the design
 reference for any future `linus agent` / `linus mcp <server>` CLI.
+
+**Refresh-added reading (2026-05-18):** Read `crates/goose/src/acp/server/` (eleven submodules) and
+`crates/goose/src/acp/transport/{http,websocket,connection}.rs` plus the spike documents at
+`ui/desktop/spike-doc/acp-migration-spike.md` and `ui/desktop/spike-doc/acp-config-extensions-first-spike.md` — these
+together are the primary reference for the DEC-0056 Anthropic-compat-amendment Phase 2a / Phase 5+ planning work. Read
+`crates/goose/src/hooks/mod.rs` plus `crates/goose/src/plugins/discovery.rs` + `plugins/formats/open_plugins.rs` and the
+canonical `examples/plugins/hello-hooks/` plugin as the Hooks-substrate reference for a Linus equivalent. Skim
+`crates/goose-cli/src/commands/review.rs` (or wherever the `feat(cli): add goose review` #9114 entry point lands) for
+the review-as-recipe pattern.
 
 Cluster cell: [g7-harnesses](../syntheses/repo-clusters/g7-harnesses.md). goose belongs in the harness cluster alongside
 `cline`, `claw-code`, `claw-code-local`, `openclaw`, and `claude-code-guide`. Within that cluster goose is the **shipped
@@ -446,3 +524,28 @@ deliverable.
    spec name goose's recipe-scanner as a design reference? Tentative answer: yes when the spec is drafted, but defer the
    spec itself to Phase 7+ — Linus is single-user, Dan-authored-skills-only at v0; external skill acceptance is
    genuinely Phase 7+ territory. Document the reference now, write the spec when it becomes load-bearing.
+
+9. **ACP-migration phasing (2026-05-18 refresh).** The 2026-05-18 upstream snapshot shows goose treating ACP as the
+   destination protocol, not just an additional shape: PR #9097 mounts ACP inside goosed and the
+   `acp-migration-spike.md` document commits to a multi-quarter migration plan, with WebSocket transport already shipped
+   alongside HTTP. This sharpens DEC-0056 (Anthropic-compat amendment) from "should we?" to "when, and is WebSocket part
+   of v1?" Three plausible postures for the Phase 2a Linus orchestration backend: (a) ship OpenAI-compat HTTP only at v0
+   per DEC-0005, defer ACP to Phase 5+; (b) ship OpenAI-compat HTTP at v0 and mount an ACP HTTP surface in Phase 2b/c —
+   earlier than originally planned — given the four-product convergence (Letta, Kimi-K2, goose, plus
+   openclaw-via-promptfoo); (c) ship both protocols at v0 with WebSocket transport for ACP, matching goose's
+   most-aggressive shape. Tentative answer: (b) — defer to Phase 2b/c rather than Phase 5+. v0 stays OpenAI-compat-only
+   (the spec is simpler, the harness coverage from Cline / Claude Code / openclaw is immediate), but Phase 2b/c adds ACP
+   HTTP as a second endpoint to capture the goose / Letta / Kimi-K2 client surface natively. WebSocket transport is a
+   Phase 5+ optimization, not a v1 requirement. Worth re-anchoring the DEC-0056 amendment text against this acceleration
+   at the next planning-update session.
+
+10. **Hooks-substrate adoption as a Phase 2+ Linus capability.** Goose's new Hooks subsystem (PR #9093) plus the
+    plugins/discovery scaffolding gives Linus a worked Rust-side reference for declarative agent-lifecycle hooks
+    (`session_start`, `pre_tool_call`, `post_tool_call`, `session_end`) wired through a plugin-discovery layer. Linus
+    already has Claude-Code-harness-lifecycle hooks (`.claude/settings.json` PostToolUse running ruff/prettier); the
+    open question is whether the **orchestration layer** should ship an analogous agent-lifecycle hooks substrate.
+    Tentative answer: yes for Phase 2+. The natural shape is a Pydantic-validated `hooks.json` per plugin, discovered
+    from `~/.linus/plugins/` and `src/linus/plugins/`, executed via subprocess at lifecycle events. The `pre_tool_call`
+    hook in particular is the natural cut-in point for the Phase 7+ biosecurity tier check (DEC-0047) — separating the
+    hook substrate from the biosecurity policy makes both lighter. Write a Phase 2+ spec ADR for "Linus agent-lifecycle
+    hooks" referencing goose's `crates/goose/src/hooks/mod.rs` as the design baseline.
