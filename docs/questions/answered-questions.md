@@ -15,6 +15,7 @@ Sister documents:
 
 ## Table of contents
 
+- [2026-05-18 session resolutions](#session-2026-05-18-resolutions)
 - [Round 4 sweep (resolved 2026-05-16)](#round-4-sweep-resolved-2026-05-16)
 - [Sweep Tier 3 + Entrepreneurship (resolved 2026-05-06)](#sweep-tier-3--entrepreneurship-resolved-2026-05-06)
 - [Sweep Tier 2 — S11–S31 (resolved 2026-05-06)](#sweep-tier-2--s11s31-resolved-2026-05-06)
@@ -31,6 +32,70 @@ Sister documents:
 - [Source-archive items propagated and resolved (from open-questions.md)](#source-archive-items-propagated-and-resolved-from-open-questionsmd)
 - [Uncovered resolutions](#uncovered-resolutions)
 - [Resolution sessions log](#resolution-sessions-log)
+
+---
+
+<a id="session-2026-05-18-resolutions"></a>
+
+## 2026-05-18 session resolutions
+
+Mid-cycle audit pass after the 2026-05-18 consolidation arc (PRs #50–#56) merged. Three top-questions items were
+informed by empirical work landed on 2026-05-18 — none reach full RESOLVED status (each remains a Dan-judgment call
+or a still-unrun reconciliation), but the data inputs are now durable and worth recording so the next planning
+session inherits them. Conservative pass: items considered-but-not-marked are listed at the end of this section.
+
+#### R2-03. Dan task suite scope and grader design (Phase 1d)
+
+**Informed, not resolved.** The 2026-05-18 baseline run produced two new artefacts —
+`benchmarks/results/dan_tasks_baseline_2026-05-18-qwen3-8b.json` (qwen3:8b, all three tasks succeeded) and
+`benchmarks/results/dan_tasks_baseline_2026-05-18-qwen3.6-27b.json` (qwen3.6:27b, all three tasks timed out at 600s).
+These give the suite an empirical comparison anchor at the current scope (3 tasks) for two new Worker candidates beyond
+the qwen2.5-coder:7b 2026-05-16 baseline. The scope/grader decision itself remains explicitly Dan-owned: the
+[`2026-05-18-dan-manual-tasks.md`](../specs/2026-05-18-dan-manual-tasks.md) doc (PR #56) carries this as **C2** — Dan
+authors `docs/adr/0064-dan-task-suite-scope.md` plus the new task definitions in `benchmarks/dan_tasks/tasks/`, with
+N7 (R3-08) landing the cross-task convention separately. R2-03 stays open in top-questions; resolution closes when the
+C2 ADR lands.
+
+#### R3-04. Phase 1c spike model list reconciliation
+
+**Informed, not resolved.** The qwen3.6:27b failure (3/3 tasks timed out at 600s, 17 GB model on 32 GB unified memory
+almost certainly swap-thrashing — see `benchmarks/results/dan_tasks_baseline_2026-05-18-qwen3.6-27b.json` and the
+[`2026-05-18-dan-manual-tasks.md`](../specs/2026-05-18-dan-manual-tasks.md) E3 commentary) is a hardware-limit
+datapoint: any Phase 1c sweep candidate at 27B-parameter scale is non-viable on the current M1 Max 32 GB hardware at
+the current 600s timeout, independent of which synthesis lists it. The existing `docs/specs/phase1c-spike.md` already
+caps the FP16 baseline (C4) at Qwen2.5-7B or 14B — the 27B failure confirms 14B is the right ceiling rather than a
+later 27B aspiration. The actual reconciliation work — comparing the g1-apple-silicon and native-low-bit synthesis
+model lists and committing the merged list to `phase1c-spike.md` — has not landed. R3-04 stays open; the 27B datapoint
+should be folded into the reconciliation rationale when it lands.
+
+#### R3-22. Bonsai Ternary 8B domain-task quality gap measurement
+
+**Informed, not resolved.** qwen3:8b ran cleanly on the 3-task suite on 2026-05-18 — providing a same-scale (~8B
+parameters) FP16 Ollama-served comparison anchor against which a future Bonsai Ternary 8B (or PrismML ternary 8B,
+C2 in the spike) run can be measured. R3-22 explicitly framed the question as the pre-Phase-1c informal 10-task run on
+genomics/metagenomics; that run has not happened. What changed today is that the FP16 8B side of the comparison now
+has a recorded 3-task baseline at `benchmarks/results/dan_tasks_baseline_2026-05-18-qwen3-8b.json`, so when the Bonsai
+ternary run is executed (whether pre-Phase-1c or as part of the formal sweep) the comparison is grounded against a
+real qwen3:8b baseline rather than against a published-benchmark surrogate. R3-22 stays open.
+
+**Items considered but not touched in this audit:**
+
+- **R3-08** (benchmarking ADR codifying open-answer-headline + coverage/accuracy/precision convention): unchanged.
+  Tracked as **N7** in the 2026-05-17 implementation-plan-v2; ADR has not landed. The qwen3 baselines are per-task data
+  in the existing flat format, not a codification of the convention.
+- **R3-25** (Origin macOS Tahoe compatibility): unchanged. The 2026-05-18 repo-pull audit
+  (`docs/audits/2026-05-18-repo-pull-status.md`) flags origin as a high-impact tier candidate (157 commits / 512
+  files) and notes "Macos Tahoe quirk noted in R3-25" without resolving it. The actual `sw_vers` + `cargo build` smoke
+  test that R3-25 demands has not run.
+- **R2-38** (WeKnora per-KB indexing toggle): unchanged. The repo-pull audit flags WeKnora as a high-impact tier
+  candidate (383 commits / 827 files) and explicitly tags R2-38 as "the open question" awaiting a refresh. The
+  per-KB-indexing-toggle design call hasn't moved.
+- **R3-07** (worktree fan-out vs sequential dispatch): already partial-resolved 2026-05-16 (see N6 janitorial below).
+  The PR #55 References-section 5-agent fan-out landed cleanly and produced no new worktree-discipline lessons in
+  CLAUDE.md; no further partial-resolution material to add.
+- **Moby / distroless / Spinner paper-note** (PR #53): no R-NN closure. The moby repo-note touches R2-15 (Phase 7
+  Worker sandboxing) as reference material only, not as a resolution. The Spinner protein-design paper-note is a
+  benchmarking-methodology reference for cross-model evaluation; no top-questions item is resolved by its landing.
 
 ---
 
@@ -1378,6 +1443,17 @@ during the next planning session. The remaining uncovered items are correctly un
 The metadata about when and how questions were resolved. Promotes the `Resolution Log` headers that previously sat at
 the top of `top-questions.md` into one place at the bottom of this archive, so the reader's first impression is the
 resolved Q&A pairs (most relevant) rather than session bookkeeping.
+
+### 2026-05-18 — Post-consolidation question audit (Worker)
+
+No full RESOLVED resolutions; three INFORMED-not-resolved entries propagated. The 2026-05-18 consolidation arc (PRs
+#50 N1 sandbox, #51 N6 janitorial, #52 v2 implementation plan, #53 Wave-2 stragglers, #54 synthesis coverage audit,
+#55 References sections × 27 syntheses, #56 Dan-manual-tasks + repo-pull audit + qwen3 baselines) added empirical
+inputs to three top-questions items without closing any: R2-03 (Dan task suite scope — qwen3:8b + qwen3.6:27b
+baselines added; design call still Dan-owned via C2 in dan-manual-tasks doc), R3-04 (Phase 1c model list reconciliation
+— 27B failure rules out 27B-class FP16 ceilings on M1 Max 32 GB), R3-22 (Bonsai Ternary 8B gap measurement — qwen3:8b
+baseline added as an FP16 anchor pending the actual Bonsai run). Items explicitly considered but not touched: R3-08,
+R3-25, R2-38, R3-07.
 
 ### 2026-05-16 — Wave 2 R4 ADR batch (Worker fan-out)
 
