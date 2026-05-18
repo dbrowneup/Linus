@@ -12,19 +12,19 @@ during repo-note authoring.
 Group 9 is the most directly mission-aligned cluster in the entire fan-out run. The other groups abstract outward —
 inference substrate, memory architecture, knowledge-graph patterns, agent orchestration — but G9 lands squarely in Dan's
 PhD specialization: bacterial genomics, variant biology, secondary metabolite chemistry, and the computational biology
-tooling that sits around all of them. That direct alignment has a strategic implication: these five bioinformatics
-tools and models are not just infrastructure candidates; they are evidence for what Linus can credibly offer that
-generic AI tooling cannot.
+tooling that sits around all of them. That direct alignment has a strategic implication: these five bioinformatics tools
+and models are not just infrastructure candidates; they are evidence for what Linus can credibly offer that generic AI
+tooling cannot.
 
 The verdicts are: **one Integrate** (bioSkills — the inaugural Phase 7 skills payload), **four Study** (Bacformer,
-BioReason, deepsems, ClawBio). Bacformer carries a "path to Integrate at Phase 7" hedge because Apple Silicon
-viability is plausible but unverified. BioReason and deepsems are Study because one is CUDA-locked at training time
-and the other is a narrow wrapper target whose value is conditional on a paper-reproducibility check. ClawBio is
-Study with a high prior on later Adapt: the specific 63-skill catalog targets human consumer/clinical genomics rather
-than Dan's microbial work, but the engineering shape (per-skill tests, reproducibility bundles, conformance linter,
-Claude Code plugin distribution) is the closest existing precedent for what a Phase 7 inaugural bio-skills bundle
-should look like in working form. The synthesis across all five is richer than five independent verdicts: the group
-collectively outlines a working stack that could serve both Dan's own research and a paying biotech client.
+BioReason, deepsems, ClawBio). Bacformer carries a "path to Integrate at Phase 7" hedge because Apple Silicon viability
+is plausible but unverified. BioReason and deepsems are Study because one is CUDA-locked at training time and the other
+is a narrow wrapper target whose value is conditional on a paper-reproducibility check. ClawBio is Study with a high
+prior on later Adapt: the specific 63-skill catalog targets human consumer/clinical genomics rather than Dan's microbial
+work, but the engineering shape (per-skill tests, reproducibility bundles, conformance linter, Claude Code plugin
+distribution) is the closest existing precedent for what a Phase 7 inaugural bio-skills bundle should look like in
+working form. The synthesis across all five is richer than five independent verdicts: the group collectively outlines a
+working stack that could serve both Dan's own research and a paying biotech client.
 
 ---
 
@@ -36,10 +36,10 @@ biological FMs, evaluated benchmarks, and validated tools that most LLM-infrastr
 because their authors do not have the domain literacy to evaluate them. The unifying claim this group supports is that
 the combination of Linus's infrastructure (orchestration layer, KnowledgeBase, Worker pipeline) with G9's domain content
 is not just a personal productivity stack. It is the concrete substrate for a biotech intelligence product that a
-boutique company or research lab would pay for today, without waiting for Phase 6 or Phase 7 to land. ClawBio's
-addition to the cluster reinforces this — it is a working precedent for a bioinformatics-AI commercial surface that
-ships behind a Python CLI, a Claude Code plugin, and a Telegram/Discord agent simultaneously, with DOI-versioned
-Zenodo releases as the academic-credibility surface.
+boutique company or research lab would pay for today, without waiting for Phase 6 or Phase 7 to land. ClawBio's addition
+to the cluster reinforces this — it is a working precedent for a bioinformatics-AI commercial surface that ships behind
+a Python CLI, a Claude Code plugin, and a Telegram/Discord agent simultaneously, with DOI-versioned Zenodo releases as
+the academic-credibility surface.
 
 The entrepreneurial surface that the skills-and-practices synthesis named as "scientific literature intelligence for
 biotech teams" can now be described with specific components: bioSkills for domain-correct code and tool patterns (G9),
@@ -67,24 +67,24 @@ upgrade.
 **ClawBio is the depth-vs-breadth complement to bioSkills and the closest existing precedent for the Phase 7 bio-skills
 bundle in working form.** Where bioSkills is broad-and-shallow (438 skills across 63 categories, mostly SKILL.md +
 usage-guide + examples), ClawBio is narrow-and-deep: 63 skills heavily concentrated in human consumer and clinical
-genomics (pharmacogenomics, GWAS lookup, polygenic risk scoring, ancestry PCA, fine-mapping, scRNA-seq,
-clinical-variant reporting, methylation clocks, proteomics) plus a Galaxy Bridge skill that exposes 8,000+ external
-bioinformatics tools through a single agent-callable interface. Each ClawBio skill ships with red/green TDD tests, a
-demo dataset (Manuel Corpas's CC0 30x WGS reference genome — the "Corpasome"), a benchmark scorer where ground truth
-exists (168/182 tests passing across 10 audited skills at v0.5.0, including an Alzheimer's ground-truth gene set), and
-a reproducibility bundle (`commands.sh` + `environment.yml` + SHA-256 checksums) that ships with every analysis output.
-Distribution is via `/plugin marketplace add ClawBio/ClawBio` — the Claude Code plugin marketplace is itself a
-Phase 5/7 distribution channel Linus should consider. The cluster-level pattern bioSkills + ClawBio together
-demonstrate is that Linus's Phase 7 biology skill class needs both **broad coverage** (bioSkills's catalogue spread)
-**AND curated depth** (ClawBio's per-skill engineering rigour). The plausible Phase 7 strategy is to take the ClawBio
-engineering shape — per-skill tests, reproducibility bundle as standard output, catalogue generator, 17-check
-SKILL.md conformance linter — and fill it with bioSkills-equivalent breadth tuned to Dan's metagenomics and B. braunii
-work. ClawBio also carries a small but load-bearing security pattern (the `allowed_extra_flags` per-skill allowlist
-filtered against subprocess invocation in `clawbio.py`) that should be the default in Linus's tool registry / agent
-spawner for any subprocess-invoked skill. Verdict: Study with a high prior on later Adapt-as-skill-library-pattern;
-the specific clinical/consumer skills don't map to Dan's microbial domain, but the engineering shape is directly
-liftable. Three ADR seeds emerge from the ClawBio review and are flagged in the repo-note: reproducibility-bundle
-output convention, SKILL.md conformance linter, and per-skill flag allowlist as default for subprocess-invoked tools.
+genomics (pharmacogenomics, GWAS lookup, polygenic risk scoring, ancestry PCA, fine-mapping, scRNA-seq, clinical-variant
+reporting, methylation clocks, proteomics) plus a Galaxy Bridge skill that exposes 8,000+ external bioinformatics tools
+through a single agent-callable interface. Each ClawBio skill ships with red/green TDD tests, a demo dataset (Manuel
+Corpas's CC0 30x WGS reference genome — the "Corpasome"), a benchmark scorer where ground truth exists (168/182 tests
+passing across 10 audited skills at v0.5.0, including an Alzheimer's ground-truth gene set), and a reproducibility
+bundle (`commands.sh` + `environment.yml` + SHA-256 checksums) that ships with every analysis output. Distribution is
+via `/plugin marketplace add ClawBio/ClawBio` — the Claude Code plugin marketplace is itself a Phase 5/7 distribution
+channel Linus should consider. The cluster-level pattern bioSkills + ClawBio together demonstrate is that Linus's Phase
+7 biology skill class needs both **broad coverage** (bioSkills's catalogue spread) **AND curated depth** (ClawBio's
+per-skill engineering rigour). The plausible Phase 7 strategy is to take the ClawBio engineering shape — per-skill
+tests, reproducibility bundle as standard output, catalogue generator, 17-check SKILL.md conformance linter — and fill
+it with bioSkills-equivalent breadth tuned to Dan's metagenomics and B. braunii work. ClawBio also carries a small but
+load-bearing security pattern (the `allowed_extra_flags` per-skill allowlist filtered against subprocess invocation in
+`clawbio.py`) that should be the default in Linus's tool registry / agent spawner for any subprocess-invoked skill.
+Verdict: Study with a high prior on later Adapt-as-skill-library-pattern; the specific clinical/consumer skills don't
+map to Dan's microbial domain, but the engineering shape is directly liftable. Three ADR seeds emerge from the ClawBio
+review and are flagged in the repo-note: reproducibility-bundle output convention, SKILL.md conformance linter, and
+per-skill flag allowlist as default for subprocess-invoked tools.
 
 **Bacformer is the only Apple-Silicon-realistic broad bacterial FM in the entire run.** The protein-embedding-as-token
 pattern — ESM2 or ESM++ embeds each ORF, then a second-stage Transformer treats the genome as a sequence of those
@@ -179,10 +179,10 @@ elements — and the deepsems pattern shows this is tractable with a vanilla arc
 
 **Reproducibility bundle as standard skill output (ClawBio).** Every ClawBio analysis emits `commands.sh` +
 `environment.yml` + `checksums.sha256` alongside the markdown report — not as an afterthought, but as part of the
-standard output convention. The argument for adoption beyond biology is straightforward: any Linus skill that produces
-a publishable artefact (RNA-seq DE plot, paper synthesis figure, anything that might end up in a paper or a slide)
-should ship the bundle so a reviewer can reproduce in 30 seconds without contacting Dan. This is a candidate Linus
-convention with a small implementation cost and a strong reproducibility argument; flagged as ADR seed
+standard output convention. The argument for adoption beyond biology is straightforward: any Linus skill that produces a
+publishable artefact (RNA-seq DE plot, paper synthesis figure, anything that might end up in a paper or a slide) should
+ship the bundle so a reviewer can reproduce in 30 seconds without contacting Dan. This is a candidate Linus convention
+with a small implementation cost and a strong reproducibility argument; flagged as ADR seed
 `_Seed: DEC-NNNN reproducibility-bundle-output-convention_` in the ClawBio repo-note. Companion to DEC-0023 (output
 interface citations + LLM Wiki) and DEC-0027 (public APIs + measurement discipline).
 
@@ -316,12 +316,12 @@ launches default-on or opt-in. The overlap-confusion concern is the empirical qu
 _Cross-references: G8 synthesis (paper-qa, LAB-Bench, scientific-agent-skills, ether0); skills-and-practices synthesis
 (entrepreneurial surface, section 5; Claude Code plugin marketplace as Phase 5+ distribution channel — surfaced via
 ClawBio); memory synthesis (scratchpad retention, episodic store); entrepreneurship synthesis (biotech
-literature-intelligence stack as commercial surface; ClawBio's DOI + Zenodo + plugin-marketplace shape as a
-local-first bioinformatics commercial-surface precedent); function-annotation-discovery synthesis (BioReason-Pro as
-first protein-function skill, S24 resolution); biological-foundation-models synthesis (ClawBio as worked example of
+literature-intelligence stack as commercial surface; ClawBio's DOI + Zenodo + plugin-marketplace shape as a local-first
+bioinformatics commercial-surface precedent); function-annotation-discovery synthesis (BioReason-Pro as first
+protein-function skill, S24 resolution); biological-foundation-models synthesis (ClawBio as worked example of
 specialist-skill-as-Worker framing at the skill-class layer rather than the model-class layer); ROADMAP.md Phase 7
-(Skills & Autonomy Graduation); [`docs/specs/biology-phase7-roadmap.md`](../../specs/biology-phase7-roadmap.md)
-(Phase 7 sub-roadmap, FM-pairing sequencing, BioReason-Pro eval shape, LAB-Bench canary obligations); DEC-0046
+(Skills & Autonomy Graduation); [`docs/specs/biology-phase7-roadmap.md`](../../specs/biology-phase7-roadmap.md) (Phase 7
+sub-roadmap, FM-pairing sequencing, BioReason-Pro eval shape, LAB-Bench canary obligations); DEC-0046
 (`external_api_tool` deployment field — ClawBio's `galaxy-bridge` skill as worked example); DEC-0047 (biosecurity tier
 control — Bacformer Tier B for causal checkpoint, deepsems Tier B for BGC→SMILES generation; ClawBio's
 clinical-variant-reporter Tier B obligation); DEC-0048 (model_prediction edges for KB write-back); ADR seeds from
@@ -329,3 +329,43 @@ ClawBio review (reproducibility-bundle output convention, SKILL.md conformance l
 Revisit when the Bacformer MPS benchmark lands in `benchmarks/results/`, when BioReason checkpoints are released, when
 the Phase 6 MLX training infrastructure is established, and when Phase 7 planning chooses between the bioSkills
 breadth-first or ClawBio depth-first lineage (or, more likely, hybridizes them)._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`AgenticResearchWiki`](../../repo-notes/AgenticResearchWiki.md) — agent-driven research-wiki Skills repo; skill-count
+  comparison anchor.
+- [`Bacformer`](../../repo-notes/Bacformer.md) — protein-embedding-as-token bacterial genome FM; Apple-Silicon-realistic
+  Phase 7 candidate.
+- [`BioReason`](../../repo-notes/BioReason.md) — DNA-encoder + LLM fusion with GRPO; CUDA-locked, MLX re-implementation
+  in Phase 6.
+- [`bioSkills`](../../repo-notes/bioSkills.md) — 438-skill bioinformatics catalogue; inaugural Phase 7 skills payload
+  (Integrate).
+- [`ClawBio`](../../repo-notes/ClawBio.md) — 63 deeply engineered clinical/consumer genomics skills with reproducibility
+  bundles and conformance linter.
+- [`deepsems`](../../repo-notes/deepsems.md) — BGC→SMILES transformer for cryptic-BGC metabolite prediction; Phase 3
+  tool-wrapper candidate.
+- [`ether0`](../../repo-notes/ether0.md) — RLVR reward layer for chemistry; companion to BioReason's GRPO reasoning
+  recipe.
+- [`infranodus`](../../repo-notes/infranodus.md) — network-analysis platform; skill-count comparison anchor.
+- [`infranodus-skills`](../../repo-notes/infranodus-skills.md) — 15-skill InfraNodus Claude Code package; skill-count
+  comparison anchor.
+- [`LAB-Bench`](../../repo-notes/LAB-Bench.md) — biology benchmark; quality bar for the bioSkills +
+  scientific-agent-skills bundle.
+- [`OmegaWiki`](../../repo-notes/OmegaWiki.md) — wiki engine with 24 Skills; skill-count comparison anchor.
+- [`openrouter-skills`](../../repo-notes/openrouter-skills.md) — 8 OpenRouter Claude Code skills; skill-count comparison
+  anchor.
+- [`paper-qa`](../../repo-notes/paper-qa.md) — RAG application for grounded literature QA; G8 component of the
+  biotech-intelligence stack.
+- [`scientific-agent-skills`](../../repo-notes/scientific-agent-skills.md) — ~135 lab-science Skills; pairs with
+  bioSkills as Phase 7 catalogue.
+
+### Paper-notes
+
+- [`2026.03.19.712954v1`](../../paper-notes/2026.03.19.712954v1.md) — BioReason-Pro protein function prediction with
+  GO-GPT and reasoning RL.
+- [`2505.23579v2`](../../paper-notes/2505.23579v2.md) — BioReason multimodal biological reasoning within a DNA-LLM
+  model.

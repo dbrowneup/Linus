@@ -129,16 +129,16 @@ ladder.
 each just 3 linear-32-leakyReLU layers — generates three-node RNA gene circuits with prescribed **adaptation behavior**
 (sensitivity ≥10 + precision ≥1, the integral-feedback signature) plus an **evolutionary property** (low ruggedness
 around the circuit in the binding-energy landscape). IntaRNA 2.0 supplies the physics-based validator that turns the
-generative output into ground truth. Two methodologically important findings: (a) **~1500 training samples suffice**
-for high prompt adherence ($R^2 = 0.97$), undercutting the field's assumption that whole-circuit generative design
-requires massive curated datasets; (b) the CVAE's latent space recapitulates the **Ma et al. 2009** adaptation motifs
-(buffer / balancer / proportioner classes) — the model rediscovers known biological structure without being told. The
+generative output into ground truth. Two methodologically important findings: (a) **~1500 training samples suffice** for
+high prompt adherence ($R^2 = 0.97$), undercutting the field's assumption that whole-circuit generative design requires
+massive curated datasets; (b) the CVAE's latent space recapitulates the **Ma et al. 2009** adaptation motifs (buffer /
+balancer / proportioner classes) — the model rediscovers known biological structure without being told. The
 circuit-design rung is structurally distinct from the sequence-design rungs above it: the artefact is a topology +
 parameter vector, not a base/residue sequence, and the validator is a deterministic physics simulator rather than a
-learned predictor. The same generate→score→filter→wet-lab workflow shape carries over, with the validator step
-performed by IntaRNA + ODE simulation rather than by AlphaFold or ESMFold. For Linus's Phase 7 biology skills, this is
-the canonical exemplar of typed-structured-prediction wrapping free-text rationale (S25 / BioReason-Pro convention) at
-the circuit level.
+learned predictor. The same generate→score→filter→wet-lab workflow shape carries over, with the validator step performed
+by IntaRNA + ODE simulation rather than by AlphaFold or ESMFold. For Linus's Phase 7 biology skills, this is the
+canonical exemplar of typed-structured-prediction wrapping free-text rationale (S25 / BioReason-Pro convention) at the
+circuit level.
 
 The ladder is not just descriptive. Every cross-cutting thread — local deployability, validation cost, dual-use weight,
 foundation model dependence, KG schema choice — shifts monotonically along the residue→genome axis. Bigger artefacts
@@ -603,3 +603,44 @@ and the Phase 6 / 7 spec backlog plus a Phase 1 SAFETY.md addendum. It should be
 Phase 7 wrappers land, when the Wave 3 Evo 2 + generative-phage mini-synthesis is written, when the `external_api_tool`
 ADR is drafted, when DISCO local-deployability becomes tractable on a Mac Studio tier, and when any new Group B paper
 enters `context/papers/`._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`Bacformer`](../repo-notes/Bacformer.md) — protein-embedding-as-token bacterial genome FM; pairs with DeepSeMS in
+  Phase 7.
+- [`BioReason`](../repo-notes/BioReason.md) — DNA-encoder + LLM fusion; BioReason-Pro typed-structured-prediction
+  convention reference.
+- [`deepsems`](../repo-notes/deepsems.md) — BGC→SMILES transformer producing 65k novel candidate metabolites from ocean
+  MAGs.
+- [`LAB-Bench`](../repo-notes/LAB-Bench.md) — biology benchmark; canary obligation propagates into Phase 7 biology-skill
+  safety policy.
+- [`ProtiCelli`](../repo-notes/ProtiCelli.md) — DiT-L latent-diffusion FM for proteome-wide single-cell
+  immunofluorescence image synthesis.
+- [`transcriptformer`](../repo-notes/transcriptformer.md) — generative cell-atlas transformer; the transcriptomic arm of
+  the cell-scale axis.
+
+### Paper-notes
+
+- [`1-s2.0-S0022283626000513-main`](../paper-notes/1-s2.0-S0022283626000513-main.md) — mCSM-metal hybrid neuro-symbolic
+  predictor for metal-ion-binding mutation effects.
+- [`2025.03.02.641084v1`](../paper-notes/2025.03.02.641084v1.md) — DeepSeMS LLM revealing hidden biosynthetic potential
+  in ocean metagenomes.
+- [`2025.05.13.653614v2`](../paper-notes/2025.05.13.653614v2.md) — Trias generative LM decoding codon-usage constraints
+  across 640 vertebrates.
+- [`2025.09.12.675911v1`](../paper-notes/2025.09.12.675911v1.md) — Generative design of viable bacteriophages with
+  Evo-family genome LMs.
+- [`2026.03.31.715748v1`](../paper-notes/2026.03.31.715748v1.md) — ProtiCelli generative ML unlocking proteome-wide
+  images of human cells.
+- [`2026.04.22.720063v1`](../paper-notes/2026.04.22.720063v1.md) — GenNA conditional generation of nucleotide sequences
+  from natural-language prompts.
+- [`2306.03809v1`](../paper-notes/2306.03809v1.md) — Can LLMs democratize dual-use biotechnology; SAFETY.md dual-use
+  anchor.
+- [`2506.02070v3`](../paper-notes/2506.02070v3.md) — An introduction to flow matching and diffusion models; DISCO
+  mathematical on-ramp.
+- [`2604.05181v1`](../paper-notes/2604.05181v1.md) — DISCO multimodal protein design enabling DNA-encoding of chemistry.
+- [`s41540-026-00683-6`](../paper-notes/s41540-026-00683-6.md) — Gallup & Steel CVAE generative design of three-node
+  adaptive RNA gene circuits.

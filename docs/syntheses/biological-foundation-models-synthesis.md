@@ -159,45 +159,43 @@ specialist composition Phase 3's parallel-agent infrastructure exists to enable.
 
 ## Specialists-as-Workers at the skill-class layer: ClawBio as working precedent
 
-The constellation argument above is framed at the **model-class layer** — LucaOne as cross-modal default,
-specialists invoked when the task is in their named domain. The [ClawBio](../repo-notes/ClawBio.md) repo
-(ClawBio/ClawBio) is the closest existing implementation of the same dispatch logic at the **skill-class layer**:
-a curated 63-skill bioinformatics library where each skill is a deterministic, versioned specialist, and a
-`bio-orchestrator` skill routes free-text queries to the right downstream skill based on file type and keywords.
-The dispatch surface is exactly the one this synthesis recommends — generalist orchestrator over named
-specialists — except the specialists are deterministic Python tools rather than learned FMs, and the routing
-signal is filename + keyword rather than model-class. ClawBio extends the existing g9-bio cluster prior art
-alongside Bacformer, BioReason, bioSkills, and deepsems, and is the depth-vs-breadth complement to bioSkills:
-~438 broad-but-shallow Anthropic-format skills versus 63 deeply engineered skills with tests, demo data, a
-reproducibility bundle, and a benchmark scorer where ground truth exists (e.g. the v0.5.0 AD ground-truth gene
-set with 168/182 benchmark tests passing across 10 audited skills).
+The constellation argument above is framed at the **model-class layer** — LucaOne as cross-modal default, specialists
+invoked when the task is in their named domain. The [ClawBio](../repo-notes/ClawBio.md) repo (ClawBio/ClawBio) is the
+closest existing implementation of the same dispatch logic at the **skill-class layer**: a curated 63-skill
+bioinformatics library where each skill is a deterministic, versioned specialist, and a `bio-orchestrator` skill routes
+free-text queries to the right downstream skill based on file type and keywords. The dispatch surface is exactly the one
+this synthesis recommends — generalist orchestrator over named specialists — except the specialists are deterministic
+Python tools rather than learned FMs, and the routing signal is filename + keyword rather than model-class. ClawBio
+extends the existing g9-bio cluster prior art alongside Bacformer, BioReason, bioSkills, and deepsems, and is the
+depth-vs-breadth complement to bioSkills: ~438 broad-but-shallow Anthropic-format skills versus 63 deeply engineered
+skills with tests, demo data, a reproducibility bundle, and a benchmark scorer where ground truth exists (e.g. the
+v0.5.0 AD ground-truth gene set with 168/182 benchmark tests passing across 10 audited skills).
 
-Two ClawBio patterns are load-bearing for the integration hooks this synthesis has already committed to. First,
-the **Galaxy Bridge skill** wraps `BioBlend` to expose the full usegalaxy.org tool catalog (8,000+ external
-bioinformatics tools) through a single Python skill — a working precedent for the
-[DEC-0046](../adr/0046-external-api-tool-registry-deployment-field.md) `external_api_tool` deployment field. The
-pattern (one Linus tool → many external tools, with the registry tagging it as external-API-deployed and the
-audit log capturing every invocation) is no longer aspirational; it is shipping today behind a `/plugin install
-clawbio` command. Second, ClawBio's **cross-platform chaining examples** (Galaxy VEP → ClawBio PharmGx; Galaxy
-Kraken2 → ClawBio metagenomics) are a working precedent for the model-prediction-edge data flow described in
-[DEC-0048](../adr/0048-kb-model-prediction-edge-class.md): a variant scored by one tool flowing as typed
-provenance into the next tool's input is exactly the `model_prediction` edge shape, and the chaining contract
-ClawBio enforces (per-skill `--input` / `--output` / `--demo` plus a per-skill `allowed_extra_flags` allowlist
-filtered before subprocess invocation) is a candidate prior-art template for the agent-spawner's tool dispatch
-contract.
+Two ClawBio patterns are load-bearing for the integration hooks this synthesis has already committed to. First, the
+**Galaxy Bridge skill** wraps `BioBlend` to expose the full usegalaxy.org tool catalog (8,000+ external bioinformatics
+tools) through a single Python skill — a working precedent for the
+[DEC-0046](../adr/0046-external-api-tool-registry-deployment-field.md) `external_api_tool` deployment field. The pattern
+(one Linus tool → many external tools, with the registry tagging it as external-API-deployed and the audit log capturing
+every invocation) is no longer aspirational; it is shipping today behind a `/plugin install clawbio` command. Second,
+ClawBio's **cross-platform chaining examples** (Galaxy VEP → ClawBio PharmGx; Galaxy Kraken2 → ClawBio metagenomics) are
+a working precedent for the model-prediction-edge data flow described in
+[DEC-0048](../adr/0048-kb-model-prediction-edge-class.md): a variant scored by one tool flowing as typed provenance into
+the next tool's input is exactly the `model_prediction` edge shape, and the chaining contract ClawBio enforces
+(per-skill `--input` / `--output` / `--demo` plus a per-skill `allowed_extra_flags` allowlist filtered before subprocess
+invocation) is a candidate prior-art template for the agent-spawner's tool dispatch contract.
 
-The framing implication for Phase 7 is that **the right Linus dispatch surface is one agent spawner that
-dispatches to both kinds of Worker — deterministic skill _and_ specialist FM — through a uniform interface**.
-ClawBio's `bio-orchestrator` plus per-skill subprocess pattern works for tools that are deterministic and fast;
-this synthesis's recommended layered design (LucaOne anchor + specialist FMs) works for tools that are stochastic
-and inference-heavy. The two are not competing — they are the two ends of the same dispatch contract, and the
-spawner needs to know which dispatch path is active for a given task. Whether Linus extracts ClawBio's specific
-implementation, re-implements over BioBlend directly with Linus's tool-registry conventions, or simply lifts the
-engineering shape (per-skill tests + reproducibility bundle + catalog generator + conformance linter) into a
-Linus-native skill bundle is a Phase 7 planning question — but the pattern itself is no longer a hypothesis. It
-is the closest existing precedent for what a Phase 7 inaugural bio-skills bundle should look like in working
-form, and the depth-vs-breadth complement to bioSkills makes the choice between them an "or both, fork the
-engineering shape from one and the breadth-of-content from the other" question rather than an "or" question.
+The framing implication for Phase 7 is that **the right Linus dispatch surface is one agent spawner that dispatches to
+both kinds of Worker — deterministic skill _and_ specialist FM — through a uniform interface**. ClawBio's
+`bio-orchestrator` plus per-skill subprocess pattern works for tools that are deterministic and fast; this synthesis's
+recommended layered design (LucaOne anchor + specialist FMs) works for tools that are stochastic and inference-heavy.
+The two are not competing — they are the two ends of the same dispatch contract, and the spawner needs to know which
+dispatch path is active for a given task. Whether Linus extracts ClawBio's specific implementation, re-implements over
+BioBlend directly with Linus's tool-registry conventions, or simply lifts the engineering shape (per-skill tests +
+reproducibility bundle + catalog generator + conformance linter) into a Linus-native skill bundle is a Phase 7 planning
+question — but the pattern itself is no longer a hypothesis. It is the closest existing precedent for what a Phase 7
+inaugural bio-skills bundle should look like in working form, and the depth-vs-breadth complement to bioSkills makes the
+choice between them an "or both, fork the engineering shape from one and the breadth-of-content from the other" question
+rather than an "or" question.
 
 ---
 
@@ -559,3 +557,52 @@ ProteinReasoner checkpoints appear on BioMap GitHub / `airkingbd` HF (passive wa
 7B local-deployability spikes land; the ProtiCelli and TranscriptFormer M1-Max MPS spikes land; the Wave 3 Evo 2 +
 generative phage mini-synthesis (R2-57) is written; any new Group A paper enters `context/papers/`. Updated 2026-05-10
 (ClawBio specialist-skill-as-Worker fold-in)._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`Bacformer`](../repo-notes/Bacformer.md) — protein-embedding-as-token bacterial genome FM; Apache 2.0,
+  Apple-Silicon-realistic.
+- [`BioReason`](../repo-notes/BioReason.md) — DNA-encoder + LLM fusion with GRPO reasoning traces over KEGG pathways.
+- [`bioSkills`](../repo-notes/bioSkills.md) — 438-skill bioinformatics SKILL.md catalogue for Claude Code.
+- [`ClawBio`](../repo-notes/ClawBio.md) — 63 deeply engineered clinical/consumer genomics skills with reproducibility
+  bundles.
+- [`deepsems`](../repo-notes/deepsems.md) — BGC→SMILES transformer for cryptic biosynthetic-gene-cluster metabolite
+  prediction.
+- [`fastmcp`](../repo-notes/fastmcp.md) — decorator-based MCP server framework; Linus's default MCP substrate
+  (DEC-0045).
+- [`OptimusKG`](../repo-notes/OptimusKG.md) — biomedical knowledge graph with medallion-architecture FAIR ingest
+  pipeline.
+- [`ProtiCelli`](../repo-notes/ProtiCelli.md) — DiT-L diffusion FM synthesizing proteome-wide single-cell
+  immunofluorescence images.
+- [`transcriptformer`](../repo-notes/transcriptformer.md) — generative cell-atlas autoregressive transformer family with
+  `--device mps` support.
+
+### Paper-notes
+
+- [`2025.07.20.665723v2`](../paper-notes/2025.07.20.665723v2.md) — Bacformer contextualised protein language model over
+  bacterial genomes.
+- [`2025.07.21.665832v2`](../paper-notes/2025.07.21.665832v2.md) — ProteinReasoner multi-modal PLM with MSA-profile
+  chain-of-thought.
+- [`2025.09.12.675911v1`](../paper-notes/2025.09.12.675911v1.md) — Generative design of viable bacteriophages with
+  Evo-family genome LMs.
+- [`2026.03.31.715748v1`](../paper-notes/2026.03.31.715748v1.md) — ProtiCelli proteome-wide generative imaging
+  foundation model.
+- [`2604.27269v1`](../paper-notes/2604.27269v1.md) — OptimusKG unified biomedical knowledge graph with provenance and
+  FAIR principles.
+- [`gkaf836`](../paper-notes/gkaf836.md) — REMME/REBEAN tiny DNA-LM for reference-free metagenomic enzyme annotation.
+- [`s41467-025-60872-5`](../paper-notes/s41467-025-60872-5.md) — RiNALMo 650M RNA language model with cross-family
+  generalisation.
+- [`s41586-025-10014-0`](../paper-notes/s41586-025-10014-0.md) — AlphaGenome single-bp regulatory variant effect
+  prediction across 5,930 tracks.
+- [`s41586-026-10176-5`](../paper-notes/s41586-026-10176-5.md) — Evo 2 StripedHyena DNA FM with 1M-token context across
+  all domains of life.
+- [`s41592-025-02776-2`](../paper-notes/s41592-025-02776-2.md) — METL biophysics-based protein LM pretrained on Rosetta
+  simulations.
+- [`s42256-025-01044-4`](../paper-notes/s42256-025-01044-4.md) — LucaOne unified DNA+RNA+protein encoder with
+  central-dogma emergence.
+- [`science.aec8514`](../paper-notes/science.aec8514.md) — TranscriptFormer generative cell atlas across 1.5 billion
+  years of evolution.
