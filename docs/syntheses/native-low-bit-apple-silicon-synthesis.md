@@ -772,6 +772,54 @@ and adds the Bonsai productized line as a third axis that bridges them. The next
 synthesis. The [`docs/landscapes/synthesis-landscape.md`](../landscapes/synthesis-landscape.md) and
 [`docs/questions/open-questions.md`](../questions/open-questions.md) should pick up the seven open questions above.
 
+## References
+
+### Repo-notes
+
+- [`ANE`](../repo-notes/ANE.md) — Maderix/ANE-training; reverse-engineered methodology reference for Apple Neural Engine
+  training, public-API line per DEC-0027.
+- [`BitNet`](../repo-notes/BitNet.md) — Microsoft's reference implementation including bitnet.cpp CPU runtime and the
+  BitDistill training pipeline.
+- [`Bonsai-demo`](../repo-notes/Bonsai-demo.md) — PrismML's released 1-bit and ternary 8B checkpoints with
+  MLX/Metal/CUDA kernels and llama-server endpoint.
+- [`Kimi-K2`](../repo-notes/Kimi-K2.md) — Moonshot AI release artifact (block-fp8 weights, deployment scripts, tech
+  report); substrate for DEC-0055 and DEC-0056.
+- [`mlx-flash`](../repo-notes/mlx-flash.md) — The dense >RAM streaming reference Linus would integrate against for any
+  fine-tuned Worker that exceeds RAM.
+- [`pmetal`](../repo-notes/pmetal.md) — Epistates' maintained Rust ML platform for Apple Silicon; long-term native
+  runtime where a Linus-contributed MLX ternary kernel would land.
+
+### Paper-notes
+
+- [`2310.11453v1`](../paper-notes/2310.11453v1.md) — BitNet, the founding 1-bit Transformer paper introducing BitLinear
+  and SubLN.
+- [`2312.11514v3`](../paper-notes/2312.11514v3.md) — LLM in a Flash; Apple's foundation paper for activation-sparsity
+  weight streaming, M1 Max tested.
+- [`2402.17764v1`](../paper-notes/2402.17764v1.md) — BitNet b1.58; the ternary {−1,0,+1} variant achieving FP16 LLaMA
+  parity at 3B and above.
+- [`2411.04965v1`](../paper-notes/2411.04965v1.md) — BitNet a4.8; first push to 4-bit activations via hybrid
+  quantization + sparsification.
+- [`2502.11880v1`](../paper-notes/2502.11880v1.md) — bitnet.cpp; CPU inference runtime delivering 2.15–4.91× over FP16
+  on Apple M2 Ultra via NEON SIMD.
+- [`2502.16721v1`](../paper-notes/2502.16721v1.md) — Speed and LLMs; task-completion-time methodology for the Phase 1c
+  unified benchmark harness.
+- [`2504.12285v2`](../paper-notes/2504.12285v2.md) — BitNet b1.58 2B4T; the released open-weights ternary checkpoint,
+  0.4 GB and 29 ms TPOT on CPU.
+- [`2504.18415v2`](../paper-notes/2504.18415v2.md) — BitNet v2; W1.58A4 via online Hadamard transformation enabling
+  4-bit KV cache.
+- [`2510.13998v1`](../paper-notes/2510.13998v1.md) — BitNet Distillation; three-stage pipeline converting any FP16 model
+  into 1.58-bit at ~0.25% of from-scratch cost.
+- [`2602.18308v2`](../paper-notes/2602.18308v2.md) — JPmHC; Cayley-stabilized orthogonal Hyper-Connections, sibling
+  Phase 8 cross-product substrate.
+- [`bonsai-1-bit-8b-whitepaper`](../paper-notes/bonsai-1-bit-8b-whitepaper.md) — PrismML's 1-bit Bonsai 8B; Qwen3 PTQ to
+  1.15 GB at 70.5 benchmark average, 131 tok/s on M4 Pro.
+- [`bonsai-ternary-8b-whitepaper`](../paper-notes/bonsai-ternary-8b-whitepaper.md) — PrismML's Ternary Bonsai 8B; 1.75
+  GB at 75.5 average (95% of FP16 Qwen3-8B), first openly released native-ternary 8B.
+- [`flash_moe`](../paper-notes/flash_moe.md) — Anthropic + Daniel Woods 397B-MoE streaming on M3 Max via bespoke
+  Metal/Objective-C; OS-page-cache lesson.
+- [`Kimi-K2-2507.20534`](../paper-notes/Kimi-K2-2507.20534.md) — Moonshot AI Kimi K2 tech report; MLA+MoE topology,
+  MuonClip optimizer, zero loss spikes across 15.5T tokens.
+
 ---
 
 _This synthesis should be revisited when the Phase 1c spike results land (it will turn the four-way comparison into

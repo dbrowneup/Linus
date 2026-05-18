@@ -182,16 +182,16 @@ ones that **scale arbitrarily with compute** rather than encoding domain-specifi
 that tried to encode linguistic structure (parse-tree-augmented attention, syntax-aware embeddings, etc.) plateaued; the
 generic attention + scaled-compute approach won. Sutton's argument predates the Llama recipe by years but organizes the
 post-2017 architectural convergence as a single observation: the architectural choices that scale are the ones that
-survive. Tan's 53-model dataset (Era III, 2023–2024) quantifies adoption rates: 77% of
-surveyed models use RMSNorm, 70% use RoPE, 72% use SwiGLU, and GQA or MQA are standard in every recent decoder-only
-system. The operation-level audit (Kim et al.) adds an important nuance: FFN layers account for ~60–65% of inference
-time in a Transformer block, not attention, so the SwiGLU substitution's quality improvement is more valuable than its
-raw FLOP count suggests. The efficiency survey (Sun et al.) maps the frontier past the settled baseline: MoE and linear
-attention variants (state-space models, linear RNNs) are active research targets but have no convergence signal at
-production scale comparable to the four core substitutions. For Linus, the implication is clean: Phase 6 fine-tuning
-inherits RoPE, RMSNorm, SwiGLU, and GQA from whatever base model is chosen — Qwen2.5- Coder, Llama 3, Mistral — without
-needing to re-evaluate them. The unsettled frontier (MoE routing, linear attention) is Phase 7+ territory when the
-memory and compute situation is re-evaluated, not a Phase 1–3 decision.
+survive. Tan's 53-model dataset (Era III, 2023–2024) quantifies adoption rates: 77% of surveyed models use RMSNorm, 70%
+use RoPE, 72% use SwiGLU, and GQA or MQA are standard in every recent decoder-only system. The operation-level audit
+(Kim et al.) adds an important nuance: FFN layers account for ~60–65% of inference time in a Transformer block, not
+attention, so the SwiGLU substitution's quality improvement is more valuable than its raw FLOP count suggests. The
+efficiency survey (Sun et al.) maps the frontier past the settled baseline: MoE and linear attention variants
+(state-space models, linear RNNs) are active research targets but have no convergence signal at production scale
+comparable to the four core substitutions. For Linus, the implication is clean: Phase 6 fine-tuning inherits RoPE,
+RMSNorm, SwiGLU, and GQA from whatever base model is chosen — Qwen2.5- Coder, Llama 3, Mistral — without needing to
+re-evaluate them. The unsettled frontier (MoE routing, linear attention) is Phase 7+ territory when the memory and
+compute situation is re-evaluated, not a Phase 1–3 decision.
 
 ### The practitioner layer: trajectory, failure modes, and mathematical grounding
 
@@ -631,6 +631,86 @@ planning-loop pattern and the now-four-way "world model" lexical collision. Grou
 downstream of the attention machinery this synthesis anchors; Wave 3's Group B generative-biology reading is downstream
 of the Flow Matching textbook it anchors. Group G's role is not to add a research direction but to establish the
 references everything else points back to and the measurement disciplines everything else should adopt.
+
+## References
+
+### Repo-notes
+
+- [`flash-moe`](../repo-notes/flash-moe.md) — Daniel Woods + Claude Opus 4.6 collaboration; 397B-MoE streaming with
+  bespoke Metal/Objective-C inference, the OS-page-cache lesson.
+- [`mlx-flash`](../repo-notes/mlx-flash.md) — MPC-Lite predictive I/O scheduler for dense >RAM MLX models,
+  layer-by-layer weight streaming reference design.
+
+### Paper-notes
+
+- [`1910.07467`](../paper-notes/1910.07467.md) — Zhang & Sennrich, RMSNorm — mean-free layer normalization replacing
+  LayerNorm in the modern Transformer stack.
+- [`2002.05202`](../paper-notes/2002.05202.md) — Shazeer, GLU Variants Improve Transformer — SwiGLU as the gated FFN
+  replacing ReLU in the Llama recipe.
+- [`2003.02320v6`](../paper-notes/2003.02320v6.md) — Hogan et al., Knowledge Graphs survey — third REFERENCE-tag anchor
+  alongside Transformer and Flow Matching textbook.
+- [`2104.09864`](../paper-notes/2104.09864.md) — Su et al., RoFormer / RoPE — rotary position embedding replacing
+  sinusoidal positional encodings.
+- [`2203.15556v1`](../paper-notes/2203.15556v1.md) — Hoffmann et al., Chinchilla — compute-optimal training scaling law,
+  anchor for EgoScale's log-linear fine-tuning extrapolation.
+- [`2305.13245`](../paper-notes/2305.13245.md) — Ainslie et al., Grouped-Query Attention (GQA) — practical middle ground
+  reducing KV cache memory pressure.
+- [`2310.11453v1`](../paper-notes/2310.11453v1.md) — BitNet, the founding 1-bit Transformer paper; load-bearing thread
+  for quantization-driven efficiency on the Transformer substrate.
+- [`2311.12351`](../paper-notes/2311.12351.md) — Huang et al., long-context architectures survey; one of four 2024
+  surveys confirming Llama-recipe convergence.
+- [`2312.11514v3`](../paper-notes/2312.11514v3.md) — Apple, LLM in a Flash — foundational paper for the larger-than-RAM
+  streaming axis; mlx-flash's design doc.
+- [`2407.21783v3`](../paper-notes/2407.21783v3.md) — The Llama 3 Herd of Models — modern industrialized instantiation of
+  the four-substitution recipe.
+- [`2410.11381`](../paper-notes/2410.11381.md) — Kim et al., operation-level audit of converging LLM architectures; FFN
+  dominance finding for SwiGLU.
+- [`2412.03220`](../paper-notes/2412.03220.md) — Shao et al., LLM architectures survey — taxonomy of trends and
+  benchmarks across the field.
+- [`2412.06769v3`](../paper-notes/2412.06769v3.md) — Coconut, training LLMs to reason in continuous latent space; the
+  named link to PAN's GLP-style architecture.
+- [`2502.16721v1`](../paper-notes/2502.16721v1.md) — Speed and Conversational LLMs — task-completion-time methodology
+  paper anchoring the capability-first measurement thread.
+- [`2506.02070v3`](../paper-notes/2506.02070v3.md) — Holderrieth & Erives, Flow Matching and Diffusion Models MIT
+  lecture notes; the math reference for Wave 3 generative biology.
+- [`2506.13023v1`](../paper-notes/2506.13023v1.md) — A Practical Guide for Evaluating LLMs — 5 D's checklist, balanced
+  metric scorecard, capability-first measurement.
+- [`2508.09834`](../paper-notes/2508.09834.md) — Sun et al., Speed Always Wins efficiency-architectures survey; frontier
+  past the Llama-recipe baseline.
+- [`2508.15734v1`](../paper-notes/2508.15734v1.md) — Elsworth et al., measuring Gemini's per-prompt environmental
+  impact; Wh-per-prompt measurement-boundary methodology.
+- [`2511.09057v3`](../paper-notes/2511.09057v3.md) — PAN, MBZUAI world-model paper; Generative Latent Prediction
+  architecture and forward-simulation planning loop.
+- [`2511.02824v2`](../paper-notes/2511.02824v2.md) — Kosmos, autonomous AI scientist; symbolic-scientific world-model
+  sense in the four-way "world model" lexical disambiguation.
+- [`2602.15922v1`](../paper-notes/2602.15922v1.md) — DreamZero, NVIDIA GEAR Lab — world-action model for zero-shot
+  robotics policies extending the WHAM lineage.
+- [`2602.16710v1`](../paper-notes/2602.16710v1.md) — EgoScale, NVIDIA GEAR Lab — log-linear data-scaling law for
+  dexterous manipulation from egocentric human data.
+- [`2602.18308v2`](../paper-notes/2602.18308v2.md) — JPmHC, Cayley-stabilized orthogonal Hyper-Connections; manifold-ML
+  footnote and Phase 8 cross-product candidate.
+- [`2407.10362v3`](../paper-notes/2407.10362v3.md) — LAB-Bench — FutureHouse coverage/accuracy/precision benchmark with
+  explicit refusal option; Phase 1 Worker-selection anchor.
+- [`2503.00096v3`](../paper-notes/2503.00096v3.md) — BixBench — MCQ→open-answer collapse and Aviary three-tool agent
+  harness; the agent-loop benchmark anchor.
+- [`bandaru_transformer_design_guide_pt2_modern_architecture`](../paper-notes/bandaru_transformer_design_guide_pt2_modern_architecture.md)
+  — Bandaru, Transformer Design Guide Part 2; mathematical grounding for the four substitutions.
+- [`flash_moe`](../paper-notes/flash_moe.md) — Flash-MoE, 397B MoE streaming on consumer Apple Silicon; OS-page-cache
+  finding and deferred-CMD3 pipeline.
+- [`jytan_2025_crystallization_of_transformer_architectures`](../paper-notes/jytan_2025_crystallization_of_transformer_architectures.md)
+  — Tan, crystallization study with 53-model Era III adoption-rate data.
+- [`Kimi-K2-2507.20534`](../paper-notes/Kimi-K2-2507.20534.md) — Moonshot AI Kimi K2 tech report; MLA+MoE topology,
+  MuonClip optimizer-stability finding, token-efficiency framing.
+- [`mughal_context_window_management`](../paper-notes/mughal_context_window_management.md) — Mughal, context window
+  management guide; effective vs nominal context budget and lost-in-the-middle degradation.
+- [`NIPS-2017-attention-is-all-you-need-Paper`](../paper-notes/NIPS-2017-attention-is-all-you-need-Paper.md) — Vaswani
+  et al., the architectural anchor; every Worker is a descendant of this paper.
+- [`raschka_2025_big_llm_architecture_comparison`](../paper-notes/raschka_2025_big_llm_architecture_comparison.md) —
+  Raschka, Big LLM Architecture Comparison extending Tan's trajectory through DeepSeek V3, Llama 4, GLM-5.
+- [`s41586-025-08600-3`](../paper-notes/s41586-025-08600-3.md) — WHAM, Microsoft/Ninja Theory; user-study-grounded
+  capability-first evaluation methodology for world models.
+- [`sutton_bitter_lesson`](../paper-notes/sutton_bitter_lesson.md) — Sutton 2019, The Bitter Lesson;
+  compute-scaling-beats-encoded-knowledge as the organizing claim for Era III convergence.
 
 ---
 

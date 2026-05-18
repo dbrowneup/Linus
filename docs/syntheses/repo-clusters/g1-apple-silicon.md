@@ -268,6 +268,36 @@ _Resolved (DEC-0018, DEC-0045, ARCHITECTURE.md C.1): Linus's tool registry is MC
 fastmcp. pmetal-mcp is the first **external** MCP server consumed via client adapter — not the registry foundation
 itself. The decision is captured in ARCHITECTURE.md's Tool registry section._
 
+## References
+
+### Repo-notes
+
+- [`ANE`](../../repo-notes/ANE.md) — Maderix/ANE-training reverse-engineered Neural Engine training methodology;
+  private-API methodology reference, not vendored.
+- [`autoresearch`](../../repo-notes/autoresearch.md) — Karpathy's upstream autoresearch loop; CUDA-required reference
+  methodology for keep-or-revert experimental discipline.
+- [`autoresearch-mlx`](../../repo-notes/autoresearch-mlx.md) — Clean MLX port of autoresearch making the loop runnable
+  on M1 Max today via `uv sync && uv run`.
+- [`BitNet`](../../repo-notes/BitNet.md) — Microsoft BitNet/bitnet.cpp reference implementation; theory and CPU-first
+  Apple Silicon serving runtime.
+- [`Bonsai-demo`](../../repo-notes/Bonsai-demo.md) — PrismML's Apple-Silicon-native 1-bit/ternary 8B checkpoints with
+  llama-server endpoint for Phase 1c.
+- [`flash-moe`](../../repo-notes/flash-moe.md) — Bespoke Objective-C 397B-MoE streaming; source of the "trust the OS
+  page cache" engineering convention.
+- [`mlx-flash`](../../repo-notes/mlx-flash.md) — Framework-integrated dense >RAM streaming with the MPC-Lite predictive
+  I/O scheduler.
+- [`pmetal`](../../repo-notes/pmetal.md) — Epistates' maintained Rust ML platform; load-bearing center of the cluster
+  covering both inference and training paths on Apple Silicon.
+- [`QiMeng-cpu-v1`](../../repo-notes/QiMeng-cpu-v1.md) — Behavioral synthesis of tape-out-grade RISC-V CPU; formerly
+  grouped here as methodological reference, promoted to g12.
+
+### Paper-notes
+
+- [`2312.11514v3`](../../paper-notes/2312.11514v3.md) — Apple's LLM in a Flash; cited as the theoretical foundation both
+  flash-moe and mlx-flash build on.
+- [`2602.18308v2`](../../paper-notes/2602.18308v2.md) — JPmHC Cayley-stabilized Hyper-Connections paper; pmetal-mhc
+  crate's training-experiment companion.
+
 ---
 
 _This synthesis is a point-in-time document. It should be revisited when Phase 1b's pmetal verdict lands (it resolves
