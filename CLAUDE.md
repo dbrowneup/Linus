@@ -320,6 +320,16 @@ When a Worker task produces a missing or empty result and the session log shows 
 state before re-issuing the task. Workers may have partially written output even if the session terminated abnormally.
 Check the target files and branch state first; re-running a completed task wastes tokens and may overwrite good work.
 
+**API-error mid-work recovery for in-worktree agents.** When an agent dispatched with `isolation: "worktree"` returns an
+API error (529 Overloaded, 503, network) after writing files but before committing, the files persist in the agent's
+worktree at `.claude/worktrees/agent-<id>/`. The agent's branch pointer is still at the base SHA; the work-in-progress
+is in the worktree's working tree, unstaged. Maestro can land the work directly without re-dispatching:
+`git -C .claude/worktrees/agent-<id> status` to inspect, then `git -C ... add ...`, `git -C ... commit -m "..."`,
+`git -C ... push -u origin <branch>` to publish. The pattern was validated 2026-05-18 when 3 of 4 refresh-fanout agents
+hit API 529 after completing all 9 file edits — every file recovered cleanly via Maestro-side commit + push. Re-dispatch
+would have burnt fresh tokens to redo work already done, and worse, re-rolled the model's outputs (a 7B Worker doesn't
+deterministically reproduce a 200-line refresh).
+
 ### State verification across context boundaries
 
 When state was established in a prior context — different session, compaction summary, or Maestro's own earlier claims
@@ -429,12 +439,53 @@ analyses) AND the dispatch is SEQUENTIAL (not parallel), file-level partitioning
 Maestro commits each agent's output without the worktree overhead (base-SHA drift, path-resolution quirks, manual
 cleanup, cherry-pick conflicts). For PARALLEL dispatch, the hard rule above wins regardless.
 
+**Worktrees can't see gitignored content; agents needing to read it must use absolute paths to the main checkout.**
+`git worktree add` creates a working directory containing TRACKED files only. Gitignored content — notably `repos/`
+(138 cloned reference repositories), `context/`, `~/.linus/` artifacts — is NOT carried into the new worktree's
+filesystem space. Agents that need to read gitignored content (e.g., refreshing a repo-note against current upstream,
+running benchmark fixtures from `context/papers/`) must use the absolute path of the main checkout:
+`/Users/dbrowne/Desktop/Programming/GitHub/Linus/repos/<name>/`. The absolute path resolves to the actual filesystem
+location regardless of which worktree the agent is in. This is reads-only safe — writes via absolute path hit the
+Edit-tool path-resolution quirk documented above, which agents must recover via the standard capture-diff / restore-main
+/ git-apply pattern. When dispatching agents that need both read-from-gitignored-source and write-to-tracked-target,
+state this explicitly in the prompt: "Use absolute paths to read FROM `repos/...`; writes to `docs/...` should land in
+your worktree but may hit the path-resolution quirk — use the recovery pattern."
+
+**`git -C <path>` over `cd <path>` when operating across multiple worktrees.** Multi-worktree operations from Maestro
+(committing + pushing in each of N worktrees in sequence) are vulnerable to CWD confusion: a `cd` from a prior Bash call
+leaves Maestro's CWD in a worktree that may not be the one Maestro intends for the next operation. The 2026-05-18
+recovery flow hit this — a `git add` for "batch 3 files" was issued with CWD pointing at batch 2's worktree, and the
+command silently no-op'd because those files weren't where CWD was. Use `git -C <worktree-path> <subcommand>` for every
+git operation that crosses worktree boundaries. This makes each operation explicit about its target and immune to the
+silent-wrong-worktree class of bug. Reserve `cd` for cases where multiple sequential commands genuinely share a working
+directory inside the same Bash invocation chained by `&&`.
+
 **Worktree cleanup sequence.** After all agent commits are cherry-picked and confirmed:
 
 1. `git worktree unlock <path>` — release any stale process lock
 2. `git worktree remove --force <path>` — removes directory; branch pointer persists
 3. Verify: `git branch | grep agent/` — branches should still appear
 4. Delete branches only after the consolidated PR is merged: `git branch -D agent/<name>`
+
+**Source-branch cleanup timing — default conservative, fast-track when cherry-picks are clean.** Step 4 above defaults
+to "delete only after the consolidated PR is merged" because keeping source agent branches alive lets you re-cherry-pick
+if you discover a conflict-resolution error. That conservative rule is correct when cherry-picks involved real merge
+conflicts and you might need to re-resolve. When cherry-picks were CLEAN (no conflict markers, byte-identical diffs
+against the consolidation branch), the source branches carry no information the consolidation branch doesn't already
+hold — they can be deleted as soon as the consolidation branch is pushed and the PR is opened. The 2026-05-18 refresh
+fanout used this fast-track: 4 source branches were deleted while PR #57 was still open, with no recovery risk because
+every cherry-pick had landed conflict-free. The end-of-session sweep then becomes:
+
+1. Identify source branches whose commits exist on either `main` (merged PRs) or an open consolidation PR (clean
+   cherry-picks).
+2. Local delete: `git branch -D <name>` for each.
+3. Remote delete: `git push origin --delete <name>` for each.
+4. `git remote prune origin` to clear stale remote-tracking refs.
+5. Dismantle all worktrees per the sequence above.
+
+Mass-deletion safety check before step 2: confirm each source branch's commits are represented on the consolidation
+branch via `git log <consolidation-branch> --grep "<scope-tag>"` or by reading the PR description's named source SHAs.
+If a source branch had merge-conflict cherry-picks, keep it until the consolidation PR merges (the conservative rule).
 
 **End-of-session dismantling, not just post-PR.** The sequence above is canonically written for the
 after-cherry-picks-and-PR-merge case, but the same sequence applies whenever a worktree's purpose is complete —
