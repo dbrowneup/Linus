@@ -729,6 +729,45 @@ Cross-references that were load-bearing without being in the eleven-paper set:
 
 ---
 
+## References
+
+### Paper-notes
+
+- [`2102.05095v4`](../paper-notes/2102.05095v4.md) — Bertasius, Wang & Torresani, _Is Space-Time Attention All You Need
+  for Video Understanding?_ (TimeSformer); the wall-of-attention case study from a non-text domain.
+- [`2203.15556v1`](../paper-notes/2203.15556v1.md) — Hoffmann et al., _Training Compute-Optimal Large Language Models_
+  (Chinchilla scaling-laws paper).
+- [`2205.11916v4`](../paper-notes/2205.11916v4.md) — Kojima et al., _Large Language Models are Zero-Shot Reasoners_ (the
+  "let's think step by step" empirical anchor).
+- [`2303.12712v5`](../paper-notes/2303.12712v5.md) — Bubeck et al., _Sparks of Artificial General Intelligence: Early
+  experiments with GPT-4_ (capability survey + memory-deficit failure catalogue).
+- [`2305.15408v5`](../paper-notes/2305.15408v5.md) — Feng, Zhang et al., _Towards Revealing the Mystery behind Chain of
+  Thought: A Theoretical Perspective_ (constructive CoT-as-depth proof).
+- [`2310.07923v5`](../paper-notes/2310.07923v5.md) — Merrill & Sabharwal, _The Expressive Power of Transformers with
+  Chain of Thought_ (TC0 ceiling and scratchpad-regime escape).
+- [`2407.21783v3`](../paper-notes/2407.21783v3.md) — Meta, _The Llama 3 Herd of Models_ (vanilla-dense brute-force-via-
+  attention upper bound).
+- [`2410.01201v3`](../paper-notes/2410.01201v3.md) — Feng et al., _Were RNNs All We Needed?_ (minGRU / minLSTM parallel-
+  scan minimal recurrence substrate).
+- [`2411.07279v2`](../paper-notes/2411.07279v2.md) — Akyürek et al., _The Surprising Effectiveness of Test-Time Training
+  for Few-Shot Learning_ (per-task LoRA episodic consolidation candidate).
+- [`2412.04604v2`](../paper-notes/2412.04604v2.md) — Chollet et al., _ARC Prize 2024: Technical Report_ (test-time
+  training / o3 search as external-memory mechanisms).
+- [`2412.06769v3`](../paper-notes/2412.06769v3.md) — Hao et al., _Training Large Language Models to Reason in a
+  Continuous Latent Space_ (Coconut latent-recurrence substrate).
+- [`2412.17794v1`](../paper-notes/2412.17794v1.md) — Garrison, _Memory Makes Computation Universal, Remember?_ (the
+  proof-paper nucleus of this synthesis).
+- [`2502.16721v1`](../paper-notes/2502.16721v1.md) — _Speed and Conversational LLMs: Not All Is About Tokens per Second_
+  (task-completion-time over tok/s; the Worker-selection axis).
+- [`2512.24695v1`](../paper-notes/2512.24695v1.md) — Behrouz et al., _Nested Learning_ (Continuum Memory System + Hope
+  architecture; multi-timescale update as unifying primitive).
+- [`Letta-2310.08560`](../paper-notes/Letta-2310.08560.md) — Packer et al., _MemGPT: Towards LLMs as Operating Systems_
+  (hierarchical memory tiers via virtual context management; 2023 historical anchor).
+- [`mughal_context_window_management`](../paper-notes/mughal_context_window_management.md) — Mughal, _Why Claude Gets
+  Dumber the Longer Your Session Runs_ (operational lost-in-middle + real-vs-nominal token budget evidence).
+
+---
+
 _This synthesis is the input to the next round of edits to [paper-landscape.md](../landscapes/paper-landscape.md),
 [synthesis-landscape.md](../landscapes/synthesis-landscape.md), [total-landscape.md](../landscapes/total-landscape.md),
 [open-questions.md](../questions/open-questions.md), and [top-questions.md](../questions/top-questions.md). It should be

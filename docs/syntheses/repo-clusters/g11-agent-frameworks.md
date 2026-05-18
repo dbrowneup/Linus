@@ -450,6 +450,44 @@ promptfoo baseline reveals which tasks hit context quality failures first?
 
 ---
 
+## References
+
+### Repo-notes
+
+- [`agent-skills-for-context-engineering`](../../repo-notes/agent-skills-for-context-engineering.md) — 14 platform-
+  agnostic skills teaching context engineering; the theoretical grounding for Linus's context-routing decisions.
+- [`autogen`](../../repo-notes/autogen.md) — Microsoft Research multi-agent framework (in maintenance mode; pivots to
+  Microsoft Agent Framework); group-chat-as-coordination-primitive origin.
+- [`claude-code-guide`](../../repo-notes/claude-code-guide.md) — community-curated 3,700-line Claude Code reference
+  mapping slash commands, hooks, plugins, MCP wiring, sandbox modes, sub-agents.
+- [`dspy`](../../repo-notes/dspy.md) — Stanford declarative self-improving Python framework; treats prompts as learned
+  parameters optimized end-to-end against a metric.
+- [`gptme`](../../repo-notes/gptme.md) — terminal-first autonomous agent CLI with plugin / skills / lessons
+  architecture; closest production reference for what a Linus Worker Agent looks like.
+- [`huginn`](../../repo-notes/huginn.md) — Ruby-on-Rails self-hosted automation platform; agent/event DAG pattern as
+  multi-agent-workflow-composition reference (implementation not portable).
+- [`langgraph`](../../repo-notes/langgraph.md) — LangChain Inc.'s low-level orchestration framework for stateful,
+  multi-actor LLM applications.
+- [`lmnr`](../../repo-notes/lmnr.md) — Laminar full-stack AI observability platform; OpenTelemetry-based trace viewer +
+  SQL backend as the Phase 5+ observability target.
+- [`MiroFish-Offline`](../../repo-notes/MiroFish-Offline.md) — fully local fork of the Chinese-market `666ghj/MiroFish`
+  multi-agent swarm-intelligence engine.
+- [`promptfoo`](../../repo-notes/promptfoo.md) — production-grade Node.js CLI for evaluating and red-teaming LLM
+  applications; the Phase 1-close evaluation harness for the Dan task suite.
+- [`pydantic-ai`](../../repo-notes/pydantic-ai.md) — Pydantic team's type-safe provider-agnostic Python agent framework;
+  Integrate verdict as the Phase 2a orchestration primitive.
+- [`superpowers`](../../repo-notes/superpowers.md) — skill-based plugin methodology enforcing structured workflows
+  across coding-agent platforms; behavioral discipline layer (spec-first, RED-GREEN-REFACTOR, two-stage review).
+- [`swarm`](../../repo-notes/swarm.md) — System-Wide Assessment of Risk in Multi-agent systems framework; soft-label
+  population-level safety metrics and 27+ governance levers.
+
+### Paper-notes
+
+- [`swarm-2604.19752`](../../paper-notes/swarm-2604.19752.md) — Aiersilan & Savitt, _Soft-Label Governance for
+  Distributional Safety in Multi-Agent Systems_ (2026); paired with `repo-notes/swarm.md`.
+
+---
+
 _This synthesis should be revisited when the Phase 1 promptfoo baseline lands (it determines the Phase 2a evaluation
 target), when the pydantic-ai smoke test runs (it confirms or revises the Integrate verdict), when the Phase 2a
 orchestration spec is written (huginn, superpowers, gptme, and Agent-Skills all feed into it), and when Phase 6

@@ -463,6 +463,64 @@ default framework. DEC-0005's MCP portion is superseded by DEC-0018 per the inde
 
 ---
 
+## References
+
+### Repo-notes
+
+- [`claude-squad`](../../repo-notes/claude-squad.md) — terminal app `cs` supervising multiple coding-agent CLIs in
+  parallel, each in isolated tmux + git-worktree; the runtime-isolation primitive.
+- [`claude-task-master`](../../repo-notes/claude-task-master.md) — opinionated PRD-to-tasks-to-execution npm package +
+  MCP server with 36 tools; the task-decomposition pattern complementing claude-squad.
+- [`claw-code`](../../repo-notes/claw-code.md) — Rust CLI agent harness from-scratch reimplementation of Claude Code's
+  terminal experience; Architect / Executor / Reviewer triad reference diagram.
+- [`claw-code-local`](../../repo-notes/claw-code-local.md) — small fork of `ultraworkers/claw-code-parity` adding local-
+  model (Ollama) support to the `claw` CLI.
+- [`cline`](../../repo-notes/cline.md) — VS Code agentic-coding extension; full in-editor agent harness with
+  monolithic-loop architecture.
+- [`codebuff`](../../repo-notes/codebuff.md) — TypeScript multi-agent CLI coding assistant on Bun; role-specialized
+  internal fleet and `handleSteps` generator pattern.
+- [`debate-or-vote`](../../repo-notes/debate-or-vote.md) — research-code reference implementation for NeurIPS 2025
+  Spotlight on heuristic-belief-update multi-agent coordination.
+- [`goose`](../../repo-notes/goose.md) — production Rust+MCP coding agent (Block / AAIF); Recipe DSL and provider-side
+  ACP shim reaching pi.
+- [`gravityfile`](../../repo-notes/gravityfile.md) — Rust+Ratatui TUI disk-usage explorer; included in G7 as the
+  designated outlier (no LLM dependency); scanner macOS-4-thread cap is the only durable detail.
+- [`Kimi-K2`](../../repo-notes/Kimi-K2.md) — Moonshot AI's 1.04T-parameter / 32B-active MoE open-weights model release
+  vehicle; Anthropic-compat endpoint signal.
+- [`Letta`](../../repo-notes/Letta.md) — productized MemGPT descendant; Anthropic-compat endpoint signal among the
+  growing dual-endpoint trend.
+- [`openclaw`](../../repo-notes/openclaw.md) — local-first Node.js personal AI assistant platform spanning 20+
+  messaging channels; Phase 5+ Linus front-end target consuming pi.
+- [`openrouter-skills`](../../repo-notes/openrouter-skills.md) — first-party Anthropic-Skills-format Skills collection
+  from OpenRouter; the `open-responses/SKILL.md` protocol spec is the one keeper.
+- [`origin`](../../repo-notes/origin.md) — Apple-Silicon-only Rust local memory daemon (libSQL + BGE + RRF + LLM
+  rescoring) speaking MCP; Phase 2b memory-sidecar candidate, AGPL-blocked at the desktop layer only.
+- [`pi`](../../repo-notes/pi.md) — Mario Zechner's TypeScript/Node monorepo minimalist harness (four built-in tools,
+  no MCP); substrate openclaw consumes.
+- [`python-sdk`](../../repo-notes/python-sdk.md) — official OpenRouter Python SDK; `ProviderPreferences` is the most
+  mature router-vocabulary prior-art reference.
+- [`semanticworkbench`](../../repo-notes/semanticworkbench.md) — Microsoft's prototype-assistants platform with
+  FastAPI + React + assistant-as-HTTP-service protocol; protocol shape worth studying, Azure coupling disqualifies the
+  implementation.
+- [`swarm`](../../repo-notes/swarm.md) — System-Wide Assessment of Risk in Multi-agent systems framework; population-
+  level soft-label governance complementing the harness-orchestration thread.
+- [`symphony`](../../repo-notes/symphony.md) — OpenAI engineering-preview harness reframing the human/agent
+  relationship to "manage the work the agent does"; issue-tracker-driven autonomous-dispatch and `WORKFLOW.md` policy-
+  in-repo.
+- [`workgraph`](../../repo-notes/workgraph.md) — Rust CLI `wg` treating coordination as a typed dependency graph;
+  `.workgraph/graph.jsonl` append-only DAG is the recommended Phase 2a session-store shape.
+
+### Paper-notes
+
+- [`Kimi-K2-2507.20534`](../../paper-notes/Kimi-K2-2507.20534.md) — Kimi Team, _Kimi K2: Open Agentic Intelligence_
+  (Moonshot AI, 2025); tech report paired with `repo-notes/Kimi-K2.md`.
+- [`Letta-2310.08560`](../../paper-notes/Letta-2310.08560.md) — Packer et al., _MemGPT: Towards LLMs as Operating
+  Systems_ (UC Berkeley, 2023); Letta's foundational paper.
+- [`swarm-2604.19752`](../../paper-notes/swarm-2604.19752.md) — Aiersilan & Savitt, _Soft-Label Governance for
+  Distributional Safety in Multi-Agent Systems_ (2026); paired with `repo-notes/swarm.md`.
+
+---
+
 _This document should be revisited at Phase 1f ADR close, at Phase 2a design kickoff (serving protocol and session store
 decisions), at Phase 2b (origin-vs-build-from-scratch for the memory layer), and at Phase 3 kickoff (Worker registry
 schema and parallel-agent heartbeat supervisor)._
