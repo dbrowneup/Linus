@@ -493,3 +493,60 @@ begins. Key references: [KB_DESIGN_PATTERNS.md](../../context/notes/KB_DESIGN_PA
 [repos/flash-moe](../repo-notes/flash-moe.md) for the autoresearch methodology applied to Apple Silicon inference,
 [repos/autoresearch](../repo-notes/autoresearch.md) and [repos/autoresearch-mlx](../repo-notes/autoresearch-mlx.md) for
 the research loop framework._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`AgenticResearchWiki`](../repo-notes/AgenticResearchWiki.md) — Wiki holds data paths, training configs, and eval
+  records; compounds project memory via two ready-to-install Claude Code Skills.
+- [`ANE`](../repo-notes/ANE.md) — Maderix's Apple Neural Engine reverse-engineering reference; companion input to the
+  flash-moe optimization work.
+- [`agentic-wiki-builder`](../repo-notes/agentic-wiki-builder.md) — Git-branch-per-ingestion provenance model with
+  DuckDB+NetworkX linker for contamination tracing.
+- [`agentmemory`](../repo-notes/agentmemory.md) — Production reference architecture behind Rohit v2 gist; BM25 + vector
+  - KG with RRF fusion, 95.2% on LongMemEval-S, 51 MCP tools, 13-hook lifecycle.
+- [`anamnesis`](../repo-notes/anamnesis.md) — Purpose-built provenance layer ("the wiki is the codebase; Anamnesis is
+  the git log") running 13 agents in production.
+- [`autoresearch`](../repo-notes/autoresearch.md) — Research loop framework implementing Karpathy's autoresearch pattern
+  (metric + goal + reference materials + extended run).
+- [`autoresearch-mlx`](../repo-notes/autoresearch-mlx.md) — MLX-targeted autoresearch variant; companion to autoresearch
+  for Apple Silicon optimization workflows.
+- [`flash-moe`](../repo-notes/flash-moe.md) — Streaming 397B-parameter MoE on M3 Max via the autoresearch pattern;
+  documented success case for Linus's planned performance methodology.
+- [`hyalo`](../repo-notes/hyalo.md) — Phase 3 KB tooling complement to keppi: transactional link rewrites with
+  schema-validated authoring; together they form the Phase 3 KB tooling layer.
+- [`keppi`](../repo-notes/keppi.md) — Weighted directed graph from wikilinks/tags/frontmatter with blast-radius analysis
+  and 19-tool FastMCP server; tested on 1,471 notes / 267K edges.
+- [`llm-research-wiki`](../repo-notes/llm-research-wiki.md) — Academic-research template with domain-specific page types
+  (concepts, authors, debates, syntheses).
+- [`llm-wikidata`](../repo-notes/llm-wikidata.md) — Entity-deduplication pattern using LLMs plus ChromaDB to recall
+  existing entities before insert.
+- [`llmwiki`](../repo-notes/llmwiki.md) — NiharShrotri's Python CLI: Ollama plus Qwen3, QMD hybrid search, 3-way query
+  scope, write-back, contradiction detection.
+- [`llmwiki-cli`](../repo-notes/llmwiki-cli.md) — nashsu's cross-platform Tauri (Rust) shell with Ollama plus
+  multi-provider and 3-column graph-view layout.
+- [`obsidian-llm-wiki-local`](../repo-notes/obsidian-llm-wiki-local.md) — 100% local Ollama wiki with concept extraction
+  and rejection feedback loop; proves the fully-local pattern.
+- [`omega-memory`](../repo-notes/omega-memory.md) — Local semantic search (FTS5 + vector + cross-encoder rerank) hitting
+  95.4% on LongMemEval at 50ms retrieval; solves the index.md scaling wall.
+- [`ontomics`](../repo-notes/ontomics.md) — Tree-sitter AST plus TF-IDF plus code embeddings producing a deterministic
+  semantic index of a codebase's domain vocabulary; exposed as MCP tools.
+- [`openaugi`](../repo-notes/openaugi.md) — "Links are the whole thing": two-table SQLite schema (`blocks`, `links`)
+  with sqlite-vec + FTS5, 17-tool MCP server, write-back from chat.
+- [`origin`](../repo-notes/origin.md) — Tauri (Rust) desktop app with background daemon, Qwen3 on Metal, and explicit
+  quality gate at ingest.
+- [`qmd`](../repo-notes/qmd.md) — Local hybrid search engine (BM25 + vector + LLM rerank) and MCP server; explicitly
+  recommended by Karpathy for wikis past the index.md wall.
+- [`synthadoc`](../repo-notes/synthadoc.md) — Multi-provider including Ollama with contradiction detection, confidence
+  thresholds, HITL review queue, audit trail, six file format ingesters.
+- [`TheKnowledge`](../repo-notes/TheKnowledge.md) — Write-validator pattern: hard-rejects any wiki page write without a
+  resolved `[[sources/]]` link; the most rigorous citation enforcement in the corpus.
+- [`vectorless`](../repo-notes/vectorless.md) — Knowledge-graph traversal for document retrieval with no vector database
+  via a knowledge-link graph for contextual retrieval.
+- [`WeKnora`](../repo-notes/WeKnora.md) — Tencent's auto-built wiki plus typed knowledge graph (Neo4j) with
+  wiki-grounded retrieval and a Chrome ingestion extension.
+- [`wikiloom`](../repo-notes/wikiloom.md) — Chunk-level SHA-256 hashing with source traceability via
+  `sha256(source_hash + chunk_index)` in page frontmatter.
