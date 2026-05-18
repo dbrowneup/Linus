@@ -328,69 +328,67 @@ harness-surface coverage as a double-check against Linus's own CLAUDE.md and pro
 ## 4b. ClawBio as a worked example of the skills-as-shippable-bundle archetype (added 2026-05-10)
 
 The [ClawBio](../repo-notes/ClawBio.md) repo (ClawBio/ClawBio) extends the g11 framing in a direction the
-agent-framework cluster does not: it is a working precedent for **what the ship-side of a Linus skill looks like**
-once the bench has been written. Three patterns from ClawBio land directly on the skills-and-practices argument and
-are worth treating as design inputs rather than reference material.
+agent-framework cluster does not: it is a working precedent for **what the ship-side of a Linus skill looks like** once
+the bench has been written. Three patterns from ClawBio land directly on the skills-and-practices argument and are worth
+treating as design inputs rather than reference material.
 
 The first is **the Claude Code plugin marketplace as a Phase 5+ distribution channel**. ClawBio installs as
 `/plugin marketplace add ClawBio/ClawBio` followed by `/plugin install clawbio`, after which all 63 skills are
-agent-routable inside Claude Code without any deeper integration work. This is the same surface Linus would use to
-ship its own skill bundles to any Claude Code user — Dan first, a wider audience later if any of Linus's skills
-graduate to a commercial-surface offering. Section 6 already establishes Claude Code as the Maestro harness via
-[DEC-0007](../adr/0007-claude-code-terminal-maestro.md); the plugin marketplace is the paired distribution channel
-for skill bundles that should be addressable from Claude Code without bundling them into the Linus orchestration
-runtime. Importantly, the plugin path does not displace Linus's own internal SKILL.md format or the in-house tool
-registry — it is an _output_ format the orchestration layer can render to alongside MCP and direct in-process
-invocation. Worth surfacing as a Phase 5/7 distribution-channel option in the spec backlog.
+agent-routable inside Claude Code without any deeper integration work. This is the same surface Linus would use to ship
+its own skill bundles to any Claude Code user — Dan first, a wider audience later if any of Linus's skills graduate to a
+commercial-surface offering. Section 6 already establishes Claude Code as the Maestro harness via
+[DEC-0007](../adr/0007-claude-code-terminal-maestro.md); the plugin marketplace is the paired distribution channel for
+skill bundles that should be addressable from Claude Code without bundling them into the Linus orchestration runtime.
+Importantly, the plugin path does not displace Linus's own internal SKILL.md format or the in-house tool registry — it
+is an _output_ format the orchestration layer can render to alongside MCP and direct in-process invocation. Worth
+surfacing as a Phase 5/7 distribution-channel option in the spec backlog.
 
 The second is **the reproducibility bundle as a candidate output convention for any Linus skill that produces a
-publishable artefact**. Every ClawBio analysis emits `commands.sh` + `environment.yml` + `checksums.sha256`
-alongside the markdown report, not as an afterthought but as part of the standard skill-output contract. The
-argument for adoption generalizes well beyond biology: any Linus skill whose output might end up in a paper, a
-slide, or a downstream pipeline should ship a bundle so a reviewer can reproduce the result in one command without
-contacting Dan. The cost is small — three files written alongside the report — and the value compounds with every
-skill that adopts it. _Seed: DEC-NNNN reproducibility-bundle-output-convention_ — companion to
-[DEC-0023](../adr/0023-output-interface-citations-llm-wiki.md) (output interface citations + LLM Wiki) and
-[DEC-0027](../adr/0027-linus-practice-stance-batch.md) (public APIs + measurement discipline). Phase 7
-finalization is the natural commit point.
+publishable artefact**. Every ClawBio analysis emits `commands.sh` + `environment.yml` + `checksums.sha256` alongside
+the markdown report, not as an afterthought but as part of the standard skill-output contract. The argument for adoption
+generalizes well beyond biology: any Linus skill whose output might end up in a paper, a slide, or a downstream pipeline
+should ship a bundle so a reviewer can reproduce the result in one command without contacting Dan. The cost is small —
+three files written alongside the report — and the value compounds with every skill that adopts it. _Seed: DEC-NNNN
+reproducibility-bundle-output-convention_ — companion to [DEC-0023](../adr/0023-output-interface-citations-llm-wiki.md)
+(output interface citations + LLM Wiki) and [DEC-0027](../adr/0027-linus-practice-stance-batch.md) (public APIs +
+measurement discipline). Phase 7 finalization is the natural commit point.
 
-The third is **the SKILL.md conformance linter as a worked example of the "schema is the product" framing that
-runs through this synthesis**. ClawBio's `scripts/lint_skills.py` enforces a 17-check checklist on every skill PR:
-YAML frontmatter completeness, required sections, ≥3 trigger keywords, ≥3 gotchas, a safety disclaimer reference,
-the agent-boundary clause, demo data presence, test directory presence, and a 500-line ceiling on SKILL.md size.
-The point is not the specific checks (Linus's own would differ — agent-boundary clauses do not generalize cleanly
-to non-bio skills) but the existence of an _enforced_ schema, machine-checkable at PR time. The progressive-
-disclosure skill format Section 4a flagged as triple-converged across superpowers, gptme, and
-Agent-Skills-for-Context-Engineering becomes a stronger pattern when paired with a linter that prevents drift; a
-SKILL.md-shaped bundle that no one validates is markdown, not a contract. _Seed: DEC-NNNN
-skill-md-conformance-linter_ — Linus's own skill template, regardless of which lineage it descends from
-(Anthropic's, ClawBio's, bioSkills's, or a synthesis), should ship with an equivalent linter from day one of
-Phase 7 prep.
+The third is **the SKILL.md conformance linter as a worked example of the "schema is the product" framing that runs
+through this synthesis**. ClawBio's `scripts/lint_skills.py` enforces a 17-check checklist on every skill PR: YAML
+frontmatter completeness, required sections, ≥3 trigger keywords, ≥3 gotchas, a safety disclaimer reference, the
+agent-boundary clause, demo data presence, test directory presence, and a 500-line ceiling on SKILL.md size. The point
+is not the specific checks (Linus's own would differ — agent-boundary clauses do not generalize cleanly to non-bio
+skills) but the existence of an _enforced_ schema, machine-checkable at PR time. The progressive- disclosure skill
+format Section 4a flagged as triple-converged across superpowers, gptme, and Agent-Skills-for-Context-Engineering
+becomes a stronger pattern when paired with a linter that prevents drift; a SKILL.md-shaped bundle that no one validates
+is markdown, not a contract. _Seed: DEC-NNNN skill-md-conformance-linter_ — Linus's own skill template, regardless of
+which lineage it descends from (Anthropic's, ClawBio's, bioSkills's, or a synthesis), should ship with an equivalent
+linter from day one of Phase 7 prep.
 
 ClawBio also extends Section 4a's claude-code-guide observation about persona library-as-quarry: ClawBio's
-templates/SKILL-TEMPLATE.md plus the conformance linter together are the **engineering shape** for what a Linus
-skill template should look like, while the breadth-of-content question (which skills, in which domain order)
-remains separately answerable from bioSkills, Anthropic's official skills repo, or whatever lineage Linus chooses
-to inaugurate Phase 7 with. The two-axis split — engineering shape from one upstream, content from another — is
-the operational form of the "delete every requirement" discipline applied to skill-library inheritance. _Verdict:
-**Study (with a high prior on later Adapt-as-skill-library-pattern)**_ from [`ClawBio.md`](../repo-notes/ClawBio.md).
+templates/SKILL-TEMPLATE.md plus the conformance linter together are the **engineering shape** for what a Linus skill
+template should look like, while the breadth-of-content question (which skills, in which domain order) remains
+separately answerable from bioSkills, Anthropic's official skills repo, or whatever lineage Linus chooses to inaugurate
+Phase 7 with. The two-axis split — engineering shape from one upstream, content from another — is the operational form
+of the "delete every requirement" discipline applied to skill-library inheritance. _Verdict: **Study (with a high prior
+on later Adapt-as-skill-library-pattern)**_ from [`ClawBio.md`](../repo-notes/ClawBio.md).
 
 ### Output-token-budget compression as a first-class skill (added 2026-05-16, caveman fold-in)
 
 [`caveman`](../repo-notes/caveman.md) (Julius Brussee, MIT) adds a new sub-thread to the skills column: a Claude Code
-skill plus 30+-harness install matrix that constrains agent output to telegraphic fragments while preserving
-technical content, with a measured **~65–75% output-token reduction at 100% technical accuracy** validated through a
-disciplined three-arm eval harness (skill vs. plain `Answer concisely.` vs. baseline; the honest delta is skill vs.
-terse, not skill vs. verbose). The pattern is directly applicable to DEC-0032's in-context-window-cap policy — caveman
-is the output-side complement to the input-side cap. The Phase 2a Worker spec should absorb an explicit `output_style`
-field (`verbose` / `default` / `terse` / `caveman`) alongside the existing `memory_mode` and `cot_budget` (DEC-0031),
-with the dispatcher injecting the corresponding system-prompt rider and the audit log recording the choice. The
-load-bearing discipline rule is caveman's **auto-clarity carve-out** (drop to normal prose for security warnings,
-irreversible-action confirmations, multi-step sequences with ambiguity risk, user-confused states) — the design
-pattern for "compress aggressively, bypass under documented conditions" that DEC-0032's cap-bypass-audit-log rule
-already commits to on the input side. A secondary opportunity is `caveman-compress`-style memory-file compaction: a
-derived `CLAUDE.compact.md` variant that Linus's dispatcher selects when the calling Worker's `output_style` is
-`terse`, yielding measurable per-invocation input-token reduction across every Worker call. The
+skill plus 30+-harness install matrix that constrains agent output to telegraphic fragments while preserving technical
+content, with a measured **~65–75% output-token reduction at 100% technical accuracy** validated through a disciplined
+three-arm eval harness (skill vs. plain `Answer concisely.` vs. baseline; the honest delta is skill vs. terse, not skill
+vs. verbose). The pattern is directly applicable to DEC-0032's in-context-window-cap policy — caveman is the output-side
+complement to the input-side cap. The Phase 2a Worker spec should absorb an explicit `output_style` field (`verbose` /
+`default` / `terse` / `caveman`) alongside the existing `memory_mode` and `cot_budget` (DEC-0031), with the dispatcher
+injecting the corresponding system-prompt rider and the audit log recording the choice. The load-bearing discipline rule
+is caveman's **auto-clarity carve-out** (drop to normal prose for security warnings, irreversible-action confirmations,
+multi-step sequences with ambiguity risk, user-confused states) — the design pattern for "compress aggressively, bypass
+under documented conditions" that DEC-0032's cap-bypass-audit-log rule already commits to on the input side. A secondary
+opportunity is `caveman-compress`-style memory-file compaction: a derived `CLAUDE.compact.md` variant that Linus's
+dispatcher selects when the calling Worker's `output_style` is `terse`, yielding measurable per-invocation input-token
+reduction across every Worker call. The
 [March 2026 brevity-improves-accuracy paper (arXiv 2604.00025)](https://arxiv.org/abs/2604.00025) cited in the caveman
 README is a Phase 1 corpus add candidate alongside the Lost-in-the-Middle and Toolformer adds flagged in the
 [Letta-MemGPT paper-note](../paper-notes/Letta-2310.08560.md) §Open Question 7; if the brevity-improves-accuracy
@@ -516,3 +514,77 @@ CLAUDE.md §Writing style for docs mandates elsewhere.
 ---
 
 _Document synthesized May 2026. Source threads archived in `context/threads/`._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`agent-skills-for-context-engineering`](../repo-notes/agent-skills-for-context-engineering.md) — Muratcan Koylan's
+  14-skill platform-agnostic curriculum on context engineering; cited as one of three independent appearances of the
+  YAML-frontmatter progressive-disclosure skill format (Section 3 item 6 and Section 4a).
+- [`autoresearch`](../repo-notes/autoresearch.md) — Andrej Karpathy's overnight LLM-directed ML-research loop with
+  `program.md` as the human-edited skill sheet; cited as the canonical pattern for Phase 6d / Phase 7c experimentation
+  loops.
+- [`autoresearch-mlx`](../repo-notes/autoresearch-mlx.md) — Trevin Creator's MLX port of Karpathy's autoresearch loop;
+  cited with an Integrate verdict for M1-Max-native execution as the entry point for the Phase 1 / Phase 6d autoresearch
+  smoke run.
+- [`caveman`](../repo-notes/caveman.md) — Julius Brussee's output-token compression skill plus cross-harness install
+  matrix (~65–75% reduction at 100% technical accuracy); cited as the output-side complement to DEC-0032's in-context
+  cap and the source of the `output_style` Worker-spec field proposal.
+- [`claude-code-guide`](../repo-notes/claude-code-guide.md) — Zebbern's community-curated Claude Code reference (106
+  agent personas, 29 SKILL modules, three CLAUDE.md guideline collections); cited as the most concrete external exemplar
+  of community-organized Claude Code patterns and the seed quarry for the Phase 3 spawner Role catalogue.
+- [`claude-squad`](../repo-notes/claude-squad.md) — smtg-ai's terminal supervisor running multiple coding-agent CLIs in
+  parallel under tmux + git worktrees; cited as a Study verdict and one of the two Phase 1f orchestration evaluation
+  finalists alongside Task Master AI.
+- [`claude-task-master`](../repo-notes/claude-task-master.md) — Eyal Toledano's PRD-to-tasks-to-execution workflow
+  (npm + fastmcp); cited as a Study verdict for adopting the pattern (task-spec JSON, three-role model split,
+  complexity-then-expand, update-subtask breadcrumb) without vendoring the product.
+- [`cline`](../repo-notes/cline.md) — VS Code agentic coding extension supporting Ollama + LM Studio backends; cited as
+  the Worker-facing IDE harness for code-writing Workers while Claude Code remains the Maestro front-end.
+- [`ClawBio`](../repo-notes/ClawBio.md) — ClawBio's 63 bioinformatics-native AI agent skills built on OpenClaw; cited as
+  a worked example of the skills-as-shippable-bundle archetype, the SKILL.md conformance linter pattern, and the
+  reproducibility-bundle output convention.
+- [`codebase-memory-mcp`](../repo-notes/codebase-memory-mcp.md) — DeusData's static-C-binary code intelligence engine
+  indexing repos into a tree-sitter knowledge graph with 14 MCP tools; cited with an Integrate verdict as a Phase 2a
+  spike candidate for KnowledgeBase code-indexing.
+- [`dlt`](../repo-notes/dlt.md) — dlthub's LLM-native data-pipeline library with 5,000+ source integrations; cited as a
+  Phase 4 data-sovereignty enabler for offline ingestion of databases like NCBI and UniProt.
+- [`dspy`](../repo-notes/dspy.md) — Stanford's program-not-prompt foundation-model framework with Signatures,
+  Teleprompters, and BootstrapFewShot; cited with a Study verdict as the Phase 6 entry point bridging DSPy-optimized
+  in-context demos to LoRA training demonstrations.
+- [`extractthinker`](../repo-notes/extractthinker.md) — Enoch Tor's ORM-like Pydantic-contract document-extraction
+  library; cited as Phase 3 scientific-paper-processing tooling for KnowledgeBase ingestion.
+- [`fastmcp`](../repo-notes/fastmcp.md) — Prefect-maintained Python MCP framework; cited with an Integrate verdict
+  (DEC-0045) as the committed Linus MCP framework on which in-house tool servers will be built.
+- [`gptme`](../repo-notes/gptme.md) — gptme's terminal-first AI agent CLI with a plugin/skills/lessons architecture;
+  cited with a Study verdict as the concrete answer to encoding Dan's bioinformatics expertise into Worker context via
+  the lessons keyword-activation pattern.
+- [`huginn`](../repo-notes/huginn.md) — Self-hosted event-driven automation platform with Agent/Event DAGs in a
+  scheduler loop; cited with a Study verdict as the orchestration-reference pattern for Phase 2a dispatch design.
+- [`lmnr`](../repo-notes/lmnr.md) — Laminar's full-stack AI observability platform (Rust/Next.js/Python +
+  OpenTelemetry); cited with a Study (Phase 5+) verdict and a Phase 2a instrumentation recommendation (OTel from day
+  one).
+- [`markdownify-mcp`](../repo-notes/markdownify-mcp.md) — Glama AI's MCP server wrapping Microsoft `markitdown` to
+  convert PDFs, images, audio, and Office documents to Markdown; cited as Phase 2 / Phase 3 KnowledgeBase ingestion
+  tooling.
+- [`promptfoo`](../repo-notes/promptfoo.md) — Promptfoo's open-source LLM eval + red-teaming CLI/library; cited as the
+  Phase 2 SAFETY.md sandbox-escape-testing infrastructure.
+- [`pydantic-ai`](../repo-notes/pydantic-ai.md) — The Pydantic team's type-safe agent framework with `Agent`,
+  `RunContext`, and `@tool` primitives; cited with an Integrate (Phase 2a) verdict as the orchestration base abstraction
+  for Linus Workers.
+- [`rendergit`](../repo-notes/rendergit.md) — Karpathy's static-HTML repo flattener for LLM context paste; cited with a
+  Watch verdict for Phase 5+ repo-to-hosted-Claude architectural reviews.
+- [`superpowers`](../repo-notes/superpowers.md) — obra/superpowers methodology and plugin system enforcing spec-first /
+  TDD / subagent-driven workflows; cited as the discipline layer of the three-layer g11 Worker stack (pydantic-ai +
+  superpowers + gptme).
+- [`vanna`](../repo-notes/vanna.md) — Vanna 2.0's natural-language-to-SQL agent platform with user-aware permissioning;
+  cited as the prior-art pattern for Phase 3 structured-dataset query skills over Dan's genomics data.
+
+### Paper-notes
+
+- [`Letta-2310.08560`](../paper-notes/Letta-2310.08560.md) — MemGPT paper (Packer, Wooders et al.); cited via the
+  caveman fold-in's pointer to the Letta paper-note's Open Question 7 on brevity-improves-accuracy and Toolformer corpus
+  additions.

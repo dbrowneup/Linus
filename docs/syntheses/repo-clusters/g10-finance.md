@@ -274,3 +274,25 @@ per-skill configuration?
 ever grows a financial skill — even research-only — worth adding an explicit tier that forbids broker API calls and
 wallet signing regardless of what a Worker requests? Pre-committing this constraint before the capability exists is
 cheaper than adding it after.
+
+---
+
+## References
+
+### Repo-notes
+
+- [`dexter`](../../repo-notes/dexter.md) — virattt's Claude-Code-shaped autonomous equity-research agent (TypeScript /
+  Bun / LangChain / Ink TUI); the source of the two-tier microcompact + compact context-compaction prior art lifted into
+  the Phase 2 context-manager spec (E5).
+- [`nixtla`](../../repo-notes/nixtla.md) — Nixtla's TimeGPT SDK over a hosted paid API plus the fully-local Nixtlaverse
+  (statsforecast, mlforecast, neuralforecast, hierarchicalforecast, utilsforecast); the most cross-domain finding in the
+  group, applicable to omics-trajectory and environmental-monitoring time-series.
+- [`OpenBB`](../../repo-notes/OpenBB.md) — OpenBB Finance's Open Data Platform with ~35 data-provider integrations under
+  one Pydantic schema plus `openbb-mcp`; the entrepreneurial-surface anchor of the cluster and the source of the dynamic
+  per-session tool-activation pattern.
+- [`QuantAgent`](../../repo-notes/QuantAgent.md) — Stony Brook / CMU / UBC / Yale / Fudan four-node LangGraph pipeline
+  (Indicator → Pattern → Trend → Decision) using vision-LLM-on-rendered-chart; brackets the minimal end of the
+  multi-agent orchestration design space.
+- [`TradingAgents`](../../repo-notes/TradingAgents.md) — Tauric Research's LangGraph multi-agent trading framework with
+  Analyst Team / bull-bear Researcher debate / Trader / Risk Management debate; the source of the `deep_think_llm` /
+  `quick_think_llm` two-tier LLM split and the decision-log-feeds-next-run-prompt self-correction pattern.
