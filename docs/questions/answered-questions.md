@@ -34,6 +34,64 @@ Sister documents:
 
 ---
 
+<a id="n6-janitorial-resolved-2026-05-16"></a>
+
+## N6 janitorial (resolved 2026-05-16)
+
+Inter-sweep cleanup pass following the 2026-05-12 implementation plan's six-of-seven landing. Five questions resolved
+or partially resolved by a mix of "the work already happened, just propagate," "the question's premise is incorrect,"
+and one fresh audit drill (`pip-audit` + Ollama blob integrity). Scoped as N6 in the implementation-plan-v2 candidate
+list. Findings written to [`docs/security-log.md`](../security-log.md).
+
+#### R2-05. Open Responses vs Chat Completions for the Phase 2a serving protocol
+
+**Resolution:** Resolved by implementation choice. Phase 2a (PR #32, `src/linus/server.py`) shipped the OpenAI Chat
+Completions endpoint, which the existing harness fleet (Cline, openclaw, claw-code-local, Ollama clients) all speak
+without translation. The Open Responses spec adds stateful response threading + SSE event catalog which has value but
+no concrete client demand at Phase 2a. The Open Responses surface is now a deferred capability — adding it later is a
+non-breaking endpoint addition, not a protocol replacement, so the "lock in client compatibility" framing in the
+original question is moot. The streaming response work tracked under the v2 plan adds SSE to the existing Chat
+Completions endpoint; Open Responses event-catalog adoption remains deferred and re-evaluable when a specific client
+surfaces it.
+
+#### R3-01. Has the supply chain architecture (DEC-0024) actually been executed?
+
+**Partial resolution:** First `pip-audit` drill complete (2026-05-16). 21 vulnerabilities found across 11 packages;
+none CRITICAL; six packages in the Linus orchestration runtime path (`langchain-core`, `langsmith`, `urllib3`,
+`python-multipart`, `gitpython`, `pip`) have fix versions available and are queued for env update in the v2
+implementation plan. See [`docs/security-log.md`](../security-log.md) for the full triage. The companion deliverable
+(generating `requirements-locked.txt` with hash-pinned versions per DEC-0024) remains outstanding and is also queued in
+the v2 plan. R3-01 thus splits into a now-closed "first audit" half and a still-open "lockfile generation" half; the
+remainder is tracked under a v2 plan item rather than a new top-question number.
+
+#### R3-06. DEC-0047 amendment: DeepSeMS BGC→SMILES Tier classification
+
+**Resolution:** False premise — no amendment needed. The R3-06 question text states that DEC-0047 classifies DeepSeMS
+as Tier A; the ADR's actual text already lists "BGC-to-SMILES routes" and "DeepSeMS BGC→SMILES" under the Tier B
+"Gene-level" section. Reading the ADR resolves the question without further action. The question likely arose from a
+synthesis-document reference that pre-dated the DEC-0047 final wording; the synthesis is consistent with the ADR.
+
+#### R3-07. Worktree fan-out vs sequential dispatch as Phase 3 default
+
+**Partial resolution:** The dispatch-policy half is resolved by the 2026-05-16 wave-2 lessons added to CLAUDE.md's
+"Worktree fan-out discipline" section: parallel Maestro-dispatched agents MUST run in isolated worktrees (hard rule
+validated empirically by the wave-2 fanout's 3 recoveries-via-cherry-pick from shared-checkout collisions); sequential
+dispatch with file-level partitioning remains the simpler pattern when per-agent isolation is not a hard requirement.
+The orchestration-code-shape half (what `src/linus/orchestration/workspace.py` looks like when Phase 3 implements
+multi-agent fan-out as Linus code rather than as Maestro-coordinated agent dispatch) remains open and tracked for the
+Phase 3 spawner spec at [`docs/specs/phase3-spawner.md`](../specs/phase3-spawner.md).
+
+#### R3-12. Model weight integrity verification status
+
+**Partial resolution:** Ollama blobs are content-addressed by SHA-256, so verifying on-disk integrity is a simple
+filename-vs-hash check. Drill executed 2026-05-16: 10 of 10 local blobs pass (`mistral:7b-instruct` +
+`qwen2.5-coder:7b`). See [`docs/security-log.md`](../security-log.md). The deeper provenance check — confirming the
+local SHA-256s match what `registry.ollama.ai` published at download time — requires a network operation (HTTP fetch
+of the manifest + comparison) and is queued as a v2 plan follow-up. The follow-up is low-priority given that local
+integrity is intact and no signs of tampering exist.
+
+---
+
 <a id="round-4-sweep-resolved-2026-05-16"></a>
 
 ## Round 4 sweep (resolved 2026-05-16)
