@@ -332,6 +332,13 @@ bundle + conformance linter + Claude Code plugin-marketplace distribution as dir
 `docs/knowledge-mining-surface.md` per E2 resolution 2026-05-06) becomes concrete with this stack as the first worked
 example.
 
+**everything-claude-code (added 2026-05-18) as a cross-cutting reference for Layer A + Layer E.** affaan-m's 182K-star
+performance-optimization system for AI agent harnesses is the deepest single Claude-Code-shaped ecosystem reference in
+the cloned-repo collection. SKILL.md schema + hook taxonomy + agent-file frontmatter are the three surgical Adapt lifts
+identified for Phase 2–7 work; the commercial wrapper (ECC Pro + AgentShield GitHub App + Hermes operator story) is an
+entrepreneurially instructive case study for E1/E10/E12 + the Phase 8 commercial thesis without being directly
+applicable to Linus's locally-served single-user posture.
+
 ---
 
 ## Where the gaps are (updated 2026-05-10)

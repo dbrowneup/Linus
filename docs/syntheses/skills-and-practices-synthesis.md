@@ -555,6 +555,10 @@ _Document synthesized May 2026. Source threads archived in `context/threads/`._
 - [`dspy`](../repo-notes/dspy.md) — Stanford's program-not-prompt foundation-model framework with Signatures,
   Teleprompters, and BootstrapFewShot; cited with a Study verdict as the Phase 6 entry point bridging DSPy-optimized
   in-context demos to LoRA training demonstrations.
+- [`everything-claude-code`](../repo-notes/everything-claude-code.md) — affaan-m's 182K-star performance-optimization
+  system for AI agent harnesses (skills, hooks, MCP configs, agent files, runtime gating via `ECC_HOOK_PROFILE`); cited
+  with a Study verdict and three surgical Adapt lifts (SKILL.md schema for R3-03, hook taxonomy for D3/R3-02,
+  agent-file frontmatter for Phase 3 spawner).
 - [`extractthinker`](../repo-notes/extractthinker.md) — Enoch Tor's ORM-like Pydantic-contract document-extraction
   library; cited as Phase 3 scientific-paper-processing tooling for KnowledgeBase ingestion.
 - [`fastmcp`](../repo-notes/fastmcp.md) — Prefect-maintained Python MCP framework; cited with an Integrate verdict

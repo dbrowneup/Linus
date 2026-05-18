@@ -481,6 +481,9 @@ default framework. DEC-0005's MCP portion is superseded by DEC-0018 per the inde
   internal fleet and `handleSteps` generator pattern.
 - [`debate-or-vote`](../../repo-notes/debate-or-vote.md) — research-code reference implementation for NeurIPS 2025
   Spotlight on heuristic-belief-update multi-agent coordination.
+- [`everything-claude-code`](../../repo-notes/everything-claude-code.md) — affaan-m's 182K-star multi-harness
+  performance-optimization system (Claude Code + Codex + Cursor + OpenCode + Gemini + Zed + Copilot); strong confirming
+  signal for DEC-0017 harness plurality + DEC-0020 orchestration scope bounding.
 - [`goose`](../../repo-notes/goose.md) — production Rust+MCP coding agent (Block / AAIF); Recipe DSL and provider-side
   ACP shim reaching pi.
 - [`gravityfile`](../../repo-notes/gravityfile.md) — Rust+Ratatui TUI disk-usage explorer; included in G7 as the
