@@ -377,3 +377,56 @@ _This synthesis should be revisited when the Phase 1f qmd and vectorless smoke t
 whether those patterns earn Phase 2/3 tool slots), and when Phase 3 hybrid-retrieval design begins (the qmd fusion math
 and vectorless navigation pattern both land there as concrete inputs). The MCP framework question is settled: DEC-0018 +
 DEC-0045 + DEC-0046 close it. The transport question (stdio vs. streamable-http) is the live Tier 1 open item (R2-06)._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`agentmemory`](../../repo-notes/agentmemory.md) — Referenced as one of five in-corpus MCP servers (51 tools)
+  underwriting the MCP-as-substrate finding.
+- [`autogen`](../../repo-notes/autogen.md) — Referenced in the Canteen external-corroboration block as one of the
+  packaged frameworks where MCP has won.
+- [`claw-code-local`](../../repo-notes/claw-code-local.md) — Native-Rust-plus-MCP harness referenced as a future design
+  reference; bridges Ollama behind an MCP surface.
+- [`cline`](../../repo-notes/cline.md) — Front-end harness expected to want simultaneous KB tool access alongside Claude
+  Code; drives the streamable-http transport recommendation.
+- [`codebase-memory-mcp`](../../repo-notes/codebase-memory-mcp.md) — Integrate-verdict static C binary (155 languages
+  via tree-sitter); indexes 28M LOC in 3 minutes with sub-millisecond query latency.
+- [`codesight`](../../repo-notes/codesight.md) — Integrate-verdict zero-dependency TypeScript CLI producing a structural
+  context map (routes, ORMs, import graph, blast-radius) via 13 MCP tools.
+- [`extractthinker`](../../repo-notes/extractthinker.md) — Study-Phase-2a/Integrate-Phase-2b Python library for
+  ORM-style structured document extraction via Pydantic contracts; ExtractThinker in cluster prose.
+- [`fastmcp`](../../repo-notes/fastmcp.md) — Integrate-verdict decorator-plus-introspection framework adopted as the
+  default in-house Linus MCP framework (DEC-0045).
+- [`goose`](../../repo-notes/goose.md) — Referenced in the Canteen external-corroboration block as a coding harness with
+  native-Rust MCP integration.
+- [`hyalo`](../../repo-notes/hyalo.md) — G5 KB tooling cluster reference for the positioning boundary between KB tools
+  and code-context tools.
+- [`keppi`](../../repo-notes/keppi.md) — G5 KB tooling cluster reference; its blast-radius analysis pairs with
+  codesight's import-graph blast-radius MCP tool as cognates.
+- [`markdownify-mcp`](../../repo-notes/markdownify-mcp.md) — Integrate-verdict universal document-to-Markdown bridge
+  (PDF, image, audio, office, web via Microsoft `markitdown[all]`).
+- [`obsidian-llm-wiki-local`](../../repo-notes/obsidian-llm-wiki-local.md) — G3 reference for fully-local Ollama
+  hardening conventions inherited by FastMCP tools routing through Ollama.
+- [`ontomics`](../../repo-notes/ontomics.md) — Integrate-verdict Rust binary providing Maestro's semantic window into
+  `src/linus/` (tree-sitter ASTs, TF-IDF concepts, Candle embeddings, ~20 MCP tools).
+- [`openclaw`](../../repo-notes/openclaw.md) — Referenced as one of five in-corpus MCP servers wrapping its gateway as
+  an MCP endpoint.
+- [`paper-qa`](../../repo-notes/paper-qa.md) — Phase 2c KB retrieval-and-synthesis engine (DEC-0044); first in-house
+  FastMCP server.
+- [`pmetal`](../../repo-notes/pmetal.md) — Inference candidate shipping `pmetal-mcp` with 45 tools; would compose under
+  the Linus endpoint via `FastMCP.as_proxy()` if the Phase 1b verdict is favorable.
+- [`py3plex`](../../repo-notes/py3plex.md) — G5 cluster repo shipping `py3plex-mcp`; source of the `@require`/`@ensure`
+  icontract pattern that pairs with FastMCP's typed-function idiom.
+- [`qmd`](../../repo-notes/qmd.md) — Study-verdict local hybrid search engine; fusion math (RRF k=60, original-query ×2,
+  position-aware rerank blend) is the most liftable retrieval artifact for Phase 3.
+- [`rendergit`](../../repo-notes/rendergit.md) — Watch/Phase-5+ Python CLI by Andrej Karpathy producing dual
+  human/LLM-view code export from any GitHub repo.
+- [`vanna`](../../repo-notes/vanna.md) — Study-verdict production SQL agent with three-layer architecture; the
+  user-context-injection pattern and `Tool(BaseModel)` lifecycle hooks are portable to Linus's MCP middleware.
+- [`vectorless`](../../repo-notes/vectorless.md) — Study-verdict zero-embedding retrieval-by-document-navigation
+  architecture; shell-command vocabulary (`kb_ls`/`kb_cd`/`kb_cat`/`kb_grep`/`kb_concepts`) worth porting.
+- [`WeKnora`](../../repo-notes/WeKnora.md) — Study-verdict Tencent enterprise RAG platform; conscious anti-pattern that
+  makes Linus's local-native choices explicit (Docker minimum, no Metal passthrough).

@@ -239,44 +239,42 @@ list closes them deliberately.
 
 ### ClawBio: function-annotation-discovery skills at the human-clinical-genomics scale
 
-The [ClawBio](../repo-notes/ClawBio.md) repo (ClawBio/ClawBio) extends this synthesis's modality coverage on a
-specific axis the eight Group C papers do not reach: **human consumer and clinical genomics as
-function-annotation-discovery in working form**. ClawBio ships 63 deeply engineered skills — pharmacogenomics
-(PharmGx, ClinPGx, NutriGx), GWAS lookup against UK Biobank-shaped catalogs, polygenic risk scoring, ancestry
-PCA, fine-mapping, ACMG/AMP clinical-variant reporting, methylation clocks, archaic introgression, plus a
-Galaxy-tools bridge that wraps 8,000+ external bioinformatics tools through a single Python skill via BioBlend.
-Each skill is the same shape Group C's method papers theorize about: given evidence about a variant or a
-genomic region, return a structured prediction with provenance — variant→drug response, variant→disease risk,
-variant→ancestry component, variant→regulatory consequence. The orthogonal modality (clinical genomics rather
-than protein function or KEGG-pathway reasoning) means ClawBio does not directly compete with ProtHGT,
-BioReason-Pro, or Horizyn-1 for the protein-function skill slot, but it _does_ surface specific
-function-annotation-discovery patterns at the human-clinical-genomics scale that the Group C constellation does
-not address.
+The [ClawBio](../repo-notes/ClawBio.md) repo (ClawBio/ClawBio) extends this synthesis's modality coverage on a specific
+axis the eight Group C papers do not reach: **human consumer and clinical genomics as function-annotation-discovery in
+working form**. ClawBio ships 63 deeply engineered skills — pharmacogenomics (PharmGx, ClinPGx, NutriGx), GWAS lookup
+against UK Biobank-shaped catalogs, polygenic risk scoring, ancestry PCA, fine-mapping, ACMG/AMP clinical-variant
+reporting, methylation clocks, archaic introgression, plus a Galaxy-tools bridge that wraps 8,000+ external
+bioinformatics tools through a single Python skill via BioBlend. Each skill is the same shape Group C's method papers
+theorize about: given evidence about a variant or a genomic region, return a structured prediction with provenance —
+variant→drug response, variant→disease risk, variant→ancestry component, variant→regulatory consequence. The orthogonal
+modality (clinical genomics rather than protein function or KEGG-pathway reasoning) means ClawBio does not directly
+compete with ProtHGT, BioReason-Pro, or Horizyn-1 for the protein-function skill slot, but it _does_ surface specific
+function-annotation-discovery patterns at the human-clinical-genomics scale that the Group C constellation does not
+address.
 
 The engineering shape is liftable independent of which skills Linus inherits. Every ClawBio analysis emits a
-**reproducibility bundle** (`commands.sh` + `environment.yml` + `checksums.sha256`) alongside the markdown
-report, every skill carries **per-skill tests with red/green TDD discipline**, and the v0.5.0 release added an
-**AD ground-truth gene set with mock API server for offline CI** plus swappable fine-mapping backends. The
-benchmark profile (168/182 benchmark tests passing across 10 audited skills) is the kind of operational floor
-this synthesis's Phase 1 benchmarking discussion argues every Linus-shipped skill should ship with — a per-skill
-benchmark scorer where ground truth exists, not just a `pytest` smoke test. The exact pattern translates to
-Group C's protein-function skills directly: BioReason-Pro's pre-computed 240K-protein atlas plus a Dan-authored
-expert-tie-or-exceed eval is the same shape, and ClawBio is a second independent corpus instance of the
-discipline.
+**reproducibility bundle** (`commands.sh` + `environment.yml` + `checksums.sha256`) alongside the markdown report, every
+skill carries **per-skill tests with red/green TDD discipline**, and the v0.5.0 release added an **AD ground-truth gene
+set with mock API server for offline CI** plus swappable fine-mapping backends. The benchmark profile (168/182 benchmark
+tests passing across 10 audited skills) is the kind of operational floor this synthesis's Phase 1 benchmarking
+discussion argues every Linus-shipped skill should ship with — a per-skill benchmark scorer where ground truth exists,
+not just a `pytest` smoke test. The exact pattern translates to Group C's protein-function skills directly:
+BioReason-Pro's pre-computed 240K-protein atlas plus a Dan-authored expert-tie-or-exceed eval is the same shape, and
+ClawBio is a second independent corpus instance of the discipline.
 
-The orthogonal-modality caveat matters. ClawBio's domain is **human consumer-genomics + GWAS +
-clinical-genomics**; Dan's domain is **microbial genomics + metagenomics + algal genome assembly + LanzaTech
-bioprocess metagenomics**. Of the 63 skills, perhaps 5–10 (e.g. `claw-metagenomics`, `analyze-fasta`,
-`archaic-introgression`, `variant-annotation`, `galaxy-bridge`) map directly to Dan's day job; the
-pharmacogenomics and ACMG-classification cores are the most polished part of ClawBio and the least relevant to
-Dan's research focus. The clinical-variant-reporter skill is regulated-domain-adjacent and would be Tier B under
+The orthogonal-modality caveat matters. ClawBio's domain is **human consumer-genomics + GWAS + clinical-genomics**;
+Dan's domain is **microbial genomics + metagenomics + algal genome assembly + LanzaTech bioprocess metagenomics**. Of
+the 63 skills, perhaps 5–10 (e.g. `claw-metagenomics`, `analyze-fasta`, `archaic-introgression`, `variant-annotation`,
+`galaxy-bridge`) map directly to Dan's day job; the pharmacogenomics and ACMG-classification cores are the most polished
+part of ClawBio and the least relevant to Dan's research focus. The clinical-variant-reporter skill is
+regulated-domain-adjacent and would be Tier B under
 [DEC-0047](../adr/0047-biosecurity-tier-control-generative-biology.md) (explicit Dan sign-off per invocation,
-audit-logged) if Linus ever surfaced it. What is liftable is therefore the **engineering shape** (per-skill
-tests + benchmarks against ground truth + reproducibility bundle + SKILL.md conformance linter), not the
-specific skill catalog. The complementary breadth-vs-depth choice between ClawBio (63 skills, deep) and
-bioSkills (~438 skills, broad) is the same choice the [biological-foundation-models
-synthesis](biological-foundation-models-synthesis.md)'s ClawBio fold-in flagged — the operational form of "fork
-the engineering shape from one and the breadth-of-content from the other" applies as cleanly here.
+audit-logged) if Linus ever surfaced it. What is liftable is therefore the **engineering shape** (per-skill tests +
+benchmarks against ground truth + reproducibility bundle + SKILL.md conformance linter), not the specific skill catalog.
+The complementary breadth-vs-depth choice between ClawBio (63 skills, deep) and bioSkills (~438 skills, broad) is the
+same choice the [biological-foundation-models synthesis](biological-foundation-models-synthesis.md)'s ClawBio fold-in
+flagged — the operational form of "fork the engineering shape from one and the breadth-of-content from the other"
+applies as cleanly here.
 
 ### Substrate dependencies on Group A
 
@@ -531,3 +529,48 @@ and the Phase 1 benchmarking + Phase 6 / 7 spec backlog. It should be revisited 
 local-deployment spikes land, when the ProtHGT vs BioReason-Pro benchmark-informed comparison runs, when ProteinReasoner
 checkpoints appear and the encoder-swap experiment is possible, when an RNA-reasoning paper or tissue-level FM appears
 in `context/papers/`, and when the next FutureHouse paper extends the LAB-Bench → BixBench → Kosmos arc._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`Bacformer`](../repo-notes/Bacformer.md) — protein-embedding-as-token bacterial genome FM; Apache 2.0,
+  Apple-Silicon-realistic.
+- [`BioReason`](../repo-notes/BioReason.md) — DNA-encoder + LLM fusion with GRPO reasoning traces; BioReason-Pro protein
+  successor.
+- [`bioSkills`](../repo-notes/bioSkills.md) — 438-skill bioinformatics SKILL.md catalogue; Phase 7 inaugural skills
+  bundle.
+- [`BixBench`](../repo-notes/BixBench.md) — 61-capsule agentic bioinformatics benchmark on FutureHouse's Aviary
+  scaffold.
+- [`ClawBio`](../repo-notes/ClawBio.md) — 63 deeply engineered clinical/consumer genomics skills with per-skill tests
+  and benchmarks.
+- [`LAB-Bench`](../repo-notes/LAB-Bench.md) — 2,457-question MCQ benchmark across eight practical-biology categories
+  with refusal option.
+
+### Paper-notes
+
+- [`2024.12.19.629561v2`](../paper-notes/2024.12.19.629561v2.md) — PertFormer 3B multimodal cell-state FM with zero-shot
+  in-silico perturbation.
+- [`2025.04.19.649272v1`](../paper-notes/2025.04.19.649272v1.md) — ProtHGT heterogeneous graph transformer for automated
+  protein function prediction.
+- [`2025.07.21.665832v2`](../paper-notes/2025.07.21.665832v2.md) — ProteinReasoner multi-modal PLM with typed
+  evolutionary-profile intermediate.
+- [`2026.03.19.712954v1`](../paper-notes/2026.03.19.712954v1.md) — BioReason-Pro protein function prediction with GO-GPT
+  and SFT+GSPO reasoning.
+- [`2407.10362v3`](../paper-notes/2407.10362v3.md) — LAB-Bench: measuring capabilities of language models for biology
+  research.
+- [`2502.16721v1`](../paper-notes/2502.16721v1.md) — Speed and conversational LLMs; operational-metric-over-surrogate
+  methodology.
+- [`2503.00096v3`](../paper-notes/2503.00096v3.md) — BixBench comprehensive benchmark for LLM-based agents in
+  computational biology.
+- [`2505.23579v2`](../paper-notes/2505.23579v2.md) — BioReason incentivizing multimodal biological reasoning within a
+  DNA-LLM model.
+- [`2506.13023v1`](../paper-notes/2506.13023v1.md) — A practical guide for evaluating LLMs and LLM-reliant systems.
+- [`2511.02824v2`](../paper-notes/2511.02824v2.md) — Kosmos autonomous AI scientist for 12-hour research with structured
+  world model.
+- [`rocks-et-al-2026-dual-encoder-contrastive-learning-accelerates-enzyme-discovery`](../paper-notes/rocks-et-al-2026-dual-encoder-contrastive-learning-accelerates-enzyme-discovery.md)
+  — Horizyn-1 CLIP-style dual-encoder for reaction-enzyme retrieval.
+- [`s41592-026-03030-z`](../paper-notes/s41592-026-03030-z.md) — DIAMOND DeepClust clustering 19B sequences into 335M
+  canonical representatives.

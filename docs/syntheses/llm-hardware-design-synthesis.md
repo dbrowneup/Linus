@@ -589,3 +589,72 @@ and tensor-program transcompilation; closed-source-bounded for production EDA / 
 for biology / biotech / chemistry). Dan's career corpus and domain depth point at biology / biotech as the
 highest-leverage Phase 7 / 8 target, and the verification-surface investment in that domain is the dominant unit of
 effort to amortize. **The discipline is real; the corpus is dense; Phase 7 should commit.**
+
+---
+
+## References
+
+### Repo-notes
+
+- [`Bonsai-demo`](../repo-notes/Bonsai-demo.md) — Referenced alongside Kimi-K2 and flash-moe as shaping the Phase 6d
+  Apple Silicon streaming target this synthesis points at.
+- [`CodeV`](../repo-notes/CodeV.md) — Verilog-generation LLM trained via multi-level summarization SFT on harvested
+  GitHub modules; g12 cluster anchor for HDL codegen.
+- [`flash-moe`](../repo-notes/flash-moe.md) — Apple Silicon streaming MoE inference reference informing the Phase 6d
+  kernel-codegen target.
+- [`Kimi-K2`](../repo-notes/Kimi-K2.md) — Candidate Phase 6 base-model swap from the native-low-bit-apple-silicon
+  synthesis; cited as a possible local-Worker planner substrate.
+- [`paper-qa`](../repo-notes/paper-qa.md) — KB retrieval-and-synthesis engine (DEC-0044) named as a candidate
+  Linus-relevant verifiable-oracle domain (paper-qa-faithful answers) and as the expensive-semantic verifier in the
+  two-tier verification structure.
+- [`QiMeng-MuPa`](../repo-notes/QiMeng-MuPa.md) — Mutual-supervised learning for sequential-to-parallel tensor-program
+  translation; g12 cluster repo.
+- [`QiMeng-SALV`](../repo-notes/QiMeng-SALV.md) — Signal-aware DPO at sub-module granularity for Verilog generation; g12
+  cluster repo demonstrating fine-grained reward granularity.
+- [`QiMeng-cpu-v1`](../repo-notes/QiMeng-cpu-v1.md) — Reference implementation of the automated CPU design pipeline
+  (Enlightenment-1 RISC-V chip); g12 existence proof at industrial complexity.
+- [`Sketch2Simulation`](../repo-notes/Sketch2Simulation.md) — Multi-agent LangGraph pipeline converting process-flow
+  sketches into executable Aspen HYSYS simulations; cross-thread idea→reality exemplar outside QiMeng.
+- [`workgraph`](../repo-notes/workgraph.md) — G7 harness reference whose DAG-based dispatch the verifier-pruned tree
+  search primitive generalizes with a fitness function and pruning step.
+
+### Paper-notes
+
+- [`0549`](../paper-notes/0549.md) — Automated Superscalar Processor Design by Learning Data Dependencies; State-BSD
+  extension of the QiMeng automated-CPU line into superscalar territory.
+- [`13337-ZhouQ`](../paper-notes/13337-ZhouQ.md) — QiMeng-GEMM: meta-prompts plus beam-search auto-tuning for
+  high-performance GEMM kernel generation.
+- [`2306.12456v2`](../paper-notes/2306.12456v2.md) — Pushing the Limits of Machine Design: existence proof that AI can
+  design a working RISC-V CPU from I/O examples.
+- [`2407.10424v5`](../paper-notes/2407.10424v5.md) — CodeV paper: multi-level summarization SFT for Verilog generation;
+  the structural-asymmetry insight (summarize easier than generate).
+- [`2505.06302v1`](../paper-notes/2505.06302v1.md) — QiMeng-TensorOp: automatically generating high-performance tensor
+  operators at the hardware-primitive level.
+- [`2505.24183v5`](../paper-notes/2505.24183v5.md) — QiMeng-CodeV-R1: RLVR follow-up to CodeV with automated testbench
+  generator as the dominant contribution.
+- [`2506.05007v1`](../paper-notes/2506.05007v1.md) — QiMeng: Fully Automated Hardware and Software Design for Processor
+  Chips; integrating overview paper for the family.
+- [`2506.11153v2`](../paper-notes/2506.11153v2.md) — QiMeng-MuPa paper: mutual-supervised learning for
+  sequential-to-parallel translation.
+- [`2506.12355v1`](../paper-notes/2506.12355v1.md) — QiMeng-Attention: DSL-mediated attention kernel generation via SOTA
+  attention operator.
+- [`2510.19296v4`](../paper-notes/2510.19296v4.md) — QiMeng-SALV paper: signal-aware DPO for sub-module reward
+  granularity in Verilog.
+- [`2511.20099v4`](../paper-notes/2511.20099v4.md) — QiMeng-CRUX: narrowing the gap between natural language and Verilog
+  via a CRUX intermediate representation.
+- [`2511.20100v1`](../paper-notes/2511.20100v1.md) — QiMeng-Kernel: Macro-Thinking Micro-Coding paradigm for LLM-based
+  GPU-kernel generation.
+- [`2602.15922v1`](../paper-notes/2602.15922v1.md) — DreamZero: 14B autoregressive flow-matching DiT doubling VLA
+  zero-shot generalization on bimanual manipulation (robotics arm of idea→reality).
+- [`2602.16710v1`](../paper-notes/2602.16710v1.md) — EgoScale: flow-matching VLA trained on 20,854 hours of egocentric
+  human video; clean data-scale-vs-loss law.
+- [`2603.24629v1`](../paper-notes/2603.24629v1.md) — Sketch2Simulation paper: automating flowsheet generation via
+  multi-agent decomposition with COM-API verifier.
+- [`3696443.3708931`](../paper-notes/3696443.3708931.md) — VEGA: automatic LLVM back-end generation using a pre-trained
+  language model with per-statement confidence scoring.
+- [`9546_AutoOS_Make_Your_OS_More_`](../paper-notes/9546_AutoOS_Make_Your_OS_More_.md) — AutoOS: LLM-driven Linux kernel
+  configuration tuning via observe-prune-propose-act loop.
+- [`osdi25-dong`](../paper-notes/osdi25-dong.md) — QiMeng-Xpiler: transcompiling tensor programs across deep learning
+  systems via neural-symbolic passes plus Z3.
+- [`s41586-025-08600-3`](../paper-notes/s41586-025-08600-3.md) — WHAM: World and Human Action Models towards gameplay
+  ideation; foundational lineage for the DreamZero/EgoScale robotics arm.

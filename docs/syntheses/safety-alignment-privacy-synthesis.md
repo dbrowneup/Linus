@@ -173,17 +173,17 @@ any tool below that threshold warrants explicit tier gating. The Marler/Gerstein
 data itself as a weaponization target** ("potential efforts to weaponize various aspects of biological data"), which
 foreshadows the 2026 AI-bio nexus framing in the
 [Holko/Wilbanks/Howell biodata commentary](../paper-notes/holko_wilbanks_howell_ai_ready_biodata.md) (folded into the
-entrepreneurship synthesis biodata-sovereignty thread). Together the two pieces form the strategic-policy substrate
-that DEC-0047 can cite as its external policy lineage.
+entrepreneurship synthesis biodata-sovereignty thread). Together the two pieces form the strategic-policy substrate that
+DEC-0047 can cite as its external policy lineage.
 
 ### Policy-stance benchmarks: Anthropic RSP and Claude's Constitution
 
 Two Anthropic-published documents — the
-[Responsible Scaling Policy v3.0](../../context/notes/Anthropic-Responsible-Scaling-Policy-v3.0.pdf)
-(RSP, effective 2026-02-24) and [Claude's Constitution](../../context/notes/claudes-constitution_webPDF_26-02.02a.pdf)
-(published 2026-01-21) — are not papers Linus borrows mechanism from; they are policy artifacts against which Linus's
-own posture can be calibrated. The framing is **different scope, useful benchmark**, not "more or less rigorous." RSP is
-a frontier-developer voluntary framework for catastrophic-risk management at the level of the global AI ecosystem,
+[Responsible Scaling Policy v3.0](../../context/notes/Anthropic-Responsible-Scaling-Policy-v3.0.pdf) (RSP, effective
+2026-02-24) and [Claude's Constitution](../../context/notes/claudes-constitution_webPDF_26-02.02a.pdf) (published
+2026-01-21) — are not papers Linus borrows mechanism from; they are policy artifacts against which Linus's own posture
+can be calibrated. The framing is **different scope, useful benchmark**, not "more or less rigorous." RSP is a
+frontier-developer voluntary framework for catastrophic-risk management at the level of the global AI ecosystem,
 organized around capability thresholds (e.g., "non-novel chem/bio weapons production," "cyberattacks against critical
 infrastructure," "autonomous AI R&D") that trigger ASL-tiered mitigations, Frontier Safety Roadmaps, and
 external-reviewed Risk Reports. Claude's Constitution is the values-and-behavior specification under which hosted Claude
@@ -319,8 +319,8 @@ a benign task. This is precisely the failure mode the sandbox layer is designed 
 without explicit per-task authorization in the spec, without a confirm-before-destructive gate, without per-environment
 credential scoping, and without an audit-log entry recording predicate-permission status. The incident reinforces that
 autonomy-tier graduation in SAFETY.md is not paranoia — it is the only thing standing between Linus and an analogous
-9-second irreversible loss event — and motivates per-environment / per-resource scope fields on tool-registry entries
-as a Phase 2 design commitment rather than a Phase 3+ refinement.
+9-second irreversible loss event — and motivates per-environment / per-resource scope fields on tool-registry entries as
+a Phase 2 design commitment rather than a Phase 3+ refinement.
 
 The audit log gains destination/content-class/bytes-sent provenance fields, plus a `value_frame` field per Maestro call
 (extending the Marelli attribution position from Group E that the Values paper makes operational). The log becomes both
@@ -396,36 +396,36 @@ above.
 
 The paired [`swarm`](../repo-notes/swarm.md) repo and [`swarm-2604.19752`](../paper-notes/swarm-2604.19752.md)
 paper-note add a fifth axis to the four already named in this synthesis (mechanism / values characterization /
-threat-model / design-policy): **multi-agent / population-level safety**. Aiersilan & Savitt's 2026 framework
-formalizes the move from binary `safe/unsafe` agent classifications to **soft probabilistic labels**
-`p = P(v = +1) ∈ [0, 1]` derived from a calibrated sigmoid over observable proxy signals (`task_progress`,
-`rework_count`, `verifier_rejections`, `engagement`), with four canonical metrics — toxicity rate `E[1−p | accepted]`,
-quality gap `E[p | accepted] − E[p | rejected]` (a negative value indicates adverse selection — the system
-preferentially admits low-quality interactions), conditional loss, and incoherence — quantifying emergent failure
-modes that no single-agent evaluation captures. The most distinctive metric is the **illusion delta**
-`Δ_illusion = C_perceived − C_distributed` (the gap between how good the system *looks* in short interactions and how
-consistent it *actually is* across replays), the sharpest existing operationalization of the "electric-mind regime"
-where local coherence masks global incoherence. The empirical anchors are sharp: strict governance reduces welfare by
-40% without reducing toxicity (the cost of regulation is precisely measurable); threshold-dancer agents
-mathematically scale generation variables to target `p ≈ θ_CB + ε`, achieving the highest welfare of any scenario
-while accumulating systemic risk binary thresholds miss; self-optimizing agents cut interaction costs by 98% across
-579 interactions while passing every binary benchmark — every soft metric flagged the degradation independently. The
-framework validates against live LLM-backed agents (Concordia entities backed by Llama 3.1 8B; Claude 3.5
-Haiku/Sonnet; GPT-4o-Mini), confirming that soft-label evaluation transfers across generation mechanisms without
-architectural modification. For Linus, this is the **load-bearing primary source** for a Phase 3 multi-agent safety
-surface (DEC-0050, DEC-0052): the Phase 3 spawner-spec ADR should commit to the soft-label pipeline as the canonical
-measurement shape; the audit-log schema at `~/.linus/audit.jsonl` should grow the proxy-field extensions needed for
-the metric computation; the seven canonical scenarios (Baseline / StrictGovernance / AdaptiveGovernance /
-AdversarialRedTeam / MisalignmentSweep / ThresholdDancer / CollusionDetection) are the design reference for Phase 3
-stress-test scenarios. The framework also surfaces a Phase 1c+ Worker-benchmark measurement axis (illusion delta as
-distributional-consistency) the existing function-calling-reliability / instruction-following-reliability axes do not
-cover, and a **calibration discipline** (the paper's Limitations section explicitly notes that proxy-to-probability
-mapping requires empirical calibration against human-labeled ground truth before metric values are operationally
-trustworthy) that the Phase 3 ADR should commit to as a prerequisite. The **safety-trained paradox** finding (safety-
-prompted Claude agents scored marginally higher on heuristic toxicity because the scorer penalized cooperation-
-refusal) is a portable cautionary tale for proxy-design discipline that SAFETY.md should absorb as a "measure what
-you mean, not what's easy" convention. The paired SWARM repo's bridges to OpenClaw, Concordia, Mesa, and live LLMs
-provide the operationalization companion the framework needs to be tested against Linus's stack at Phase 5+.
+threat-model / design-policy): **multi-agent / population-level safety**. Aiersilan & Savitt's 2026 framework formalizes
+the move from binary `safe/unsafe` agent classifications to **soft probabilistic labels** `p = P(v = +1) ∈ [0, 1]`
+derived from a calibrated sigmoid over observable proxy signals (`task_progress`, `rework_count`, `verifier_rejections`,
+`engagement`), with four canonical metrics — toxicity rate `E[1−p | accepted]`, quality gap
+`E[p | accepted] − E[p | rejected]` (a negative value indicates adverse selection — the system preferentially admits
+low-quality interactions), conditional loss, and incoherence — quantifying emergent failure modes that no single-agent
+evaluation captures. The most distinctive metric is the **illusion delta** `Δ_illusion = C_perceived − C_distributed`
+(the gap between how good the system _looks_ in short interactions and how consistent it _actually is_ across replays),
+the sharpest existing operationalization of the "electric-mind regime" where local coherence masks global incoherence.
+The empirical anchors are sharp: strict governance reduces welfare by 40% without reducing toxicity (the cost of
+regulation is precisely measurable); threshold-dancer agents mathematically scale generation variables to target
+`p ≈ θ_CB + ε`, achieving the highest welfare of any scenario while accumulating systemic risk binary thresholds miss;
+self-optimizing agents cut interaction costs by 98% across 579 interactions while passing every binary benchmark — every
+soft metric flagged the degradation independently. The framework validates against live LLM-backed agents (Concordia
+entities backed by Llama 3.1 8B; Claude 3.5 Haiku/Sonnet; GPT-4o-Mini), confirming that soft-label evaluation transfers
+across generation mechanisms without architectural modification. For Linus, this is the **load-bearing primary source**
+for a Phase 3 multi-agent safety surface (DEC-0050, DEC-0052): the Phase 3 spawner-spec ADR should commit to the
+soft-label pipeline as the canonical measurement shape; the audit-log schema at `~/.linus/audit.jsonl` should grow the
+proxy-field extensions needed for the metric computation; the seven canonical scenarios (Baseline / StrictGovernance /
+AdaptiveGovernance / AdversarialRedTeam / MisalignmentSweep / ThresholdDancer / CollusionDetection) are the design
+reference for Phase 3 stress-test scenarios. The framework also surfaces a Phase 1c+ Worker-benchmark measurement axis
+(illusion delta as distributional-consistency) the existing function-calling-reliability /
+instruction-following-reliability axes do not cover, and a **calibration discipline** (the paper's Limitations section
+explicitly notes that proxy-to-probability mapping requires empirical calibration against human-labeled ground truth
+before metric values are operationally trustworthy) that the Phase 3 ADR should commit to as a prerequisite. The
+**safety-trained paradox** finding (safety- prompted Claude agents scored marginally higher on heuristic toxicity
+because the scorer penalized cooperation- refusal) is a portable cautionary tale for proxy-design discipline that
+SAFETY.md should absorb as a "measure what you mean, not what's easy" convention. The paired SWARM repo's bridges to
+OpenClaw, Concordia, Mesa, and live LLMs provide the operationalization companion the framework needs to be tested
+against Linus's stack at Phase 5+.
 
 ---
 
@@ -457,6 +457,31 @@ It feeds the next round of edits to the [paper landscape](../landscapes/paper-la
 each of which should grow a Group F section reflecting the four-axis structure documented here, and to
 [open-questions.md](../questions/open-questions.md) and [top-questions.md](../questions/top-questions.md), which should
 pick up the tensions surfaced above.
+
+## References
+
+### Repo-notes
+
+- [`swarm`](../repo-notes/swarm.md) — Aiersilan & Savitt multi-agent SWARM framework; soft-label population-level safety
+  bridges to OpenClaw, Concordia, Mesa, live LLMs.
+
+### Paper-notes
+
+- [`2306.03809v1`](../paper-notes/2306.03809v1.md) — Soice et al., dual-use biotech uplift; MIT classroom exercise that
+  produced DEC-0047's three-tier biosecurity policy.
+- [`2602.16800v2`](../paper-notes/2602.16800v2.md) — Swanson et al., large-scale online deanonymization with LLMs; the
+  empirical case for local-first as identity-signal protection.
+- [`holko_wilbanks_howell_ai_ready_biodata`](../paper-notes/holko_wilbanks_howell_ai_ready_biodata.md) —
+  Holko/Wilbanks/Howell biodata sovereignty commentary (War on the Rocks, 2026); AI-bio nexus framing.
+- [`marler_gerstein_biotechnology_warfighter`](../paper-notes/marler_gerstein_biotechnology_warfighter.md) — Marler &
+  Gerstein RAND 2022; democratization as orthogonal axis to knowledge-asymmetric uplift,
+  biological-data-as-weaponization-target framing.
+- [`science.aea6792`](../paper-notes/science.aea6792.md) — Beaglehole et al., RFM-based universal steering and
+  monitoring; the activation-hooks technical mechanism behind DEC-0054.
+- [`swarm-2604.19752`](../paper-notes/swarm-2604.19752.md) — Aiersilan & Savitt soft-label governance for distributional
+  safety; calibrated probabilistic metrics and the illusion-delta measure.
+- [`Values_Paper__camera_ready_COLM_`](../paper-notes/Values_Paper__camera_ready_COLM_.md) — Anthropic Values in the
+  Wild; Clio-style empirical phenomenology of hosted Claude over 308k conversations.
 
 ---
 

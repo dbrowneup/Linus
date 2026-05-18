@@ -164,29 +164,29 @@ not.
 A practitioner observation from outside the science domain reframes a load-bearing piece of Linus's KB plan. In a
 2026-05-01 analysis of the prediction-market stack, Canteen argues:
 
-> "Translation between formats is the unappreciated moat: each TradingAgents fork added different data brokers, but
-> the structural translation work — turning a non-English macro event into a well-formed prediction-market question —
-> is the actual scarce resource."
-> — [Canteen, _Unbundling the Prediction Market Stack_, 2026-05-01](../../context/notes/canteen_blog_landscape_2026-05.md).
+> "Translation between formats is the unappreciated moat: each TradingAgents fork added different data brokers, but the
+> structural translation work — turning a non-English macro event into a well-formed prediction-market question — is the
+> actual scarce resource." —
+> [Canteen, _Unbundling the Prediction Market Stack_, 2026-05-01](../../context/notes/canteen_blog_landscape_2026-05.md).
 
 The claim was made about prediction markets, but it has a direct analog in scientific text corpora work. Turning a
 non-English (Mandarin, German, Japanese, etc.) primary-source paper, technical manual, or domain article into a
-well-formed claim, paper-note, or KB entry _is_ exactly the structural translation work — and it is the bottleneck
-that determines what reaches the corpus at all. Two papers competing for ingest attention rarely differ in their
-underlying findings; they differ in how much structural translation each requires before the claim is in a form
-Linus can store, retrieve, and cite. The KB's growth rate is set less by paper count than by the rate at which
-non-trivial structural translation can be done.
+well-formed claim, paper-note, or KB entry _is_ exactly the structural translation work — and it is the bottleneck that
+determines what reaches the corpus at all. Two papers competing for ingest attention rarely differ in their underlying
+findings; they differ in how much structural translation each requires before the claim is in a form Linus can store,
+retrieve, and cite. The KB's growth rate is set less by paper count than by the rate at which non-trivial structural
+translation can be done.
 
 Linus is bilingual-friendly through being claim-typed (DEC-0028 memory pillar; KB claim-typing per the LLM-wiki
-synthesis); the translation-as-moat framing makes the asymmetry explicit. Pure paper-counts scale linearly with
-ingest throughput; structured-translation work scales the corpus where pure paper-counts do not. Two consequences
-follow. First, Worker-side support for structural translation — non-English source → claim-typed KB record with
-preserved attribution — is a higher-leverage ingest investment than yet another retrieval optimization on
-already-translated content. Second, the Marelli accountability requirement (which model translated this claim, from
-which source, with what verification) becomes architecturally non-optional rather than a nice-to-have, because a
-translation is itself a model-mediated transformation that the audit log must capture. The Schulz collaborator frame
-operationalizes this naturally: the translation Worker is a research-assistant-like collaborator whose contribution
-is logged, citation-grounded, and human-verifiable — not a black-box pipeline stage.
+synthesis); the translation-as-moat framing makes the asymmetry explicit. Pure paper-counts scale linearly with ingest
+throughput; structured-translation work scales the corpus where pure paper-counts do not. Two consequences follow.
+First, Worker-side support for structural translation — non-English source → claim-typed KB record with preserved
+attribution — is a higher-leverage ingest investment than yet another retrieval optimization on already-translated
+content. Second, the Marelli accountability requirement (which model translated this claim, from which source, with what
+verification) becomes architecturally non-optional rather than a nice-to-have, because a translation is itself a
+model-mediated transformation that the audit log must capture. The Schulz collaborator frame operationalizes this
+naturally: the translation Worker is a research-assistant-like collaborator whose contribution is logged,
+citation-grounded, and human-verifiable — not a black-box pipeline stage.
 
 This is not a Phase 2 deliverable, but it is the strongest argument the corpus has produced for treating
 non-English-source ingest as a Phase 3+ first-class capability rather than as an afterthought to a primarily
@@ -319,3 +319,47 @@ Hamiltonian-decomposition family, and to the `docs/EPISTEMIC-STANDARDS.md` Marel
 `docs/protocols/maestro-worker-protocol.md` Philosophy section (S37) are both now written and cross-reference this
 synthesis. Revisit if Dan publishes papers using Linus, if a future Linus model is capable enough to participate in
 roadmap planning, or when a new paper extends the Binz framework. (Updated 2026-05-08.)_
+
+---
+
+## References
+
+### Repo-notes
+
+- [`Bacformer`](../repo-notes/Bacformer.md) — Prokaryotic genome foundation model (~26M and ~300M-parameter variants)
+  cited as a Dan-relevant scientific-agent instantiation of the Schulz collaborator frame in metagenomics-adjacent
+  territory.
+- [`BioReason`](../repo-notes/BioReason.md) — DNA-LLM multimodal reasoning model (Evo2 + Qwen3 + GRPO) cited as a
+  g9-bioinformatics worked example of scientific-agent prior art for the Maestro-class evaluation discussion.
+- [`bioSkills`](../repo-notes/bioSkills.md) — 438 Anthropic-format bioinformatics skills cited as part of the
+  integrate-trio (paper-qa + bioSkills + scientific-agent-skills) whose adoption operationally endorses the Schulz
+  collaborator frame.
+- [`deepsems`](../repo-notes/deepsems.md) — DeepSeMS transformer for biosynthetic-gene-cluster → SMILES prediction cited
+  as a g9-bio scientific-agent worked example alongside Bacformer and BioReason.
+- [`LAB-Bench`](../repo-notes/LAB-Bench.md) — FutureHouse biology benchmark cited as the canary-blocklist + public-split
+  discipline that keeps paper-qa adoption auditable under the Marelli accountability layer.
+- [`llm-research-wiki`](../repo-notes/llm-research-wiki.md) — Paulo de Assis's Claude-Code-driven academic-research
+  knowledge base cited (as a secondary g3-wiki-patterns edge) for operationalizing the claim categories Marelli's
+  epistemic-standards argument requires.
+- [`obsidian-llm-wiki-local`](../repo-notes/obsidian-llm-wiki-local.md) — Local-first Karpathy-style LLM Wiki for
+  Obsidian cited (as a secondary g3-wiki-patterns edge) as an agent-driven wiki build pattern operationalizing Marelli's
+  claim-typing discipline.
+- [`paper-qa`](../repo-notes/paper-qa.md) — FutureHouse's agentic-RAG package for scientific literature cited as the
+  first paper-corpus tool to earn an Integrate verdict and the operational instantiation of the Schulz collaborator
+  frame for Phase 2 KB substrate.
+- [`scientific-agent-skills`](../repo-notes/scientific-agent-skills.md) — K-Dense's 135 broad-science Anthropic-format
+  skills cited as the broader-science sibling to bioSkills in the Phase 2 KB-substrate integrate-trio.
+
+### Paper-notes
+
+- [`2306.03809v1`](../paper-notes/2306.03809v1.md) — _Can large language models democratize access to dual-use
+  biotechnology?_ — instantiates the Bender misuse-concern position in the Binz four-perspectives framework.
+- [`binz-et-al-2025-how-should-the-advancement-of-large-language-models-affect-the-practice-of-science`](../paper-notes/binz-et-al-2025-how-should-the-advancement-of-large-language-models-affect-the-practice-of-science.md)
+  — Binz et al. PNAS Perspective staging the four-way debate (Schulz / Bender / Marelli / Botvinick-Gershman) that
+  anchors this synthesis.
+- [`claude-cycles`](../paper-notes/claude-cycles.md) — Donald Knuth's _Claude's Cycles_, a first-person account of using
+  Claude Opus 4.6 to crack an open Hamiltonian-decomposition problem; the empirical counterweight to the Bender
+  skeptical position.
+- [`d41586-026-00974-2`](../paper-notes/d41586-026-00974-2.md) — Nature feature _Self-Driving Labs Power Up_ on
+  closed-loop LLM-directed laboratory automation, cited as the Schulz collaborative frame applied to wet-lab
+  experimentation.

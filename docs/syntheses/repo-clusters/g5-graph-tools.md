@@ -295,3 +295,32 @@ until someone actually misses it"? _Partially resolved (DEC-0018, DEC-0045, see
 [answered-questions.md](../../questions/answered-questions.md)): MCP adopted as extensibility substrate; fastmcp as the
 in-house default. A local infranodus façade would follow the same pattern if Phase 3 brings a self-hostable
 text-network-analysis component._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`claude-prism`](../../repo-notes/claude-prism.md) — Named here to disambiguate from the early-draft `prism` that was
+  cloned in error; claude-prism now lives in Group 8.
+- [`cline`](../../repo-notes/cline.md) — Referenced for its MCP surface as part of the cross-group MCP-as-tool-substrate
+  count.
+- [`dlt`](../../repo-notes/dlt.md) — Authoritative ETL backbone candidate for KnowledgeBase corpus feeding: schema
+  contracts, incremental loading with state tracking, pure-Python library model.
+- [`hyalo`](../../repo-notes/hyalo.md) — Integrate-verdict static Rust binary; `hyalo mv` provides transactional link
+  rewrites with concurrent-edit detection and a typed-schema system that displaces the `linus kb lint` placeholder.
+- [`infranodus`](../../repo-notes/infranodus.md) — Cognitive-variability framework (Louvain modularity + betweenness
+  centrality → biased/focused/diversified/dispersed); contribution is conceptual, code is AGPL.
+- [`infranodus-skills`](../../repo-notes/infranodus-skills.md) — Fifteen skills clarifying the Linus Skills format;
+  one-third depend on hosted `mcp.infranodus.com`, the rest are pure prompt content.
+- [`keppi`](../../repo-notes/keppi.md) — Phase 3 retrieval reference: `blast_radius.py` bounded BFS with decay and
+  `context_pack.py` greedy-fill to token budget; MCP `instructions` field encodes retrieval strategy.
+- [`OptimusKG`](../../repo-notes/OptimusKG.md) — Production medallion architecture (landing → bronze → silver → gold)
+  for biomedical knowledge graphs; catalog-first governance pattern for KnowledgeBase v1.
+- [`paper-qa`](../../repo-notes/paper-qa.md) — Referenced via OptimusKG's PaperQA3 human-in-the-loop QA validation
+  pattern.
+- [`pmetal`](../../repo-notes/pmetal.md) — Referenced for its pmetal-MCP server as part of the cross-group
+  MCP-as-tool-substrate count.
+- [`py3plex`](../../repo-notes/py3plex.md) — Serious multilayer-graph library with DSL v2 query surface, first-class
+  uncertainty quantification, and rigorous engineering hygiene (CrossHair, icontract, Hypothesis).

@@ -353,8 +353,8 @@ A second commercial-substrate signal, structurally distinct from the Canteen / A
 crystallized through three policy pieces folded into the corpus during the Wave 2 batch. The triad:
 
 - [Holko, Wilbanks & Howell 2026](../paper-notes/holko_wilbanks_howell_ai_ready_biodata.md), _AI-Ready Biodata Is
-  America's Next Strategic Infrastructure_ (War on the Rocks, March 2026) — the strategic argument that **biodata is
-  the binding constraint** on U.S. AI-bio leadership. Five policy recommendations (treat biodata as critical national
+  America's Next Strategic Infrastructure_ (War on the Rocks, March 2026) — the strategic argument that **biodata is the
+  binding constraint** on U.S. AI-bio leadership. Five policy recommendations (treat biodata as critical national
   infrastructure; secure national compute-to-data portal; convert NDAA pilots to binding standards; align the Genesis
   Mission EO with biodata generation; sustained tens-of-billions-over-a-decade investment). NSCB 2025 final report
   framing: a roughly three-year window.
@@ -372,8 +372,8 @@ crystallized through three policy pieces folded into the corpus during the Wave 
   the policy recommendation.
 
 The combined argument has two structural implications for Linus's commercial positioning. First, **the AI-bio nexus is
-bottlenecked at both the data layer (biodata) and the production layer (biomanufacturing)** — winning on either alone
-is insufficient; both must be addressed. Second, **the policy direction is converging on coordination + auditability +
+bottlenecked at both the data layer (biodata) and the production layer (biomanufacturing)** — winning on either alone is
+insufficient; both must be addressed. Second, **the policy direction is converging on coordination + auditability +
 federated learning + compute-to-data + tiered access frameworks** — independently named by Holko/Wilbanks/Howell
 (Recommendation 2) and Love/Reynolds/Goldston/Frye (federated-learning data-modeling). Linus's local-first auditable
 architecture is structurally aligned with this direction.
@@ -384,10 +384,10 @@ is a multi-year policy substrate (NSCB 2025's three-year window; Genesis EO impl
 provisions converting to standards over multiple cycles). The two threads are complementary, not competing.
 
 The most directly actionable consequence: **DEC-0047 biosecurity-tier-control framework** earns external policy
-alignment by citing this triad as its strategic substrate. Currently DEC-0047 is internally-motivated. With these
-three policy pieces in the corpus, DEC-0047 can be re-grounded as the **operational realization** of the policy
-framework the triad articulates (tiered access, auditability, compute-to-data, federated learning). This is a small
-DEC update with disproportionate strategic-narrative weight.
+alignment by citing this triad as its strategic substrate. Currently DEC-0047 is internally-motivated. With these three
+policy pieces in the corpus, DEC-0047 can be re-grounded as the **operational realization** of the policy framework the
+triad articulates (tiered access, auditability, compute-to-data, federated learning). This is a small DEC update with
+disproportionate strategic-narrative weight.
 
 The cybersecurity-notes folder ([`docs/cybersecurity-notes/`](../cybersecurity-notes/)) is the regulatory companion to
 this strategic-policy thread — NIST CSF, SP 800-207 Zero Trust, SP 800-171r2 CUI, NCSC China genomics, HHS biotech
@@ -553,3 +553,73 @@ Venue layered decomposition surfaced as a Linus-internal lens (E14). Source note
 [`canteen_blog_landscape_2026-05.md`](../../context/notes/canteen_blog_landscape_2026-05.md). Revisit when the hackathon
 kicks off, when an RFB is selected, when `@x402/mcp` ships a stable spec, or when the satellite project's architecture
 starts to inform Phase 2 decisions._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`autogen`](../repo-notes/autogen.md) — Microsoft Research's multi-agent framework, now in maintenance mode after the
+  redirect to Microsoft Agent Framework; flagged in the Canteen blog-landscape Tier-1/2 repo candidate list.
+- [`Bacformer`](../repo-notes/Bacformer.md) — Prokaryotic genome foundation model fitting M1 Max RAM constraints; cited
+  as the Apple-Silicon-realistic broad-bio FM in the Phase 7 literature-intelligence stack (paper-qa + bioSkills +
+  Bacformer + LAB-Bench + KnowledgeBase).
+- [`bioSkills`](../repo-notes/bioSkills.md) — 438 bioinformatics skills covering Dan's exact domain expertise (PacBio
+  long-read assembly, metagenomics, comparative genomics, gene cloning, protein purification, enzyme assays); cited as
+  the inaugural Phase 7 skills bundle.
+- [`debate-or-vote`](../repo-notes/debate-or-vote.md) — UW-Madison NeurIPS 2025 Spotlight research-code comparing
+  multi-agent debate against simple majority voting; flagged in the Canteen blog-landscape Tier-1/2 repo candidate list.
+- [`dexter`](../repo-notes/dexter.md) — virattt's Claude-Code-shaped autonomous equity-research agent; cited as the
+  source of the two-tier microcompact + compact context-compaction prompt template (Tier 2 transferable pattern E5) to
+  be lifted verbatim into the Phase 2 context-manager spec.
+- [`goose`](../repo-notes/goose.md) — Block's (now AAIF) production Rust+MCP coding agent; flagged in the Canteen
+  blog-landscape Tier-1/2 repo candidate list as the most relevant Rust+MCP harness reference.
+- [`LAB-Bench`](../repo-notes/LAB-Bench.md) — FutureHouse biology benchmark with coverage / accuracy / precision triple;
+  cited as the rigorous public benchmark anchoring client-facing precision claims in the literature- intelligence
+  offering.
+- [`langgraph`](../repo-notes/langgraph.md) — LangChain Inc.'s low-level orchestration framework with typed-graph DAG +
+  channel state + Pregel-inspired execution; flagged in the Canteen blog-landscape Tier-1/2 repo candidate list.
+- [`Letta`](../repo-notes/Letta.md) — The productized MemGPT descendant with memory blocks, multi-agent server, Agent
+  File format, git-backed memory repository, and first-class MCP integration; flagged in the Canteen blog-landscape
+  Tier-1/2 repo candidate list.
+- [`MiroFish-Offline`](../repo-notes/MiroFish-Offline.md) — Fully-local fork of MiroFish swapping cloud dependencies for
+  Neo4j + Ollama; flagged in the Canteen blog-landscape Tier-1/2 repo candidate list as a local-first multi-agent
+  prior-art point.
+- [`nixtla`](../repo-notes/nixtla.md) — Nixtla's TimeGPT SDK plus the open-source Nixtlaverse (statsforecast,
+  mlforecast, neuralforecast, hierarchicalforecast, utilsforecast); part of the g10-finance cluster surfacing
+  cross-domain time-series Worker capability for omics trajectories and environmental data.
+- [`OpenBB`](../repo-notes/OpenBB.md) — OpenBB Finance's Open Data Platform with ~35 data-provider integrations under
+  one Pydantic schema plus `openbb-mcp`; cited as the only Group 10 repo with direct entrepreneurial-surface utility
+  today and the source of the dynamic per-session tool-activation pattern (E3 / R2-25).
+- [`paper-qa`](../repo-notes/paper-qa.md) — FutureHouse's agentic-RAG package for scientific literature, the first
+  paper-corpus tool to earn an Integrate verdict; cited as the literature-intelligence engine of the Phase 7
+  commercial-surface stack.
+- [`QuantAgent`](../repo-notes/QuantAgent.md) — Stony Brook / CMU / UBC / Yale / Fudan four-agent LangGraph pipeline
+  (Indicator → Pattern → Trend → Decision); g10-finance cluster member providing the minimal-multi-agent counterpart to
+  TradingAgents and the vision-LLM-on-rendered-chart pattern.
+- [`rig`](../repo-notes/rig.md) — Playgrounds Analytics' Rust unified-LLM-client library; flagged in the Canteen
+  blog-landscape Tier-1/2 repo candidate list as the Rust-side counterpart to LiteLLM.
+- [`scientific-agent-skills`](../repo-notes/scientific-agent-skills.md) — K-Dense's ~135 broad-science Anthropic-format
+  skills; pairs with bioSkills as the ~573-skill inaugural Phase 7 bundle.
+- [`TradingAgents`](../repo-notes/TradingAgents.md) — Tauric Research's LangGraph multi-agent trading framework with
+  bull/bear debate and decision-log self-correction; cited as the source of the adversarial-debate primitive (E4 /
+  R2-50) and the `deep_think_llm` / `quick_think_llm` two-tier LLM split.
+- [`x402`](../repo-notes/x402.md) — Coinbase's HTTP-402 payment protocol for pay-per-API-call agent surfaces; cited via
+  the `@x402/mcp` roadmap TODO as the canonical agent-monetization-via-MCP integration point seeded as E13
+  (`DEC-NNNN agent-monetization-via-x402-mcp`).
+
+### Paper-notes
+
+- [`2412.20138v7`](../paper-notes/2412.20138v7.md) — TradingAgents trajectory note (Xiao, Sun, Luo, Wang, 2025); cited
+  as the same-lab predecessor to Trading-R1 reasoning-trace work referenced in the Canteen / Agora RFB-1
+  reasoning-traces-as-product idea.
+- [`holko_wilbanks_howell_ai_ready_biodata`](../paper-notes/holko_wilbanks_howell_ai_ready_biodata.md) — Holko, Wilbanks
+  & Howell's March 2026 _War on the Rocks_ strategic argument that biodata is the binding constraint on U.S. AI-bio
+  leadership; first of the biodata-sovereignty / biomanufacturing-policy triad supporting DEC-0047 external grounding.
+- [`love_reynolds_goldston_frye_biomanufacturing_us`](../paper-notes/love_reynolds_goldston_frye_biomanufacturing_us.md)
+  — Love, Reynolds, Goldston & Frye 2024 MIT Policy Brief on biomanufacturing capacity, leapfrog technologies, and
+  regional bioeconomy innovation hubs; second of the biodata-sovereignty / biomanufacturing-policy triad.
+- [`marler_gerstein_biotechnology_warfighter`](../paper-notes/marler_gerstein_biotechnology_warfighter.md) — Marler &
+  Gerstein 2022 RAND report on biology's inherent dual-use character; the foundational policy substrate underpinning the
+  biodata-sovereignty triad and DEC-0047 biosecurity-tier-control framework.

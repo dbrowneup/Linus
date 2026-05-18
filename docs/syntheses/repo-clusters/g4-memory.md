@@ -319,6 +319,31 @@ _Open: tracked as R2-28 (Tier 3) in [top-questions.md](../../questions/top-quest
 
 ---
 
+## References
+
+### Repo-notes
+
+- [`agentmemory`](../../repo-notes/agentmemory.md) — TypeScript/Node memory server (51 MCP tools + REST + WebSocket
+  viewer); hook taxonomy and lease/signal/checkpoint primitives for Phase 3 parallel-Worker coordination.
+- [`anamnesis`](../../repo-notes/anamnesis.md) — "4D Strategic Memory Engine" with Postgres + pgvector; authority-
+  weighted hierarchy and four-channel retrieval pattern.
+- [`engram`](../../repo-notes/engram.md) — Python CLI plain-markdown wiki maintained by the agent; six-issue lint
+  taxonomy directly portable as an episodic-store audit verb.
+- [`k-dense-byok`](../../repo-notes/k-dense-byok.md) — local-first agentic research assistant (Kady) with maestro/expert
+  dispatch over 170+ scientific skills; skill-routing patterns for Phase 2a tool registry.
+- [`memex`](../../repo-notes/memex.md) — governed markdown directory operated by any agentic CLI; cross-vendor enforcer
+  pattern and the constitution-as-portable-rules discipline.
+- [`omega-memory`](../../repo-notes/omega-memory.md) — local-first cross-model MCP memory server on SQLite + sqlite-vec
+  + FTS5; same substrate as openaugi with a heavier product surface.
+- [`openaugi`](../../repo-notes/openaugi.md) — Obsidian-vault personal intelligence engine on SQLite + sqlite-vec + MCP;
+  the closest existing match to the DEC-0029 v0 substrate.
+- [`prompt-vault`](../../repo-notes/prompt-vault.md) — four-folder public prompt cookbook from AI Engineer Skool;
+  miscategorized in this cluster (no runtime, schema, or storage layer).
+- [`remember`](../../repo-notes/remember.md) — Claude Code / OpenClaw second-brain plugin materialising an Obsidian-
+  compatible vault; transcript walker reusable for backfilling Layer C from history.
+
+---
+
 _Inputs:
 `docs/repo-notes/{agentmemory,anamnesis,omega-memory,engram,remember,prompt-vault,openaugi,memex,k-dense-byok}.md`.
 Primary cross-references: `docs/syntheses/memory-synthesis.md`, `docs/specs/memory-architecture.md` (DEC-0028 through

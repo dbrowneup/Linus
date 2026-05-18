@@ -225,3 +225,23 @@ bandwidth is the binding constraint, which is exactly the constraint Linus is bu
 Revisit when the skills synthesis is updated to the cross-domain framing (still pending as of 2026-05-08), when the
 Phase 3 spawner spec lands and the `goal_orientation` field becomes a named requirement, and whenever a new paper in the
 human-development or team-learning literature lands in `context/papers/`.
+
+---
+
+## References
+
+### Paper-notes
+
+- [`harvey-et-al-2023-the-dynamics-of-team-learning-harmony-and-rhythm-in-teamwork-arrangements-for-innovation`](../paper-notes/harvey-et-al-2023-the-dynamics-of-team-learning-harmony-and-rhythm-in-teamwork-arrangements-for-innovation.md)
+  — Harvey, Cromwell, Johnson & Edmondson's 2023 _Administrative Science Quarterly_ paper introducing the 2×2 of
+  reflexive / experimental / vicarious / contextual learning activities with the harmony-within-episode and
+  rhythm-across-episodes prescription; the team-episode-timescale anchor of the synthesis.
+- [`nihms-2096004`](../paper-notes/nihms-2096004.md) — Sauerbrei-Pruszynski commentary _The brain works at more than 10
+  bits per second_ pushing back on details of the Zheng-Meister bandwidth estimate without contesting the slow-
+  controller-over-parallel-substrate shape; second half of the millisecond-scale cognitive-throughput pair.
+- [`PIIS0896627324008080`](../paper-notes/PIIS0896627324008080.md) — Zheng-Meister _The unbearable slowness of being:
+  Why do we live at 10 bits/s?_ documenting the ~10 bit/s conscious channel above a massively parallel sensorimotor
+  substrate; the millisecond-scale anchor for the Maestro/Worker three-timescale argument.
+- [`science.adt7790`](../paper-notes/science.adt7790.md) — Güllich, Barth, Hambrick & Macnamara's December 2025
+  _Science_ review of ~34,000 adult international top performers showing early-narrow practice is anti-correlated with
+  adult excellence; the career-timescale anchor of the synthesis.

@@ -531,6 +531,14 @@ choice for sovereignty, but it means there is no cloud backup redundancy. A Time
 disconnected between backup runs is the minimum viable protection against both accidental deletion and ransomware. Is
 this currently in place for the drive containing genomics data and model weights?
 
+## References
+
+_This synthesis draws on the NIST Cybersecurity Framework primers in
+[`docs/cybersecurity-notes/`](../cybersecurity-notes/) and on [DEC-0024](../adr/0024-security-posture-supply-chain.md)
+(supply-chain posture); it does not cite any per-repo or per-paper notes. Future revisions that fold in
+security-relevant paper-notes (deanonymization, dual-use uplift) or repo-notes should add corresponding `### Repo-notes`
+and `### Paper-notes` subsections here._
+
 ---
 
 _This synthesis was substantially rewritten on 2026-05-05 using the NIST Cybersecurity Framework, NIST SP 800-207, SP

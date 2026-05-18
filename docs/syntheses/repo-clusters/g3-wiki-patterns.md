@@ -261,3 +261,28 @@ _Cross-references: llm-wiki-synthesis.md (canonical practitioner patterns); memo
 requirements); security-synthesis.md (trust-tier tagging for KB content); g8-sci-agents.md (paper-qa as Phase 2c KB
 retrieval engine, DEC-0044). Update this document when the Phase 2 KB schema spec lands or when Phase 3 lint design
 begins._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`agentic-wiki-builder`](../../repo-notes/agentic-wiki-builder.md) — Git-branch-per-session provenance plus a
+  DuckDB+NetworkX Linker that extracts inter-file wikilinks into an edge table for connected-component analysis.
+- [`AgenticResearchWiki`](../../repo-notes/AgenticResearchWiki.md) — Two ready-to-install Claude Code Skills
+  (`import-notes`, `project-doc-update`) plus a `CLAUDE.md` navigation discipline.
+- [`atomic-knowledge`](../../repo-notes/atomic-knowledge.md) — Seven-page-type schema with the `procedure` type; the
+  `get_context` walker (~70 lines) provides near-zero-infrastructure KB read tooling.
+- [`beever-atlas`](../../repo-notes/beever-atlas.md) — Production-scale outlier: `gather → compile → cache` pipeline,
+  ADK `SequentialAgent + ParallelAgent` shape, dual semantic+graph memory.
+- [`hyalo`](../../repo-notes/hyalo.md) — G5 Integrate-recommended lint engine; planned substrate beneath the
+  `linus kb lint` command.
+- [`llm-research-wiki`](../../repo-notes/llm-research-wiki.md) — Six-page-type schema (source-note, concept, author,
+  debate, synthesis, project) with three formalized workflows (INGEST, QUERY, LINT).
+- [`llm-wikidata`](../../repo-notes/llm-wikidata.md) — Entity-deduplication pattern (~50 lines, ChromaDB-backed
+  conservative/granular resolver) addressing the concept-drift problem.
+- [`obsidian-llm-wiki-local`](../../repo-notes/obsidian-llm-wiki-local.md) — Pip-installable 10-KLOC package with SQLite
+  state, atomic writes, SHA-256 hashing, and the `structured_output.py` 3-tier JSON fallback worth lifting immediately.
+- [`paper-qa`](../../repo-notes/paper-qa.md) — G8 Integrate verdict (DEC-0044) reframing Phase 2 KB substrate from
+  "build" to "adopt + extend"; tantivy full-text + vector retrieval pipeline.

@@ -552,6 +552,53 @@ Cross-references that were load-bearing without being part of Group D:
 
 ---
 
+## References
+
+### Repo-notes
+
+- [`goose`](../repo-notes/goose.md) — production Rust+MCP coding agent (Block / AAIF); Recipe DSL as one of the three
+  reference task-spec shapes for the Phase 3 spawner.
+- [`Letta`](../repo-notes/Letta.md) — productized MemGPT descendant; Agent File task-spec shape and Anthropic-compat
+  endpoint reference.
+- [`swarm`](../repo-notes/swarm.md) — System-Wide Assessment of Risk in Multi-agent systems framework; population-level
+  soft-label safety substrate for Phase 3 stress-tests.
+- [`symphony`](../repo-notes/symphony.md) — OpenAI engineering-preview harness; `WORKFLOW.md` policy-in-repo as third
+  task-spec reference and issue-tracker-driven autonomous-dispatch entrant.
+
+### Paper-notes
+
+- [`2026.02.09.704801v1`](../paper-notes/2026.02.09.704801v1.md) — Ma et al., _BioGuider: A multi-agent platform for
+  assessment and improvement of bioinformatics software documentation_ (Ohio State, 2026).
+- [`2304.05332v1`](../paper-notes/2304.05332v1.md) — Boiko, MacKnight & Gomes, _Emergent autonomous scientific research
+  capabilities of large language models_ (Carnegie Mellon, 2023).
+- [`2402.03755v1`](../paper-notes/2402.03755v1.md) — Wang, Yuan, Ni & Guo, _QuantAgent: Seeking Holy Grail in Trading by
+  Self-Improving Large Language Model_ (HKUST / IDEA, 2024); the only Bayesian-regret-bound theoretical contribution.
+- [`2412.20138v7`](../paper-notes/2412.20138v7.md) — Xiao, Sun, Luo & Wang, _TradingAgents: Multi-Agents LLM Financial
+  Trading Framework_ (UCLA / MIT / Tauric Research, 2025).
+- [`2503.19065v1`](../paper-notes/2503.19065v1.md) — Yang et al., _WikiAutoGen: Towards Multi-Modal Wikipedia-Style
+  Article Generation_ (KAUST, 2025); four-viewpoint critic-stronger-than-writer pattern.
+- [`2506.13023v1`](../paper-notes/2506.13023v1.md) — Rudd, Andrews & Tully, _A Practical Guide for Evaluating LLMs and
+  LLM-Reliant Systems_ (Google, 2025).
+- [`2509.09995v3`](../paper-notes/2509.09995v3.md) — Xiong et al., _QuantAgent: Price-Driven Multi-Agent LLMs for High-
+  Frequency Trading_ (Stony Brook / CMU / UBC / Yale / Fudan, 2025); minimal four-specialists + integrator template.
+- [`2509.11420v1`](../paper-notes/2509.11420v1.md) — Xiao et al., _Trading-R1: Financial Trading with LLM Reasoning via
+  Reinforcement Learning_ (Tauric / UCLA, 2025); RL-trained single-model collapse of TradingAgents orchestration.
+- [`2510.09244v1`](../paper-notes/2510.09244v1.md) — de Lamo Castrillo et al., _Fundamentals of Building Autonomous LLM
+  Agents_ (UPC / TUM, 2025); the eight-role taxonomy reference.
+- [`2511.02824v2`](../paper-notes/2511.02824v2.md) — Mitchener et al., _Kosmos: An AI Scientist for Autonomous
+  Discovery_ (Edison Scientific / FutureHouse, 2025); 12-hour autonomous research agent upper bound.
+- [`2603.24629v1`](../paper-notes/2603.24629v1.md) — Bahamdan et al., _Sketch2Simulation: Automating Flowsheet
+  Generation via Multi-Agent Large Language Models_ (Imperial / BYU, 2026).
+- [`Kimi-K2-2507.20534`](../paper-notes/Kimi-K2-2507.20534.md) — Kimi Team, _Kimi K2: Open Agentic Intelligence_
+  (Moonshot AI, 2025); open-source SOTA on agentic benchmarks; Phase 6d weight-streaming and Phase 6 LoRA-seed
+  candidate.
+- [`sutton_bitter_lesson`](../paper-notes/sutton_bitter_lesson.md) — Sutton, _The Bitter Lesson_ (2019); foundational
+  methodological substrate for the Maestro/Worker discipline.
+- [`swarm-2604.19752`](../paper-notes/swarm-2604.19752.md) — Aiersilan & Savitt, _Soft-Label Governance for
+  Distributional Safety in Multi-Agent Systems_ (2026); paired with `repo-notes/swarm.md`.
+
+---
+
 _This synthesis is the input to the next round of edits to [paper-landscape.md](../landscapes/paper-landscape.md),
 [synthesis-landscape.md](../landscapes/synthesis-landscape.md), [total-landscape.md](../landscapes/total-landscape.md),
 and [open-questions.md](../questions/open-questions.md). It should be revisited when the Phase 3 agent-spawner ADR

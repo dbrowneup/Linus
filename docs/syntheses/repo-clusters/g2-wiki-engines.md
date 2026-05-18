@@ -272,3 +272,50 @@ _Update this document when the Phase 2 KB schema spec lands and when Phase 3 par
 begins. G3 cross-check is now complete (2026-05-08). Primary inputs: `docs/repo-notes/` for all eleven repos;
 `docs/syntheses/llm-wiki-synthesis.md`; `docs/syntheses/memory-synthesis.md`;
 `docs/syntheses/repo-clusters/g3-wiki-patterns.md`; Crossing 3 of `docs/landscapes/total-landscape.md`._
+
+---
+
+## References
+
+### Repo-notes
+
+- [`agentic-wiki-builder`](../../repo-notes/agentic-wiki-builder.md) — Companion G3 build-pattern repo cross-checked
+  here on provenance depth.
+- [`AgenticResearchWiki`](../../repo-notes/AgenticResearchWiki.md) — Companion G3 build-pattern repo cross-checked here
+  on provenance depth.
+- [`atomic-knowledge`](../../repo-notes/atomic-knowledge.md) — Companion G3 build-pattern repo cross-checked here on
+  provenance depth.
+- [`beever-atlas`](../../repo-notes/beever-atlas.md) — Companion G3 build-pattern repo cross-checked here on provenance
+  depth.
+- [`hyalo`](../../repo-notes/hyalo.md) — G5 Integrate-recommended lint engine; planned substrate underneath the LINT
+  workflow the G3 cluster recommends.
+- [`link`](../../repo-notes/link.md) — Elegant minimalist Python stdlib wiki engine; `doctor` command is the most
+  developed lint/orphan-detection in the cluster.
+- [`llm-research-wiki`](../../repo-notes/llm-research-wiki.md) — Companion G3 build-pattern repo cross-checked here on
+  provenance depth.
+- [`llm-wikidata`](../../repo-notes/llm-wikidata.md) — Companion G3 build-pattern repo cross-checked here on provenance
+  depth.
+- [`llmbase`](../../repo-notes/llmbase.md) — Operations registry (`Operation` dataclass plus `register()` /
+  `dispatch()`) is the near-drop-in pattern for a one-definition-three-surfaces tool registry.
+- [`llmwiki`](../../repo-notes/llmwiki.md) — `guide` MCP tool exemplifies schema-as-tool-output, delivering the wiki
+  ontology as a tool return value rather than system-prompt text.
+- [`llmwiki-cli`](../../repo-notes/llmwiki-cli.md) — Cross-platform CLI variant evaluated alongside the cluster siblings
+  for the markdown-on-filesystem axis.
+- [`obsidian-llm-wiki-local`](../../repo-notes/obsidian-llm-wiki-local.md) — Companion G3 build-pattern repo with the
+  SHA-256-plus-atomic-rename writes that are chunk-level-adjacent.
+- [`OmegaWiki`](../../repo-notes/OmegaWiki.md) — The cleanest `.claude/skills/` layout in the corpus; 24 skills spanning
+  the full research lifecycle including LaTeX paper submission and reviewer rebuttal.
+- [`paper-qa`](../../repo-notes/paper-qa.md) — G8 Integrate verdict (DEC-0044) reframing Phase 2 KB substrate from
+  "build" to "adopt + extend"; tantivy full-text + vector retrieval pipeline.
+- [`swarmvault`](../../repo-notes/swarmvault.md) — Four-package pnpm monorepo with context-pack and task-ledger patterns
+  directly applicable to Maestro/Worker handoff specs.
+- [`synthadoc`](../../repo-notes/synthadoc.md) — Long-running operational service with durable job queue, OTel traces,
+  decomposition agent, and `BaseSkill` hot-load registry.
+- [`TheKnowledge`](../../repo-notes/TheKnowledge.md) — Gateway-as-only-writer discipline with the `NlmClient` Protocol
+  pattern and hard citation validator; most defensible write architecture in the cluster.
+- [`wikidesk`](../../repo-notes/wikidesk.md) — Runner-trait abstraction (`generic`, `stream-json`, `acp`) with
+  bounded-concurrency semaphore; the only sibling that has thought about multi-agent deployment topology.
+- [`wikiloom`](../../repo-notes/wikiloom.md) — Deepest provenance in the cluster:
+  `chunk_id = sha256(source_hash + chunk_index)[:12]` stored in page frontmatter for deterministic source tracing.
+- [`wikimind`](../../repo-notes/wikimind.md) — Most-elaborate storage substrate (SQLModel, optional Postgres, ARQ-backed
+  async compilation); the high-end of the markdown-to-RDBMS spectrum.
