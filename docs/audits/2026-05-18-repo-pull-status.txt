@@ -1,0 +1,139 @@
+UNCHG  Agent-Skills-for-Context-Engineering @ 7a95d94c36
+UNCHG  agentic-wiki-builder @ 901ed9e8f9
+UNCHG  AgenticResearchWiki @ 7072981255
+UPDATE agentmemory: 94fc1191ef6ae559d3a1858e2f8658947058d31e → 08d781d431506cea3f1220313f30f0eea42ffde7 (95 commits, 182 files)
+UPDATE AgentPrometheus: 443029cba6362f2ecb13b0f7bba636c2260332c4 → e0a1e2f9b5016dd5ed675776dc34fa936ec07408 (18 commits, 17 files)
+UNCHG  ai-firm @ ec47313e04
+UPDATE algebrica: ba63418ebcc8f698ddea3ab10823941354f08474 → b4fc92a9f236aebabc90d1dafbe7ccd9da536ae0 (2 commits, 5 files)
+UNCHG  anamnesis @ 494661e82b
+UNCHG  ANE @ d91c9845c0
+UNCHG  archimedes @ 9cea7e6bb2
+UNCHG  atomic-knowledge @ 49ef2c1a4b
+UNCHG  autogen @ 027ecf0a37
+UNCHG  autoresearch-mlx @ ba6ebf6d35
+UNCHG  autoresearch @ 228791fb49
+UNCHG  aviary @ 826577f332
+UNCHG  awesome-ai-agent-papers @ 224538291b
+UNCHG  awesome-ml @ 81c7bdf6fd
+UPDATE Bacformer: 25688535adaf80dcbf52073ef969a2190ef65921 → 305a78217a7a1fa11e31090cbeed891867743b8f (2 commits, 1 files)
+UPDATE beever-atlas: 6ed89cebc4fbf71ffe085a70698682a9c3ec796b → 63be2e0b8080857e8ed7b131c8fa51f333a6caa0 (219 commits, 619 files)
+UNCHG  BioReason @ 4dd776849d
+UPDATE bioSkills: ebe4f4003ebeef4beda84ae1fb4f52295848c4e1 → 48f348813346a992ad27ad5728afd611dcfa9c82 (10 commits, 288 files)
+UNCHG  BitNet @ 01eb415772
+UNCHG  BixBench @ 49311180bd
+UPDATE Bonsai-demo: e54f9c19fec1ffee09214a30308e5b8017a9d27a → a83615ba6fd1e4ef264276871ccef279d7d29aa6 (4 commits, 8 files)
+UPDATE caveman: 63a91ecadbf4c4719a4602a5abb00883f9966034 → 18e45320a0b1aecc959a807f8568ee44b3aaa055 (1 commits, 1 files)
+UPDATE claude-code-guide: 60cd513d7a5266243c1620a1ed04caf26be1c2a9 → e317d8befea224bb7d695f74aac67ceaeafdc3c0 (6 commits, 1 files)
+UNCHG  claude-prism @ eb1e300c81
+UPDATE claude-squad: a4ab698899d57f23a428b18101fa0041771d18fd → 4a02a308be98053130223e7d80f7316a9264fb97 (6 commits, 12 files)
+UNCHG  claude-task-master @ c0c98d367c
+UNCHG  claw-code-local @ f4cc5d7180
+UPDATE claw-code: a389f8dff1d591d2eafc2f48747313cd556412ee → f8e1bb7262b261da1ee6bfcd461bfc5b676f6a6d (339 commits, 128 files)
+UPDATE ClawBio: 2321e520caf6ba583ea2ab8e50133fc61fceae3e → f92bff1e1558dd9abb9e4e16992e415d37f961ab (47 commits, 82 files)
+UNCHG  cline @ 9dea336ced
+UPDATE codebase-memory-mcp: 3305c1f9d320494d1e20bd47f5ac67063a8be62c → 22153563cd1072b4f79e0e27113f6e0dea3abc1a (96 commits, 117 files)
+UPDATE codebuff: 9c1c96e3c87d0e4fd37290730cad3c603de47628 → 26e593b4290fd1855bbabd2e227bfb80b84eb4d8 (195 commits, 267 files)
+UPDATE codesight: 9c6fdcefa32cbfbe7ce930b8f89ebec878989fb3 → 6946ca37efe79025669a63fc7a46f5ca9ac10e73 (12 commits, 248 files)
+UNCHG  CodeV @ daa44818d5
+UPDATE cs249r_book: bbde92d1d8e00d8b7885ed2c04d34f0f744328ab → b5d428c7c8f7387329fc94d4fdbc2424a07ae640 (763 commits, 622 files)
+UNCHG  debate-or-vote @ 82c929ea77
+UNCHG  deepsems @ 7470a4faae
+UPDATE dexter: 8819ad744c3d96dead87b2812ceb427da845c0f8 → 08d175af92b7dde22f676c85c95f186ef76c7e72 (11 commits, 38 files)
+UNCHG  distroless @ 37e595e611
+UPDATE dlt: 1be2ccf8410dbd43610beae0b9ae2055fe7a4006 → 2999fa12ac61ddeae4d956e3e6332fe25e145dcf (7 commits, 51 files)
+UPDATE docling: bcd550950a7467f9f09551ecedd2ffd41ae2d1b4 → b6158396e15c3ceb38784df4b45a93d3f7a12405 (10 commits, 120 files)
+UNCHG  dreamzero @ ab790c198f
+UPDATE dspy: faa99d1f784a5d34cd0d0a5af5725ace9dae21d8 → 661a612cc64cac08af80ce58af52ec87d1a81f73 (22 commits, 56 files)
+UNCHG  engram @ 6999228d7d
+UNCHG  ether0 @ b77e0d8eb0
+UNCHG  ExtractThinker @ 66920c9af1
+UPDATE fastmcp: d0315974fa844b2424c93f4ad43c8f2d543ff51a → d8dcc273cac9f6f17889a1b60adbdc654f948a50 (27 commits, 558 files)
+UNCHG  finch @ aea66fdf2d
+UNCHG  flash-moe @ 3601d41882
+UPDATE goose: ea5802c3806d23cf1eddacffd4f343f0edc7634a → 60c482de259deb271d217995292db99535672792 (138 commits, 383 files)
+UPDATE gptme: fb4f6a7e1c625b66c3e07b195852b75d5622f26f → 1b31bd8a5b25d365cdc69069efd1c5ca530ba708 (57 commits, 153 files)
+UPDATE gravityfile: e05dd0b03d50ab61c7cb1de335df8de3aff9c563 → 0cbf1f85e4ec16cce3ea595d6d5856d39d87b977 (10 commits, 38 files)
+UNCHG  hackathon @ 3e58a309dd
+UPDATE huginn: 0ee995c4e0ff497356cd17a956d7c82df449cc4b → 10ff6efb8c277eb8aec128c703d927a79faa35ae (20 commits, 19 files)
+UPDATE hyalo: a6cf70589f6c4502663a85c129229584a40d74c3 → 567a2399120f64f084ef17dc5ba7ed4cc106c466 (51 commits, 120 files)
+UPDATE ibmdotcom-tutorials: d34ec8ea981cf8affb2a98491e79a3d9235f344e → 5f95f4507650e308daef4d88e1b023855dcbbe81 (4 commits, 1 files)
+UNCHG  infranodus-skills @ cbed3fab27
+UNCHG  infranodus @ 1a91e545ea
+UPDATE jan: d642ff7e3f3d58029aadbc241973439ca6e11e1f → 1a1223846040b71ccb6010cbc5aaacb8ca60b2d5 (12 commits, 189 files)
+UPDATE k-dense-byok: 0252ebd670ee7cae411f82f07a63dc8553be9a9a → cea2cd81a0ac73310423fbbfcff8efd64135bcf3 (2 commits, 9 files)
+UPDATE keppi: 256ef21969692cfafbc420040d4c6caa09039645 → d81dd3ffff6f4fbab0d516b4e6b5185c560aa412 (2 commits, 13 files)
+UNCHG  Kimi-K2 @ 1b4022bbb7
+UNCHG  LAB-Bench @ 998a8e0a40
+UPDATE langgraph: 2e5025ec1ac8d435840ed4a972097de87aaa2eab → 076e2a3627206f5a1aef573aaca4a01e5af897ca (20 commits, 26 files)
+UNCHG  ldp @ 44247779b0
+UPDATE Letta: bb52a8900a79cf1378e6e9cdecf244b673a13a72 → 1131535716e8a31c9a437f8695e25ac98f203a24 (1 commits, 16 files)
+UNCHG  LHM @ 6f2d661fc2
+UPDATE link: ded22cd2e430d9bac9740024e6216b85a04c4003 → 88f07ba9afe8c29f3e4f3a4367ce6bda6960507a (333 commits, 129 files)
+UNCHG  llm-research-wiki @ 280fc41436
+UNCHG  llm-wikidata @ b16788fb95
+UNCHG  llmbase @ d6b990bd60
+UNCHG  llmwiki-cli @ 0331792725
+UPDATE llmwiki: 60d29f6113349b3f2e60e2896ad35b0da3329c37 → 0836b2e47794c6d4af5ce08be73bc070e7f30064 (18 commits, 107 files)
+UNCHG  lmnr @ f02af8e500
+UNCHG  local-whisper @ 60f678a82a
+UNCHG  markdownify-mcp @ 024f97cea9
+UPDATE memex: 3f3a9e174020394fcf4ba8063f530d988a7a4147 → 4365e507edb3ecd8bacf27d448c2be18c1ecccaf (10 commits, 98 files)
+UNCHG  MiroFish-Offline @ 313fe64285
+UNCHG  mlx-flash @ efb3c9e485
+UPDATE moby: 675945d39e1b4dc0e5806b216191e29094e43ec1 → dd24a3adc1db4c762fb1b26b35c08ffd936f2d8f (7 commits, 5 files)
+UNCHG  MoneyPrinterV2 @ eca94cda0a
+UPDATE nixtla: 5ae7d047ab18bd83595a500269905d014fb58acf → 1106b87b38729dacd703bde416e9ac5639e1e51e (9 commits, 7 files)
+UPDATE obsidian-llm-wiki-local: 7d550a3155d82bfe414813b1c714a503c4d2a704 → 56e81cca2be7c9b30bd7af2cf0fef1fe90c7167a (21 commits, 39 files)
+UPDATE omega-memory: 470e64ca62fa9dc7d15b3a9cf2db0f16be1d4876 → e1bffa766e9572732937839f55a37fe6e18f79d2 (14 commits, 18 files)
+UPDATE OmegaWiki: baf1a1b6108df9006c61df87db9ffef10bcefddd → 8667bd7e9d18a5ace189734c4352cce0e3719f8a (10 commits, 172 files)
+UNCHG  ontomics @ 897a95379a
+UNCHG  openaugi @ b15bc57a80
+UPDATE OpenBB: a08d5d75d00564f10503f915e4aab64119c50a13 → 186cbb068c194fb11adc57bb492a75e474ef4103 (3 commits, 88 files)
+UNCHG  openclaw-workflow @ c0749ac5f4
+UNCHG  openclaw @ 4c5394d0ba
+UPDATE openrouter-skills: 83827c3f3b1200bc3b609f4ab4ec3241c0cfb7ad → 184bbb69273b7ab5a8e504364600b1c74fa55ccc (2 commits, 4 files)
+UPDATE OptimusKG: ec31f5ee120660bd3f41154a67c254049f0dc530 → 29ce692a673e2d3f69e2a550b09fcfad53ce96c9 (1 commits, 15 files)
+UPDATE origin: 14af3e4321948952376da767830c2bf4afca3041 → 43d905dceb92b7f6f454443c1097f090c3b61170 (157 commits, 512 files)
+UNCHG  paper-qa @ d2c3c698fd
+UPDATE PhysiGym: e00e79fad9b06333f1bd3c0e3d98709a6d70bbd4 → ec02a90088d1e8a138355de06557f7d7e40acadb (7 commits, 11 files)
+UPDATE pi: 87881ca686a49004df7671125626bf9314e60469 → f10cf57e96addf6ba8e2ed3e859e68a911923756 (75 commits, 95 files)
+UPDATE pmetal: ecc82067f30b68a3c8bd363c81ad2c9dae263013 → 089171635d1b9c9b7a58b575cf7d522834022cd3 (99 commits, 418 files)
+UPDATE project-nomad: 3117a1be9d011fa07b08ec6c16d2dedbdddb8e4c → 9d73628ee3c66a5d08f28e4a118dbaf306ba2261 (2 commits, 2 files)
+UNCHG  prologue @ 59dcf96e51
+UNCHG  prompt-vault @ 807e5ed546
+UPDATE promptfoo: dddd275c5df20d8d01341de405a30bd9afe78538 → e01ab392bf172932fadc291a468a23a1a930f258 (128 commits, 487 files)
+UNCHG  ProtiCelli @ f7a3a57357
+UPDATE py3plex: 1b737540b90b3e8e274b91de99e4a62dcb4d167d → 08004c95a0d3407288aa3f11d1557a2457cc6a56 (14 commits, 161 files)
+UPDATE pydantic-ai: 4e91659f3e432236ea3eba14c1d34f11b89fed55 → 206453a0c6c10ff90f1f8ec881458b38ca7e4b36 (61 commits, 491 files)
+UPDATE python-sdk: 8ac9dede84ffd68144a0acea363e6cff54c19430 → e7a06917b24366a056c72eec83e4fdd53b08f087 (37 commits, 1 files)
+UNCHG  QiMeng-cpu-v1 @ 7a90772dd1
+UNCHG  QiMeng-MuPa @ ae1680fb41
+UNCHG  QiMeng-SALV @ 5e2b06c31c
+UPDATE qmd: d58fedf4b5785ccbdcdc92f7ab7b8b175801d6e5 → ddbd6bd8be7a5ea201de94e31ca27e3a36f73e8f (49 commits, 34 files)
+UPDATE QuantAgent: 36cdaa67ef5d15525107359aca02b7cb6db9674f → 92519f806286192345e940e7ab77496462d662b7 (2 commits, 5 files)
+UPDATE remember: 9dcf7e53f9e06f46ba4bb18e23754e0249477829 → dd2886cd85645d4a2819538b5b046ba871c80cd6 (32 commits, 35 files)
+UNCHG  rendergit @ 14d7a58c0f
+UPDATE rig: e9a4cc22561cada42d95e12c518a5ccc6af8ae63 → 425c96ef066e4d70dfba848beb9f593d5f9f916d (18 commits, 307 files)
+UNCHG  robin @ 4a5cce310f
+UPDATE scientific-agent-skills: e143ef2f9514c97a1757fb23b67a60f5cc3bd06d → 63de55a76c10bbf353a336ae0d65b213142a082d (21 commits, 25 files)
+UNCHG  semanticworkbench @ 2c2b0df7b1
+UNCHG  Sketch2Simulation @ 764b0dc97a
+UNCHG  superpowers @ f2cbfbefeb
+UPDATE swarm: 7845552e56dd0af295703d6056e528ccbc72a82b → a588f68fddc69e5cc6463e58f2d3d1e4378c8390 (5 commits, 13 files)
+UNCHG  swarms @ 64ccdc9ec7
+UPDATE swarmvault: f5714dd74695d50ac030f6b0141db0a6ba02b908 → 7785f8310b8d9834701be6d27c93186dded95269 (15 commits, 75 files)
+UNCHG  symphony @ bbef62364d
+UPDATE synthadoc: 82926b4a2d5922c127b55c0e987a51c77dacb80d → e03d45bebd9b692f7af2538be77e7e2ad967a564 (21 commits, 121 files)
+UPDATE TheKnowledge: 098a37ab243a79d101c684e2d0ac3aa4f9dec00f → 4227ad0baac8d8da9cab6ca540f25b82b5cf5fdb (117 commits, 2169 files)
+UPDATE TradingAgents: 7e9e7b83c7fcc18d941300b253c6ed24d985788d → 61522e103e61601c553b4544abcd53fa7ebf9f1d (39 commits, 55 files)
+UNCHG  transcriptformer @ c943a89a4d
+UNCHG  vanna @ 365d0617c1
+UPDATE vectorless: d51c85eb3e49b59fb6c7e63791d3f9bb64bc042d → 66c7a02b8f3da4af072f9ed90159d6c883c43ee2 (2 commits, 1 files)
+UPDATE vellum-assistant: 7eb7607e21581475f5cb45c352b88f96a7d732f2 → b43083bfdec0de7b9c66e3932cbbdd6a001bb14f (76 commits, 162 files)
+UPDATE WeKnora: 58a283effeac7ccfcb2b25063233695f600237e1 → 1cb522e621857402ef1360a60f7a079a06b77401 (383 commits, 827 files)
+UNCHG  wikidesk @ 6bde3164bb
+UPDATE wikiloom: bbeb08013ce5531671c35ef8c08557a81911f655 → d965c84fb577a7a37d46947c3f2b5e6d59d4ecc3 (21 commits, 27 files)
+UPDATE wikimind: 2fc8fc9c62a53aceef3d495a27196659d370c961 → 9ad85af08891273f55bba4f0a75e4b7bdbce1d57 (207 commits, 549 files)
+UNCHG  workgraph @ 14766d86e6
+UNCHG  x402 @ dd927a26cf
+DONE

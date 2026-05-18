@@ -1,0 +1,32 @@
+{
+  "schema_version": "v0",
+  "suite": "dan_tasks",
+  "model": "qwen3.6:27b",
+  "ollama_host": "http://localhost:11434",
+  "started_at": "2026-05-18T18:29:22.419257+00:00",
+  "finished_at": "2026-05-18T18:59:24.978466+00:00",
+  "wall_time_s": 1802.56,
+  "results": [
+    {
+      "task": "fasta-gc-content",
+      "status": "exception",
+      "error": "TimeoutError('timed out')",
+      "elapsed_s": 600.23,
+      "output": null
+    },
+    {
+      "task": "paper-summarization",
+      "status": "exception",
+      "error": "TimeoutError('timed out')",
+      "elapsed_s": 601.66,
+      "output": null
+    },
+    {
+      "task": "title-clustering",
+      "status": "exception",
+      "error": "TimeoutError('timed out')",
+      "elapsed_s": 600.56,
+      "output": null
+    }
+  ]
+}
