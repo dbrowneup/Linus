@@ -30,19 +30,28 @@ satisfied.
 
 **Target duration:** 2 weeks (in progress)
 
-**Status snapshot (2026-05-10):**
+**Status snapshot (2026-05-18):**
 
-- **1a — Repo synthesis notes:** complete. 117 repo notes + 118 paper notes + 27 syntheses (15 thematic + 12 cluster,
-  g1–g12) written across 12 original + multiple waves of second-wave additions (omega-memory, keppi, agentmemory,
-  openaugi, fastmcp, Task Master AI, claude-squad, the g11 cluster, then PR #29's QiMeng family + Kimi-K2 + DreamZero +
-  EgoScale + ClawBio + transcriptformer + ProtiCelli, then PR 30's Bin A Letta / rig / autogen / langgraph / x402 and
-  Bin B goose / debate-or-vote / MiroFish-Offline). Folded primarily into Phase 1a; second-wave items now also covered
-  by Phase 1f (this section).
-- **1b — pmetal deep evaluation:** in progress. Built from source successfully; smoke tests pass; initial impressions
-  strongly positive. LoRA trial, serve trial, and comparative benchmark vs. Ollama still to run before the verdict ADR
-  (next free DEC-NNNN, slug `inference-backend`) is written.
-- **1c, 1d, 1e, 1f:** not yet started; specs and decision rules are committed (memory-pillar spikes per DEC-0033/
-  DEC-0034/ DEC-0037; minGRU MLX port spike per DEC-0038; Phase 1c Pareto methodology in `docs/specs/phase1c-spike.md`).
+- **1a — Repo synthesis notes:** complete. ~130 repo notes + ~127 paper notes + 27 syntheses (15 thematic + 12 cluster,
+  g1–g12). All 27 syntheses carry `## References` sections (PR #55 convention). Wave-2 stragglers (moby, distroless,
+  the Spinner protein-design paper-note) and everything-claude-code landed via PRs #53 and #61.
+- **1b — pmetal deep evaluation:** in progress (Dan-driven; v1 Item 7 / v2 C1). v0.5.0 release confirmed via the
+  2026-05-18 repo-pull audit (99 commits / 418 files since clone); refresh repo-note landed via PR #57. LoRA trial,
+  serve trial, comparative benchmark vs. Ollama, and verdict ADR still to run — see
+  [`docs/specs/2026-05-18-dan-manual-tasks.md`](docs/specs/2026-05-18-dan-manual-tasks.md) task A1.
+- **1c — Memory-pillar viability spike:** not yet run (Dan-driven). Spec at
+  [`docs/specs/phase1c-spike.md`](docs/specs/phase1c-spike.md); reconciliation of model list between syntheses (R3-04)
+  is the 15-minute prep step. The 2026-05-18 qwen3.6:27b run is an early data point: 27B-class FP16 Workers are
+  empirically non-viable on M1 Max 32 GB at current Ollama config (swap-thrashed all three Dan tasks at 600s timeout),
+  so qwen3:8b remains the practical Worker ceiling. Informs DEC-0033 / DEC-0034 fingerprint calibration.
+- **1d — Dan task suite v0:** complete. Three tasks shipped via PR #33 (fasta-gc-content, paper-summarization,
+  title-clustering); baselines collected for `qwen2.5-coder:7b` (2026-05-16) and `qwen3:8b` (2026-05-18) at
+  `benchmarks/results/dan_tasks_baseline_*.json`. R3-08 benchmark-convention ADR (v2 plan N7) outstanding.
+- **1e — First Maestro/Worker loop:** complete. Recorded via PR #38; verdict REJECT; calibration data preserved at
+  `experiments/first-loop-review.md`. Sandbox helpers subsequently hand-written by Maestro (PR #50).
+- **1f — minGRU MLX-port spike:** not yet run (Dan-driven, ~1 day feasibility pass; v2 plan C3).
+- **ADR landings since 2026-05-10:** DEC-0055 (filename discipline) via PR #31; DEC-0056 / DEC-0057 / DEC-0058
+  (Anthropic-compat, AGPL-fork posture, x402 graduation) via PR #36.
 
 **Goal:** know what each repo is, know how our worker models perform on real tasks, and have the first Maestro/Worker
 loop on record.
@@ -147,6 +156,24 @@ and private benchmarks, (c) the Maestro/Worker pattern works end-to-end on a rea
 **Goal:** a minimal but real Linus orchestration backend + a chat UI, grounded in KnowledgeBase, demo-able to a peer in
 under 5 minutes.
 
+**Status snapshot (2026-05-18):**
+
+- **2a Orchestration backend:** shipped — FastAPI server at `src/linus/server.py` with OpenAI-compatible
+  `/v1/chat/completions` + tool-call routing + model preference fallback (PRs #32 + #40). Outstanding: streaming SSE
+  (v2 N2), Anthropic `/v1/messages` per DEC-0056 (v2 N3), env-loaded config (v2 N4), session store (v2 N5). See
+  [`docs/specs/2026-05-17-linus-implementation-plan-v2.md`](docs/specs/2026-05-17-linus-implementation-plan-v2.md).
+- **2c KnowledgeBase adapter v0:** shipped — read-only adapter at `src/linus/knowledge/adapter.py` (PR #34).
+  Outstanding: SPECTER2 semantic search (v2 N10), dual substrate (deferred to v3), citation synthesis (v2 N9).
+- **2h Memory pillar v0:** shipped — Layer C substrate (SQLite + content hashes + audit log) at `src/linus/memory/`
+  with unit-test coverage (PR #35). Outstanding: dispatch-layer prefix loader + router primitive plumbing + Worker
+  registry (the 2h.5/6/7 split deferred behind D3 hook-taxonomy ADR).
+- **Tool registry + KB tools:** shipped (PR #40). Two real tools registered (`search_papers`, `get_paper`); server
+  routes OpenAI tool_calls through the registry.
+- **Sandbox:** shipped — `SandboxFS` at `src/linus/sandbox/fs.py` (PR #50) — hand-written after Item 3 first-loop
+  calibration showed Workers couldn't pass security gates.
+- **Not yet shipped:** 2b chat UI (v2 N8), 2e citation drill-down (v2 N9), 2f KB dual substrate (deferred to v3),
+  2g knowledge-mining-surface doc, 2i ARC-AGI memory diagnostic (v2 N11), 2j Worker non-conformance.
+
 **2a — Orchestration backend (first implementation) at `src/linus/`:**
 
 - FastAPI app exposing `/v1/chat/completions` with OpenAI ChatCompletions schema
@@ -239,7 +266,6 @@ non-conformant; Phase 2 will not ship with a non-conformant Worker as default.
 - Voice, Canvas, native app (later phases)
 - Fine-tuning (Phase 6)
 - Skills (Phase 7)
-- Memory beyond session history
 
 **Gate to Phase 3:** MVP demo-able end-to-end. Paper-grounded answers measurably better than the same local model
 without Linus's RAG on the Dan task suite.

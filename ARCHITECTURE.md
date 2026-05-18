@@ -104,7 +104,19 @@ harness layer can stay thin and swappable.
 
 ### The Linus orchestration layer (src/linus/)
 
-This is the product. A Python package, built iteratively starting in Phase 2.
+This is the product. A Python package; Phase 2a is largely landed as of 2026-05-18. Current modules:
+
+- `linus.server` — FastAPI app exposing OpenAI-compatible `POST /v1/chat/completions` with tool-call routing and
+  model-preference fallback (PRs #32 + #40).
+- `linus.tools` — in-memory tool registry + `@tool` decorator + KB tool wrappers (`search_papers`, `get_paper`).
+- `linus.knowledge` — read-only `KnowledgeBaseAdapter` over the submodule's metadata SQLite (PR #34).
+- `linus.memory` — SQLite episodic store (DEC-0029), append-only JSONL audit log (DEC-0030/0031), content-hashing
+  helpers (PR #35).
+- `linus.sandbox` — path-validating `SandboxFS` enforcing the SAFETY.md Tier 0/1 contract (PR #50).
+
+Outstanding Phase 2a items tracked in
+[`docs/specs/2026-05-17-linus-implementation-plan-v2.md`](docs/specs/2026-05-17-linus-implementation-plan-v2.md):
+streaming SSE (N2), Anthropic `/v1/messages` per DEC-0056 (N3), env-loaded model config (N4), session store (N5).
 
 **Router.** Receives OpenAI-compatible requests. Selects the appropriate worker model based on request metadata and task
 class. Routes to the chosen inference engine.
@@ -269,7 +281,17 @@ struct, recorded in the audit log (DEC-0031).
 ### OpenAI-compatible endpoint
 
 `POST /v1/chat/completions` with the OpenAI ChatCompletions schema, including `tools` and `tool_choice`. Supports
-streaming via SSE. Supports tool-call extensions for Linus-native tools alongside standard ones.
+streaming via SSE. Supports tool-call extensions for Linus-native tools alongside standard ones. Shipped in Phase 2a
+(PR #32 + #40).
+
+### Anthropic-compatible endpoint (DEC-0056 amends DEC-0005)
+
+`POST /v1/messages` with the Anthropic Messages schema. Shares the underlying Ollama routing, tool registry, sandbox,
+and audit-log machinery with `/v1/chat/completions` — not a parallel pipeline. The translation layer handles
+system-field placement, content-block shape, tool-call format, and the streaming-event catalog (`message_start`,
+`content_block_delta`, `message_delta`, `message_stop`). Three confirming signals from the cloned-repo collection
+(Letta, Kimi-K2, goose) established the dual-protocol norm as the production-stack default. Outstanding for Phase 2a
+per v2 plan item N3.
 
 ### Tool schema
 
