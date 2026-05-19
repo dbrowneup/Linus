@@ -594,6 +594,26 @@ All changes to `main` require a pull request reviewed by Dan before merge. Branc
 Push to origin and use `gh pr create` to open PRs. Maestro (Dan) reviews and merges via GitHub. Never force-push to
 `main`; force-push to your own branch is OK before opening a PR. See BRANCHING.md for detailed workflows and examples.
 
+**Pytest before merge — hard rule.** No PR opens against `main` without a clean local pytest run, and no PR description
+claims green without a `Verification:` line recording what was run. Two suites:
+
+- **Hermetic** — `pytest src/linus/tests/` (~2s, no external deps). Runs on **every** PR, doc-only included. Doc-only
+  PRs still risk breaking imports referenced from docstrings or accidentally moving a code-block path; the cost of
+  running it is negligible.
+- **Integration** — `pytest tests/` (~12s, requires `brew services start ollama` + a pulled qwen3-class model). Runs
+  whenever the PR touches `src/linus/server.py`, `src/linus/agents/`, `src/linus/knowledge/`, `src/linus/memory/`, or
+  `src/linus/sandbox/`. These are the modules whose contracts cross the Ollama boundary; hermetic alone can't catch
+  regressions in the model-call shape.
+
+The rule exists because the 2026-05-19 MVP build merged 15 PRs without running pytest between them and
+`test_chat_completions_happy_path` regressed silently when a too-tight `max_tokens=16` collided with qwen3:8b's default
+thinking mode (fixed in PR #83). A pytest run between merges would have caught it inside one of the contributing PRs
+instead of after the fact.
+
+If a test fails, fix it BEFORE opening the PR — do not open the PR + push fixes inside it just because the branch is
+ready otherwise. The PR description's `Verification:` line must reflect what is true at PR-open time, e.g.
+`Verification: hermetic 102 passed (~2s), integration 4 passed (~12s)`.
+
 **Merge strategy: default is `--merge` (preserve graph), squash only on explicit justification.** Use
 `gh pr merge <N> --merge --delete-branch` or the "Create a merge commit" button in the GitHub UI. Merge commits preserve
 branch divergence + re-convergence in `git log --graph`, keep per-commit authorship and SHAs intact, and make
