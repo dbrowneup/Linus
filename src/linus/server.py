@@ -855,6 +855,30 @@ app = FastAPI(
 )
 
 
+@app.get("/")
+def root() -> dict[str, Any]:
+    """Friendly root endpoint — orients anyone curl-hitting the base URL.
+
+    Returns project identity + a tour of the available endpoints so the
+    server isn't an opaque 404 to a curious operator. The Streamlit UI
+    uses ``/healthz`` (not this) for its liveness probe; this route is
+    purely human-facing.
+    """
+    return {
+        "name": "Linus",
+        "tagline": "A personal AI orchestration backend for Apple Silicon.",
+        "version": app.version,
+        "docs": "/docs",
+        "endpoints": {
+            "health": "GET /healthz",
+            "openai_chat_completions": "POST /v1/chat/completions",
+            "anthropic_messages": "POST /v1/messages",
+            "sessions_create": "POST /v1/sessions",
+            "sessions_messages": "GET /v1/sessions/{session_id}/messages",
+        },
+    }
+
+
 @app.get("/healthz")
 def healthz() -> dict[str, Any]:
     """Lightweight liveness probe. Reports the locally-available model list and

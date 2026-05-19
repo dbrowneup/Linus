@@ -43,19 +43,45 @@ def test_healthz_reports_ollama_and_models(client: TestClient) -> None:
     )
 
 
+def test_root_endpoint_returns_identity_and_endpoint_map(client: TestClient) -> None:
+    """GET / should return project identity + a tour of the available endpoints.
+
+    Regression guard for the 2026-05-19 routing bug: the Streamlit UI's
+    landing page reported "Unreachable" because it was hitting GET / which
+    returned 404. The UI fix targets /healthz; this endpoint exists for
+    anyone curl-hitting the base URL.
+    """
+    resp = client.get("/")
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["name"] == "Linus"
+    assert "endpoints" in body
+    # Sanity-check a few key endpoints are advertised:
+    endpoints = body["endpoints"]
+    assert endpoints["health"] == "GET /healthz"
+    assert "openai_chat_completions" in endpoints
+    assert "anthropic_messages" in endpoints
+
+
 def test_chat_completions_happy_path(client: TestClient) -> None:
     """POST /v1/chat/completions returns a ChatCompletion-shaped response.
 
     Asks the model a tiny prompt to keep latency low. Asserts on the response
     *shape* rather than content — model outputs are non-deterministic but the
     schema is fixed.
+
+    ``max_tokens`` is set generously (256) because qwen3:8b runs in "thinking
+    mode" by default, which silently consumes tokens on internal reasoning
+    before emitting visible content. A tight 16-token budget gets spent on
+    thinking and ``content`` lands empty with ``finish_reason="length"`` —
+    not the integration failure this test exists to surface.
     """
     payload = {
         "model": "qwen3:8b",  # may fall back to qwen2.5-coder:7b on this box
         "messages": [
             {"role": "user", "content": "Reply with exactly the word: ack"},
         ],
-        "max_tokens": 16,
+        "max_tokens": 256,
     }
     resp = client.post("/v1/chat/completions", json=payload)
     assert resp.status_code == 200, resp.text
