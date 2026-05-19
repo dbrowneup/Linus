@@ -9,36 +9,25 @@ atom. Linus is a force that harnesses human knowledge for good in the world.
 
 ## Owner Background
 
-- Daniel R. Browne, 37 (GitHub: dbrowneup, email: dbrowne.up@gmail.com)
-- **Current role**: Senior Scientist at LanzaTech (Skokie, IL), since Apr 2026. Maintains enterprise LLM infrastructure
-  for company-wide AI tools and leads development/validation of bioinformatics software for metagenomics analyses.
-  Promoted from Computational Biologist (Jun 2023–Mar 2026) at the same company, where he led metagenomics SW dev,
-  analyzed genomic/metagenomic datasets for commercial process insights, and trained colleagues on bioinformatics
-  workflows.
-- **Prior industry**: PacBio (Chicago, 2019–2023) — Product Owner for Bioinformatics & Sequencing Platforms (Jul 2021–
-  Jan 2023), translating user needs into product requirements across R&D/Sales/Support; before that Field Applications
-  Scientist for Bioinformatics, supporting 35+ customer accounts on complex long-read pipelines and identifying edge
-  cases.
-- **Education**: PhD Biochemistry, Texas A&M (2018), with a Graduate Certificate in Entrepreneurship; BS Environmental
-  Science with Chemistry minor, University of Portland (2011). Doctoral thesis on systems analysis of metabolism and
-  physiology in the oil-producing green alga _Botryococcus braunii_ (Showa, race B).
-- **Domain specialty**: genomics and computational biology — long-read sequencing (PacBio HiFi), genome/transcriptome
-  assembly, comparative genomics, metagenomics, gene cloning/expression/editing, protein purification and enzyme assays.
-  _B. braunii_ genome assembly and downstream lipid/terpene metabolism analyses are the deepest part of his publication
-  record (11 publications, 15 presentations).
-- **Production stack he already operates in**: Python, Linux, Bash, Git, GitHub, GitHub Actions, SQL, WDL, Docker, AWS,
-  Azure; Agile/Jira; pipeline validation and automated testing.
-- **Entrepreneurship background**: founded Botryonyx LLC (2018–2019), an algae-based wastewater-treatment + carbon-
-  capture venture; raised $42K in seed funding, tested a prototype, competed at Rice Business Plan and was an SEC Pitch
-  semi-finalist for Texas A&M; 2nd place at the Aggie Pitch Competition ($12K). Scientific Advisor at CaribAlgae in
-  Curaçao (2018–2022). The speed-and-evidence instinct in this repo's Algorithm/blitzscaling framings is lived
-  experience, not borrowed mindset.
-- **13 years of Python in scientific computing**; self-taught CS, comfortable with trial-and-error debugging.
-- **Currently learning**: Rust, nodejs/npm, agentic systems, LLM inference/fine-tuning. Calibrate explanations
-  accordingly — deep biology/Python/Linux fluency, newer to systems-language idioms and modern JS tooling.
-- **Hardware**: MacBook Pro 2021, Apple M1 Max, 32 GB unified memory, 10 CPU / 24 GPU / 16 ANE cores.
-- **Storage**: 400 GB available internal SSD; 1 TB external flash SSD with ~600 GB available, attached as needed.
-- **Location**: Hawthorn Woods, Illinois (greater Chicago area).
+- Daniel R. Browne, 37 (GitHub: dbrowneup, email: dbrowne.up@gmail.com). Hawthorn Woods, IL.
+- **Current role**: Senior Scientist at LanzaTech (Skokie, IL) since Apr 2026 — maintains enterprise LLM infra +
+  leads metagenomics bioinformatics SW. Promoted from Computational Biologist (Jun 2023). Prior: PacBio
+  (2019–2023, Product Owner Bioinformatics + Field Applications Scientist).
+- **Education**: PhD Biochemistry, Texas A&M (2018, + Entrepreneurship cert). Thesis on _Botryococcus braunii_
+  metabolism. BS Environmental Science + Chemistry minor, U. Portland (2011).
+- **Domain specialty**: genomics + computational biology — long-read sequencing (PacBio HiFi), genome/transcriptome
+  assembly, metagenomics, gene cloning/expression, protein purification. _B. braunii_ genome assembly + downstream
+  lipid/terpene metabolism is the deepest publication-record thread (11 pubs, 15 presentations).
+- **Stack he operates in**: Python (13yrs scientific computing), Linux, Bash, Git, GitHub Actions, SQL, WDL,
+  Docker, AWS, Azure; Agile/Jira; pipeline validation + automated testing. Self-taught CS, trial-and-error debug
+  fluency.
+- **Entrepreneurship**: founded Botryonyx LLC (2018–2019, algae wastewater + carbon capture, $42K seed, Rice BP
+  + SEC Pitch semi-finalist, 2nd at Aggie Pitch $12K); Sci Advisor CaribAlgae Curaçao (2018–2022). The
+  speed/evidence instinct in this repo's Algorithm/blitzscaling framings is lived experience.
+- **Currently learning**: Rust, nodejs/npm, agentic systems, LLM inference/fine-tuning. Calibrate accordingly —
+  deep biology/Python/Linux, newer to systems-language idioms + modern JS tooling.
+- **Hardware**: MacBook Pro 2021, Apple M1 Max, 32 GB unified memory (10 CPU / 24 GPU / 16 ANE cores). 400 GB
+  internal SSD; 1 TB external flash, ~600 GB free.
 
 ## North Star
 
@@ -80,8 +69,9 @@ Ship rough, learn, iterate.
 
 - **Maestro** = Dan + hosted Claude (this chat, Claude Code, Claude.ai). Architecture, planning, spec writing, hard
   debugging, taste-level decisions.
-- **Worker** = local models (Qwen3 — best available for 32 GB M1 Max hardware; future fine-tuned Linus). Bulk
-  implementation, test generation, refactors, pipeline execution.
+- **Worker** = local models. Current practical Worker on 32 GB M1 Max is `qwen3:8b` (FP16) — empirically validated
+  2026-05-18 against `qwen3.6:27b` which swap-thrashed at the 600s timeout on all Dan tasks. Bulk implementation,
+  test generation, refactors, pipeline execution.
 - Maestro attention is the scarce resource. Push any well-specified task to Workers.
 
 ### Evidence beats intuition
@@ -120,205 +110,54 @@ working.
 
 ```
 Linus/
-├── CLAUDE.md                                     # This file — read first in every session
-├── VISION.md                                     # The north star; project philosophy
-├── ARCHITECTURE.md                               # System design, layer boundaries, component diagram
-├── ROADMAP.md                                    # Phased plan with targets
-├── SAFETY.md                                     # Sandbox policy, autonomy tiers, forbidden ops
-├── DECISIONS.md                                  # Pointer + index for the per-file ADRs in docs/adr/
-├── GLOSSARY.md                                   # Terms, component names, Linus-specific vocabulary
-├── README.md                                     # Entry point for humans
-├── environment.yml                               # conda env spec for `linus`
-├── pyproject.toml                                # Python package config for src/linus/
-├── .gitignore
-├── .gitmodules                                   # KnowledgeBase submodule pinning
-├── src/                                          # Linus source code — the product
-│   └── linus/                                    # Python package
-├── modules/                                      # Tracked live dependencies (submodules)
-│   └── KnowledgeBase/                            # Dan's paper corpus + RAG + knowledge graph
-├── repos/                                        # Reference clones (gitignored); read-only study material
-├── context/                                      # Dan's personal context (gitignored: papers, threads, notes, pics)
-│   ├── papers/
-│   ├── books/
-│   ├── threads/
-│   ├── notes/
-│   └── pics/
-├── benchmarks/                                   # Evaluation harnesses, Dan task suite, results
-│   ├── dan_tasks/                                # Private benchmark suite (Dan-authored)
-│   └── results/                                  # Dated JSON result files
-├── experiments/                                  # Throwaway scripts, ablations, quick tests
-└── docs/                                                                 # Long-form writing, synthesis notes
-    ├── README.md                                                         # Tour of the docs tree
-    ├── curation-log.md                                                   # Per-DEC-0025 archive/removal record
-    ├── repo-notes/                                                       # 117 per-repo write-ups + INDEX.md
-    ├── paper-notes/                                                      # 118 per-paper write-ups + INDEX.md
-    ├── adr/                                                              # Per-file ADRs (NNNN-<slug>.md matching DEC-NNNN ids)
-    │   ├── README.md                                                     # ADR index and authoring conventions
-    │   ├── 0001-project-name-and-namesake.md                             # Pauling/Torvalds + carbon-atom rationale
-    │   ├── 0002-orchestration-backend-as-core-product.md                 # Linus is the orchestration layer, not a harness
-    │   ├── 0003-knowledgebase-submodule.md                               # KnowledgeBase tracked as a git submodule, not vendored
-    │   ├── 0004-mambaforge-conda-env.md                                  # mambaforge + conda env named `linus`
-    │   ├── 0005-openai-compatible-protocol.md                            # Linus speaks OpenAI HTTP for harness portability
-    │   ├── 0006-pmetal-phase1-evaluation.md                              # Phase 1 pmetal smoke-test gate
-    │   ├── 0007-claude-code-terminal-maestro.md                          # Claude Code in terminal is the Maestro harness
-    │   ├── 0008-openclaw-frontend-native-app.md                          # openclaw as Phase 5+ native front-end target
-    │   ├── 0009-lm-studio-discovery-only.md                              # LM Studio is discovery-only; not a Linus front-end
-    │   ├── 0010-engineering-conventions-from-kb.md                       # Inherit KB conventions (smoke-test, quirks, etc.)
-    │   ├── 0011-lightweight-branching-then-gitflow.md                    # Lightweight branches now; GitFlow later
-    │   ├── 0012-pmetal-primary-inference-candidate.md                    # pmetal is the primary Phase 1 inference candidate
-    │   ├── 0013-bitnet-2b4t-spike.md                                     # BitNet 2B4T spike scoping
-    │   ├── 0014-phase6-finetuning-lane-deferred.md                       # Fine-tuning lane defers to Phase 6
-    │   ├── 0015-kb-dual-graph-substrates.md                              # KB carries dual graph substrates
-    │   ├── 0016-kb-spec-split-convention.md                              # KB-spec lives in docs/specs/kb/
-    │   ├── 0017-harness-plurality-roles.md                               # Multiple harnesses coexist; each has a role
-    │   ├── 0018-mcp-extensibility-substrate.md                           # MCP is the tool-extensibility substrate
-    │   ├── 0019-kb-ingest-quality-surface.md                             # KB ingest exposes a quality-gate surface
-    │   ├── 0020-orchestration-scope-bounded.md                           # Orchestration scope is bounded; harnesses stay separate
-    │   ├── 0021-phase5c-claw-code-local.md                               # claw-code-local lands in Phase 5c
-    │   ├── 0022-parallel-worker-write-coordination.md                    # How parallel Workers coordinate writes
-    │   ├── 0023-output-interface-citations-llm-wiki.md                   # Output interface includes citations + LLM Wiki
-    │   ├── 0024-security-posture-supply-chain.md                         # Supply-chain posture; uv envs for experimental pkgs
-    │   ├── 0025-curation-protocol.md                                     # Quarterly curation review protocol
-    │   ├── 0026-planning-write-back-cadence.md                           # Each planning session ends with core-doc write-back
-    │   ├── 0027-linus-practice-stance-batch.md                           # Public APIs only, OS page cache, multi-language stance
-    │   ├── 0028-memory-architecture-phase2-pillar.md                     # Memory is a Phase 2 architectural pillar
-    │   ├── 0029-episodic-memory-substrate.md                             # Episodic memory substrate (Layer C) choice
-    │   ├── 0030-scratchpad-first-class-artifact.md                       # Reasoning scratchpad is durable, addressable
-    │   ├── 0031-router-primitives-cot-budget-memory-mode.md              # Router primitives: cot_budget + memory_mode
-    │   ├── 0032-in-context-window-cap-policy.md                          # 16K default in-context cap with audit-logged bypass
-    │   ├── 0033-cot-gap-fingerprint-registry-property.md                 # CoT-gap fingerprint as registry property
-    │   ├── 0034-worker-size-vs-cot-length-comparison.md                  # Worker-size vs CoT-length comparison framework
-    │   ├── 0035-arc-agi-as-memory-diagnostic.md                          # ARC-AGI as a memory-architecture diagnostic
-    │   ├── 0036-kv-cache-continuity-architectural-constraint.md          # KV-cache continuity as architectural constraint
-    │   ├── 0037-ttt-apple-silicon-viability-spike.md                     # Test-time training Apple Silicon viability spike
-    │   ├── 0038-mingru-mlx-port-spike.md                                 # minGRU MLX-port spike
-    │   ├── 0039-episodic-schema-hybrid-leaf-summary.md                   # Hybrid leaf+summary episodic schema
-    │   ├── 0040-faithfulness-audit-deferred.md                           # CoT faithfulness audit deferred
-    │   ├── 0041-mingru-bitnet-phase8-research-direction.md               # minGRU + BitNet as Phase 8 research direction
-    │   ├── 0042-coconut-phase6-substrate-experiment.md                   # COCONUT as Phase 6 substrate experiment
-    │   ├── 0043-memory-mode-finetuning-targets-phase6.md                 # Memory-mode-specific fine-tuning targets in Phase 6
-    │   ├── 0044-paper-qa-kb-retrieval-engine.md                          # paper-qa as KB retrieval engine
-    │   ├── 0045-fastmcp-mcp-framework-default.md                         # fastmcp is the default MCP framework
-    │   ├── 0046-external-api-tool-registry-deployment-field.md           # Tool registry tags external-API deployment
-    │   ├── 0047-biosecurity-tier-control-generative-biology.md           # Biosecurity tiers gate generative biology
-    │   ├── 0048-kb-model-prediction-edge-class.md                        # Model-prediction edges are a first-class KB edge class
-    │   ├── 0049-pmetal-vs-prismml-fork-deferred-phase1b.md               # pmetal vs PrismML fork decision deferred to Phase 1b
-    │   ├── 0050-role-first-class-type-agent-spawner.md                   # Role is a first-class type in the agent spawner
-    │   ├── 0051-agent-report-typed-inter-agent-message.md                # AgentReport is the typed inter-agent message
-    │   ├── 0052-investigation-memory-layer-d.md                          # Investigation memory is Layer D in the memory model
-    │   ├── 0053-kb-hosted-maestro-flow-policy.md                         # Policy for KB content flowing to hosted Maestro
-    │   └── 0054-activation-hooks-api-stub.md                             # Activation-hooks API stub for Phase 2+
-    ├── audits/                                                           # Per-synthesis citation-traceability audits
-    │   └── citation-traceability-2026-05-05/                             # 2026-05-05 audit batch (one .md per thematic synthesis)
-    │       ├── agentic-systems-audit.md                                  # Audit for agentic-systems-synthesis.md
-    │       ├── biological-foundation-models-audit.md                     # Audit for biological-foundation-models-synthesis.md
-    │       ├── entrepreneurship-audit.md                                 # Audit for entrepreneurship-synthesis.md
-    │       ├── function-annotation-discovery-audit.md                    # Audit for function-annotation-discovery-synthesis.md
-    │       ├── generative-biology-audit.md                               # Audit for generative-biology-synthesis.md
-    │       ├── humans-teams-performance-audit.md                         # Audit for humans-teams-performance-synthesis.md
-    │       ├── infra-foundations-audit.md                                # Audit for infra-foundations-synthesis.md
-    │       ├── llm-wiki-audit.md                                         # Audit for llm-wiki-synthesis.md
-    │       ├── llms-in-science-audit.md                                  # Audit for llms-in-science-synthesis.md
-    │       ├── memory-audit.md                                           # Audit for memory-synthesis.md
-    │       ├── native-low-bit-apple-silicon-audit.md                     # Audit for native-low-bit-apple-silicon-synthesis.md
-    │       ├── safety-alignment-privacy-audit.md                         # Audit for safety-alignment-privacy-synthesis.md
-    │       ├── security-audit.md                                         # Audit for security-synthesis.md
-    │       └── skills-and-practices-audit.md                             # Audit for skills-and-practices-synthesis.md
-    ├── cybersecurity-notes/                                              # Government/standards primers (genomics/biotech focus)
-    │   ├── index.md                                                      # Tour of the cybersecurity-notes folder
-    │   ├── 01-NIST-Framework-v1.1.md                                     # NIST Cybersecurity Framework v1.1 summary
-    │   ├── 02-NIST-SP-800-207-ZeroTrust.md                               # NIST SP 800-207 zero-trust architecture
-    │   ├── 03-NIST-SP-800-171r2-CUI.md                                   # NIST SP 800-171r2 controlled unclassified info
-    │   ├── 04-NCSC-China-Genomics.md                                     # NCSC advisory on China + genomics data
-    │   ├── 05-HHS-Cyberthreats-Biotech.md                                # HHS cyberthreats to the biotech sector
-    │   ├── 06-Foley-Biotech-IP-Confidentiality.md                        # Foley brief on biotech IP confidentiality
-    │   └── 07-NCCoE-Genomics-Workshop.md                                 # NCCoE genomics-cybersecurity workshop notes
-    ├── landscapes/                                                       # Repo/paper/synthesis landscape rollups
-    │   ├── total-landscape.md                                            # Cross-corpus rollup (active)
-    │   ├── synthesis-landscape.md                                        # Synthesis-doc rollup (active)
-    │   ├── paper-landscape.md                                            # Deprecated stub; see paper-notes/INDEX.md
-    │   └── repo-landscape.md                                             # Deprecated stub; see repo-notes/INDEX.md
-    ├── protocols/                                                        # Operational protocols
-    │   ├── maestro-protocol.md                                           # Maestro role, behavioral disciplines L1-L7, work-split rubric
-    │   ├── maestro-worker-protocol.md                                    # Maestro/Worker hand-off protocol (spec → invoke → review)
-    │   └── curation-protocol.md                                          # Quarterly curation review protocol (DEC-0025)
-    ├── questions/                                                        # Question lifecycle: top → open → answered
-    │   ├── top-questions.md                                              # Current working set (R1, R2-NN promotions)
-    │   ├── open-questions.md                                             # Per-source mirror of open per-note questions
-    │   └── answered-questions.md                                         # Resolution archive with DEC links + uncovered audit
-    ├── session-summaries/                                                # Date-prefixed Maestro session recaps
-    │   ├── 2026-05-03-memory-pillar-session-summary.md                   # Memory pillar resolution session
-    │   ├── 2026-05-03-paper-notes-session-summary.md                     # Paper-notes generation session
-    │   ├── 2026-05-03-top-questions-resolution-session-summary.md        # Top-questions Round 1 resolution
-    │   ├── 2026-05-04-fan-out-session-summary.md                         # Section 7 fan-out session
-    │   ├── 2026-05-05-landscape-rollup-session-summary.md                # Landscape rollup session
-    │   ├── 2026-05-05-planning-update-session-summary.md                 # Planning-update spec authoring session
-    │   ├── 2026-05-07-planning-update-execution-session-summary.md       # Planning-update Worker fan-out + L1-L7 lessons
-    │   ├── 2026-05-08-notes-consistency-sweep-session-summary.md         # Notes-consistency sweep session
-    │   └── 2026-05-08-synthesis-refinement-session-summary.md            # Synthesis refinement session
-    ├── specs/                                                            # Implementation specs (living docs)
-    │   ├── kb/                                                           # KnowledgeBase-specific specs
-    │   │   ├── canaries.yaml                                             # KB canary test set (machine-readable)
-    │   │   ├── canary-blocklist.md                                       # KB canary blocklist (curated)
-    │   │   ├── model-prediction-edges.md                                 # Model-prediction edge-class spec (DEC-0048)
-    │   │   └── paper-qa-substrate-integration.md                         # paper-qa integration spec (DEC-0044)
-    │   ├── 2026-05-09-context-foldin-fanout.md                           # Context fold-in fan-out spec (PR 30 source)
-    │   ├── 2026-05-10-pr30-cleanup-spec.md                               # PR 30 cleanup tier spec (this Tier 5 pass)
-    │   ├── biology-phase7-roadmap.md                                     # Phase 7 biology-skills roadmap
-    │   ├── memory-architecture.md                                        # 5-layer memory pillar implementation contract (DEC-0028+)
-    │   ├── notes-consistency-fanout.md                                   # Notes-consistency sweep fan-out spec
-    │   ├── phase1c-spike.md                                              # Phase 1c Worker-selection spike spec
-    │   ├── phase3-spawner.md                                             # Phase 3 agent-spawner design-intent stub (DEC-0050)
-    │   ├── phase6d-streaming-target.md                                   # Phase 6d weight-streaming target spec
-    │   ├── planning-update-spec.md                                       # Most-recent planning-update task router (rewritten per session)
-    │   ├── qimeng-category-promotion.md                                  # QiMeng family category promotion spec
-    │   ├── question-lifecycle.md                                         # Question lifecycle protocol spec
-    │   ├── synthesis-cleanup-spec.md                                     # Synthesis open-questions cleanup spec (Policy B)
-    │   └── synthesis-refinement-spec.md                                  # Synthesis refinement spec
-    └── syntheses/                                                        # 15 thematic + 12 cluster syntheses
-        ├── repo-clusters/                                                # 12 repo-cluster syntheses (g1-g12)
-        │   ├── g1-apple-silicon.md                                       # Apple Silicon inference + training
-        │   ├── g2-wiki-engines.md                                        # LLM Wiki engine implementations
-        │   ├── g3-wiki-patterns.md                                       # LLM Wiki agent-driven build patterns
-        │   ├── g4-memory.md                                              # Agent persistent memory
-        │   ├── g5-graph-tools.md                                         # Knowledge-graph + network-analysis tooling
-        │   ├── g6-mcp-tools.md                                           # MCP servers + code/document context tools
-        │   ├── g7-harnesses.md                                           # Agent harnesses, orchestration, model routing
-        │   ├── g8-sci-agents.md                                          # Scientific reasoning agents (FutureHouse stack + adjacents)
-        │   ├── g9-bio.md                                                 # Bioinformatics + domain-specific science models
-        │   ├── g10-finance.md                                            # Finance / quant agents
-        │   ├── g11-agent-frameworks.md                                   # General-purpose agent frameworks
-        │   └── g12-llm-hardware-design.md                                # LLM-driven hardware design (Kimi-K2 + QiMeng family)
-        ├── agentic-systems-synthesis.md                                  # Agentic-systems thematic synthesis
-        ├── biological-foundation-models-synthesis.md                     # Biological foundation models thematic synthesis
-        ├── entrepreneurship-synthesis.md                                 # Entrepreneurship thematic synthesis (E1-E12)
-        ├── function-annotation-discovery-synthesis.md                    # Function annotation + discovery synthesis
-        ├── generative-biology-synthesis.md                               # Generative biology thematic synthesis
-        ├── humans-teams-performance-synthesis.md                         # Humans, teams, performance synthesis
-        ├── infra-foundations-synthesis.md                                # Infrastructure foundations synthesis
-        ├── llm-hardware-design-synthesis.md                              # LLM-driven hardware design synthesis (idea→reality spine)
-        ├── llm-wiki-synthesis.md                                         # LLM Wiki thematic synthesis
-        ├── llms-in-science-synthesis.md                                  # LLMs in science thematic synthesis
-        ├── memory-synthesis.md                                           # Memory thematic synthesis
-        ├── native-low-bit-apple-silicon-synthesis.md                     # Native low-bit Apple Silicon synthesis
-        ├── safety-alignment-privacy-synthesis.md                         # Safety, alignment, privacy synthesis
-        ├── security-synthesis.md                                         # Security thematic synthesis
-        └── skills-and-practices-synthesis.md                             # Skills + practices thematic synthesis
+├── CLAUDE.md · VISION.md · ARCHITECTURE.md · ROADMAP.md · SAFETY.md · DECISIONS.md · GLOSSARY.md · README.md
+├── BRANCHING.md · environment.yml · pyproject.toml · .gitignore · .gitmodules
+├── src/linus/                    # Linus source — the product (Python package)
+├── modules/KnowledgeBase/        # Tracked submodule — Dan's paper corpus + RAG + KG
+├── repos/                        # 138 reference clones (gitignored, read-only study material)
+├── context/                      # Dan's personal context (gitignored: papers/, books/, threads/, notes/, pics/)
+├── benchmarks/                   # dan_tasks/ + results/ (dated JSON)
+├── experiments/                  # Throwaway scripts, ablations, quick tests
+└── docs/
+    ├── README.md                 # Tour of the docs tree
+    ├── curation-log.md           # DEC-0025 archive/removal record
+    ├── security-log.md           # Routine pip-audit + incident log per SAFETY.md
+    ├── repo-notes/               # Per-repo write-ups + INDEX.md (doc-type convention below)
+    ├── paper-notes/              # Per-paper write-ups + INDEX.md
+    ├── adr/                      # Per-file ADRs NNNN-<slug>.md matching DEC-NNNN; README.md = index
+    ├── audits/                   # Dated audit batches (citation-traceability, repo-pull, etc.)
+    ├── cybersecurity-notes/      # Government/standards primers (genomics/biotech focus)
+    ├── landscapes/               # Cross-corpus rollups (total-, synthesis- active; paper-/repo- deprecated)
+    ├── protocols/                # maestro-, maestro-worker-, curation-protocol.md
+    ├── questions/                # top- → open- → answered-questions.md (lifecycle in docs/specs/question-lifecycle.md)
+    ├── session-summaries/        # Date-prefixed Maestro session recaps
+    ├── specs/                    # Living implementation specs (memory-architecture.md, phase1c-spike.md, etc.)
+    │   └── kb/                   # KB-specific specs
+    └── syntheses/                # 15 thematic + 12 cluster (g1–g12) syntheses
+        └── repo-clusters/        # g1-apple-silicon … g12-llm-hardware-design
 ```
+
+Per-file ADR index lives at `docs/adr/README.md`; full DEC list at `DECISIONS.md`. Per-document conventions for
+repo-notes / paper-notes / audits / session-summaries live in §Doc-type conventions below.
 
 ## Phased Plan
 
-See [ROADMAP.md](ROADMAP.md) for full detail. Current phase markers:
+See [ROADMAP.md](ROADMAP.md) for full detail; v2 implementation plan at
+`docs/specs/2026-05-17-linus-implementation-plan-v2.md`.
 
 - **Phase 0 — Foundation** _(closed)_: scaffolding, docs, env
-- **Phase 1 — Recon & Baselines** _(in progress)_: synthesis notes, benchmarks, pmetal eval, first loop
-- **Phase 2 — Linus MVP**: orchestration backend, chat UI, KnowledgeBase v1
-- **Phase 3 — Knowledge & Parallel Agents**: deeper KB integration, agent fan-out
+- **Phase 1 — Recon & Baselines** _(mostly done)_: synthesis notes ✅, Dan task suite v0 ✅, first
+  Maestro/Worker loop ✅; pmetal v0.5.0 verdict (1b) and memory-pillar spike (1c) + minGRU MLX port (1f) still
+  open as Dan-driven items
+- **Phase 2 — Linus MVP** _(in flight)_: FastAPI orchestration backend ✅, KB read-only adapter ✅, tool registry
+  + KB tools ✅, memory v0 + sandbox ✅; remaining: streaming SSE, Anthropic `/v1/messages` (DEC-0056), session
+  store, Streamlit chat UI, semantic search, citation synthesis
+- **Phase 3 — Knowledge & Parallel Agents**: deeper KB integration, agent fan-out (workspace.py per R3-07)
 - **Phase 4 — Data Sovereignty**: Kiwix, ProtoMaps/OSM, versioned datasets
-- **Phase 5 — Interface Refinement**: openclaw as front-end, VS Code polish
-- **Phase 6 — Fine-Tuning**: LoRA on domain corpus, flash-streaming inference
-- **Phase 7 — Skills & Autonomy Graduation**: domain tools, widening sandbox
-- **Phase 8 — Beyond MacBook**: mobile, Mac Studio, native app, Vision Pro
+- **Phase 5 — Interface Refinement**: openclaw as front-end, VS Code polish, claw-code-local (Phase 5c)
+- **Phase 6 — Fine-Tuning**: LoRA on domain corpus, flash-streaming inference, DSPy track
+- **Phase 7 — Skills & Autonomy Graduation**: domain tools (biology Phase 7 roadmap), widening sandbox
+- **Phase 8 — Beyond MacBook**: mobile, Mac Studio, native app, Vision Pro; minGRU+BitNet research direction
 
 ## Architecture Summary (see ARCHITECTURE.md for detail)
 
@@ -363,49 +202,15 @@ TODOs. Makes long sessions resumable if interrupted.
 
 ### Hooks
 
-`.claude/settings.json` runs a `PostToolUse` hook on `Edit|Write`. Each sub-command guards on the file extension so
-unrelated edits skip cleanly. Python edits are formatted by `ruff format` at line length 120, import-sorted by
-`ruff check --select I --fix`, then linted by `ruff check`. Markdown edits are formatted by `prettier --write`; the
-prettier config at `.prettierrc.json` overrides `printWidth: 120` and `proseWrap: always` for `*.md` files, so markdown
-prose is actively re-wrapped to 120 columns (matching the Python convention) rather than preserving original line
-breaks. `.prettierignore` keeps `repos/`, `modules/`, `context/`, and lockfiles out of prettier's reach as
-defense-in-depth.
+`.claude/settings.json` runs a `PostToolUse` hook on `Edit|Write` that extension-guards each step. Python files:
+`ruff format --line-length 120` → `ruff check --select I --fix` (import sort) → `ruff check` (lint). Markdown files:
+`prettier --write` using `.prettierrc.json`'s `*.md` override (`printWidth: 120`, `proseWrap: always`) so prose is
+actively re-wrapped to 120 columns. `.prettierignore` keeps `repos/`, `modules/`, `context/`, and lockfiles out of
+prettier's reach. The actual hook JSON lives in `.claude/settings.json`.
 
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff format --line-length 120 \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
-          },
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check --select I --fix \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
-          },
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then ruff check \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
-          },
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.md ]]; then prettier --write \"$CLAUDE_FILE_PATH\" 2>&1 || true; fi"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-`mdlint` (the Markdown linter — pip-installed alongside prettier in the linus env) is **deliberately not in the hook
-chain.** mdlint 0.3.15's `check` subcommand silently auto-fixes some rules (notably MD004 list marker style) even
-without `--fix`, which can corrupt prose containing characters that look like list markers — e.g. `+` in the middle of a
-sentence about feature flags gets rewritten to `-`. Run mdlint manually with confirmation when you want lint feedback;
-do not put it in the auto-format chain. See Known Library Quirks below.
+`mdlint` is **deliberately not in the hook chain** — 0.3.15's `check` subcommand silently auto-fixes some rules (notably
+MD004) even without `--fix`, corrupting prose with characters that look like list markers (a `+` in "ANE + MLX + serve"
+gets rewritten to `-`). Run `mdlint check <file>` manually + inspect the diff if you want lint feedback.
 
 ### Commit discipline
 
@@ -417,22 +222,18 @@ registry"). Scope tags welcome (`[orch]`, `[kb]`, `[infer]`, `[docs]`).
 Multi-file audit, multi-repo synthesis, multi-paper analysis, benchmark sweeps — all fan out to parallel Task agents or
 multiple Worker processes. Sequential is the exception, not the default.
 
-### MCP as tool substrate (resolved 2026-05-04)
+### MCP as tool substrate
 
-After the Section 7 fan-out, MCP-as-Linus-tool-substrate is no longer an open question — only the policy details (which
-tools, what permissions, which transport) remain. Six independent repos in the cloned collection ship MCP servers
-(pmetal-mcp, openclaw, py3plex*mcp, agentmemory's 51-tool MCP, keppi, plus fastmcp as the underlying framework). The G6
-synthesis (`docs/syntheses/repo-clusters/g6-mcp-tools.md`) canonicalizes the verdict: in-house Linus MCP servers build
-\_on* fastmcp's decorator API + middleware pipeline, not parallel to it. The MCP adoption ADR should be written at Phase
-2a planning time rather than deferred to Phase 3.
+In-house Linus MCP servers build on **fastmcp** (DEC-0045) — decorator API + middleware pipeline, not parallel to it.
+Open policy details: which tools, what permissions, transport (R2-06 stdio vs streamable-http). See
+`docs/syntheses/repo-clusters/g6-mcp-tools.md` for the cluster-level verdict.
 
-### Workgraph JSONL as the Phase 2a session-store shape (recommended)
+### Workgraph JSONL session-store shape (Phase 2a recommendation)
 
-The G7 synthesis (`docs/syntheses/repo-clusters/g7-harnesses.md`) identifies workgraph's `.workgraph/graph.jsonl`
-append-only DAG plus `handler_for_model.rs` dispatch as the most directly liftable orchestration runtime in the entire
-cloned-repo collection — recommended as the Phase 2a session-store and audit-log format before any other format is
-committed to. The Rust crate doesn't need to be vendored; the JSONL shape and dispatch pattern can be ported to Python.
-Caveat: workgraph's tree-kill is Linux `/proc`-only; macOS port needs a `psutil`-based equivalent.
+Workgraph's `.workgraph/graph.jsonl` append-only DAG + `handler_for_model.rs` dispatch is the most directly liftable
+orchestration runtime in the cloned-repo collection (G7 synthesis). Recommended as Phase 2a session-store + audit-log
+format before any other format is committed to. Port the JSONL shape + dispatch pattern to Python; do not vendor the
+Rust crate. Caveat: workgraph's tree-kill is Linux `/proc`-only; macOS port needs `psutil`.
 
 ### Maestro budget discipline
 
@@ -521,34 +322,28 @@ Check the target files and branch state first; re-running a completed task waste
 
 ### State verification across context boundaries
 
-When state was established in a prior context — a different session, a context-window compaction summary, or even
-Maestro's own claims from earlier in the same session — verify the state before building further work on it. The
-canonical failure mode (PR #12, 2026-05-06): a compaction summary stated "committed and pushed on branch X." The
-post-compaction continuation acted on this without verification; the commit was actually on branch Y. An empty PR was
-opened and merged before anyone checked, and the actual content nearly went into the reflog-only state.
+When state was established in a prior context — different session, compaction summary, or Maestro's own earlier claims
+in the same session — verify before building on it. Canonical failure mode (PR #12, 2026-05-06): a compaction summary
+stated "committed and pushed on branch X," the continuation acted on it, the commit was actually on branch Y; an empty
+PR almost lost work to the reflog. Two applications:
 
-The rule has two specific applications worth calling out:
-
-- **Branch state verification before "ready to merge" claims.** Before any end-of-session report that a PR is ready or
-  that a branch contains a commit, run `git log <branch>..main --stat` and `git log main..<branch> --stat`. If those two
-  commands don't show the expected diff, the claim is false.
-- **Compaction-summary humility.** Treat any synthesized session summary as a hypothesis about prior state, not a ground
-  truth. Verify any "X was committed / pushed / merged / written" claim against the actual artefact before proceeding.
+- **Branch state before "ready to merge" claims.** Run `git log <branch>..main --stat` and `git log main..<branch>
+  --stat` before any end-of-session report. If the diffs don't match expectation, the claim is false.
+- **Compaction-summary humility.** Treat synthesized summaries as hypothesis, not ground truth. Verify "X was committed
+  / pushed / merged / written" claims against the actual artefact.
 
 ### Cherry-pick to preserve, never reset to delete
 
-Before any `git reset --hard` past a commit, run `git branch --contains <sha>` to confirm the commit exists elsewhere.
-If it does not, the reset will leave the commit reachable only via reflog (recoverable for ~90 days, durable for zero).
-The safe pattern is cherry-pick first to a known-good branch, then reset; never the reverse. Canonical failure mode: the
-Task A redo (2026-05-06), where a "cleanup" reset destroyed the only copy of the cherry-pickable commit. The reflog
-rescue worked but the discipline rule is cheaper.
+Before any `git reset --hard` past a commit, run `git branch --contains <sha>` to confirm it exists elsewhere. If not,
+reset leaves the commit reachable only via reflog (~90 days, durable for zero). Safe pattern: cherry-pick first to a
+known-good branch, then reset. Canonical failure mode: Task A redo (2026-05-06) where a cleanup reset destroyed the
+only copy of a cherry-pickable commit; reflog rescue worked but the discipline rule is cheaper.
 
-Cherry-pick recovery is also the load-bearing discipline when shared-checkout parallel agents collide — validated
-3-for-3 across the 2026-05-16 wave-2 fanout (A3 recovered to `agent/phase2c-kb-adapter-final`, C1 recovered to
-`agent/r4-adrs-take2`, B1 recovered mid-stream). When an agent reports "my commits landed on the wrong branch,"
-the recovery flow is: identify the agent's commits by scope tag (`[orch]`, `[memory]`, `[kb]`, `[bench]`,
-`[docs]`, `[adr]`), `git checkout -b <agent-rescue-branch> origin/main`, `git cherry-pick <sha>...`, push, open
-PR. Never `git reset --hard` the contaminated branch; let it linger as audit trail until the rescue PR merges.
+Cherry-pick recovery is also the load-bearing discipline when shared-checkout parallel agents collide (validated 3-for-3
+in 2026-05-16 wave-2 fanout). When an agent reports "my commits landed on the wrong branch": identify the agent's
+commits by scope tag (`[orch]`, `[memory]`, `[kb]`, `[bench]`, `[docs]`, `[adr]`), `git checkout -b <rescue-branch>
+origin/main`, `git cherry-pick <sha>...`, push, open PR. Never `git reset --hard` the contaminated branch; let it
+linger as audit trail until the rescue PR merges.
 
 ### PR summary discipline
 
@@ -592,59 +387,47 @@ Worktrees enable genuine parallel agent work but carry non-obvious failure modes
 `isolation: "worktree"` agent dispatch or manual `git worktree add` fan-out.
 
 **HARD RULE: parallel Maestro-dispatched agents MUST run in isolated worktrees.** When dispatching N>1 agents
-concurrently from Maestro, every agent gets its own physical checkout (`isolation: "worktree"` parameter on the
-Agent tool, or manual `git worktree add` for each). Shared-checkout parallel agents COLLIDE on the single
-`.git/HEAD` pointer: branch switches revert mid-command, commits land on sibling agents' branches, and recovery
-requires the cherry-pick discipline below. The 2026-05-16 wave-2 fanout validated this empirically: 7 agents on
-shared checkout produced 1 outright failure (B2) and 2 recoveries-via-cherry-pick (A3, C1) with multiple
-`-v2`/`-clean`/`-final`/`-take2` branch-proliferation artifacts; subsequent 9 agents in isolated worktrees
-landed clean (zero collisions). The CLAUDE.md §"When not to use worktrees" exception below applies only to
-SEQUENTIAL agent dispatch with file-level partitioning, NOT to parallel dispatch.
+concurrently, every agent gets its own physical checkout (`isolation: "worktree"` on the Agent tool, or manual
+`git worktree add`). Shared-checkout parallel agents collide on `.git/HEAD`: branch switches revert mid-command, commits
+land on sibling branches, recovery requires cherry-pick. Validated 2026-05-16: 7 shared-checkout agents → 1 outright
+failure + 2 cherry-pick recoveries + branch-proliferation artifacts; subsequent 9 in isolated worktrees → zero
+collisions. The §"When not to use worktrees" exception below applies only to SEQUENTIAL dispatch.
 
-**Default to the main checkout.** Worktrees should be the exception, not the default. Most Claude Code sessions —
-strategic analysis, artifact production, single-file refactors, reading the corpus, writing specs for handoff — do not
-need worktree isolation and are actively harmed by it (path-resolution surprises, invisible-filesystem artifacts,
-cleanup overhead). Create a worktree only when one of the genuinely-needed conditions holds: parallel agent fan-out
-where each agent's commits must remain branch-isolated, in-progress PR work that needs to coexist with mainline edits,
-or experiments that mutate state in ways you want to throw away atomically. If none of those apply, work in the main
-checkout. If a session opens in a worktree and the work doesn't actually need one, the right move is to dismantle the
-worktree (see cleanup sequence below) and continue in the main checkout — the cost of staying in a wrong-shaped
-worktree compounds across the session.
+**Default to the main checkout.** Worktrees are the exception. Strategic analysis, artifact production, single-file
+refactors, corpus reads, spec writing — none need worktree isolation and most are actively harmed by it
+(path-resolution surprises, invisible-filesystem artifacts, cleanup overhead). Create a worktree only for parallel
+agent fan-out, in-progress PR work that must coexist with mainline edits, or atomically-throwaway experiments. If a
+session opens in a worktree and doesn't need one, dismantle and continue in main — staying in a wrong-shaped worktree
+compounds cost across the session.
 
-**Branch preservation.** `git worktree remove` deletes the working directory but leaves the branch pointer in git. This
-is the desired behavior — preserve it. Do NOT immediately `git branch -D` agent branches after removing their worktrees.
-Retain agent branches in git history for at least as long as the consolidated PR is open; they are the per-agent audit
-trail and can be re-cherry-picked if a conflict was resolved incorrectly. Only delete agent branches after their commits
-are confirmed present in the merged target branch.
+**Branch preservation.** `git worktree remove` deletes the directory but leaves the branch pointer. Preserve it. Do NOT
+immediately `git branch -D` agent branches after worktree removal — retain them at least until the consolidated PR is
+open (audit trail; re-cherry-pickable if conflict resolution was wrong). Delete after commits confirmed on the merged
+target branch. Fast-track exception: if cherry-picks were clean (no conflict resolution involved), delete on
+consolidation-push rather than waiting for PR merge — the commits are byte-identical with the consolidation branch's.
 
-**Base-SHA pinning.** All parallel worktrees in one fan-out must branch from the same commit. Before dispatching, record
-the base SHA (`git rev-parse HEAD`) and include it verbatim in each agent's prompt. If Maestro commits to the base
-branch between dispatching individual agents, later agents get a different base — cherry-picks at consolidation produce
-false conflicts or silently miss commits. Verify with `git log <agent-branch>..<base-branch>` before beginning
-cherry-pick consolidation.
+**Base-SHA pinning.** All parallel worktrees in one fan-out must branch from the same commit. Record base SHA
+(`git rev-parse HEAD`) before dispatching; include it verbatim in each agent's prompt. If Maestro commits to base
+between agent dispatches, later agents see a different base and consolidation cherry-picks produce false conflicts or
+silently miss commits. Verify with `git log <agent-branch>..<base-branch>` before cherry-pick consolidation.
 
-**Edit-tool path resolution.** Inside a worktree, Edit/Write tool calls using absolute paths sometimes resolve to the
-primary checkout rather than the worktree path — the Edit tool's path resolver anchors to the repo's registered primary
-worktree. Agents inside worktrees should use Bash with `git -C <worktree-path>` for git operations, and prefer
-`Bash(cd <worktree-path> && <cmd>)` over direct Edit calls for mechanical bulk file edits. When an agent reports "file
-already has this content" or edits appear in the wrong checkout, the root cause is almost always absolute-path
-resolution.
+**Edit-tool path resolution.** Inside a worktree, Edit/Write with absolute paths sometimes resolve to the primary
+checkout rather than the worktree — the resolver anchors to the registered primary. Agents inside worktrees should use
+`git -C <worktree-path>` for git operations and prefer `Bash(cd <worktree-path> && <cmd>)` over direct Edit calls. When
+an agent reports "file already has this content" or edits appear in the wrong checkout, the root cause is almost always
+absolute-path resolution. Recovery: capture `git diff` in main, `git checkout --` to restore main, `git apply` inside
+the worktree.
 
-A specific failure mode worth naming: **handoff artifacts written into a worktree are invisible to humans navigating
-the main checkout.** When a session in a worktree produces files intended for handoff to a human, another Claude Code
-session, or another repo (e.g., specs, briefs, drafts staged in `experiments/`), write to the main checkout's absolute
-path explicitly — `/Users/dbrowne/Desktop/Programming/GitHub/Linus/experiments/...` — not to the worktree-relative
-path. The worktree's filesystem is its own private space; persisting an artifact only there is a slow data-loss
-footgun, because worktrees get removed and the human looking at `~/Linus/experiments/...` sees nothing. If the artifact
-must live in the worktree for in-flight reasons, copy it out to the main checkout at the end of the session before
-dismantling.
+**Handoff artifacts written into a worktree are invisible to humans in the main checkout.** Write handoff files (specs,
+briefs, drafts in `experiments/`) using the main-checkout absolute path
+(`/Users/dbrowne/Desktop/Programming/GitHub/Linus/experiments/...`) — not the worktree-relative path. Worktrees get
+removed; the human looking at `~/Linus/experiments/...` sees nothing. If the artifact must live in the worktree for
+in-flight reasons, copy it out before dismantling.
 
-**When not to use worktrees.** Worktrees earn their complexity only when per-agent isolation is a hard requirement —
-e.g., each agent opens its own PR for independent review, or commits must be cherry-picked selectively. For fan-outs
-where agents write non-overlapping files on a shared branch (filling out N notes, running N analyses), the simpler
-pattern is sequential agent dispatch with file-level partitioning: Maestro reviews and commits each agent's output
-without the worktree overhead (base-SHA drift, path-resolution quirks, manual cleanup, cherry-pick conflicts). When in
-doubt, start with the simpler pattern.
+**When not to use worktrees.** For fan-outs where agents write non-overlapping files on a shared branch (N notes, N
+analyses) AND the dispatch is SEQUENTIAL (not parallel), file-level partitioning is simpler than worktree isolation —
+Maestro commits each agent's output without the worktree overhead (base-SHA drift, path-resolution quirks, manual
+cleanup, cherry-pick conflicts). For PARALLEL dispatch, the hard rule above wins regardless.
 
 **Worktree cleanup sequence.** After all agent commits are cherry-picked and confirmed:
 
@@ -662,16 +445,6 @@ next session won't immediately need it, dismantle. Worktrees are cheap to recrea
 debug. For branches with zero unique commits (e.g., a session that produced artifacts but no commits to the worktree's
 branch), the branch-preservation rule above does not apply — delete the empty branch as part of dismantling.
 
-### Reference-stack maintenance signals (PR 30 fold-ins, 2026-05-09)
-
-Two findings from the PR 30 Bin A/B repo-notes are worth surfacing as engineering-convention signals. First, **AutoGen
-is in maintenance mode** — Microsoft has redirected new multi-agent development to Microsoft Agent Framework
-(`microsoft/agent-framework`); future Linus reference work for multi-agent patterns may pivot to MAF, with AutoGen
-retained as frozen reference. Second, **Anthropic-compat HTTP endpoints are converging as a production-stack norm**:
-four independent Bin A/B + Kimi-K2 confirmations show production agent stacks shipping Anthropic-compat alongside
-OpenAI-compat. DEC-0005 (OpenAI-compatible-protocol) earns a Phase 2a revisit — a Linus orchestration backend that
-speaks both is the likely shape.
-
 ### Writing style for docs
 
 Prose over bullet-heavy dumps for anything a human will read. Markdown files in this repo communicate reasoning, not
@@ -680,82 +453,61 @@ style.
 
 ### Doc-type conventions
 
-The corpus has matured into recognizable per-document-type shapes. Until they graduate to dedicated guides under
-`docs/skills/notes/` (or similar) the inline definitions below are the source of truth. Fan-out agents and future note
-authors should match them exactly. Fixed section order matters because cross-doc grep and fan-out agents rely on it;
-don't reorder sections without surfacing the change as a convention update.
+Per-document-type shapes. Fan-out agents must match them exactly — fixed section order matters because cross-doc grep
+relies on it. Don't reorder without surfacing the change as a convention update. Also add a `## References`
+bibliography to the end of each synthesis (per PR #55 convention) listing the repo-notes and paper-notes it cites.
 
-**Paper-note** — `docs/paper-notes/<paper-id>.md`. YAML frontmatter (`title`, `source`, `authors`, `affiliation`,
-`date`, `pdf`, `tags`). H1 = paper title. Eight H2 sections in fixed order: `## TL;DR` ·
-`## The problem (in plain language)` · `## What they propose` · `## Key results` · `## What's reusable in Linus` ·
-`## What's NOT applicable / hype filter` · `## Connections` · `## Open questions for Dan`. The "Reusable in Linus"
-section maps each point to a phase (Phase 1..8) and references a DEC or spec where applicable. "Connections" uses
-relative markdown links. Open questions are numbered sequentially with no gaps; partial-resolved items use
-`_Partially resolved (DEC-NNNN, see [answered-questions.md](../questions/answered-questions.md)): nuance._`.
+**Paper-note** — `docs/paper-notes/<paper-id>.md`. YAML frontmatter: `title`, `source`, `authors`, `affiliation`,
+`date`, `pdf`, `tags`. H1 = paper title. Eight H2 sections in fixed order: `## TL;DR` · `## The problem (in plain
+language)` · `## What they propose` · `## Key results` · `## What's reusable in Linus` (maps each point to a phase
+1..8, references DEC/spec where applicable) · `## What's NOT applicable / hype filter` · `## Connections` (relative
+markdown links) · `## Open questions for Dan` (numbered sequentially, no gaps).
 
-**Paper-note (paired-repo variant).** When the source PDF lives in a paired repo rather than `context/papers/` (e.g., a
-model release shipping its own tech report alongside the weights/code), use a hybrid filename `<RepoName>-<arxiv-id>.md`
-instead of the default `<arxiv-id>.md`. This makes the paper↔repo pairing visible at INDEX-scan time and prevents the
-paper-note from looking like a standalone arxiv entry when it's actually load-bearing for a specific repo. The `pdf:`
-frontmatter field points to a relative path into `repos/` (e.g., `../../repos/Kimi-K2/tech_report.pdf`) rather than
-`../../context/papers/...`. Canonical example: Kimi-K2 tech report (arxiv 2507.20534) →
-`paper-notes/Kimi-K2-2507.20534.md` paired with `repo-notes/Kimi-K2.md`.
+**Paper-note paired-repo variant.** When the source PDF lives in a paired repo (model release shipping its own tech
+report alongside weights/code), use hybrid filename `<RepoName>-<arxiv-id>.md` and point `pdf:` at the repo path
+(`../../repos/Kimi-K2/tech_report.pdf`). Canonical: `paper-notes/Kimi-K2-2507.20534.md` ↔ `repo-notes/Kimi-K2.md`.
 
-**Repo-note** — `docs/repo-notes/<repo-name>.md`. No frontmatter. H1 =
-`# <repo-name> (\`<owner/repo>\`)`. Seven numbered H2 sections in fixed order: `## 1. Purpose and scope`·`## 2.
-Architecture summary`·`## 3. What's reusable in Linus`·`## 4. What's inspiration only`·`## 5. What's incompatible or out
-of scope`·`## 6. Recommendation: **<verdict>**`·`## 7. Questions for Dan`. Recommendation verdicts come from a fixed
-vocabulary: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore** (single primary verdict; modifiers like "with a
-high prior on later Integrate-as-service" are allowed). Section 7 uses numbered sequential items (no bullets), matching
-paper-notes; legacy bulleted items in repo-notes are tolerated and converted to numbered by Maestro at consolidation,
-not by per-note authors during normal work — to avoid drift. Same Reusable / Connections / Open-questions discipline as
-paper-notes.
+**Repo-note** — `docs/repo-notes/<repo-name>.md`. No frontmatter. H1 = `` # <repo-name> (`<owner/repo>`) ``. Seven
+numbered H2 sections: `## 1. Purpose and scope` · `## 2. Architecture summary` · `## 3. What's reusable in Linus` ·
+`## 4. What's inspiration only` · `## 5. What's incompatible or out of scope` · `## 6. Recommendation: **<verdict>**`
+· `## 7. Questions for Dan`. Verdict vocabulary: **Integrate**, **Study**, **Adapt**, **Watch**, **Ignore** (single
+primary verdict + optional modifier). Section 7 numbered sequentially. Same Reusable / Connections / Open-questions
+discipline as paper-notes.
 
-**Partial-resolved citation format.** Items use
-`_Partially resolved (DEC-NNNN, see [answered-questions.md](...)): nuance._` where DEC-NNNN points to the resolving ADR.
-Where no ADR exists but a sweep / entrepreneurship / memory ID does (S-NN / E-NN / M-NN from the planning-update arc),
-the form `_Partially resolved (S-NN, see [answered-questions.md](...)): nuance._` is accepted; agents should not
-normalize S/E/M IDs to DEC-NNNN unless the mapping is verifiable from `docs/adr/` alone (Maestro handles
-cross-referencing through `docs/questions/`).
+**Refreshed-note dated line.** When refreshing a repo-note against current upstream, add immediately after H1:
+`_Refreshed YYYY-MM-DD against upstream HEAD <short-sha>; <N commits / M files> reviewed._` (per 2026-05-18 refresh
+convention).
 
-**Audit** — `docs/audits/<batch-name>/<source>-audit.md`. H1 = audit subject. Sections: `## Summary` · `## Findings`
-(with H3 sub-categories grouped by severity or class) · `## Remediation recommendations (priority order)` ·
-`## Confidence assessment`.
+**Partial-resolved citation.** Items use `_Partially resolved (DEC-NNNN, see [answered-questions.md](...)): nuance._`
+where DEC-NNNN is the resolving ADR. S-NN / E-NN / M-NN IDs from the planning-update arc are also accepted; agents
+should not normalize them to DEC-NNNN unless the mapping is verifiable from `docs/adr/`.
 
-**Session summary** — `docs/session-summaries/<YYYY-MM-DD>-<slug>-session-summary.md`. Filename always date-prefixed
-with ISO date. Structure: `## Pre-execution context`, then numbered `## Step N — <name>` sections in chronological
-order, then `## Lessons learned (write-back candidates)` with H3 sub-items naming each lesson's destination doc, then
-`## Outstanding items for next session`, then `## Suggested next steps`. The date prefix and lessons-learned
-sub-structure are required; step structure is recommended. Per the "Measure, don't just estimate" convention below,
-every session summary records "estimated wall time vs actual" in its closing section.
+**Audit** — `docs/audits/<batch-name>/<source>-audit.md`. H1 = subject. Sections: `## Summary` · `## Findings` (H3
+sub-categories by severity/class) · `## Remediation recommendations (priority order)` · `## Confidence assessment`.
+
+**Session summary** — `docs/session-summaries/<YYYY-MM-DD>-<slug>-session-summary.md`. Sections in order: `##
+Pre-execution context` · numbered `## Step N — <name>` · `## Lessons learned (write-back candidates)` (H3 per
+destination doc) · `## Outstanding items for next session` · `## Suggested next steps`. Date prefix + lessons-learned
+sub-structure required; record "estimated wall time vs actual" in the closing section per §Measure, don't just
+estimate.
 
 ### Measure, don't just estimate
 
-Time and resource estimates degrade quickly when not measured. Convention: every multi-step task and every fan-out logs
-start time, end time, and a short variance note whenever actual diverges from estimate by more than ~20%. Two
-implementation paths:
-
-- **Per-session summaries** — every entry in `docs/session-summaries/` records "estimated wall time vs actual" in its
-  closing section. This is the durable measurement record.
-- **Per-fan-out reports** — each Worker agent records bin-level start/end timestamps in its summary report; Maestro
-  records wall-time delta vs the planned estimate in the spec's status line at consolidation.
-
-Use the accumulated record to refine future estimates. If session-summary measurements show that "spec-first + canary +
-parallel fan-out + consolidate + PR" consistently overruns 2-hour estimates by 50%, the next plan starts from the
-empirical 3-hour anchor, not the optimistic 2-hour one. This is the flash-moe pattern (DEC-0027) applied to time itself:
-measurement wins over intuition, even on workflow estimates.
+Every multi-step task and fan-out logs start time, end time, and a variance note when actual diverges from estimate by
+>~20%. Per-session summaries record "estimated wall time vs actual" in closing; per-fan-out reports record bin-level
+timestamps and Maestro records delta vs estimate in the spec's status line at consolidation. Use the accumulated
+record to anchor future estimates — if "spec → canary → parallel fan-out → consolidate → PR" consistently overruns
+2-hour estimates by 50%, the next plan starts from a 3-hour empirical anchor. Flash-moe pattern (DEC-0027) applied to
+workflow estimates: measurement beats intuition.
 
 ### ADR numbering atomic reservation
 
-When authoring an ADR, the agent reserves the next-free DEC-NNNN number atomically by writing the file before any
-other agent can claim it. On collision (two agents both attempt to author the same DEC-NNNN), the agent that
-wrote-then-committed first wins; the late agent picks the next-free number. "Seed" labels in synthesis prose
-(`DEC-NNNN seed: ...`) are placeholders, NOT reservations — they get reconciled at consolidation when the actual
-ADRs land. The 2026-05-16 wave-2 fanout surfaced this: `native-low-bit-apple-silicon-synthesis.md` had
-"DEC-0055 seed" and "DEC-0056 seed" placeholders for Kimi-K2 fold seeds, but those numbers were claimed by
-landed ADRs (DEC-0055 filename discipline, DEC-0056 Anthropic-compat amendment). The Kimi-K2 seeds need
-re-renumbering at the next consolidation. To prevent recurrence: when a planning session reserves an ADR number
-in prose, treat the reservation as soft; the actual DEC-NNNN is whatever the file-writing agent claims first.
+The next-free DEC-NNNN number is reserved by writing the file. On collision (two agents authoring the same number),
+first-to-commit wins; the late agent picks the next free. "Seed" labels in synthesis prose (`DEC-NNNN seed: ...`) are
+placeholders, NOT reservations — reconcile at consolidation. The 2026-05-16 wave-2 fanout surfaced this:
+`native-low-bit-apple-silicon-synthesis.md` had DEC-0055/0056 seed placeholders but those numbers were claimed by
+landed ADRs (DEC-0055 filename discipline, DEC-0056 Anthropic-compat amendment); seeds need re-renumbering at next
+consolidation. Treat any prose-level ADR-number reservation as soft.
 
 ### Session usage budgeting
 
