@@ -37,14 +37,15 @@ st.header("Server status")
 health_col, url_col = st.columns([1, 3])
 
 
-def _check_server(url: str, timeout: float = 2.0) -> tuple[bool, str]:
-    """Return ``(ok, detail)`` from a GET on the server's ``/healthz`` probe.
+def _check_server(url: str, timeout: float = 2.0) -> tuple[bool, str, dict | None]:
+    """Return ``(ok, detail, body)`` from a GET on the server's ``/healthz`` probe.
 
     Hitting ``/healthz`` rather than ``/`` matters: the FastAPI app doesn't
     define a root route, so a GET on ``/`` returns 404 and the page would
     incorrectly report "Unreachable" while the server is actually fine.
     The ``/healthz`` endpoint additionally tells us whether Ollama is
-    reachable from the server's perspective.
+    reachable from the server's perspective, plus the new degradation
+    payload introduced in feature/q3-loud-degradation.
     """
     probe = url.rstrip("/") + "/healthz"
     try:
@@ -54,17 +55,17 @@ def _check_server(url: str, timeout: float = 2.0) -> tuple[bool, str]:
             ollama_ok = body.get("ollama_reachable", False)
             n_models = len(body.get("models", []) or [])
             detail_msg = f"HTTP 200 from {probe} — Ollama {'reachable' if ollama_ok else 'NOT reachable'}, {n_models} model(s) pulled"
-            return True, detail_msg
-        return False, f"HTTP {response.status_code} from {probe}"
+            return True, detail_msg, body
+        return False, f"HTTP {response.status_code} from {probe}", None
     except httpx.ConnectError:
-        return False, f"Connection refused at {probe} — is the server running?"
+        return False, f"Connection refused at {probe} — is the server running?", None
     except httpx.TimeoutException:
-        return False, f"Timeout after {timeout}s at {probe}"
+        return False, f"Timeout after {timeout}s at {probe}", None
     except Exception as exc:  # noqa: BLE001 — surface any failure mode to the UI
-        return False, f"{type(exc).__name__}: {exc}"
+        return False, f"{type(exc).__name__}: {exc}", None
 
 
-ok, detail = _check_server(SERVER_URL)
+ok, detail, health_body = _check_server(SERVER_URL)
 with health_col:
     if ok:
         st.success("Reachable")
@@ -82,14 +83,63 @@ if not ok:
         "```"
     )
 
+# ── Effective state (degradations) ──────────────────────────────────────────
+# Live-vs-degraded was previously invisible. /healthz now ships an
+# ``effective_state`` + ``degradations`` payload describing each silent
+# fall-through (missing Worker model, empty papers dir, missing KB
+# artifacts, empty Ollama installation). Show it inline so the
+# Reachable/Unreachable binary doesn't swallow operationally-significant
+# problems.
+if ok and health_body is not None:
+    st.header("Effective state")
+    effective_state = health_body.get("effective_state", "unknown")
+    degradations = health_body.get("degradations", []) or []
+
+    if effective_state == "live":
+        st.success(f"State: **live** — all checks passing ({len(degradations)} degradations)")
+    elif effective_state == "degraded":
+        st.warning(f"State: **degraded** — {len(degradations)} warning(s); core function intact")
+    elif effective_state == "down":
+        st.error(f"State: **down** — {len(degradations)} blocking issue(s); core function impaired")
+    else:
+        st.info(f"State: **{effective_state}**")
+
+    if degradations:
+        st.table(
+            [
+                {
+                    "Component": d.get("component", ""),
+                    "Expected": d.get("expected", ""),
+                    "Actual": d.get("actual", ""),
+                    "Severity": d.get("severity", ""),
+                    "Remediation": d.get("remediation", ""),
+                }
+                for d in degradations
+            ]
+        )
+    else:
+        st.caption("No degradations reported.")
+
 # ── KB artifact availability ────────────────────────────────────────────────
 st.header("KnowledgeBase artifacts")
 
 artifact_rows: list[tuple[str, str, bool]] = [
     ("Cluster hierarchy", str(KB_OUTPUTS_DIR / "hierarchy.json"), (KB_OUTPUTS_DIR / "hierarchy.json").exists()),
-    ("Broad cluster labels", str(KB_OUTPUTS_DIR / "labels_broad.json"), (KB_OUTPUTS_DIR / "labels_broad.json").exists()),
-    ("Paper graph (2D)", str(KB_OUTPUTS_DIR / "graph" / "graph_sigma.html"), (KB_OUTPUTS_DIR / "graph" / "graph_sigma.html").exists()),
-    ("Knowledge graph", str(KB_OUTPUTS_DIR / "knowledge_graph" / "kg_graph.graphml"), (KB_OUTPUTS_DIR / "knowledge_graph" / "kg_graph.graphml").exists()),
+    (
+        "Broad cluster labels",
+        str(KB_OUTPUTS_DIR / "labels_broad.json"),
+        (KB_OUTPUTS_DIR / "labels_broad.json").exists(),
+    ),
+    (
+        "Paper graph (2D)",
+        str(KB_OUTPUTS_DIR / "graph" / "graph_sigma.html"),
+        (KB_OUTPUTS_DIR / "graph" / "graph_sigma.html").exists(),
+    ),
+    (
+        "Knowledge graph",
+        str(KB_OUTPUTS_DIR / "knowledge_graph" / "kg_graph.graphml"),
+        (KB_OUTPUTS_DIR / "knowledge_graph" / "kg_graph.graphml").exists(),
+    ),
     ("Metadata DB", str(KB_METADATA_DB), KB_METADATA_DB.exists()),
     ("SPECTER2 embeddings", str(KB_EMBEDDINGS_DIR / "specter2.npy"), (KB_EMBEDDINGS_DIR / "specter2.npy").exists()),
 ]

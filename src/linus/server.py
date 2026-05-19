@@ -39,6 +39,7 @@ import os
 import time
 import uuid
 from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import ollama
@@ -313,6 +314,231 @@ def _list_local_models() -> list[str]:
     return names
 
 
+def _resolve_papers_dir() -> Path:
+    """Resolve the paper-qa papers directory the same way
+    :func:`linus.knowledge.paperqa._papers_dir` does.
+
+    Duplicated here (rather than imported) so degradation detection does not
+    drag paper-qa import-time cost into ``/healthz``. The resolution order
+    must stay in lock-step with the paperqa module:
+
+    1. ``LINUS_PAPERQA_DIR`` env var, if set.
+    2. ``LINUS_PAPERS_DIR`` env var, if set (shared with arxiv_ingest).
+    3. ``~/.linus/papers/`` default.
+    """
+    raw = os.environ.get("LINUS_PAPERQA_DIR") or os.environ.get("LINUS_PAPERS_DIR")
+    if raw:
+        return Path(raw).expanduser()
+    return Path.home() / ".linus" / "papers"
+
+
+def _kb_artifact_paths() -> list[tuple[str, Path]]:
+    """Return the canonical ``(label, path)`` list of KB artifacts.
+
+    Mirrors the artifact table rendered by ``src/linus/app/main.py`` so
+    /healthz reports the same set the Streamlit landing audits. Reading
+    ``linus.app.config`` here pulls in the same env-var resolution the UI
+    uses without forcing Streamlit as a server import.
+    """
+    from linus.app.config import KB_EMBEDDINGS_DIR, KB_METADATA_DB, KB_OUTPUTS_DIR
+
+    return [
+        ("hierarchy.json", KB_OUTPUTS_DIR / "hierarchy.json"),
+        ("labels_broad.json", KB_OUTPUTS_DIR / "labels_broad.json"),
+        ("graph_sigma.html", KB_OUTPUTS_DIR / "graph" / "graph_sigma.html"),
+        ("kg_graph.graphml", KB_OUTPUTS_DIR / "knowledge_graph" / "kg_graph.graphml"),
+        ("metadata.db", KB_METADATA_DB),
+        ("specter2.npy", KB_EMBEDDINGS_DIR / "specter2.npy"),
+    ]
+
+
+def _compute_degradations() -> tuple[str, list[dict[str, Any]]]:
+    """Inspect Linus's effective runtime state and return ``(effective_state, degradations)``.
+
+    The orchestration server can be "reachable" yet still unable to do its
+    primary job: the preferred Worker model may not be pulled, paper-qa's
+    papers directory may be empty, KB outputs may be missing, or Ollama may
+    be running with zero models installed. The original ``/healthz`` only
+    surfaced reachable-vs-down, which let these failures hide until tool
+    invocation. This function makes them loud.
+
+    Detection covers four classes (see CLAUDE.md and the Q3 spec for
+    cross-pollination context from Archimedes' ``/health``):
+
+    - ``worker_model`` — the first preferred model is not in the locally
+      pulled list. severity=warning if a fallback preference matches;
+      severity=error if no preference matches at all.
+    - ``papers_dir`` — the resolved papers directory does not exist OR
+      contains zero PDFs. severity=error (paper-qa tools will fail at
+      call time without a populated directory).
+    - ``kb_outputs`` — one or more of the canonical KB artifact paths
+      (hierarchy.json, labels_broad.json, graph, kg, metadata.db,
+      specter2.npy) is missing. One degradation entry per missing
+      artifact; severity=warning each (Streamlit pages already handle the
+      missing case gracefully).
+    - ``ollama_models_empty`` — Ollama is reachable but no models are
+      pulled at all. severity=error.
+
+    The returned ``effective_state`` is:
+
+    - ``"live"`` — zero degradations.
+    - ``"degraded"`` — warnings only.
+    - ``"down"`` — any error-severity degradation, OR Ollama unreachable.
+
+    Each degradation carries an actionable ``remediation`` string so the
+    UI can show a concrete fix (e.g. ``ollama pull qwen3:8b``) rather
+    than a vague "warning". The shape is::
+
+        {"component": str,
+         "expected": str,
+         "actual": str,
+         "severity": "warning" | "error",
+         "remediation": str}
+    """
+    degradations: list[dict[str, Any]] = []
+    ollama_reachable = True
+    models: list[str] = []
+
+    try:
+        models = _list_local_models()
+    except HTTPException:
+        ollama_reachable = False
+
+    # --- ollama_models_empty ------------------------------------------------
+    # If Ollama is reachable but has zero models pulled, every Worker call
+    # will fail immediately. Surface this as an error, not a warning.
+    if ollama_reachable and not models:
+        degradations.append(
+            {
+                "component": "ollama_models_empty",
+                "expected": "at least one model pulled in Ollama",
+                "actual": "Ollama reachable but no models installed",
+                "severity": "error",
+                "remediation": f"Run: ollama pull {_MODEL_PREFERENCES[0]}",
+            }
+        )
+
+    # --- worker_model -------------------------------------------------------
+    # The first preference is the model Linus actually wants to use. If it's
+    # missing but a later preference is locally available, that's a silent
+    # fall-through — degradation=warning. If NO preference is available,
+    # ``_resolve_model`` would 503; surface that as a degradation=error so
+    # /healthz answers the question without a chat-completions roundtrip.
+    if ollama_reachable and models:
+        first_preference = _MODEL_PREFERENCES[0]
+        if first_preference not in models:
+            available_preference = next(
+                (m for m in _MODEL_PREFERENCES if m in models),
+                None,
+            )
+            if available_preference is None:
+                degradations.append(
+                    {
+                        "component": "worker_model",
+                        "expected": f"first preference {first_preference!r} (or any of {list(_MODEL_PREFERENCES)})",
+                        "actual": f"none of the preferred models are pulled; available: {models}",
+                        "severity": "error",
+                        "remediation": f"Run: ollama pull {first_preference}",
+                    }
+                )
+            else:
+                degradations.append(
+                    {
+                        "component": "worker_model",
+                        "expected": f"first preference {first_preference!r}",
+                        "actual": f"falling back to {available_preference!r}",
+                        "severity": "warning",
+                        "remediation": f"Run: ollama pull {first_preference}",
+                    }
+                )
+
+    # --- papers_dir ---------------------------------------------------------
+    # paper-qa tools register at import time and only fail at call time when
+    # the directory is missing or empty. Surface both shapes as a single
+    # error-severity degradation so the operator sees it before a tool call.
+    papers_dir = _resolve_papers_dir()
+    if not papers_dir.exists():
+        degradations.append(
+            {
+                "component": "papers_dir",
+                "expected": f"existing directory at {papers_dir}",
+                "actual": "directory does not exist",
+                "severity": "error",
+                "remediation": (
+                    f"Create the directory and add PDFs: mkdir -p {papers_dir} "
+                    "(or set LINUS_PAPERQA_DIR to an existing directory)"
+                ),
+            }
+        )
+    else:
+        try:
+            pdfs = list(papers_dir.glob("*.pdf"))
+        except OSError as exc:
+            degradations.append(
+                {
+                    "component": "papers_dir",
+                    "expected": f"readable directory at {papers_dir}",
+                    "actual": f"cannot enumerate PDFs: {exc!s}",
+                    "severity": "error",
+                    "remediation": f"Check permissions on {papers_dir}",
+                }
+            )
+        else:
+            if not pdfs:
+                degradations.append(
+                    {
+                        "component": "papers_dir",
+                        "expected": f"at least one PDF in {papers_dir}",
+                        "actual": "directory exists but contains zero PDFs",
+                        "severity": "error",
+                        "remediation": (
+                            f"Add PDFs to {papers_dir} (e.g. via the paperqa.ingest tool "
+                            "or by copying papers in manually)"
+                        ),
+                    }
+                )
+
+    # --- kb_outputs ---------------------------------------------------------
+    # Per-artifact entries (warning each) so the operator can see exactly
+    # which artifact is missing without cross-referencing the artifact list
+    # in the Streamlit landing.
+    try:
+        artifacts = _kb_artifact_paths()
+    except Exception:
+        # Defensive: linus.app.config import or env-var-resolution failure
+        # must not crash /healthz. Surface as zero kb_outputs degradations
+        # rather than a 500.
+        artifacts = []
+    for name, path in artifacts:
+        if not path.exists():
+            degradations.append(
+                {
+                    "component": "kb_outputs",
+                    "expected": f"KB artifact {name} at {path}",
+                    "actual": "missing",
+                    "severity": "warning",
+                    "remediation": (
+                        f"Run the KnowledgeBase pipeline to produce {name}, or set "
+                        "LINUS_KB_OUTPUTS_DIR / LINUS_KB_METADATA_DB / "
+                        "LINUS_KB_EMBEDDINGS_DIR to a populated location"
+                    ),
+                }
+            )
+
+    # --- effective_state classification ------------------------------------
+    # "down" covers both Ollama-unreachable AND any error-severity
+    # degradation; the orchestration server cannot do its primary job in
+    # either case.
+    if not ollama_reachable or any(d["severity"] == "error" for d in degradations):
+        effective_state = "down"
+    elif degradations:
+        effective_state = "degraded"
+    else:
+        effective_state = "live"
+
+    return effective_state, degradations
+
+
 def _resolve_model(requested: str) -> str:
     """Pick the model to actually run.
 
@@ -388,11 +614,7 @@ def _extract_tool_calls(message_obj: Any) -> list[ToolCall]:
     if message_obj is None:
         return []
 
-    raw = (
-        message_obj.get("tool_calls")
-        if isinstance(message_obj, dict)
-        else getattr(message_obj, "tool_calls", None)
-    )
+    raw = message_obj.get("tool_calls") if isinstance(message_obj, dict) else getattr(message_obj, "tool_calls", None)
     if not raw:
         return []
 
@@ -519,9 +741,7 @@ def _run_chat_loop(
             content = getattr(message_obj, "content", "") if message_obj is not None else ""
             prompt_tokens = int(getattr(result, "prompt_eval_count", 0) or 0)
             completion_tokens = int(getattr(result, "eval_count", 0) or 0)
-            done_reason = getattr(result, "done_reason", None) or (
-                "stop" if getattr(result, "done", False) else None
-            )
+            done_reason = getattr(result, "done_reason", None) or ("stop" if getattr(result, "done", False) else None)
 
         prompt_tokens_total += prompt_tokens
         completion_tokens_total += completion_tokens
@@ -686,9 +906,7 @@ def _stream_chat_completion(
 
     # Emit the leading role chunk (OpenAI's convention: the first delta
     # carries role=assistant; subsequent chunks carry content deltas).
-    yield _sse_format(
-        _streaming_chunk(completion_id, created, resolved_model, delta={"role": "assistant"})
-    )
+    yield _sse_format(_streaming_chunk(completion_id, created, resolved_model, delta={"role": "assistant"}))
 
     for iteration in range(_MAX_TOOL_ITERATIONS + 1):
         try:
@@ -750,9 +968,7 @@ def _stream_chat_completion(
             yield "data: [DONE]\n\n"
             return
 
-        transcript.append(
-            ChatMessage(role="assistant", content=accumulated_content or "", tool_calls=tool_calls)
-        )
+        transcript.append(ChatMessage(role="assistant", content=accumulated_content or "", tool_calls=tool_calls))
 
         if iteration >= _MAX_TOOL_ITERATIONS:
             yield _sse_format(
@@ -817,7 +1033,7 @@ def _stream_with_session_append(
         # Parse content deltas as they fly by; cheap because each event is
         # already a small JSON blob the client is consuming.
         if event.startswith("data: "):
-            payload = event[len("data: "):].strip()
+            payload = event[len("data: ") :].strip()
             if payload and payload != "[DONE]":
                 try:
                     chunk = json.loads(payload)
@@ -881,20 +1097,41 @@ def root() -> dict[str, Any]:
 
 @app.get("/healthz")
 def healthz() -> dict[str, Any]:
-    """Lightweight liveness probe. Reports the locally-available model list and
-    the registered tool names so harnesses can introspect what's wired up."""
+    """Lightweight liveness probe with degradation reporting.
+
+    Returns the locally-available model list and registered tool names
+    (pre-existing keys; backwards-compat preserved) AND two new fields:
+
+    - ``effective_state`` — one of ``"live"`` / ``"degraded"`` / ``"down"``,
+      classifying whether Linus can do its primary job. Live-vs-degraded
+      was previously invisible: a server could be "reachable" yet have no
+      Worker model pulled, an empty papers directory, missing KB
+      artifacts, etc. The Streamlit landing's Reachable/Unreachable
+      binary swallowed all of these.
+    - ``degradations`` — list of structured entries describing each
+      detected problem, with an actionable ``remediation`` string the UI
+      can surface inline (e.g. ``ollama pull qwen3:8b``).
+
+    See :func:`_compute_degradations` for the full classification
+    contract.
+    """
     try:
         models = _list_local_models()
         ollama_reachable = True
     except HTTPException:
         models = []
         ollama_reachable = False
+
+    effective_state, degradations = _compute_degradations()
+
     return {
         "status": "ok",
         "ollama_reachable": ollama_reachable,
         "models": models,
         "default_model_preference": list(_MODEL_PREFERENCES),
         "tools": default_registry.names(),
+        "effective_state": effective_state,
+        "degradations": degradations,
     }
 
 
@@ -975,8 +1212,7 @@ def chat_completions(req: ChatCompletionRequest):
                 index=0,
                 message=final_message,
                 finish_reason=(
-                    "tool_calls" if final_message.tool_calls and finish_reason == "length"
-                    else finish_reason
+                    "tool_calls" if final_message.tool_calls and finish_reason == "length" else finish_reason
                 ),
             )
         ],
