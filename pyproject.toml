@@ -148,7 +148,7 @@ exclude = [
 [tool.pytest.ini_options]
 testpaths = ["tests", "src/linus/tests", "benchmarks", "experiments"]
 python_files = ["test_*.py", "*_test.py"]
-addopts = "-ra --strict-markers"
+addopts = "-v -ra --strict-markers --tb=short --durations=10"
 markers = [
     "slow: marks tests as slow (deselect with -m 'not slow')",
     "smoke: marks smoke tests for pre-full-run validation",

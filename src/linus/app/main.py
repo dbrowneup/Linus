@@ -38,16 +38,28 @@ health_col, url_col = st.columns([1, 3])
 
 
 def _check_server(url: str, timeout: float = 2.0) -> tuple[bool, str]:
-    """Return ``(ok, detail)`` from a GET on the server's root endpoint."""
+    """Return ``(ok, detail)`` from a GET on the server's ``/healthz`` probe.
+
+    Hitting ``/healthz`` rather than ``/`` matters: the FastAPI app doesn't
+    define a root route, so a GET on ``/`` returns 404 and the page would
+    incorrectly report "Unreachable" while the server is actually fine.
+    The ``/healthz`` endpoint additionally tells us whether Ollama is
+    reachable from the server's perspective.
+    """
+    probe = url.rstrip("/") + "/healthz"
     try:
-        response = httpx.get(url, timeout=timeout)
+        response = httpx.get(probe, timeout=timeout)
         if response.status_code == 200:
-            return True, f"HTTP 200 from {url}"
-        return False, f"HTTP {response.status_code} from {url}"
+            body = response.json()
+            ollama_ok = body.get("ollama_reachable", False)
+            n_models = len(body.get("models", []) or [])
+            detail_msg = f"HTTP 200 from {probe} — Ollama {'reachable' if ollama_ok else 'NOT reachable'}, {n_models} model(s) pulled"
+            return True, detail_msg
+        return False, f"HTTP {response.status_code} from {probe}"
     except httpx.ConnectError:
-        return False, f"Connection refused at {url} — is the server running?"
+        return False, f"Connection refused at {probe} — is the server running?"
     except httpx.TimeoutException:
-        return False, f"Timeout after {timeout}s at {url}"
+        return False, f"Timeout after {timeout}s at {probe}"
     except Exception as exc:  # noqa: BLE001 — surface any failure mode to the UI
         return False, f"{type(exc).__name__}: {exc}"
 
