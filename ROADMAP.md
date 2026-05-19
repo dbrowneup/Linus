@@ -156,23 +156,38 @@ and private benchmarks, (c) the Maestro/Worker pattern works end-to-end on a rea
 **Goal:** a minimal but real Linus orchestration backend + a chat UI, grounded in KnowledgeBase, demo-able to a peer in
 under 5 minutes.
 
-**Status snapshot (2026-05-18):**
+**Status snapshot (2026-05-19, v0.5.0 reveal-prep arc):**
+
+Phase 2 MVP shipped 2026-05-19 (PRs #66–#82, v0.4.0 release tag). The v0.5.0 reveal-prep arc through 2026-05-25 adds
+paper-qa Phase 2c integration, a grounding gate, loud-degradation health checks, reveal-ready READMEs, and pmetal
+v0.5.0 binaries. Hermetic test suite at **413 tests** (~2.5s), zero regressions.
 
 - **2a Orchestration backend:** shipped — FastAPI server at `src/linus/server.py` with OpenAI-compatible
-  `/v1/chat/completions` + tool-call routing + model preference fallback (PRs #32 + #40). Outstanding: streaming SSE
-  (v2 N2), Anthropic `/v1/messages` per DEC-0056 (v2 N3), env-loaded config (v2 N4), session store (v2 N5). See
-  [`docs/specs/2026-05-17-linus-implementation-plan-v2.md`](docs/specs/2026-05-17-linus-implementation-plan-v2.md).
-- **2c KnowledgeBase adapter v0:** shipped — read-only adapter at `src/linus/knowledge/adapter.py` (PR #34).
-  Outstanding: SPECTER2 semantic search (v2 N10), dual substrate (deferred to v3), citation synthesis (v2 N9).
-- **2h Memory pillar v0:** shipped — Layer C substrate (SQLite + content hashes + audit log) at `src/linus/memory/`
-  with unit-test coverage (PR #35). Outstanding: dispatch-layer prefix loader + router primitive plumbing + Worker
-  registry (the 2h.5/6/7 split deferred behind D3 hook-taxonomy ADR).
-- **Tool registry + KB tools:** shipped (PR #40). Two real tools registered (`search_papers`, `get_paper`); server
-  routes OpenAI tool_calls through the registry.
-- **Sandbox:** shipped — `SandboxFS` at `src/linus/sandbox/fs.py` (PR #50) — hand-written after Item 3 first-loop
-  calibration showed Workers couldn't pass security gates.
-- **Not yet shipped:** 2b chat UI (v2 N8), 2e citation drill-down (v2 N9), 2f KB dual substrate (deferred to v3),
-  2g knowledge-mining-surface doc, 2i ARC-AGI memory diagnostic (v2 N11), 2j Worker non-conformance.
+  `/v1/chat/completions` (PRs #32 + #40), streaming SSE (PR #72), Anthropic `/v1/messages` per DEC-0056 (PR #73),
+  env-loaded config (in `src/linus/app/config.py`), session store (`src/linus/memory/sessions.py`, PR #73).
+  See [`docs/specs/2026-05-17-linus-implementation-plan-v2.md`](docs/specs/2026-05-17-linus-implementation-plan-v2.md).
+  Newly extended 2026-05-19 with `effective_state` + `degradations[]` per DEC-0060 (PR #93).
+- **2b Chat UI:** shipped — Streamlit landing (`src/linus/app/main.py`) plus seven pages:
+  `1_chat.py` (streaming chat), `2_corpus_stats.py`, `3_cluster_explorer.py`, `4_paper_graph.py`,
+  `5_knowledge_graph.py`, `6_search.py`, and `7_paper_qa.py` (PR #92, paper-qa Q&A UI).
+- **2c KnowledgeBase integration + paper-qa Phase 2c:** shipped — read-only KB adapter at
+  `src/linus/knowledge/adapter.py` (PR #34) plus `src/linus/knowledge/paperqa.py` wrapping paper-qa's `Docs` API
+  with citation-to-provenance mapping and four registered tools (`paperqa.search`, `paperqa.gather_evidence`,
+  `paperqa.answer`, `paperqa.reset`) (PR #89). KB submodule pin bumped 2026-05-19 to incorporate the AGPL-honest
+  README rewrite (PR #90 + KB PR #1).
+- **2e Output rigor (NEW for v0.5.0 reveal):** shipped — grounding gate at `src/linus/knowledge/rigor.py` with
+  citation grounding, entity grounding (`BuiltinEntityLookup` stub for v0.5.0), and confidence-calibration
+  cross-check via the audit log (PR #94, DEC-0059). Time-series-aware and Archimedes-style quant-overfitting
+  extensions documented as post-reveal additive plug-ins.
+- **2h Memory pillar v0:** shipped — Layer C SQLite substrate, content hashes, audit log (PR #35). Coverage push
+  2026-05-19 brought `memory/episodic.py` (PR #86), `memory/audit_log.py` (PR #88), and `memory/sessions.py` to
+  ≥96% hermetic coverage. The 2h.5/6/7 dispatch-layer prefix loader + router primitive plumbing + Worker registry
+  remain deferred behind the D3 hook-taxonomy ADR (Phase 3 work).
+- **Tool registry + KB tools:** shipped (PR #40). Tool registry coverage hit 100% in PR #87.
+- **Sandbox:** shipped — `SandboxFS` at `src/linus/sandbox/fs.py` (PR #50) — coverage hit 100% in PR #85.
+- **Deferred to post-reveal:** 2f KB dual substrate (RDF + property graph), 2i ARC-AGI memory diagnostic, 2j Worker
+  non-conformance constraints. Q2 signed-audit-slice (`anchor.py`) seeded for post-reveal authorship per the
+  Archimedes cross-pollination eval.
 
 **2a — Orchestration backend (first implementation) at `src/linus/`:**
 
