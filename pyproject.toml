@@ -38,6 +38,7 @@ dependencies = [
     "openai>=1.12",
     "ollama>=0.1.7",
     "tiktoken>=0.5",
+    "pypdf>=4.0",  # PDF text extraction (BSD-3); see DEC-0057 re: PyMuPDF/AGPL choice
 ]
 
 [project.optional-dependencies]
