@@ -26,9 +26,21 @@ from linus.knowledge.adapter import (
     KnowledgeBaseUnavailableError,
     Paper,
 )
+from linus.knowledge.retriever import (
+    DEFAULT_WEIGHTS,
+    KnowledgeRetriever,
+    RetrievalHit,
+    RetrievalMethod,
+    RetrievalResult,
+)
 
 __all__ = [
+    "DEFAULT_WEIGHTS",
     "KnowledgeBaseAdapter",
     "KnowledgeBaseUnavailableError",
+    "KnowledgeRetriever",
     "Paper",
+    "RetrievalHit",
+    "RetrievalMethod",
+    "RetrievalResult",
 ]
