@@ -1,0 +1,39 @@
+# QFinCorpus seed list — arXiv IDs of quantitative-finance papers to ingest.
+#
+# Format: one arxiv id per line. Lines starting with `#` are comments.
+# IDs can be bare (e.g. 2407.12345) or full URLs; the ingest tool normalizes.
+# Versions (e.g. 2407.12345v2) are accepted and normalized to the bare id.
+#
+# This starter set is intentionally small — populate further from the
+# arxiv q-fin.PM (portfolio management), q-fin.MF (mathematical finance),
+# q-fin.ST (statistical finance), q-fin.RM (risk management), and
+# q-fin.TR (trading and microstructure) categories as you find papers that
+# warrant inclusion in the Archimedes strategy-grounding library.
+#
+# Many canonical quant-finance papers (Faber 2007 SMA200; Moreira-Muir 2017
+# volatility-managed portfolios; Moskowitz-Ooi-Pedersen 2012 TSMOM) live on
+# SSRN rather than arxiv — those should be added via a separate path
+# (manual PDF drop into modules/QFinCorpus/papers/ with hand-written
+# .json metadata, or wait for a future SSRN-ingest tool).
+#
+# To run the seeder against this list:
+#   conda activate linus
+#   python scripts/seed_qfin_corpus.py
+#
+# To start fresh (re-fetch everything): delete modules/QFinCorpus/papers/
+# and re-run; arxiv API + PDF endpoints are stable so this is reproducible.
+
+# Bailey & López de Prado — deflated Sharpe ratio + PBO foundations
+# (the two specific Bailey/de Prado papers powering Archimedes' selection-
+# bias gate live on SSRN; their arxiv-hosted companion paper on the
+# strategy-approval process for fund-of-funds is the closest arxiv proxy)
+1311.4257
+
+# Optimal portfolio choice with stochastic interest rates — Munk class
+1907.05597
+
+# A deep reinforcement learning framework for portfolio management
+1706.10059
+
+# Cont (2001) — fundamental properties of asset returns; on arxiv
+cond-mat/0104010
