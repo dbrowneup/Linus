@@ -58,6 +58,7 @@ dependencies:
   - pandas
   - numpy
   - scipy
+  - pypdf         # PDF text extraction (BSD-3); see DEC-0057 for the PyMuPDF/AGPL stance
 
   # Markdown / docs tooling
   - pre-commit
