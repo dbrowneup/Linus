@@ -225,8 +225,9 @@ EOF
 
 # Dan reviews on GitHub
 # After approval:
-gh pr merge <pr-number> --squash
-# Or merge via GitHub UI
+gh pr merge <pr-number> --merge --delete-branch
+# Or "Create a merge commit" in the GitHub UI
+# Default is merge commit (preserves graph); squash only when explicitly justified — see CLAUDE.md "Branch discipline"
 
 # Clean up:
 git branch -d <branch-name>
