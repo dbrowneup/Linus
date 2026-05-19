@@ -1,37 +1,47 @@
 # codebuff (`CodebuffAI/codebuff`)
 
+_Refreshed 2026-05-18 against upstream HEAD 26e593b42; 195 commits / 267 files reviewed._
+
 ## 1. Purpose and scope
 
 Codebuff is an open-source, multi-agent CLI coding assistant written in TypeScript on Bun, distributed as the paid
-`codebuff` npm package and as `freebuff` — a free, ad-supported sibling built from the same monorepo via a
-`FREEBUFF_MODE=true` compile-time flag. Where Cline and claw-code wrap a single LLM in a tool loop, Codebuff decomposes
-a coding request across a small orchestra of specialized agents — File Picker, Code Searcher, Planner, Editor, Reviewer,
-Basher, Researcher, Thinker, Context-Pruner — each with its own model, prompt, tool allow-list, and output contract. Per
-the README it scores 61% vs Claude Code's 53% on a 175-task internal eval suite that reimplements real git commits
-across multiple open-source repos. For Linus this is the most directly relevant repo in the harness group: it is a
-working, shipped instantiation of the exact Maestro/Worker decomposition the project is committing to, with a published
-SDK so the orchestration layer can be embedded rather than reverse-engineered.
+`codebuff` npm package (CLI now at v1.0, SDK at v0.10) and as `freebuff` — a free, ad-supported sibling built from the
+same monorepo via a `FREEBUFF_MODE=true` compile-time flag (freebuff at v0.0.93 with country-restricted "limited mode"
+labelling, #670/#682). Where Cline and claw-code wrap a single LLM in a tool loop, Codebuff decomposes a coding request
+across a small orchestra of specialized agents — File Picker, Code Searcher, Planner, Editor, Reviewer, Basher,
+Researcher, Thinker, Context-Pruner, plus newer Librarian and General-Agent additions — each with its own model, prompt,
+tool allow-list, and output contract. Per the README it scores 61% vs Claude Code's 53% on a 175-task internal eval
+suite that reimplements real git commits across multiple open-source repos. For Linus this is the most directly relevant
+repo in the harness group: it is a working, shipped instantiation of the exact Maestro/Worker decomposition the project
+is committing to, with a published SDK so the orchestration layer can be embedded rather than reverse-engineered.
 
 ## 2. Architecture summary
 
 A Bun workspace monorepo: `cli/` (OpenTUI + React terminal UI), `sdk/` (`@codebuff/sdk` — the embeddable client), `web/`
 (Next.js app + API routes serving as the backend), `packages/agent-runtime/` (server-side agent loop and tool handling),
-`agents/` (the shipped agent fleet), `common/` (shared types, tool schemas, Zod validators), `evals/` (the git-commit
-eval harness), and `freebuff/` (the free build with mode toggles, subscription/credits surface, and ad-disable commands
-stripped at compile time). The orchestrator is `agents/base2/base2.ts` — internally named "Buffy the Orchestrator" —
-which exposes a `createBase2(mode)` factory producing variants for default / free / lite / max / fast. Buffy declares a
-`spawnableAgents` array (file-picker, code-searcher, researcher-web, researcher-docs, basher, thinker, opus-agent,
-gpt-5-agent, editor, code-reviewer, browser-use, context-pruner, …) and a `handleSteps` generator that yields tool calls
-— `spawn_agents` to fan out, `spawn_agent_inline` for the always-running context-pruner. Sub- agents are themselves
-`SecretAgentDefinition`s with model + prompt + toolNames + spawnableAgents; for example `file-picker` runs Gemini 2.5
-Flash Lite, spawns a single `file-lister`, dedupes paths, and pipes them into a `read_files` call. Models are addressed
-via OpenRouter slugs (`anthropic/claude-opus-4.7`, `moonshotai/kimi-k2.6`, `deepseek/deepseek-v4-pro`,
-`google/gemini-3.1-flash-lite-preview`), so any model on OpenRouter is selectable per-agent. The communication contract
-between agents is structurally just typed messages over the spawn boundary — each agent's `outputMode` (`last_message`)
-plus `set_output` tool defines what gets returned to the parent. The eval methodology, in `evals/`, has a Prompting
-Agent guide a coding agent through up to 5 turns to reimplement a target git commit, then three Gemini 2.5 Pro judges
-score completion / efficiency / code-quality / overall on 0–10 and the median is taken; reference eval files in-tree are
-`eval-codebuff.json`, `eval-manifold.json`, `eval-saleor.json`.
+`agents/` (the shipped agent fleet, with `librarian/` and `general-agent/` added since the prior note),
+`agents-graveyard/` (retired agents kept for history — context-discoverer, decomposing-thinker, deep-code-reviewer,
+brainstormer, …, useful negative reference for what the team tried and dropped), `common/` (shared types, tool schemas,
+Zod validators), `evals/` (the git-commit eval harness), `freebuff/` (the free build with mode toggles,
+subscription/credits surface, and ad-disable commands stripped at compile time), and `python-app/` (a placeholder
+pointing users to the npm install — there is no live Python implementation). The orchestrator is `agents/base2/base2.ts`
+— internally named "Buffy the Orchestrator" — which exposes a `createBase2(mode)` factory producing variants for default
+/ free / lite / max / fast. Buffy declares a `spawnableAgents` array (file-picker (now removed from default base2,
+#421a0a5ce), code-searcher, researcher-web, researcher-docs, basher, thinker, opus-agent, gpt-5-agent, editor,
+code-reviewer, browser-use, context-pruner, …) and a `handleSteps` generator that yields tool calls — `spawn_agents` to
+fan out, `spawn_agent_inline` for the always-running context-pruner. Sub-agents are themselves `SecretAgentDefinition`s
+with model + prompt + toolNames + spawnableAgents; for example `file-picker` runs Gemini 2.5 Flash Lite, spawns a single
+`file-lister`, dedupes paths, and pipes them into a `read_files` call. Models are addressed via OpenRouter slugs
+(`anthropic/claude-opus-4.7`, `moonshotai/kimi-k2.6`, `deepseek/deepseek-v4-pro`,
+`google/gemini-3.1-flash-lite-preview`, `minimax/m2.7`), so any model on OpenRouter is selectable per-agent. Lite mode
+(paid Codebuff) defaults to Kimi explicitly to avoid data-retention surfaces; free mode (freebuff) defaults to MiniMax
+M2.7 with Kimi and DeepSeek as separate free agent variants. The communication contract between agents is structurally
+just typed messages over the spawn boundary — each agent's `outputMode` (`last_message`) plus `set_output` tool defines
+what gets returned to the parent. The eval methodology, in `evals/`, has a Prompting Agent guide a coding agent through
+up to 5 turns to reimplement a target git commit, then three Gemini 2.5 Pro judges score completion / efficiency /
+code-quality / overall on 0–10 and the median is taken; reference eval files in-tree are `eval-codebuff.json`,
+`eval-manifold.json`, `eval-saleor.json`. The docs surface added `docs/patterns/handle-steps-generators.md` since the
+prior note, formalizing the generator pattern.
 
 ## 3. What's reusable in Linus
 
@@ -40,14 +50,17 @@ The most reusable artifact is the **agent-definition contract itself** — a Typ
 `instructionsPrompt`, `stepPrompt`, `handleSteps` generator, `outputMode`. This is concrete prior art for what Linus's
 own Worker registry should look like, and it generalizes across model families because each agent picks its model. The
 `handleSteps` generator pattern — yielding tool calls and receiving `STEP` resumption tokens — is a clean formalism for
-deterministic orchestration glue around stochastic LLM steps; cleaner than Cline's monolithic loop. The `@codebuff/sdk`
-is callable from any Node/Bun process with
+deterministic orchestration glue around stochastic LLM steps; cleaner than Cline's monolithic loop. The new
+`docs/patterns/handle-steps-generators.md` is now an explicit canonicalization of this pattern worth reading directly
+when Linus's Phase 3 spawner design comes due. The `@codebuff/sdk` is callable from any Node/Bun process with
 `client.run({ agent, prompt, agentDefinitions, customToolDefinitions, handleEvent })`, which means the Linus
 orchestration backend could in principle delegate a whole sub-tree of work to Codebuff and stream events back. The
 `evals/` harness — git-commit reimplementation with a Prompting-Agent driver and triple-Gemini-judge median — is
 directly adoptable as a Linus benchmark beyond `dan_tasks`, once API budget allows. The `context-pruner` sub-agent that
 runs inline every turn is a worked example of "a specialized worker dedicated to context hygiene," which Linus's Phase 3
-will want.
+will want. The `agents-graveyard/` is itself reusable as negative evidence: a candid record of which agent
+decompositions the team tried and abandoned (context-discoverer, decomposing-thinker, deep-code-reviewer,
+knowledge-keeper, …) saves Linus from re-running the same experiments.
 
 ## 4. What's inspiration only
 
@@ -63,24 +76,27 @@ is good prompt-engineering prior art for Linus's eventual orchestrator prompt; c
 
 ## 5. What's incompatible or out of scope
 
-The product economics — paid Codebuff with credits, free Freebuff that the README and `freebuff/SPEC.md` together make
+The product economics — paid Codebuff with credits, free Freebuff that the README and `freebuff/README.md` together make
 clear is **not** truly free in the local-first sense: it is a thin client that connects to Codebuff's cloud backend,
 ships ads in the CLI, and routes prompts through cloud-hosted models (DeepSeek V4 Pro by default, with the
-`freebuff/README.md` itself flagging "its API collects data for training," plus Kimi K2.6, Gemini 3.1 Flash Lite, and
-GPT-5.4 via the user's ChatGPT subscription). "Free" means no credit card, not no network and not no telemetry. For a
-private local assistant this is disqualifying. The web/Next.js + Postgres + BigQuery + billing infrastructure under
-`packages/` is a SaaS business backend, not Linus's concern. The Bun runtime requirement is a soft incompatibility — not
-a blocker, but Linus is Python + Rust today. Tight coupling to OpenRouter (and the assumption that any model can be
-hot-swapped at a URL) is incompatible with a local-Ollama-first design.
+`freebuff/README.md` itself flagging "its API collects data for training," plus Kimi K2.6, MiniMax M2.7, DeepSeek V4
+Flash, and GPT-5.4 via the user's ChatGPT subscription). The "limited mode" labelling (#670, #682, #697) makes clear
+that Freebuff is geographically gated and rate-limited, with country-specific access. "Free" means no credit card, not
+no network and not no telemetry. For a private local assistant this is disqualifying. The web/Next.js + Postgres +
+BigQuery + billing infrastructure under `packages/` is a SaaS business backend, not Linus's concern. The Bun runtime
+requirement is a soft incompatibility — not a blocker, but Linus is Python + Rust today. Tight coupling to OpenRouter
+(and the assumption that any model can be hot-swapped at a URL) is incompatible with a local-Ollama-first design.
 
 ## 6. Recommendation: **Study**
 
 Read `agents/base2/base2.ts`, `agents/file-explorer/file-picker.ts`, `agents/editor/editor.ts`,
-`agents/reviewer/code-reviewer.ts`, and `agents/context-pruner.ts` carefully when designing Linus's Phase 3 Worker
-catalog and orchestrator. Borrow the agent-definition shape, the `handleSteps` generator pattern, the inline
-context-pruner idea, and the "specialist per role with its own model" principle. Adopt the `evals/` git-commit
-reimplementation methodology as a Linus benchmark in Phase 1c or Phase 2b once API budget allows it. Do **not** vendor
-or run Codebuff or Freebuff as part of Linus — the cloud-and-ads economics defeat the project's purpose.
+`agents/reviewer/code-reviewer.ts`, `agents/context-pruner.ts`, and the newer `agents/librarian/` and
+`agents/general-agent/` carefully when designing Linus's Phase 3 Worker catalog and orchestrator. Borrow the
+agent-definition shape, the `handleSteps` generator pattern (and `docs/patterns/handle-steps-generators.md` for the
+formal articulation), the inline context-pruner idea, and the "specialist per role with its own model" principle. Use
+`agents-graveyard/` as a curated list of decompositions to NOT try first. Adopt the `evals/` git-commit reimplementation
+methodology as a Linus benchmark in Phase 1c or Phase 2b once API budget allows it. Do **not** vendor or run Codebuff or
+Freebuff as part of Linus — the cloud-and-ads economics defeat the project's purpose.
 
 ## 7. Questions for Dan
 
