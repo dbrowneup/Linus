@@ -59,6 +59,7 @@ dependencies:
   - numpy
   - scipy
   - pypdf         # PDF text extraction (BSD-3); see DEC-0057 for the PyMuPDF/AGPL stance
+  - plotly        # interactive plotting — Sankey + 3D UMAP scatter for the UI
 
   # Markdown / docs tooling
   - pre-commit
@@ -74,3 +75,4 @@ dependencies:
     - langgraph                # state-machine agent workflows (Phase 3+ evaluation)
     - tiktoken                 # token counting
     - lm-eval                  # EleutherAI lm-evaluation-harness (Phase 1)
+    - pyvis                    # interactive knowledge-graph render (NetworkX → vis.js)
