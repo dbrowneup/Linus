@@ -396,6 +396,9 @@ DEC-0045 + DEC-0046 close it. The transport question (stdio vs. streamable-http)
   via tree-sitter); indexes 28M LOC in 3 minutes with sub-millisecond query latency.
 - [`codesight`](../../repo-notes/codesight.md) — Integrate-verdict zero-dependency TypeScript CLI producing a structural
   context map (routes, ORMs, import graph, blast-radius) via 13 MCP tools.
+- [`everything-claude-code`](../../repo-notes/everything-claude-code.md) — affaan-m's curated 14+ entry MCP-config
+  catalog with descriptions and the "keep under 10 MCPs to preserve context window" guidance; Phase 2/3 tool-registry
+  seed reference complementing DEC-0045 + DEC-0046.
 - [`extractthinker`](../../repo-notes/extractthinker.md) — Study-Phase-2a/Integrate-Phase-2b Python library for
   ORM-style structured document extraction via Pydantic contracts; ExtractThinker in cluster prose.
 - [`fastmcp`](../../repo-notes/fastmcp.md) — Integrate-verdict decorator-plus-introspection framework adopted as the

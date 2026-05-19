@@ -306,6 +306,12 @@ These converge on a single architectural implication: **build the custom orchest
 adopt patterns/primitives from off-the-shelf tools rather than re-implement them.** Phase 1f deliverable is the explicit
 Algorithm-check.
 
+**everything-claude-code (added 2026-05-18) cross-cuts skills-and-practices + g7-harnesses + agentic-systems +
+g6-mcp-tools.** affaan-m's 182K-star multi-harness performance system anchors a fourth cross-edge in the orchestration
+cluster — the closest existing reference to the full Claude-Code-shaped ecosystem (skills + hooks + agent files + MCP
+configs + runtime gating). Primary thematic home: skills-and-practices; secondary: g7-harnesses (multi-harness pattern
+as strong confirming signal for DEC-0017 harness plurality).
+
 ---
 
 ## Where the syntheses tension

@@ -556,6 +556,10 @@ Cross-references that were load-bearing without being part of Group D:
 
 ### Repo-notes
 
+- [`everything-claude-code`](../repo-notes/everything-claude-code.md) — affaan-m's 182K-star agent-harness performance
+  system; agent-file frontmatter as the cleanest reference for per-Worker role definitions (third corner of the
+  task-spec / agent-state / role-definition triangle alongside goose Recipe + Letta Agent File). Continuous-learning
+  hooks (`/learn` → `/evolve` → `/promote` → `/instinct-status`) relevant to the agent-improvement thread.
 - [`goose`](../repo-notes/goose.md) — production Rust+MCP coding agent (Block / AAIF); Recipe DSL as one of the three
   reference task-spec shapes for the Phase 3 spawner.
 - [`Letta`](../repo-notes/Letta.md) — productized MemGPT descendant; Agent File task-spec shape and Anthropic-compat
