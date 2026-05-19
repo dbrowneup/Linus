@@ -79,7 +79,9 @@ These eight items each block a Phase 1 spike or a Phase 2a architectural decisio
   regression coverage) tasks against the local Ollama Worker. For Dan's domain (genomics Q&A, metagenomics analysis,
   paper summarization), semantic-similarity assertions may not capture correctness — gene names are right or wrong, not
   "similar." Phase 1d blocks on Dan authoring the tasks and choosing the grader strategy. _(g11-agent-frameworks;
-  cross-cutting Phase 1d need.)_
+  cross-cutting Phase 1d need.)_ _INFORMED 2026-05-18 (post-consolidation audit) by the qwen3:8b + qwen3.6:27b
+  baselines; design call carried by C2 in `docs/specs/2026-05-18-dan-manual-tasks.md`. See
+  [answered-questions.md](answered-questions.md#session-2026-05-18-resolutions)._
 - **R2-04. Context-routing policy in the Phase 2a orchestration layer.** Agent-Skills-for-Context-Engineering argues
   that context quality, not model size, is the primary determinant of Worker effectiveness. When does session history
   get summarized vs. passed verbatim? When does a KB query result get truncated vs. passed in full? Phase 2a spec needs
@@ -259,7 +261,10 @@ These eight items each block a Phase 1 spike, a Phase 2a deliverable, or an ADR 
   syntheses give slightly different model lists for the Phase 1c benchmark sweep (g1 includes `llama3-8b-1.58` via
   Ollama as a 1-bit baseline; native-low-bit's four-way comparison does not). Running the spike from two reading angles
   produces different test matrices. Reconcile in `docs/specs/phase1c-spike.md` first. _(native-low-bit-apple-silicon;
-  cluster anchor: g1-apple-silicon.)_
+  cluster anchor: g1-apple-silicon.)_ _INFORMED 2026-05-18 (post-consolidation audit): qwen3.6:27b run failed all three
+  Dan-task baselines at the 600s timeout — 27B-class FP16 is not viable as M1 Max 32 GB FP16 ceiling; the existing
+  spike spec's Qwen2.5-7B/14B cap is the right anchor. See
+  [answered-questions.md](answered-questions.md#session-2026-05-18-resolutions)._
 - **R3-05. AlphaGenome local-deployability spike (overdue Phase 1).** The biological-foundation-models synthesis
   recommends a one-day spike (clone, inspect model size, attempt one local inference on a 1 Mb interval) before
   committing the variant-scoring skill. Not yet done. The answer determines whether AlphaGenome is a local Worker or
@@ -347,7 +352,11 @@ proceeds.
 - **R3-22. Bonsai Ternary 8B domain-task quality gap measurement (pre-Phase-1c).** The 75.5 published benchmark average
   (95% of FP16 Qwen3-8B) is on general benchmarks; Dan's genomics and metagenomics questions may show a different gap. A
   10-task informal pre-Phase-1c run gives an early signal on whether the ternary checkpoint is Worker-viable before the
-  formal sweep. Determines whether Phase 1c resources go to confirmation or discovery. _(g1-apple-silicon.)_
+  formal sweep. Determines whether Phase 1c resources go to confirmation or discovery. _(g1-apple-silicon.)_ _INFORMED
+  2026-05-18 (post-consolidation audit): qwen3:8b 3-task baseline at
+  `benchmarks/results/dan_tasks_baseline_2026-05-18-qwen3-8b.json` provides the FP16 8B-class anchor against which the
+  Bonsai ternary 8B run, when executed, can be compared. See
+  [answered-questions.md](answered-questions.md#session-2026-05-18-resolutions)._
 - **R3-23. paper-qa "adopt + extend" interaction with G2 lift candidates.** g8 established paper-qa as the first
   paper-corpus Integrate (DEC-0044). G2 identified wikiloom's chunk-id derivation, TheKnowledge's citation validator,
   and llmbase's operations registry as high-priority lift candidates for Phase 2 KB. Do those lifts go on top of
