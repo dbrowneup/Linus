@@ -38,10 +38,12 @@ import json
 import os
 import time
 import uuid
+from collections.abc import Iterator
 from typing import Any
 
 import ollama
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from linus.tools import ToolRegistry, default_registry
@@ -561,6 +563,183 @@ def _ollama_finish_to_anthropic_stop_reason(finish_reason: str | None) -> str:
     return "end_turn"
 
 
+def _sse_format(payload: dict[str, Any]) -> str:
+    """Encode a payload dict as a single Server-Sent Event in OpenAI's wire shape.
+
+    OpenAI's streaming endpoint emits ``data: {json}\\n\\n`` for each chunk and
+    a final ``data: [DONE]\\n\\n`` sentinel. This helper handles the ``{json}``
+    case; the sentinel is emitted as a string literal at the end of the stream.
+    """
+    return f"data: {json.dumps(payload)}\n\n"
+
+
+def _streaming_chunk(
+    completion_id: str,
+    created: int,
+    model: str,
+    delta: dict[str, Any],
+    finish_reason: str | None = None,
+) -> dict[str, Any]:
+    """Build one OpenAI ``chat.completion.chunk``-shaped dict.
+
+    Per the OpenAI streaming contract, each chunk has the same envelope as
+    a non-streaming completion but with ``object="chat.completion.chunk"``
+    and a single ``delta`` (partial update) instead of a full ``message``.
+    The first chunk of a stream typically carries ``delta={"role": "assistant"}``;
+    subsequent chunks carry ``delta={"content": "<token-or-tokens>"}``;
+    the terminal chunk carries an empty delta plus ``finish_reason``.
+    """
+    return {
+        "id": completion_id,
+        "object": "chat.completion.chunk",
+        "created": created,
+        "model": model,
+        "choices": [
+            {
+                "index": 0,
+                "delta": delta,
+                "finish_reason": finish_reason,
+            }
+        ],
+    }
+
+
+def _stream_chat_completion(
+    transcript: list[ChatMessage],
+    resolved_model: str,
+    options: dict[str, Any],
+    tool_specs: list[dict[str, Any]],
+) -> Iterator[str]:
+    """Generator yielding SSE-encoded OpenAI streaming chunks.
+
+    Iterates Ollama's native streaming chat API. When the model emits
+    ``tool_calls`` (typically arriving on the final chunk of an iteration),
+    the generator executes them server-side via
+    :data:`linus.tools.default_registry`, appends ``role=tool`` messages to
+    the transcript, and continues streaming the next iteration. Up to
+    :data:`_MAX_TOOL_ITERATIONS` cycles; the bound is shared with the
+    non-streaming path.
+
+    Tool-call content is **not** emitted as visible deltas to the client —
+    the tool roundtrip is server-internal, and only the model's final
+    text response surfaces token-by-token. This matches the UX users
+    expect (they see the answer, not the plumbing); harnesses that want
+    to inspect tool calls should hit the non-streaming endpoint.
+
+    The terminating event is ``data: [DONE]\\n\\n`` per the OpenAI spec.
+    Errors mid-stream are emitted as a final ``data: {"error": ...}`` event
+    before ``[DONE]`` so the client sees a structured failure rather than
+    a half-finished stream.
+    """
+    completion_id = f"chatcmpl-{uuid.uuid4().hex}"
+    created = int(time.time())
+
+    # Emit the leading role chunk (OpenAI's convention: the first delta
+    # carries role=assistant; subsequent chunks carry content deltas).
+    yield _sse_format(
+        _streaming_chunk(completion_id, created, resolved_model, delta={"role": "assistant"})
+    )
+
+    for iteration in range(_MAX_TOOL_ITERATIONS + 1):
+        try:
+            stream = ollama.chat(
+                model=resolved_model,
+                messages=[_message_to_ollama(m) for m in transcript],
+                stream=True,
+                options=options or None,
+                tools=tool_specs or None,
+            )
+        except Exception as exc:  # noqa: BLE001 — surface any failure mid-stream
+            yield _sse_format({"error": {"message": f"Ollama call failed: {exc!r}", "type": "ollama_error"}})
+            yield "data: [DONE]\n\n"
+            return
+
+        accumulated_content = ""
+        last_message_obj: Any = None
+        last_done_reason: str | None = None
+
+        for chunk in stream:
+            if isinstance(chunk, dict):
+                message_obj = chunk.get("message", {}) or {}
+                done = bool(chunk.get("done", False))
+                done_reason = chunk.get("done_reason")
+            else:
+                message_obj = getattr(chunk, "message", None) or {}
+                done = bool(getattr(chunk, "done", False))
+                done_reason = getattr(chunk, "done_reason", None)
+
+            content_delta = ""
+            if isinstance(message_obj, dict):
+                content_delta = message_obj.get("content", "") or ""
+            else:
+                content_delta = getattr(message_obj, "content", "") or ""
+
+            if content_delta:
+                accumulated_content += content_delta
+                yield _sse_format(
+                    _streaming_chunk(completion_id, created, resolved_model, delta={"content": content_delta})
+                )
+
+            if done:
+                last_message_obj = message_obj
+                last_done_reason = done_reason
+                break
+
+        tool_calls = _extract_tool_calls(last_message_obj) if last_message_obj is not None else []
+
+        if not tool_calls:
+            yield _sse_format(
+                _streaming_chunk(
+                    completion_id,
+                    created,
+                    resolved_model,
+                    delta={},
+                    finish_reason=last_done_reason or "stop",
+                )
+            )
+            yield "data: [DONE]\n\n"
+            return
+
+        transcript.append(
+            ChatMessage(role="assistant", content=accumulated_content or "", tool_calls=tool_calls)
+        )
+
+        if iteration >= _MAX_TOOL_ITERATIONS:
+            yield _sse_format(
+                _streaming_chunk(
+                    completion_id,
+                    created,
+                    resolved_model,
+                    delta={},
+                    finish_reason="tool_calls",
+                )
+            )
+            yield "data: [DONE]\n\n"
+            return
+
+        for tc in tool_calls:
+            try:
+                tool_result = default_registry.call_tool(tc.function.name, tc.function.arguments)
+                payload = _format_tool_result(tool_result)
+            except KeyError:
+                payload = json.dumps({"error": f"Tool {tc.function.name!r} is not registered"})
+            except ToolError as exc:
+                payload = json.dumps({"error": str(exc)})
+            except Exception as exc:  # pragma: no cover - defensive
+                payload = json.dumps({"error": f"Unexpected tool error: {type(exc).__name__}: {exc}"})
+
+            transcript.append(
+                ChatMessage(
+                    role="tool",
+                    name=tc.function.name,
+                    tool_call_id=tc.id,
+                    content=payload,
+                )
+            )
+
+    yield "data: [DONE]\n\n"
+
+
 # --- app --------------------------------------------------------------------
 
 
@@ -593,8 +772,8 @@ def healthz() -> dict[str, Any]:
     }
 
 
-@app.post("/v1/chat/completions", response_model=ChatCompletionResponse)
-def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
+@app.post("/v1/chat/completions")
+def chat_completions(req: ChatCompletionRequest):
     """OpenAI-compatible chat-completions endpoint.
 
     The v0+Item6 implementation:
@@ -607,9 +786,10 @@ def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
       or :data:`_MAX_TOOL_ITERATIONS` is hit.
     - Translates ``temperature``, ``top_p``, ``max_tokens`` into Ollama
       ``options``. Other sampling fields are not yet honored.
-
-    Streaming (``stream=true``) is accepted but ignored in v0 — the response
-    is always materialized in full before returning.
+    - When ``stream=true``, returns a ``text/event-stream`` SSE response
+      emitting OpenAI-shape ``chat.completion.chunk`` events terminated by
+      ``data: [DONE]``. Tool-call iterations are server-internal in the
+      streaming path — only final assistant text surfaces token-by-token.
     """
     if not req.messages:
         raise HTTPException(status_code=400, detail="messages must be a non-empty list")
@@ -619,6 +799,13 @@ def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
     tool_specs = _merge_tool_specs(default_registry, req.tools)
 
     transcript: list[ChatMessage] = list(req.messages)
+
+    if req.stream:
+        return StreamingResponse(
+            _stream_chat_completion(transcript, resolved, options, tool_specs),
+            media_type="text/event-stream",
+        )
+
     final_message, finish_reason, prompt_tokens_total, completion_tokens_total = _run_chat_loop(
         transcript, resolved, options, tool_specs
     )
