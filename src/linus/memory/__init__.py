@@ -18,6 +18,13 @@ not in this package yet — they're blocked on the DEC-0033 CoT-gap fingerprint 
 from linus.memory.audit_log import AuditLog, DispatchEvent, MemoryWriteEvent
 from linus.memory.episodic import EpisodicRecord, EpisodicStore
 from linus.memory.hashing import content_hash, verify_hash
+from linus.memory.sessions import (
+    Session,
+    SessionStore,
+    StoredMessage,
+    get_default_store,
+    reset_default_store,
+)
 
 __all__ = [
     "AuditLog",
@@ -25,6 +32,11 @@ __all__ = [
     "EpisodicRecord",
     "EpisodicStore",
     "MemoryWriteEvent",
+    "Session",
+    "SessionStore",
+    "StoredMessage",
     "content_hash",
+    "get_default_store",
+    "reset_default_store",
     "verify_hash",
 ]

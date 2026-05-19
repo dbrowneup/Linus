@@ -46,6 +46,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from linus.memory.sessions import (
+    SessionStore,
+    StoredMessage,
+    get_default_store,
+)
 from linus.tools import ToolRegistry, default_registry
 from linus.tools.registry import ToolError
 
@@ -143,6 +148,11 @@ class ChatCompletionRequest(BaseModel):
     # OpenAI permits ``"auto"`` / ``"none"`` / ``"required"`` / a forced-tool
     # object here; v0 accepts and forwards the string forms verbatim.
     tool_choice: str | dict[str, Any] | None = None
+    # Optional session_id makes the request stateful: when present, the
+    # server prepends prior stored history to ``messages`` before sending
+    # to Ollama, and appends the new user turn(s) + assistant response to
+    # the store after the call completes. Per task A.3 of the MVP spec.
+    session_id: str | None = None
 
 
 class ChatCompletionChoice(BaseModel):
@@ -164,6 +174,41 @@ class ChatCompletionResponse(BaseModel):
     model: str
     choices: list[ChatCompletionChoice]
     usage: ChatCompletionUsage
+
+
+# --- Session-store API models (task A.3) ------------------------------------
+
+
+class CreateSessionRequest(BaseModel):
+    """Body of ``POST /v1/sessions``. All fields are optional."""
+
+    model: str | None = None
+    system_prompt: str | None = None
+    session_id: str | None = Field(
+        default=None,
+        description="Client-provided session id (UUID). If omitted, the server mints one.",
+    )
+
+
+class CreateSessionResponse(BaseModel):
+    session_id: str
+    created_at: int
+    model: str | None = None
+    system_prompt: str | None = None
+
+
+class StoredMessageOut(BaseModel):
+    """One entry in ``GET /v1/sessions/{id}/messages``."""
+
+    idx: int
+    role: str
+    content: str
+    created_at: int
+
+
+class SessionMessagesResponse(BaseModel):
+    session_id: str
+    messages: list[StoredMessageOut]
 
 
 # --- Anthropic-compatible request/response models (per DEC-0056) ------------
@@ -388,6 +433,11 @@ def _format_tool_result(result: Any) -> str:
         return json.dumps(result, default=str)
     except (TypeError, ValueError):
         return str(result)
+
+
+def _stored_to_chat_message(stored: StoredMessage) -> ChatMessage:
+    """Translate a :class:`StoredMessage` into the internal :class:`ChatMessage` shape."""
+    return ChatMessage(role=stored.role, content=stored.content)
 
 
 def _message_to_ollama(msg: ChatMessage) -> dict[str, Any]:
@@ -740,6 +790,58 @@ def _stream_chat_completion(
     yield "data: [DONE]\n\n"
 
 
+def _stream_with_session_append(
+    transcript: list[ChatMessage],
+    resolved_model: str,
+    options: dict[str, Any],
+    tool_specs: list[dict[str, Any]],
+    store: SessionStore,
+    session_id: str,
+    new_messages: list[ChatMessage],
+) -> Iterator[str]:
+    """Wrap :func:`_stream_chat_completion` with a post-stream session append.
+
+    Streams normally, accumulating the assistant content from each
+    ``delta.content`` event. After the inner stream emits ``[DONE]``,
+    appends the new user/system messages + the accumulated assistant
+    response to the session store so the next request with the same
+    ``session_id`` sees this turn in its history.
+
+    Session writes are best-effort — any exception during the append
+    is swallowed silently so a storage failure doesn't truncate the
+    user-visible stream.
+    """
+    accumulated = ""
+    for event in _stream_chat_completion(transcript, resolved_model, options, tool_specs):
+        yield event
+        # Parse content deltas as they fly by; cheap because each event is
+        # already a small JSON blob the client is consuming.
+        if event.startswith("data: "):
+            payload = event[len("data: "):].strip()
+            if payload and payload != "[DONE]":
+                try:
+                    chunk = json.loads(payload)
+                except json.JSONDecodeError:
+                    continue
+                choices = chunk.get("choices") or []
+                if choices:
+                    delta_content = choices[0].get("delta", {}).get("content")
+                    if delta_content:
+                        accumulated += delta_content
+
+    try:
+        new_turns: list[tuple[str, str]] = []
+        for m in new_messages:
+            if m.role in ("user", "system") and m.content:
+                new_turns.append((m.role, m.content))
+        if accumulated:
+            new_turns.append(("assistant", accumulated))
+        if new_turns:
+            store.append_messages(session_id, new_turns)
+    except Exception:  # noqa: BLE001 — session-store failure must not truncate the stream
+        pass
+
+
 # --- app --------------------------------------------------------------------
 
 
@@ -798,9 +900,27 @@ def chat_completions(req: ChatCompletionRequest):
     options = _build_options(req)
     tool_specs = _merge_tool_specs(default_registry, req.tools)
 
-    transcript: list[ChatMessage] = list(req.messages)
+    # Session-aware mode: if session_id is set, prepend stored history before
+    # req.messages. The client only sends NEW turns; the server reconstructs
+    # the full transcript so model context survives page refreshes.
+    history: list[ChatMessage] = []
+    store: SessionStore | None = None
+    if req.session_id:
+        store = get_default_store()
+        store.ensure_session(req.session_id, model=resolved)
+        history = [_stored_to_chat_message(m) for m in store.get_messages(req.session_id)]
+
+    transcript: list[ChatMessage] = history + list(req.messages)
 
     if req.stream:
+        if store is not None and req.session_id:
+            # Wrap the stream generator with a post-stream session append.
+            return StreamingResponse(
+                _stream_with_session_append(
+                    transcript, resolved, options, tool_specs, store, req.session_id, req.messages
+                ),
+                media_type="text/event-stream",
+            )
         return StreamingResponse(
             _stream_chat_completion(transcript, resolved, options, tool_specs),
             media_type="text/event-stream",
@@ -809,6 +929,18 @@ def chat_completions(req: ChatCompletionRequest):
     final_message, finish_reason, prompt_tokens_total, completion_tokens_total = _run_chat_loop(
         transcript, resolved, options, tool_specs
     )
+
+    # Session-aware mode: append the new user turns + assistant response so the
+    # next request with the same session_id sees this turn in its history.
+    if store is not None and req.session_id:
+        new_turns: list[tuple[str, str]] = []
+        for m in req.messages:
+            if m.role in ("user", "system") and m.content:
+                new_turns.append((m.role, m.content))
+        if final_message.content:
+            new_turns.append(("assistant", final_message.content))
+        if new_turns:
+            store.append_messages(req.session_id, new_turns)
 
     return ChatCompletionResponse(
         id=f"chatcmpl-{uuid.uuid4().hex}",
@@ -908,6 +1040,56 @@ def messages(req: AnthropicMessageRequest) -> AnthropicMessageResponse:
             input_tokens=prompt_tokens_total,
             output_tokens=completion_tokens_total,
         ),
+    )
+
+
+@app.post("/v1/sessions", response_model=CreateSessionResponse)
+def create_session(req: CreateSessionRequest | None = None) -> CreateSessionResponse:
+    """Create a new chat session and return its id.
+
+    Body is optional. Callers can supply ``model`` and ``system_prompt``
+    for the UI to surface; they're stored verbatim but not enforced on
+    subsequent requests. Callers can also provide their own
+    ``session_id`` (e.g. a browser-generated UUID) and the server will
+    honor it.
+    """
+    body = req or CreateSessionRequest()
+    store = get_default_store()
+    session = store.create_session(
+        model=body.model,
+        system_prompt=body.system_prompt,
+        session_id=body.session_id,
+    )
+    return CreateSessionResponse(
+        session_id=session.id,
+        created_at=session.created_at,
+        model=session.model,
+        system_prompt=session.system_prompt,
+    )
+
+
+@app.get("/v1/sessions/{session_id}/messages", response_model=SessionMessagesResponse)
+def get_session_messages(session_id: str) -> SessionMessagesResponse:
+    """Return the stored message history for a session.
+
+    Used by the Streamlit chat page (task B.1) to render conversation
+    history on page load. The session must exist; 404 otherwise.
+    """
+    store = get_default_store()
+    if store.get_session(session_id) is None:
+        raise HTTPException(status_code=404, detail=f"Unknown session_id: {session_id!r}")
+    messages = store.get_messages(session_id)
+    return SessionMessagesResponse(
+        session_id=session_id,
+        messages=[
+            StoredMessageOut(
+                idx=m.idx,
+                role=m.role,
+                content=m.content,
+                created_at=m.created_at,
+            )
+            for m in messages
+        ],
     )
 
 
