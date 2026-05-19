@@ -46,6 +46,7 @@ from linus.tools.registry import (
 # import default_registry`` users get a populated registry without any
 # explicit second import.
 from linus.tools import kb_tools as _kb_tools  # noqa: F401
+from linus.tools import arxiv_ingest as _arxiv_ingest  # noqa: F401
 
 __all__ = [
     "ToolRegistry",
