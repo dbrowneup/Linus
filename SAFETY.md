@@ -252,7 +252,9 @@ Rotate in this order (not in parallel — each rotation is auditable and recover
 4. Run a clean smoke test (Phase 1c spike, single config) in the rebuilt env; verify behavior matches pre-incident
    baseline.
 5. Document the incident in `docs/incidents/<YYYY-MM-DD>-<short-name>.md`: timeline, scope, response actions,
-   lessons learned, policy updates (e.g., add a package to a permanent blocklist).
+   lessons learned, policy updates (e.g., add a package to a permanent blocklist). The `docs/incidents/` directory
+   will be created at first-incident time; routine non-incident `pip-audit` findings go in
+   [`docs/security-log.md`](docs/security-log.md) instead.
 6. Resume normal autonomy tier only after all five attestation steps complete.
 
 ### `pip-audit` CVE response (non-incident, routine)

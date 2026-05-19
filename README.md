@@ -21,8 +21,14 @@ documentation exist to make the author's own work easier and to be a pleasure to
 
 ## Status
 
-**Phase 1 — Recon and Baselines** (in progress). Phase 0 closed. Repo synthesis notes largely complete; pmetal
-evaluation underway (built from source, smoke tests pass). See [ROADMAP.md](ROADMAP.md) for the phased plan.
+**Phase 1 — Recon and Baselines** (mostly done) + **Phase 2 — Linus MVP** (Phase 2a substantially landed). Phase 0
+closed. Repo synthesis notes complete (~130 repo-notes + ~127 paper-notes + 27 syntheses). Phase 2a shipped: FastAPI
+orchestration backend (OpenAI-compatible `/v1/chat/completions`), KB read-only adapter, memory v0 (SQLite episodic
+store + content hashing + JSONL audit log), tool registry, and SandboxFS (PRs #32–#51). Phase 1b pmetal verdict ADR
+still pending (Dan-driven; see [`docs/specs/2026-05-18-dan-manual-tasks.md`](docs/specs/2026-05-18-dan-manual-tasks.md)
+task A1). See [ROADMAP.md](ROADMAP.md) for the full phased plan and
+[`docs/specs/2026-05-17-linus-implementation-plan-v2.md`](docs/specs/2026-05-17-linus-implementation-plan-v2.md) for
+the current implementation arc.
 
 ## Principles
 
@@ -108,11 +114,11 @@ python -c "import linus; print(linus.__version__)"
 brew services start ollama
 ollama pull qwen3:14b   # or qwen3:8b depending on memory headroom; selection finalized in Phase 1c
 
-# 6. (Phase 2+) Launch the Linus backend
-# python -m linus.server  # not yet implemented
+# 6. Launch the Linus backend (Phase 2a; v0 — OpenAI-compatible /v1/chat/completions)
+uvicorn linus.server:app --reload   # or: linus-serve (entry point per pyproject.toml)
 
-# 7. (Phase 2+) Launch the chat UI
-# streamlit run src/linus/app/main.py  # not yet implemented
+# 7. (Phase 2b — not yet implemented) Launch the chat UI
+# streamlit run src/linus/app/main.py  # planned in v2 plan item N8
 ```
 
 ## For Claude Code sessions
