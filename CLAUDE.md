@@ -752,6 +752,21 @@ behaves as a fast-forward of `origin/<base>` to wherever the head pointed at PR 
 push vehicle for prior local-main commits. This is not a bug but it can confuse reviewers. PR #12 (2026-05-06) was the
 canonical instance — see the planning-update-execution session summary for the full incident.
 
+**Xcode Metal Toolchain is a load-bearing dep for Metal-shader builds; macOS updates silently break it.** Rust/C++
+projects that compile Metal shaders (notably `repos/pmetal/` building `pmetal-bridge` via MLX) require Xcode's Metal
+Toolchain component. macOS updates can silently invalidate this component, causing `cargo build` to fail deep in the
+build script with `error: cannot execute tool 'metal' due to missing Metal Toolchain; use: xcodebuild
+-downloadComponent MetalToolchain`. Recovery (interactive, requires user; cannot be automated by Maestro):
+
+```
+xcodebuild -runFirstLaunch          # if xcodebuild itself reports a plug-in load failure
+xcodebuild -downloadComponent MetalToolchain
+```
+
+First hit + recovered 2026-05-19 during the pmetal v0.5.0 rebuild for the Agora hackathon. The fix is environmental,
+not code — do not attempt build-script workarounds. After each macOS update, plan for the possibility that the next
+pmetal build will need this sequence rerun.
+
 ---
 
 _This file is the contract between Dan and Claude (Maestro), and any Worker operating in the Linus repo. Update it when
