@@ -164,6 +164,77 @@ class ChatCompletionResponse(BaseModel):
     usage: ChatCompletionUsage
 
 
+# --- Anthropic-compatible request/response models (per DEC-0056) ------------
+
+
+class AnthropicTextBlock(BaseModel):
+    """One ``{"type": "text", "text": ...}`` content block."""
+
+    type: str = "text"
+    text: str
+
+
+class AnthropicInputMessage(BaseModel):
+    """One message in an Anthropic Messages API request.
+
+    Anthropic accepts ``content`` as either a plain string OR a list of
+    typed content blocks (text, image, tool_use, tool_result, etc.). v1
+    accepts both shapes for ``role`` ∈ {``user``, ``assistant``}; only
+    text content is forwarded to the underlying Ollama model. Non-text
+    blocks are silently dropped with a logged warning — image/tool
+    handling is a v2 hop.
+    """
+
+    role: str
+    content: str | list[AnthropicTextBlock | dict[str, Any]]
+
+
+class AnthropicMessageRequest(BaseModel):
+    """Subset of the Anthropic Messages API sufficient for v1.
+
+    See https://docs.anthropic.com/en/api/messages for the full spec.
+    Fields beyond this subset are accepted but ignored (Pydantic
+    silently drops unknown fields).
+    """
+
+    model: str
+    max_tokens: int
+    messages: list[AnthropicInputMessage]
+    system: str | None = None
+    temperature: float | None = None
+    top_p: float | None = None
+    stream: bool = False
+    # Anthropic also accepts ``stop_sequences`` and ``metadata``; we accept
+    # but don't act on them in v1.
+    stop_sequences: list[str] | None = None
+    metadata: dict[str, Any] | None = None
+
+
+class AnthropicUsage(BaseModel):
+    """Anthropic-shape usage payload."""
+
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+
+class AnthropicMessageResponse(BaseModel):
+    """Anthropic Messages API response shape.
+
+    The Python ``anthropic`` SDK constructs its ``Message`` object from
+    exactly this JSON shape, so as long as the field names and types
+    match, the SDK is happy.
+    """
+
+    id: str
+    type: str = "message"
+    role: str = "assistant"
+    content: list[AnthropicTextBlock]
+    model: str
+    stop_reason: str | None = "end_turn"
+    stop_sequence: str | None = None
+    usage: AnthropicUsage
+
+
 # --- helpers ----------------------------------------------------------------
 
 
@@ -351,6 +422,145 @@ def _message_to_ollama(msg: ChatMessage) -> dict[str, Any]:
     return out
 
 
+def _run_chat_loop(
+    transcript: list[ChatMessage],
+    resolved_model: str,
+    options: dict[str, Any],
+    tool_specs: list[dict[str, Any]],
+) -> tuple[ChatMessage, str, int, int]:
+    """Run the Ollama chat-with-tools loop and return the final message.
+
+    Shared between :func:`chat_completions` (OpenAI shape) and
+    :func:`messages` (Anthropic shape). Mutates ``transcript`` by
+    appending assistant turns + tool-result messages as the loop
+    progresses.
+
+    Returns ``(final_message, finish_reason, prompt_tokens, completion_tokens)``.
+    """
+    final_message: ChatMessage | None = None
+    finish_reason: str | None = None
+    prompt_tokens_total = 0
+    completion_tokens_total = 0
+
+    for iteration in range(_MAX_TOOL_ITERATIONS + 1):
+        try:
+            result = ollama.chat(
+                model=resolved_model,
+                messages=[_message_to_ollama(m) for m in transcript],
+                stream=False,
+                options=options or None,
+                tools=tool_specs or None,
+            )
+        except ollama.ResponseError as exc:
+            raise HTTPException(status_code=502, detail=f"Ollama returned an error: {exc!s}") from exc
+        except Exception as exc:  # pragma: no cover - network/daemon failure path
+            raise HTTPException(status_code=502, detail=f"Ollama call failed: {exc!r}") from exc
+
+        if isinstance(result, dict):
+            message_obj = result.get("message", {}) or {}
+            content = message_obj.get("content", "") if isinstance(message_obj, dict) else ""
+            prompt_tokens = int(result.get("prompt_eval_count", 0) or 0)
+            completion_tokens = int(result.get("eval_count", 0) or 0)
+            done_reason = result.get("done_reason") or ("stop" if result.get("done") else None)
+        else:
+            message_obj = getattr(result, "message", None)
+            content = getattr(message_obj, "content", "") if message_obj is not None else ""
+            prompt_tokens = int(getattr(result, "prompt_eval_count", 0) or 0)
+            completion_tokens = int(getattr(result, "eval_count", 0) or 0)
+            done_reason = getattr(result, "done_reason", None) or (
+                "stop" if getattr(result, "done", False) else None
+            )
+
+        prompt_tokens_total += prompt_tokens
+        completion_tokens_total += completion_tokens
+
+        tool_calls = _extract_tool_calls(message_obj)
+
+        assistant_msg = ChatMessage(
+            role="assistant",
+            content=content or "",
+            tool_calls=tool_calls or None,
+        )
+
+        if not tool_calls:
+            final_message = assistant_msg
+            finish_reason = done_reason or "stop"
+            break
+
+        transcript.append(assistant_msg)
+
+        if iteration >= _MAX_TOOL_ITERATIONS:
+            final_message = assistant_msg
+            finish_reason = "length"
+            break
+
+        for tc in tool_calls:
+            try:
+                tool_result = default_registry.call_tool(tc.function.name, tc.function.arguments)
+                payload = _format_tool_result(tool_result)
+            except KeyError:
+                payload = json.dumps({"error": f"Tool {tc.function.name!r} is not registered"})
+            except ToolError as exc:
+                payload = json.dumps({"error": str(exc)})
+            except Exception as exc:  # pragma: no cover - defensive
+                payload = json.dumps({"error": f"Unexpected tool error: {type(exc).__name__}: {exc}"})
+
+            transcript.append(
+                ChatMessage(
+                    role="tool",
+                    name=tc.function.name,
+                    tool_call_id=tc.id,
+                    content=payload,
+                )
+            )
+
+    if final_message is None:
+        final_message = ChatMessage(role="assistant", content="")
+        finish_reason = "stop"
+
+    return final_message, finish_reason or "stop", prompt_tokens_total, completion_tokens_total
+
+
+def _anthropic_input_to_transcript(req: AnthropicMessageRequest) -> list[ChatMessage]:
+    """Translate an Anthropic Messages request into the internal :class:`ChatMessage` list.
+
+    The Anthropic shape has ``system`` as a separate top-level field; we
+    fold it into the transcript as a leading ``role=system`` message.
+    Multi-block content (list of typed content blocks) is flattened to
+    the concatenation of all ``type=text`` blocks; non-text blocks are
+    dropped silently in v1 (image / tool_use / tool_result handling is
+    a v2 hop).
+    """
+    transcript: list[ChatMessage] = []
+    if req.system:
+        transcript.append(ChatMessage(role="system", content=req.system))
+
+    for input_msg in req.messages:
+        if isinstance(input_msg.content, str):
+            text = input_msg.content
+        else:
+            text_parts: list[str] = []
+            for block in input_msg.content:
+                if isinstance(block, AnthropicTextBlock):
+                    text_parts.append(block.text)
+                elif isinstance(block, dict) and block.get("type") == "text":
+                    text_parts.append(str(block.get("text", "")))
+                # Non-text blocks dropped silently in v1.
+            text = "\n".join(p for p in text_parts if p)
+        transcript.append(ChatMessage(role=input_msg.role, content=text))
+
+    return transcript
+
+
+def _ollama_finish_to_anthropic_stop_reason(finish_reason: str | None) -> str:
+    """Translate Ollama's ``done_reason`` into Anthropic's ``stop_reason``."""
+    if finish_reason in (None, "stop"):
+        return "end_turn"
+    if finish_reason == "length":
+        return "max_tokens"
+    return "end_turn"
+
+
 # --- app --------------------------------------------------------------------
 
 
@@ -408,106 +618,10 @@ def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
     options = _build_options(req)
     tool_specs = _merge_tool_specs(default_registry, req.tools)
 
-    # Running transcript. Each model turn appends its assistant message; each
-    # tool execution appends one role=tool message.
     transcript: list[ChatMessage] = list(req.messages)
-
-    final_message: ChatMessage | None = None
-    finish_reason: str | None = None
-    prompt_tokens_total = 0
-    completion_tokens_total = 0
-
-    for iteration in range(_MAX_TOOL_ITERATIONS + 1):
-        try:
-            # ``tools=None`` is intentional when nothing is registered — Ollama
-            # treats an empty list as "no tools" but some builds get confused
-            # by an empty array. Passing None drops the field entirely.
-            result = ollama.chat(
-                model=resolved,
-                messages=[_message_to_ollama(m) for m in transcript],
-                stream=False,
-                options=options or None,
-                tools=tool_specs or None,
-            )
-        except ollama.ResponseError as exc:
-            raise HTTPException(status_code=502, detail=f"Ollama returned an error: {exc!s}") from exc
-        except Exception as exc:  # pragma: no cover - network/daemon failure path
-            raise HTTPException(status_code=502, detail=f"Ollama call failed: {exc!r}") from exc
-
-        # Read the assistant message + token counts out of the ollama response
-        # in a version-tolerant way (dict vs typed object).
-        if isinstance(result, dict):
-            message_obj = result.get("message", {}) or {}
-            content = message_obj.get("content", "") if isinstance(message_obj, dict) else ""
-            prompt_tokens = int(result.get("prompt_eval_count", 0) or 0)
-            completion_tokens = int(result.get("eval_count", 0) or 0)
-            done_reason = result.get("done_reason") or ("stop" if result.get("done") else None)
-        else:
-            message_obj = getattr(result, "message", None)
-            content = getattr(message_obj, "content", "") if message_obj is not None else ""
-            prompt_tokens = int(getattr(result, "prompt_eval_count", 0) or 0)
-            completion_tokens = int(getattr(result, "eval_count", 0) or 0)
-            done_reason = getattr(result, "done_reason", None) or (
-                "stop" if getattr(result, "done", False) else None
-            )
-
-        prompt_tokens_total += prompt_tokens
-        completion_tokens_total += completion_tokens
-
-        tool_calls = _extract_tool_calls(message_obj)
-
-        assistant_msg = ChatMessage(
-            role="assistant",
-            content=content or "",
-            tool_calls=tool_calls or None,
-        )
-
-        if not tool_calls:
-            # Plain content — we're done.
-            final_message = assistant_msg
-            finish_reason = done_reason or "stop"
-            break
-
-        # Model requested tool(s). Record the assistant turn, execute each tool,
-        # and append role=tool messages with the results.
-        transcript.append(assistant_msg)
-
-        if iteration >= _MAX_TOOL_ITERATIONS:
-            # We did our last allowed model turn and still got tool_calls.
-            # Surface the assistant turn with the unfulfilled calls and stop.
-            final_message = assistant_msg
-            finish_reason = "length"
-            break
-
-        for tc in tool_calls:
-            try:
-                tool_result = default_registry.call_tool(tc.function.name, tc.function.arguments)
-                payload = _format_tool_result(tool_result)
-            except KeyError:
-                payload = json.dumps(
-                    {"error": f"Tool {tc.function.name!r} is not registered"}
-                )
-            except ToolError as exc:
-                payload = json.dumps({"error": str(exc)})
-            except Exception as exc:  # pragma: no cover - defensive
-                payload = json.dumps(
-                    {"error": f"Unexpected tool error: {type(exc).__name__}: {exc}"}
-                )
-
-            transcript.append(
-                ChatMessage(
-                    role="tool",
-                    name=tc.function.name,
-                    tool_call_id=tc.id,
-                    content=payload,
-                )
-            )
-
-    # Defensive: the loop above always assigns final_message before breaking,
-    # but mypy can't see that and a future refactor might.
-    if final_message is None:
-        final_message = ChatMessage(role="assistant", content="")
-        finish_reason = "stop"
+    final_message, finish_reason, prompt_tokens_total, completion_tokens_total = _run_chat_loop(
+        transcript, resolved, options, tool_specs
+    )
 
     return ChatCompletionResponse(
         id=f"chatcmpl-{uuid.uuid4().hex}",
@@ -527,6 +641,85 @@ def chat_completions(req: ChatCompletionRequest) -> ChatCompletionResponse:
             prompt_tokens=prompt_tokens_total,
             completion_tokens=completion_tokens_total,
             total_tokens=prompt_tokens_total + completion_tokens_total,
+        ),
+    )
+
+
+@app.post("/v1/messages", response_model=AnthropicMessageResponse)
+def messages(req: AnthropicMessageRequest) -> AnthropicMessageResponse:
+    """Anthropic-compatible Messages API endpoint.
+
+    Implements DEC-0056: Linus speaks Anthropic Messages format alongside
+    OpenAI chat-completions so any harness or SDK already pointed at the
+    Anthropic API can target Linus via ``base_url=http://localhost:8000``
+    without code changes.
+
+    v1 ships **non-streaming only**. ``stream=true`` requests return HTTP
+    501 with a structured error pointing at the follow-up task. Full
+    Anthropic SSE streaming (``message_start`` / ``content_block_*`` /
+    ``message_delta`` / ``message_stop`` events) lands when the OpenAI
+    streaming work in task A.1 ships and the same Ollama-streaming
+    plumbing can be reused.
+
+    Internally translates the request into the existing internal
+    :class:`ChatMessage` transcript, runs the shared
+    :func:`_run_chat_loop`, then maps the final assistant message back
+    into Anthropic shape. Tool advertisement is intentionally **not**
+    exposed via this endpoint in v1 — Anthropic tool-use semantics
+    differ enough from OpenAI's that they deserve their own contract;
+    callers wanting tool routing should use ``/v1/chat/completions``.
+    """
+    if not req.messages:
+        raise HTTPException(status_code=400, detail="messages must be a non-empty list")
+
+    if req.stream:
+        raise HTTPException(
+            status_code=501,
+            detail={
+                "error": "streaming_not_implemented",
+                "message": (
+                    "Anthropic-compat streaming is not yet wired in Linus v1. "
+                    "The non-streaming form is available; call again with stream=false. "
+                    "Streaming will land alongside task A.1 (SSE on /v1/chat/completions)."
+                ),
+            },
+        )
+
+    resolved = _resolve_model(req.model)
+
+    # Translate Anthropic sampling fields into the same Ollama options
+    # shape ``_build_options`` produces for /v1/chat/completions.
+    options: dict[str, Any] = {}
+    if req.temperature is not None:
+        options["temperature"] = req.temperature
+    if req.top_p is not None:
+        options["top_p"] = req.top_p
+    if req.max_tokens is not None:
+        options["num_predict"] = req.max_tokens
+
+    transcript = _anthropic_input_to_transcript(req)
+    if not transcript or all(m.role == "system" for m in transcript):
+        raise HTTPException(
+            status_code=400,
+            detail="messages must contain at least one non-system message",
+        )
+
+    final_message, finish_reason, prompt_tokens_total, completion_tokens_total = _run_chat_loop(
+        transcript, resolved, options, []
+    )
+
+    content_text = final_message.content or ""
+    return AnthropicMessageResponse(
+        id=f"msg_{uuid.uuid4().hex[:24]}",
+        type="message",
+        role="assistant",
+        content=[AnthropicTextBlock(type="text", text=content_text)],
+        model=resolved,
+        stop_reason=_ollama_finish_to_anthropic_stop_reason(finish_reason),
+        stop_sequence=None,
+        usage=AnthropicUsage(
+            input_tokens=prompt_tokens_total,
+            output_tokens=completion_tokens_total,
         ),
     )
 
