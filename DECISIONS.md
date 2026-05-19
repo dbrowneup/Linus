@@ -80,6 +80,7 @@ at-a-glance index. The canonical format spec, authoring procedure, and full ADR 
 | [DEC-0057](docs/adr/0057-agpl-fork-posture.md)                                | AGPL-fork posture: clean-room study, no code lifts without project-level license commitment (R4-02)                           | accepted                                                                                    |
 | [DEC-0058](docs/adr/0058-x402-mcp-graduation-pathway.md)                      | @x402/mcp graduation pathway: Watch → Spike → Integrate, with concrete triggers (R4-03)                                       | accepted                                                                                    |
 | [DEC-0059](docs/adr/0059-grounding-gate-output-surface.md)                    | Grounding gate at the OUTPUT surface: hard admission for stakeable Worker outputs (Q1)                                        | accepted                                                                                    |
+| [DEC-0060](docs/adr/0060-loud-degradation-healthz-extension.md)               | Loud degradation: `/healthz` reports `effective_state` + `degradations[]` (Q3)                                                | accepted                                                                                    |
 
 _New decisions: author the ADR in `docs/adr/` first (see [`docs/adr/README.md`](docs/adr/README.md) for the procedure),
 then add a row above._
@@ -97,3 +98,8 @@ ADRs — no `DEC-NNNN` is reserved until the ADR is authored. Listed here so the
    Seeded 2026-05-09 from the Canteen blog + x402 v2.
 4. **DEC-NNNN-agent-identity-venue-decomposition** — Agent/Identity/Venue layered decomposition for multi-jurisdiction
    skill deployment. Seeded 2026-05-09 from the Canteen Trader Manifesto.
+5. **DEC-NNNN-signed-audit-slice** — exportable self-signed slice of audit + episodic records, ed25519-keypair-based,
+   forward-compatible with future Merkle-root external anchoring. Seeded 2026-05-19 from the Archimedes
+   cross-pollination eval (Q2, deferred from v0.5.0 to post-reveal). Motivation: Marelli attribution discipline when
+   Linus output enters Dan's manuscript submissions; today's audit log is fsync'd + append-only but locally checkable
+   only. The signed-slice format is the substrate; a Merkle-anchor layer is a separate later concern.
