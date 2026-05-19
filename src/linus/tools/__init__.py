@@ -48,6 +48,14 @@ from linus.tools.registry import (
 from linus.tools import kb_tools as _kb_tools  # noqa: F401
 from linus.tools import arxiv_ingest as _arxiv_ingest  # noqa: F401
 
+# Phase 2c — paper-qa integration. Importing the module triggers the four
+# ``@tool``-decorated registrations (``paperqa.search``,
+# ``paperqa.gather_evidence``, ``paperqa.answer``, ``paperqa.reset``). The
+# module is intentionally side-effect-light at import time: paper-qa itself
+# is imported lazily inside the tool callables so the hermetic test suite
+# does not require the dependency to be installed.
+from linus.knowledge import paperqa as _paperqa_tools  # noqa: F401
+
 __all__ = [
     "ToolRegistry",
     "ToolSpec",

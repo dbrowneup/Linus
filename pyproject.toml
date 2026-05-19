@@ -41,6 +41,7 @@ dependencies = [
     "pypdf>=4.0",    # PDF text extraction (BSD-3); see DEC-0057 re: PyMuPDF/AGPL choice
     "plotly>=5.20",  # Sankey + 3D UMAP scatter for the Cluster Explorer UI
     "pyvis>=0.3",    # interactive knowledge-graph render for the KG Streamlit page
+    "paper-qa>=5.0", # Phase 2c citation-grounded paper-corpus QA via local Ollama
 ]
 
 [project.optional-dependencies]
