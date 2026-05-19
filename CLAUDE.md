@@ -594,6 +594,16 @@ All changes to `main` require a pull request reviewed by Dan before merge. Branc
 Push to origin and use `gh pr create` to open PRs. Maestro (Dan) reviews and merges via GitHub. Never force-push to
 `main`; force-push to your own branch is OK before opening a PR. See BRANCHING.md for detailed workflows and examples.
 
+**Merge strategy: default is `--merge` (preserve graph), squash only on explicit justification.** Use
+`gh pr merge <N> --merge --delete-branch` or the "Create a merge commit" button in the GitHub UI. Merge commits preserve
+branch divergence + re-convergence in `git log --graph`, keep per-commit authorship and SHAs intact, and make
+`git bisect` and selective revert practical. Squash merges collapse the branch into a single linear commit, obscuring
+this structure — they're the right tool only when a PR contains noisy fix-up commits that don't tell a coherent story
+(e.g., "fix typo", "rebase", "address review feedback") and a clean single-commit summary is more readable than the
+constituent commits. When squash is the right call, state the reason in the PR description; otherwise default to merge.
+Repo-level enforcement: disable "Allow squash merging" in GitHub repo settings (Settings → General → Pull Requests) so
+the merge button cannot fall back to squash without re-enabling first.
+
 ## Session Startup Protocol
 
 When Claude Code opens a session in this repo:
