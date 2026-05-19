@@ -1,0 +1,5 @@
+# QFinCorpus local data — not tracked.
+# The seed list (which papers to fetch) lives in scripts/qfin_arxiv_seed.txt
+# and IS tracked; the actual PDFs + KB pipeline outputs are local-only.
+papers/
+data/
