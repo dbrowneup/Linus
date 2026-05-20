@@ -75,7 +75,6 @@ import networkx as nx
 from linus.app.config import KB_OUTPUTS_DIR
 from linus.knowledge.rigor import BuiltinEntityLookup, EntityLookup
 
-
 __all__ = [
     "ChainedEntityLookup",
     "KBEntityLookup",
@@ -203,10 +202,7 @@ class KBEntityLookup:
         # kg_render.load_kg's behavior — the KB writes a MultiDiGraph but
         # NetworkX's GraphML reader may downcast in some versions).
         if not isinstance(g, nx.MultiDiGraph):
-            if g.is_directed():
-                g = nx.MultiDiGraph(g)
-            else:
-                g = nx.MultiDiGraph(g.to_directed())
+            g = nx.MultiDiGraph(g) if g.is_directed() else nx.MultiDiGraph(g.to_directed())
 
         # First pass: pick out entity nodes and their surface forms.
         entity_nodes: list[tuple[str, dict[str, Any]]] = []

@@ -23,7 +23,6 @@ from linus.knowledge.entity_kb import (
 )
 from linus.knowledge.rigor import BuiltinEntityLookup, EntityLookup
 
-
 _FIXTURE_GRAPHML = Path(__file__).resolve().parent / "fixtures" / "kb" / "kg_graph.graphml"
 
 
@@ -72,8 +71,7 @@ def test_missing_graphml_raises_with_helpful_message(tmp_path: Path) -> None:
 def _fixture_lookup(case_insensitive: bool = True) -> KBEntityLookup:
     """Shorthand for the common-path fixture-backed lookup instance."""
     assert _FIXTURE_GRAPHML.exists(), (
-        f"fixture missing at {_FIXTURE_GRAPHML}; "
-        "regenerate via src/linus/tests/fixtures/kb/build_fixture.py"
+        f"fixture missing at {_FIXTURE_GRAPHML}; regenerate via src/linus/tests/fixtures/kb/build_fixture.py"
     )
     return KBEntityLookup(graphml_path=_FIXTURE_GRAPHML, case_insensitive=case_insensitive)
 
