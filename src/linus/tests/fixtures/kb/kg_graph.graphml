@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d7" for="edge" attr.name="relation" attr.type="string"/>
+<key id="d6" for="edge" attr.name="ner_label" attr.type="string"/>
+<key id="d5" for="edge" attr.name="edge_type" attr.type="string"/>
+<key id="d4" for="node" attr.name="label" attr.type="string"/>
+<key id="d3" for="node" attr.name="text" attr.type="string"/>
+<key id="d2" for="node" attr.name="year" attr.type="string"/>
+<key id="d1" for="node" attr.name="title" attr.type="string"/>
+<key id="d0" for="node" attr.name="node_type" attr.type="string"/>
+<graph edgedefault="directed"><node id="paper:p1">
+  <data key="d0">Paper</data>
+  <data key="d1">BRCA1 in breast cancer</data>
+  <data key="d2">2020</data>
+</node>
+<node id="paper:p2">
+  <data key="d0">Paper</data>
+  <data key="d1">EGFR signaling pathways</data>
+  <data key="d2">2021</data>
+</node>
+<node id="paper:p3">
+  <data key="d0">Paper</data>
+  <data key="d1">BRCA1/2 in ovarian cancer</data>
+  <data key="d2">2022</data>
+</node>
+<node id="paper:p4">
+  <data key="d0">Paper</data>
+  <data key="d1">Botryococcus braunii lipid biology</data>
+  <data key="d2">2023</data>
+</node>
+<node id="paper:p5">
+  <data key="d0">Paper</data>
+  <data key="d1">BRCA1 and DNA repair mechanisms</data>
+  <data key="d2">2024</data>
+</node>
+<node id="ent::brca1">
+  <data key="d0">Entity</data>
+  <data key="d3">BRCA1</data>
+  <data key="d4">GENE_OR_GENE_PRODUCT</data>
+</node>
+<node id="ent::egfr">
+  <data key="d0">Entity</data>
+  <data key="d3">EGFR</data>
+  <data key="d4">GENE_OR_GENE_PRODUCT</data>
+</node>
+<node id="ent::tp53">
+  <data key="d0">Entity</data>
+  <data key="d3">TP53</data>
+  <data key="d4">GENE_OR_GENE_PRODUCT</data>
+</node>
+<node id="ent::astaxanthin">
+  <data key="d0">Entity</data>
+  <data key="d3">astaxanthin</data>
+  <data key="d4">CHEMICAL</data>
+</node>
+<node id="ent::botryococcus braunii">
+  <data key="d0">Entity</data>
+  <data key="d3">Botryococcus braunii</data>
+  <data key="d4">ORGANISM</data>
+</node>
+<node id="ent::squalene">
+  <data key="d0">Entity</data>
+  <data key="d3">squalene</data>
+  <data key="d4">CHEMICAL</data>
+</node>
+<node id="ent::dna repair">
+  <data key="d0">Entity</data>
+  <data key="d3">DNA repair</data>
+  <data key="d4">BIOLOGICAL_PROCESS</data>
+</node>
+<node id="ent::cancer">
+  <data key="d0">Entity</data>
+  <data key="d3">cancer</data>
+  <data key="d4">DISEASE</data>
+</node>
+<node id="ent::ovarian cancer">
+  <data key="d0">Entity</data>
+  <data key="d3">ovarian cancer</data>
+  <data key="d4">DISEASE</data>
+</node>
+<node id="ent::lipid">
+  <data key="d0">Entity</data>
+  <data key="d3">lipid</data>
+  <data key="d4">CHEMICAL</data>
+</node>
+<edge source="paper:p1" target="ent::brca1" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p1" target="ent::cancer" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p2" target="ent::egfr" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p2" target="ent::cancer" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p3" target="ent::brca1" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p3" target="ent::ovarian cancer" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p3" target="ent::egfr" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p4" target="ent::botryococcus braunii" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p4" target="ent::astaxanthin" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p4" target="ent::squalene" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p4" target="ent::lipid" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p5" target="ent::brca1" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p5" target="ent::dna repair" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="paper:p5" target="ent::tp53" id="0">
+  <data key="d5">mentions</data>
+  <data key="d6">GENE</data>
+</edge>
+<edge source="ent::brca1" target="ent::dna repair" id="0">
+  <data key="d5">rebel</data>
+  <data key="d7">participates_in</data>
+</edge>
+<edge source="ent::egfr" target="ent::cancer" id="0">
+  <data key="d5">rebel</data>
+  <data key="d7">associated_with</data>
+</edge>
+</graph></graphml>
