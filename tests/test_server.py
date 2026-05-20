@@ -111,3 +111,49 @@ def test_empty_messages_rejected(client: TestClient) -> None:
     resp = client.post("/v1/chat/completions", json=payload)
     assert resp.status_code == 400, resp.text
     assert "messages" in resp.json()["detail"].lower()
+
+
+@pytest.mark.integration
+def test_tool_invoke_happy_path_against_real_registry(client: TestClient) -> None:
+    """POST /v1/tools/{name}/invoke routes through the real default_registry.
+
+    Integration-marked because it depends on the module-level
+    :data:`linus.tools.default_registry` having at least one
+    invocable tool registered — the production registry currently
+    advertises the KB tools (``linus.knowledge.search_papers``,
+    ``linus.knowledge.search_chunks``, etc.) and the four
+    ``paperqa.*`` tools wired in via PR #89.
+
+    We pick a tool we know is registered and has all-optional args:
+    ``paperqa.reset`` takes zero arguments and either returns a status
+    dict (paper-qa installed) or a structured 500 (paper-qa missing).
+    Either outcome demonstrates that the route reached the registry
+    and the registry produced an answer — what this test is here to
+    verify.
+    """
+    available = server.default_registry.names()
+    assert available, "no tools registered in default_registry — registry import broken?"
+
+    # Prefer paperqa.reset (no required args, fast). Fall back to any
+    # zero-required-arg tool if the paper-qa wiring isn't loaded.
+    target = None
+    for name in ["paperqa.reset", *available]:
+        spec = server.default_registry.get(name)
+        if spec is not None and not spec.parameters.get("required"):
+            target = name
+            break
+    assert target is not None, f"no zero-required-arg tool found in default_registry — available: {available}"
+
+    resp = client.post(f"/v1/tools/{target}/invoke", json={"arguments": {}})
+    # Acceptable outcomes:
+    # - 200: tool ran and returned a JSON result.
+    # - 500: tool ran, raised, surfaced as documented structured error
+    #   (e.g. PaperQAUnavailableError if paper-qa isn't pip-installed).
+    assert resp.status_code in (200, 500), resp.text
+    body = resp.json()
+    if resp.status_code == 200:
+        assert body["tool"] == target
+        assert "result" in body
+        assert isinstance(body["duration_ms"], (int, float))
+    else:
+        assert body["detail"].startswith("tool raised: ")
