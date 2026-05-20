@@ -9,6 +9,14 @@ Archimedes (q-fin strategy engine; the entrepreneurial sibling — link TBD).
 
 > _Logo placeholder: a carbon atom — sp³ orbitals, the substrate of biochemistry. Asset to land before reveal._
 
+> **Reveal context (May 2026).** Linus is the orchestration + memory substrate behind
+> [Archimedes](https://github.com/hackagora/archimedes-arcadia), a research-grounded
+> quantitative-finance strategy agent revealing alongside it for the Agora Agents
+> Hackathon. The two repos share a lineage: Linus is the personal research-intelligence
+> stack; Archimedes is what that stack looks like specialized to one domain, made
+> externally verifiable, and shipped on-chain. Linus itself remains the personal
+> substrate described below — the deliberate stance, not an accident of stage.
+
 ## What this is
 
 Linus is an OpenAI- and Anthropic-compatible AI backend that runs on a MacBook Pro, exposes domain-specific tools backed
