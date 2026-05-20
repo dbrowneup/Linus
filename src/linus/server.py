@@ -34,6 +34,8 @@ Design notes
 
 from __future__ import annotations
 
+import asyncio
+import inspect
 import json
 import os
 import time
@@ -210,6 +212,39 @@ class StoredMessageOut(BaseModel):
 class SessionMessagesResponse(BaseModel):
     session_id: str
     messages: list[StoredMessageOut]
+
+
+# --- Direct tool-invocation models (per task LX-2 follow-up) ----------------
+
+
+class ToolInvokeRequest(BaseModel):
+    """Body of ``POST /v1/tools/{tool_name}/invoke``.
+
+    The tool is identified by its registered name in the path; this body
+    carries only the keyword arguments the tool will be called with. Empty
+    by default so tools that take no arguments (e.g. ``paperqa.reset``)
+    can be invoked with ``{}``.
+    """
+
+    arguments: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Keyword arguments forwarded to the registered tool.",
+    )
+
+
+class ToolInvokeResponse(BaseModel):
+    """Successful response from ``POST /v1/tools/{tool_name}/invoke``.
+
+    ``result`` carries the tool's return value verbatim, serialized as
+    whatever JSON-compatible Python object the tool produced (dict, list,
+    str, etc.). ``duration_ms`` is the wall-clock time spent inside the
+    tool, useful for UI surfaces that want to show "took 12.3 s" without
+    re-timing the HTTP roundtrip themselves.
+    """
+
+    tool: str
+    result: Any
+    duration_ms: float
 
 
 # --- Anthropic-compatible request/response models (per DEC-0056) ------------
@@ -1089,6 +1124,7 @@ def root() -> dict[str, Any]:
             "health": "GET /healthz",
             "openai_chat_completions": "POST /v1/chat/completions",
             "anthropic_messages": "POST /v1/messages",
+            "tool_invoke": "POST /v1/tools/{tool_name}/invoke",
             "sessions_create": "POST /v1/sessions",
             "sessions_messages": "GET /v1/sessions/{session_id}/messages",
         },
@@ -1301,6 +1337,88 @@ def messages(req: AnthropicMessageRequest) -> AnthropicMessageResponse:
             output_tokens=completion_tokens_total,
         ),
     )
+
+
+@app.post("/v1/tools/{tool_name}/invoke", response_model=ToolInvokeResponse)
+async def invoke_tool(tool_name: str, req: ToolInvokeRequest) -> ToolInvokeResponse:
+    """Invoke a registered tool directly, bypassing the model.
+
+    Intended for UI surfaces that want structured tool output without the
+    natural-language-wrapping a chat completion would introduce. The
+    Streamlit paper-qa page uses this to get citation objects back as
+    JSON instead of relying on a system-prompt-steered marker-block hack.
+
+    Behavior:
+
+    - Looks up ``tool_name`` in :data:`linus.tools.default_registry`. If
+      no tool is registered under that name, returns HTTP 404 with the
+      list of available tool names in the error detail so callers can
+      self-correct without a separate ``/healthz`` roundtrip.
+    - Validates ``req.arguments`` against the tool's JSON-Schema-shaped
+      ``parameters.required`` list. Missing required args produce HTTP
+      422 with the names listed in the error detail (mirrors FastAPI's
+      own validation-error shape conceptually).
+    - Awaits the result if the underlying callable is an async
+      coroutine; otherwise calls it synchronously in a thread so the
+      event loop is not blocked. (Currently-registered ``paperqa.*``
+      tools are sync wrappers that internally bridge to async; that
+      shape is preserved transparently.)
+    - On any uncaught exception inside the tool, returns HTTP 500 with
+      ``f"tool raised: {exc_type}: {exc_msg}"`` in the detail — never a
+      stack trace.
+    - Times the invocation and reports the elapsed milliseconds in the
+      response body.
+
+    This endpoint is purely additive; it does not alter the behavior of
+    any other route.
+    """
+    spec = default_registry.get(tool_name)
+    if spec is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(f"tool not found: {tool_name}; available: {default_registry.names()}"),
+        )
+
+    # Validate required arguments against the tool's declared schema.
+    required = list(spec.parameters.get("required", []))
+    missing = [name for name in required if name not in req.arguments]
+    if missing:
+        raise HTTPException(
+            status_code=422,
+            detail=(f"tool {tool_name!r} missing required arguments: {missing}; required={required}"),
+        )
+
+    start = time.perf_counter()
+    try:
+        if inspect.iscoroutinefunction(spec.func):
+            result = await spec.func(**req.arguments)
+        else:
+            # Run sync tools in a worker thread so a long-running KB or
+            # paper-qa call (which may take tens of seconds) does not
+            # block FastAPI's event loop and starve concurrent requests.
+            result = await asyncio.to_thread(spec.func, **req.arguments)
+    except HTTPException:
+        raise
+    except TypeError as exc:
+        # Most often: caller passed an unexpected kwarg, or the schema
+        # missed an unmodeled requirement. Surface as 422 so the client
+        # can correct the call shape, not as a generic 500.
+        raise HTTPException(
+            status_code=422,
+            detail=f"tool {tool_name!r} rejected arguments: {type(exc).__name__}: {exc}",
+        ) from exc
+    except Exception as exc:
+        # Convert any uncaught tool failure to a structured 500. We catch
+        # broadly on purpose: the contract is "the tool ran or 500", not
+        # "the tool ran or whichever exception the tool happened to raise".
+        raise HTTPException(
+            status_code=500,
+            detail=f"tool raised: {type(exc).__name__}: {exc}",
+        ) from exc
+
+    duration_ms = (time.perf_counter() - start) * 1000.0
+
+    return ToolInvokeResponse(tool=tool_name, result=result, duration_ms=duration_ms)
 
 
 @app.post("/v1/sessions", response_model=CreateSessionResponse)
