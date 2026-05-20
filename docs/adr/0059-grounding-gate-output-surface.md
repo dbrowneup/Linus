@@ -84,3 +84,78 @@ complementary: ingest scores material; rigor.py scores synthesis.
   per Worker call (the audit log carrier).
 - CLAUDE.md §"Typed structured prediction for biology skills" (S25, the BioReason-Pro shape).
 - Source: `src/linus/knowledge/rigor.py`; tests at `src/linus/tests/test_rigor.py`.
+
+---
+
+## Amendment — 2026-05-19 (entity backend graduated; auto-gate wired)
+
+The original ADR described a v0.5.0 ship that was intentionally narrow: stub entity backend only,
+no auto-gate wiring on Worker output paths, no tool-registry surface. Dan's 2026-05-19 strategic call
+("we want the entities and concepts to emerge naturally from the text") pulled three additional surfaces
+into v0.5.0 scope. They landed the same day and are documented here as an amendment, not by editing the
+original Decision section.
+
+### What also ships in v0.5.0
+
+1. **`src/linus/knowledge/entity_kb.py` (PR #103)** — `KBEntityLookup`, the KB-derived entity backend that
+   replaces the stub as the v0.5.0 production default. Loads entity vertices from KnowledgeBase's
+   `kg_graph.graphml` (REBEL+SciSpacy outputs) and resolves entity names against entities that actually
+   appear in Dan's reading corpus. Lazy-loaded; ~O(1) lookup after the first call. The `source` field
+   on a resolved entity is `"kb:<sha256-prefix-of-graphml>"` so the provenance trail traces back to the
+   exact KG version that grounded the entity.
+
+2. **`ChainedEntityLookup`** (same module) — composes multiple backends with first-non-None-wins
+   semantics. The production default is `ChainedEntityLookup(KBEntityLookup(), BuiltinEntityLookup())`,
+   exposed by the convenience factory `default_kb_lookup()`. `BuiltinEntityLookup` is retained as the
+   fallback layer (a handful of well-known anchors that may not be in Dan's corpus yet — useful for
+   bootstrap and tests) but is no longer the primary backend.
+
+3. **Auto-gate on `paperqa.answer` (PR #102)** — every answer the paper-qa tool emits now carries a
+   `rigor` field with the `check_grounding` result. The gate uses the KB adapter as the
+   `PaperLookup` and the chained KBEntityLookup-then-Builtin as the `EntityLookup`. Failures inside
+   the gate fail-open to `rigor=None` rather than breaking the answer call — paper-qa answers always
+   complete; the gate is informational at the answer-payload boundary, advisory in the UI badge, and
+   hard-error only at the orchestration-boundary checkpoint a future router will enforce.
+
+4. **`rigor.check` Linus tool (PR #102)** — `check_grounding` is registered as a callable tool via the
+   standard `@tool` decorator, dispatchable through the existing `POST /v1/tools/rigor.check/invoke`
+   route from PR #98. Any harness can call the gate explicitly.
+
+5. **Streamlit page 7 rigor badge** — `pages/7_paper_qa.py` surfaces a green/yellow/red rigor badge
+   between the answer and the citations expander, plus an expandable "Rigor details" section.
+
+### What's unchanged
+
+- **Entity-grounding severity remains `warning`.** The KB-derived backend is more authoritative than the
+  hand-seeded stub, but it's still not authoritative-enough to block on a miss — an entity might be real
+  and well-known but simply absent from Dan's specific corpus, and that's not the Worker's fault. The
+  flip to `error`-severity remains contingent on a canonical reference-DB backend (NCBI Gene, UniProt,
+  GO ontology) shipping alongside KBEntityLookup. That work is post-reveal.
+- **Citation severity remains `error`.** Citations must resolve in the KB metadata DB; this is the
+  one hard gate. Fabricated paper_ids are refused at the orchestration boundary.
+- **The orchestrator surface `check_grounding(claim, papers, entities, prior_runs)` is unchanged.**
+  No callsite refactor needed; existing tests pass without modification.
+
+### Post-reveal direction (entity backend stack)
+
+The v0.5.0 ship establishes the substrate. The post-reveal direction is two-layered:
+
+- **`src/linus/knowledge/entity_ncbi.py` (v0.6.0)** — canonical reference-DB lookup against NCBI Gene
+  E-utilities + UniProt + ChEBI + GO. Cached locally to avoid network on every call. Provides
+  authoritative grounding for entities that haven't yet appeared in Dan's corpus.
+- **Production composition becomes** `ChainedEntityLookup(KBEntityLookup(), NCBIEntityLookup(),
+  BuiltinEntityLookup())`. KB-derived comes first (entities Dan actually read); canonical reference
+  second (entities the literature knows about); builtin stub as the last-resort floor.
+- **When `entity_ncbi.py` ships**, the entity-grounding severity may be promoted to `error` for KB+NCBI
+  misses, with builtin-only resolutions kept at `warning`. That severity flip will get its own ADR.
+
+The `EntityLookup` Protocol is the stable contract across all of this — additions don't change the
+orchestrator, the tool surface, or any callsite. New backends are pure plug-ins.
+
+### References (amendment)
+
+- PR #102 (rigor demo wiring) — auto-gate on `paperqa.answer`, `rigor.check` tool registration, Streamlit badge.
+- PR #103 (entity_kb backend) — `KBEntityLookup`, `ChainedEntityLookup`, `default_kb_lookup()`.
+- `src/linus/knowledge/entity_kb.py`; tests at `src/linus/tests/test_entity_kb.py`.
+- 2026-05-19 strategic conversation (Dan): "we want the entities and concepts to emerge naturally from
+  the text" — the motivating user prompt for pulling these surfaces into v0.5.0.
