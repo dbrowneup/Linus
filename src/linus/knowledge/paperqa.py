@@ -56,11 +56,14 @@ hackathon-prep framing this module ships against.
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 from typing import Any
 
 from linus.tools.registry import tool
+
+logger = logging.getLogger(__name__)
 
 # ── public exception types ────────────────────────────────────────────────
 
@@ -311,9 +314,7 @@ class LinusPaperQA:
         try:
             from paperqa import Docs, Settings  # type: ignore[import-not-found]
         except ImportError as exc:
-            raise PaperQAUnavailableError(
-                "paper-qa is not installed. Run: pip install 'paper-qa>=5.0'"
-            ) from exc
+            raise PaperQAUnavailableError("paper-qa is not installed. Run: pip install 'paper-qa>=5.0'") from exc
 
         if not self.papers_dir.exists():
             raise PaperQAConfigError(
@@ -371,9 +372,7 @@ class LinusPaperQA:
         contexts = list(session.contexts)[:k]
         return [citation_to_provenance(c) for c in contexts]
 
-    async def gather_evidence(
-        self, query: str, candidate_paper_ids: list[str] | None = None
-    ) -> list[dict[str, Any]]:
+    async def gather_evidence(self, query: str, candidate_paper_ids: list[str] | None = None) -> list[dict[str, Any]]:
         """Re-rank evidence chunks for ``query`` via the configured Worker LLM.
 
         Calls :meth:`Docs.aget_evidence`, which retrieves matching chunks
@@ -409,6 +408,10 @@ class LinusPaperQA:
         - ``question`` — the original query echoed back.
         - ``formatted_answer`` — paper-qa's pretty-printed answer with
           inline citations.
+        - ``rigor`` — the structured rigor-gate result (see
+          :func:`linus.knowledge.rigor.check_grounding`). May be ``None``
+          if the gate raised internally; the answer call itself never
+          fails because of the gate.
         """
         if max_sources < 1:
             raise ValueError(f"max_sources must be >= 1, got {max_sources}")
@@ -420,12 +423,19 @@ class LinusPaperQA:
         session = await self._docs.aquery(query=session, settings=self._settings)
 
         contexts = list(session.contexts)[:max_sources]
-        return {
+        citations = [citation_to_provenance(c) for c in contexts]
+        payload: dict[str, Any] = {
             "question": session.question,
             "answer": session.answer,
             "formatted_answer": session.formatted_answer,
-            "citations": [citation_to_provenance(c) for c in contexts],
+            "citations": citations,
         }
+        payload["rigor"] = _run_rigor_gate(
+            answer_text=session.answer,
+            citations=citations,
+            confidence=getattr(session, "confidence", None),
+        )
+        return payload
 
     async def reset(self) -> dict[str, str]:
         """Clear the in-process :class:`Docs` collection.
@@ -528,6 +538,145 @@ def _run_async(coro: Any) -> Any:
     return asyncio.run(coro)
 
 
+# ── rigor-gate auto-wiring (DEC-0059) ─────────────────────────────────────
+
+
+class _AdapterPaperLookup:
+    """Thin :class:`~linus.knowledge.rigor.PaperLookup` over :class:`KnowledgeBaseAdapter`.
+
+    Maps the rigor gate's two-method ``PaperLookup`` protocol onto the
+    KB adapter's :meth:`get_paper` + :class:`Paper` row shape. Citations
+    coming out of paper-qa carry the document's SHA256 (paper-qa's
+    ``dockey`` is wired to the SHA-style content hash that the KB
+    metadata table primary-keys on), so the resolution is a direct
+    SHA-to-row lookup.
+
+    ``get_page_count`` reads the ``page_count`` column on the matched
+    row; it returns ``None`` when the column is NULL upstream (the KB
+    occasionally fails to extract page count from supplementary
+    materials), which the rigor gate tolerates as "can't validate the
+    page" rather than as a failure.
+    """
+
+    def __init__(self, adapter: Any) -> None:
+        self._adapter = adapter
+
+    def get_paper(self, paper_id: str) -> Any | None:
+        return self._adapter.get_paper(paper_id)
+
+    def get_page_count(self, paper_id: str) -> int | None:
+        paper = self._adapter.get_paper(paper_id)
+        if paper is None:
+            return None
+        # ``KnowledgeBaseAdapter.Paper.page_count`` is the canonical
+        # field; fall back to ``pages`` for forward-compat with any
+        # alternate schema that surfaces a different attribute name.
+        page_count = getattr(paper, "page_count", None)
+        if page_count is None:
+            page_count = getattr(paper, "pages", None)
+        try:
+            return int(page_count) if page_count is not None else None
+        except (TypeError, ValueError):
+            return None
+
+
+def _adapter_to_paper_lookup(adapter: Any) -> _AdapterPaperLookup:
+    """Adapt a :class:`KnowledgeBaseAdapter` (or duck-typed equivalent) to ``PaperLookup``.
+
+    Module-private. The wrapper is intentionally tiny so tests can pass
+    any object with ``get_paper(paper_id)`` and it Just Works.
+    """
+    return _AdapterPaperLookup(adapter)
+
+
+def _resolve_entity_backend() -> Any | None:
+    """Return the best-available :class:`~linus.knowledge.rigor.EntityLookup` backend.
+
+    Prefer a KB-derived backend (``linus.knowledge.entity_kb.default_kb_lookup``)
+    when importable; fall back to the in-process
+    :class:`~linus.knowledge.rigor.BuiltinEntityLookup` stub. On any
+    import-time failure (the sibling KB-entity work hasn't landed yet,
+    or the KB DB isn't built), the fallback fires and the gate still
+    runs against the stub seeds. Returns ``None`` only if even the stub
+    can't be constructed — that path is a programmer error in this
+    module, not a runtime concern.
+    """
+    try:
+        from linus.knowledge.entity_kb import default_kb_lookup  # type: ignore[import-not-found]
+
+        return default_kb_lookup()
+    except (ImportError, FileNotFoundError, AttributeError):
+        # Forward-compatible fallback to the in-process stub.
+        try:
+            from linus.knowledge.rigor import BuiltinEntityLookup
+
+            return BuiltinEntityLookup()
+        except Exception:  # pragma: no cover — rigor module is always importable
+            return None
+
+
+def _resolve_paper_backend() -> Any | None:
+    """Return the production :class:`PaperLookup` backend, or ``None`` on failure.
+
+    Wraps :class:`KnowledgeBaseAdapter` via :func:`_adapter_to_paper_lookup`.
+    The adapter constructor is cheap (it does not open the SQLite
+    connection until first query), so building one per answer call is
+    fine. Any exception during construction routes through ``None``;
+    the rigor gate downgrades a missing paper backend to a single
+    ``backend_unavailable`` warning rather than failing.
+    """
+    try:
+        from linus.knowledge.adapter import KnowledgeBaseAdapter
+
+        return _adapter_to_paper_lookup(KnowledgeBaseAdapter())
+    except Exception:
+        return None
+
+
+def _run_rigor_gate(
+    answer_text: str | None,
+    citations: list[dict[str, Any]],
+    confidence: float | None = None,
+) -> dict[str, Any] | None:
+    """Run :func:`linus.knowledge.rigor.check_grounding` on a synthesized answer.
+
+    Best-effort by design. Constructs the :class:`ClaimDict` shape the
+    gate expects (rationale + citations + entities + confidence),
+    resolves both backends with graceful fallback, runs the gate, and
+    returns the serialized :class:`RigorResult` dict.
+
+    Returns ``None`` on any exception inside the gate — paper-qa's
+    ``answer`` contract is that the answer call always succeeds; the
+    rigor field is purely additive telemetry. A logged warning records
+    the failure for post-hoc diagnosis without surfacing it to the
+    caller.
+    """
+    try:
+        from linus.knowledge.rigor import check_grounding, result_to_dict
+
+        claim: dict[str, Any] = {
+            "rationale": answer_text or "",
+            "citations": citations,
+            "confidence": confidence,
+            "entities": [],
+        }
+        paper_backend = _resolve_paper_backend()
+        entity_backend = _resolve_entity_backend()
+        result = check_grounding(
+            claim,
+            papers=paper_backend,
+            entities=entity_backend,
+        )
+        return result_to_dict(result)
+    except Exception as exc:
+        logger.warning(
+            "rigor gate skipped for paperqa.answer (rigor=None): %s: %s",
+            type(exc).__name__,
+            exc,
+        )
+        return None
+
+
 # ── Linus tool registrations ──────────────────────────────────────────────
 
 
@@ -552,9 +701,7 @@ def paperqa_gather_evidence(query: str, candidate_paper_ids: list[str] | None = 
     shape as ``paperqa.search``, but post-ranking is performed by the
     summary LLM rather than purely by embedding similarity.
     """
-    return _run_async(
-        get_singleton().gather_evidence(query=query, candidate_paper_ids=candidate_paper_ids)
-    )
+    return _run_async(get_singleton().gather_evidence(query=query, candidate_paper_ids=candidate_paper_ids))
 
 
 @tool(name="paperqa.answer")

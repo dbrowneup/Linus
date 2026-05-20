@@ -33,20 +33,7 @@ authoring scope and ``docs/specs/2026-05-12-linus-implementation-plan.md``
 Item 5 for the upstream KB adapter scope this glues against.
 """
 
-from linus.tools.registry import (
-    ToolRegistry,
-    ToolSpec,
-    default_registry,
-    tool,
-)
-
-# Eagerly populate the default registry with the KB-backed tools. The import
-# has the side effect of running the @tool decorators in ``kb_tools.py``; we
-# expose the module reference under a private name so ``from linus.tools
-# import default_registry`` users get a populated registry without any
-# explicit second import.
-from linus.tools import kb_tools as _kb_tools  # noqa: F401
-from linus.tools import arxiv_ingest as _arxiv_ingest  # noqa: F401
+from typing import Any
 
 # Phase 2c — paper-qa integration. Importing the module triggers the four
 # ``@tool``-decorated registrations (``paperqa.search``,
@@ -55,6 +42,64 @@ from linus.tools import arxiv_ingest as _arxiv_ingest  # noqa: F401
 # is imported lazily inside the tool callables so the hermetic test suite
 # does not require the dependency to be installed.
 from linus.knowledge import paperqa as _paperqa_tools  # noqa: F401
+from linus.tools import arxiv_ingest as _arxiv_ingest  # noqa: F401
+
+# Eagerly populate the default registry with the KB-backed tools. The import
+# has the side effect of running the @tool decorators in ``kb_tools.py``; we
+# expose the module reference under a private name so ``from linus.tools
+# import default_registry`` users get a populated registry without any
+# explicit second import.
+from linus.tools import kb_tools as _kb_tools  # noqa: F401
+from linus.tools.registry import (
+    ToolRegistry,
+    ToolSpec,
+    default_registry,
+    tool,
+)
+
+
+# Phase 2c — rigor gate (DEC-0059). Registers the ``rigor.check`` tool that
+# wraps :func:`linus.knowledge.rigor.check_grounding`. The tool is callable
+# via the existing ``POST /v1/tools/rigor.check/invoke`` route and accepts
+# a ``claim`` dict argument; sane KB-backed defaults wire it to the
+# production paper + entity backends when ``use_kb_paper_lookup`` and
+# ``use_entity_lookup`` are left True. The registration lives here (rather
+# than inside :mod:`linus.knowledge.rigor`) so the rigor module itself
+# stays free of registry-side-effect imports — keeps the gate's contract
+# surface clean of orchestrator coupling.
+@tool(
+    name="rigor.check",
+    description=(
+        "Run the grounding gate on a Worker output claim. Resolves citations "
+        "against the KnowledgeBase metadata DB and entities against the "
+        "best-available reference store (KB-derived if importable, builtin "
+        "stub otherwise). Returns the serialized RigorResult shape."
+    ),
+)
+def rigor_check(
+    claim: dict[str, Any],
+    use_kb_paper_lookup: bool = True,
+    use_entity_lookup: bool = True,
+) -> dict[str, Any]:
+    """Invoke :func:`linus.knowledge.rigor.check_grounding` with sane defaults.
+
+    The ``claim`` argument follows the :data:`~linus.knowledge.rigor.ClaimDict`
+    shape: ``rationale``, ``citations`` (provenance dicts), ``entities``,
+    optional ``confidence``. The two flags toggle backend resolution —
+    ``use_kb_paper_lookup=False`` skips citation grounding (the gate
+    surfaces a ``backend_unavailable`` warning); ``use_entity_lookup=False``
+    likewise for entity grounding. Returns the JSON-shaped
+    :func:`~linus.knowledge.rigor.result_to_dict` payload.
+    """
+    from linus.knowledge.paperqa import _resolve_entity_backend, _resolve_paper_backend
+    from linus.knowledge.rigor import check_grounding, result_to_dict
+
+    papers = _resolve_paper_backend() if use_kb_paper_lookup else None
+    entities = _resolve_entity_backend() if use_entity_lookup else None
+
+    result = check_grounding(claim, papers=papers, entities=entities)
+    return result_to_dict(result)
+
 
 __all__ = [
     "ToolRegistry",

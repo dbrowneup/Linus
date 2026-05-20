@@ -44,7 +44,6 @@ from linus.knowledge.paperqa import (
 )
 from linus.tools.registry import default_registry
 
-
 # ── fake paper-qa surface ─────────────────────────────────────────────────
 
 
@@ -75,9 +74,7 @@ def _install_fake_paperqa(monkeypatch: pytest.MonkeyPatch) -> types.ModuleType:
             self.kwargs = kwargs
             # Mirror paper-qa's nested ``agent.index`` so the wrapper's
             # ``settings.agent.index.paper_directory = ...`` assignment lands.
-            self.agent = types.SimpleNamespace(
-                index=types.SimpleNamespace(paper_directory=None)
-            )
+            self.agent = types.SimpleNamespace(index=types.SimpleNamespace(paper_directory=None))
 
     class FakePQASession:
         def __init__(self, question: str = "") -> None:
@@ -301,9 +298,7 @@ def test_parse_first_page_handles_variants(name: str, expected: int | None) -> N
 # ── error paths ──────────────────────────────────────────────────────────
 
 
-def test_search_raises_paperqa_unavailable_when_not_installed(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_search_raises_paperqa_unavailable_when_not_installed(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """If paper-qa cannot be imported, calls surface :class:`PaperQAUnavailableError`."""
     # Force the lazy import to fail. Remove any cached 'paperqa' entry first.
     monkeypatch.setitem(sys.modules, "paperqa", None)
@@ -330,9 +325,7 @@ def test_ensure_loaded_raises_config_error_when_papers_dir_missing(
 # ── happy-path: search / gather / answer / reset against fake paperqa ────
 
 
-def test_search_returns_provenance_dicts(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_search_returns_provenance_dicts(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """End-to-end search call returns provenance dicts from fake session contexts."""
     fake = _install_fake_paperqa(monkeypatch)
     fake_session = fake.PQASession(question="q")
@@ -363,9 +356,7 @@ def test_search_truncates_to_k(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) 
     """``search(k=2)`` returns at most 2 contexts even when more are available."""
     fake = _install_fake_paperqa(monkeypatch)
     fake_session = fake.PQASession(question="q")
-    fake_session.contexts = [
-        _make_context(paper_id=f"p{i}", chunk_name=f"X pages {i}") for i in range(5)
-    ]
+    fake_session.contexts = [_make_context(paper_id=f"p{i}", chunk_name=f"X pages {i}") for i in range(5)]
 
     facade = LinusPaperQA(papers_dir=tmp_path)
     import asyncio
@@ -378,9 +369,7 @@ def test_search_truncates_to_k(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) 
     assert len(asyncio.run(_run())) == 2
 
 
-def test_answer_returns_full_payload(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_answer_returns_full_payload(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """``answer`` returns question / answer / formatted_answer / citations."""
     fake = _install_fake_paperqa(monkeypatch)
     fake_session = fake.PQASession(question="why?")
@@ -404,9 +393,7 @@ def test_answer_returns_full_payload(
     assert out["citations"][0]["paper_id"] == "doc-abc"
 
 
-def test_gather_evidence_filters_by_candidate_paper_ids(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_gather_evidence_filters_by_candidate_paper_ids(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """``candidate_paper_ids`` is enforced as a soft filter on returned contexts."""
     fake = _install_fake_paperqa(monkeypatch)
     fake_session = fake.PQASession(question="q")
@@ -546,9 +533,7 @@ def test_default_embedding_model_is_ollama_prefixed() -> None:
 # ── tool-call surface dispatch ───────────────────────────────────────────
 
 
-def test_paperqa_search_tool_dispatches_through_singleton(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_paperqa_search_tool_dispatches_through_singleton(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Invoking the registered ``paperqa.search`` tool runs through the singleton."""
     _install_fake_paperqa(monkeypatch)
     monkeypatch.setenv("LINUS_PAPERQA_DIR", str(tmp_path))
@@ -566,9 +551,7 @@ def test_paperqa_search_tool_dispatches_through_singleton(
     singleton.search.assert_awaited_once_with(query="anything", k=3)
 
 
-def test_paperqa_answer_tool_dispatches_through_singleton(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_paperqa_answer_tool_dispatches_through_singleton(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Invoking the registered ``paperqa.answer`` tool runs through the singleton."""
     _install_fake_paperqa(monkeypatch)
     monkeypatch.setenv("LINUS_PAPERQA_DIR", str(tmp_path))
@@ -578,16 +561,12 @@ def test_paperqa_answer_tool_dispatches_through_singleton(
     singleton = get_singleton()
     singleton.answer = AsyncMock(return_value=payload)  # type: ignore[method-assign]
 
-    result = default_registry.call_tool(
-        "paperqa.answer", {"query": "q", "max_sources": 5}
-    )
+    result = default_registry.call_tool("paperqa.answer", {"query": "q", "max_sources": 5})
     assert result == payload
     singleton.answer.assert_awaited_once_with(query="q", max_sources=5)
 
 
-def test_paperqa_reset_tool_dispatches_through_singleton(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_paperqa_reset_tool_dispatches_through_singleton(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Invoking the registered ``paperqa.reset`` tool runs through the singleton."""
     _install_fake_paperqa(monkeypatch)
     monkeypatch.setenv("LINUS_PAPERQA_DIR", str(tmp_path))
@@ -617,9 +596,7 @@ def test_paperqa_gather_evidence_tool_dispatches_through_singleton(
         {"query": "q", "candidate_paper_ids": ["a", "b"]},
     )
     assert result == []
-    singleton.gather_evidence.assert_awaited_once_with(
-        query="q", candidate_paper_ids=["a", "b"]
-    )
+    singleton.gather_evidence.assert_awaited_once_with(query="q", candidate_paper_ids=["a", "b"])
 
 
 # ── _run_async bridge ─────────────────────────────────────────────────────
@@ -654,9 +631,7 @@ def test_run_async_works_inside_running_loop() -> None:
 # ── Settings configuration ────────────────────────────────────────────────
 
 
-def test_ensure_loaded_configures_paper_directory_on_settings(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_ensure_loaded_configures_paper_directory_on_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """After load, Settings.agent.index.paper_directory points at the configured dir."""
     _install_fake_paperqa(monkeypatch)
     facade = LinusPaperQA(papers_dir=tmp_path)
@@ -665,9 +640,7 @@ def test_ensure_loaded_configures_paper_directory_on_settings(
     assert facade._settings.agent.index.paper_directory == str(tmp_path)
 
 
-def test_ensure_loaded_is_idempotent(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_ensure_loaded_is_idempotent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Calling :meth:`_ensure_loaded` twice does not recreate ``Docs``."""
     _install_fake_paperqa(monkeypatch)
     facade = LinusPaperQA(papers_dir=tmp_path)
@@ -686,3 +659,193 @@ def test_module_constants_align_with_claude_md() -> None:
     """
     assert DEFAULT_MODEL == "qwen3:8b"
     assert DEFAULT_OLLAMA_HOST == "http://localhost:11434"
+
+
+# ── rigor auto-gate on answer() ───────────────────────────────────────────
+
+
+class _FakeKBPaper:
+    """Tiny stand-in for the adapter's :class:`Paper` shape used by the rigor gate."""
+
+    def __init__(self, page_count: int) -> None:
+        self.page_count = page_count
+
+
+class _FakeKBAdapter:
+    """Fake ``KnowledgeBaseAdapter`` whose ``get_paper`` returns a fixed map.
+
+    Mirrors the production adapter's surface enough for
+    :class:`_AdapterPaperLookup` to wrap it. The rigor citation check
+    only needs ``get_paper`` and ``get_page_count`` (via the wrapper),
+    so a map of ``paper_id → page_count`` is sufficient.
+    """
+
+    def __init__(self, papers: dict[str, int]) -> None:
+        self._papers = papers
+
+    def get_paper(self, paper_id: str) -> _FakeKBPaper | None:
+        if paper_id not in self._papers:
+            return None
+        return _FakeKBPaper(page_count=self._papers[paper_id])
+
+
+def _install_rigor_backends(
+    monkeypatch: pytest.MonkeyPatch,
+    paper_map: dict[str, int],
+) -> None:
+    """Wire :func:`_resolve_paper_backend` to a fake KB; entity backend stays the stub.
+
+    Used by the auto-gate tests below so the rigor field actually runs
+    against a known-shape backend rather than failing-open. The
+    ``BuiltinEntityLookup`` stub is left in place — the answer tests
+    don't carry entities on the claim so the entity check fires the
+    "no entities" no-op path.
+    """
+    from linus.knowledge.paperqa import _adapter_to_paper_lookup
+
+    def _fake_paper_backend() -> object:
+        return _adapter_to_paper_lookup(_FakeKBAdapter(paper_map))
+
+    monkeypatch.setattr(
+        "linus.knowledge.paperqa._resolve_paper_backend",
+        _fake_paper_backend,
+    )
+
+
+def test_answer_payload_includes_rigor_field_when_backends_resolve(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The auto-gate runs and the payload carries a non-None ``rigor`` dict."""
+    fake = _install_fake_paperqa(monkeypatch)
+    fake_session = fake.PQASession(question="why?")
+    fake_session.answer = "Because X causes Y."
+    fake_session.formatted_answer = "Because X causes Y. (Smith2024)"
+    # The fake context's ``paper_id`` is ``"doc-abc"`` per ``_make_context``.
+    fake_session.contexts = [_make_context(paper_id="doc-abc", chunk_name="X pages 2")]
+
+    _install_rigor_backends(monkeypatch, paper_map={"doc-abc": 10})
+
+    facade = LinusPaperQA(papers_dir=tmp_path)
+    import asyncio
+
+    async def _run() -> dict:
+        facade._ensure_loaded()
+        facade._docs.aquery = AsyncMock(return_value=fake_session)
+        return await facade.answer(query="why?", max_sources=10)
+
+    out = asyncio.run(_run())
+    assert "rigor" in out
+    assert isinstance(out["rigor"], dict)
+    # The gate ran end-to-end against the fake KB; the rigor dict
+    # surfaces the documented :func:`result_to_dict` keys.
+    assert "passed" in out["rigor"]
+    assert "failures" in out["rigor"]
+    assert "error_count" in out["rigor"]
+
+
+def test_answer_rigor_passes_on_resolved_citation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """A citation whose paper_id resolves and whose page is in-range passes the gate."""
+    fake = _install_fake_paperqa(monkeypatch)
+    fake_session = fake.PQASession(question="why?")
+    fake_session.answer = "Because X causes Y."
+    fake_session.formatted_answer = "Because X causes Y. (Smith2024)"
+    # ``page 2`` of a 10-page paper: in range.
+    fake_session.contexts = [_make_context(paper_id="doc-abc", chunk_name="X pages 2")]
+
+    _install_rigor_backends(monkeypatch, paper_map={"doc-abc": 10})
+
+    facade = LinusPaperQA(papers_dir=tmp_path)
+    import asyncio
+
+    async def _run() -> dict:
+        facade._ensure_loaded()
+        facade._docs.aquery = AsyncMock(return_value=fake_session)
+        return await facade.answer(query="why?", max_sources=10)
+
+    out = asyncio.run(_run())
+    rigor = out["rigor"]
+    assert rigor is not None
+    assert rigor["passed"] is True
+    assert rigor["error_count"] == 0
+
+
+def test_answer_rigor_surfaces_unresolved_citation_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """A citation whose paper_id is not in the KB → ``unresolved_citation`` error."""
+    fake = _install_fake_paperqa(monkeypatch)
+    fake_session = fake.PQASession(question="why?")
+    fake_session.answer = "Because X causes Y."
+    fake_session.formatted_answer = "Because X causes Y. (Smith2024)"
+    fake_session.contexts = [
+        _make_context(paper_id="doc-missing", chunk_name="X pages 2"),
+    ]
+
+    # Empty KB → the cited paper resolves to None.
+    _install_rigor_backends(monkeypatch, paper_map={})
+
+    facade = LinusPaperQA(papers_dir=tmp_path)
+    import asyncio
+
+    async def _run() -> dict:
+        facade._ensure_loaded()
+        facade._docs.aquery = AsyncMock(return_value=fake_session)
+        return await facade.answer(query="why?", max_sources=10)
+
+    out = asyncio.run(_run())
+    rigor = out["rigor"]
+    assert rigor is not None
+    assert rigor["passed"] is False
+    assert rigor["error_count"] >= 1
+    kinds = {f.get("kind") for f in rigor["failures"]}
+    assert "unresolved_citation" in kinds
+
+
+def test_answer_rigor_failopens_to_none_when_gate_raises(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """If the rigor gate raises internally, the answer succeeds with ``rigor=None``.
+
+    The auto-gate is best-effort by contract — failures inside the gate
+    must NOT propagate to the answer call. We force the gate to raise
+    by monkeypatching :func:`check_grounding` to throw and verify the
+    answer payload still surfaces with ``rigor=None`` rather than 5xx-ing.
+    """
+    fake = _install_fake_paperqa(monkeypatch)
+    fake_session = fake.PQASession(question="why?")
+    fake_session.answer = "Because X causes Y."
+    fake_session.formatted_answer = "Because X causes Y."
+    fake_session.contexts = [_make_context()]
+
+    def _boom(*args: object, **kwargs: object) -> object:
+        raise RuntimeError("rigor gate exploded")
+
+    # Patch at the call site inside :mod:`linus.knowledge.paperqa` — the
+    # auto-gate imports ``check_grounding`` lazily inside the helper so
+    # the import-target is the module's own symbol resolution chain.
+    monkeypatch.setattr("linus.knowledge.rigor.check_grounding", _boom)
+
+    facade = LinusPaperQA(papers_dir=tmp_path)
+    import asyncio
+
+    async def _run() -> dict:
+        facade._ensure_loaded()
+        facade._docs.aquery = AsyncMock(return_value=fake_session)
+        return await facade.answer(query="why?", max_sources=10)
+
+    out = asyncio.run(_run())
+    # Answer itself succeeded.
+    assert out["answer"] == "Because X causes Y."
+    # But the rigor field failed-open to None.
+    assert out["rigor"] is None
+
+
+def test_adapter_to_paper_lookup_returns_page_count_from_paper(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """:func:`_adapter_to_paper_lookup` reads ``page_count`` off the adapter's Paper."""
+    from linus.knowledge.paperqa import _adapter_to_paper_lookup
+
+    lookup = _adapter_to_paper_lookup(_FakeKBAdapter({"x": 7}))
+    paper = lookup.get_paper("x")
+    assert paper is not None
+    assert lookup.get_page_count("x") == 7
+    # Unknown paper → both methods return None.
+    assert lookup.get_paper("missing") is None
+    assert lookup.get_page_count("missing") is None
