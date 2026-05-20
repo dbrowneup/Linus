@@ -185,6 +185,12 @@ st.session_state.setdefault("paperqa_answer_md", "")
 st.session_state.setdefault("paperqa_formatted_answer", "")
 st.session_state.setdefault("paperqa_citations", [])
 st.session_state.setdefault("paperqa_status", None)
+# ``paperqa_rigor`` holds the structured result from the auto-gate on
+# :func:`linus.knowledge.paperqa.LinusPaperQA.answer`. ``None`` means
+# either the gate failed-open (best-effort: the answer call succeeded
+# but the gate raised internally) or the server is too old to return a
+# ``rigor`` field. The renderer treats both identically.
+st.session_state.setdefault("paperqa_rigor", None)
 
 
 # ── sidebar ───────────────────────────────────────────────────────────────
@@ -249,6 +255,7 @@ with st.sidebar:
             st.session_state.paperqa_answer_md = ""
             st.session_state.paperqa_formatted_answer = ""
             st.session_state.paperqa_citations = []
+            st.session_state.paperqa_rigor = None
             st.session_state.paperqa_status = "Paper-qa session reset. The next question will rebuild the index."
             st.rerun()
 
@@ -313,23 +320,111 @@ if ask_clicked:
             st.session_state.paperqa_answer_md = ""
             st.session_state.paperqa_formatted_answer = ""
             st.session_state.paperqa_citations = []
+            st.session_state.paperqa_rigor = None
             st.error(err)
         elif not isinstance(result, dict):
             st.session_state.paperqa_answer_md = ""
             st.session_state.paperqa_formatted_answer = ""
             st.session_state.paperqa_citations = []
+            st.session_state.paperqa_rigor = None
             st.error(f"Tool returned an unexpected shape (expected dict, got {type(result).__name__}): {result!r}")
         else:
             # paperqa.answer's contract: {answer, citations, question,
-            # formatted_answer}. Be tolerant — surface whatever the tool
-            # returned, defaulting missing fields.
+            # formatted_answer, rigor}. Be tolerant — surface whatever
+            # the tool returned, defaulting missing fields.
             answer_md = str(result.get("answer") or "").strip()
             formatted = str(result.get("formatted_answer") or "").strip()
             citations_raw = result.get("citations") or []
             citations = list(citations_raw) if isinstance(citations_raw, list) else []
+            rigor_raw = result.get("rigor")
+            # ``rigor`` may be None (gate failed-open), a dict (gate ran),
+            # or absent (older server). Normalize None / non-dict to None
+            # so the renderer treats them identically.
+            rigor = rigor_raw if isinstance(rigor_raw, dict) else None
             st.session_state.paperqa_answer_md = answer_md
             st.session_state.paperqa_formatted_answer = formatted
             st.session_state.paperqa_citations = citations
+            st.session_state.paperqa_rigor = rigor
+
+
+# ── rigor-badge renderer ──────────────────────────────────────────────────
+
+
+def _render_rigor_badge(rigor: dict[str, Any] | None) -> None:
+    """Render the per-answer rigor-gate badge inline.
+
+    The badge is colored by the gate's verdict:
+
+    - **green** ``Grounded`` — ``passed=True`` and zero warnings.
+    - **yellow** ``Grounded with warnings (N)`` — ``passed=True`` but
+      ``warning_count>0``. Warnings include a missing backend, a stub
+      entity lookup, or a confidence-divergence signal — none of which
+      block the answer.
+    - **red** ``Gate failed (N errors)`` — ``passed=False``. At least
+      one ``error``-severity failure (unresolved citation,
+      page-out-of-range). A reviewer should treat this as a hard
+      regression in the answer's grounding.
+    - **informational** ``Rigor check not available`` — the gate
+      raised internally or the server didn't return a ``rigor`` field.
+      The answer is still rendered above.
+
+    Below the badge, an expandable "Rigor details" section lists each
+    failure with its kind, severity, target, and detail message.
+    ``confidence_calibration`` is surfaced as a small line when present.
+    """
+    if rigor is None:
+        st.caption("i Rigor check not available for this answer.")
+        return
+
+    passed = bool(rigor.get("passed"))
+    error_count = int(rigor.get("error_count") or 0)
+    warning_count = int(rigor.get("warning_count") or 0)
+    failures = rigor.get("failures") or []
+    calibration = rigor.get("confidence_calibration")
+
+    # Single-call colored badge using Streamlit's success/warning/error.
+    if passed and warning_count == 0:
+        st.success("Grounded — all citations and entities resolved.")
+    elif passed:
+        st.warning(
+            f"Grounded with warnings ({warning_count}) — answer passed the gate "
+            "but at least one informational signal fired."
+        )
+    else:
+        st.error(
+            f"Gate failed ({error_count} error{'s' if error_count != 1 else ''}) — "
+            "the answer's grounding has at least one hard failure."
+        )
+
+    # Confidence-calibration line, when populated. Calibration is a 0..1
+    # float; surface it with two-decimal precision so the demo audience
+    # sees the same shape the rigor module emits.
+    if calibration is not None:
+        try:
+            cal_f = float(calibration)
+            st.caption(f"Confidence calibration: {cal_f:.2f}")
+        except (TypeError, ValueError):
+            pass
+
+    # The failures list is the actionable detail. Expand it by default
+    # when the gate did NOT pass so the human's eye lands on the
+    # specifics; collapse it for the warnings-only case so the answer
+    # surface stays uncluttered.
+    if failures:
+        with st.expander(
+            f"Rigor details ({len(failures)})",
+            expanded=not passed,
+        ):
+            for failure in failures:
+                if not isinstance(failure, dict):
+                    st.markdown(f"- {failure}")
+                    continue
+                kind = failure.get("kind") or "—"
+                severity = failure.get("severity") or "—"
+                target = failure.get("target")
+                detail = failure.get("detail") or ""
+                target_str = f" · target `{target}`" if target else ""
+                st.markdown(f"- **{kind}** ({severity}){target_str}: {detail}")
 
 
 # ── render the current answer + citations ─────────────────────────────────
@@ -347,6 +442,11 @@ if st.session_state.paperqa_answer_md or st.session_state.paperqa_formatted_answ
         # ``answer`` field is empty — happens occasionally on degenerate
         # queries against tiny corpora.
         st.markdown(st.session_state.paperqa_formatted_answer)
+
+    # Rigor badge sits between the answer and the citations expander,
+    # so reviewers see the gate verdict in the same eye-sweep as the
+    # answer text but before they drill into the per-citation list.
+    _render_rigor_badge(st.session_state.paperqa_rigor)
 
     citations = st.session_state.paperqa_citations
     with st.expander(
