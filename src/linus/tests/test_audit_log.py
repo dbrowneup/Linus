@@ -196,9 +196,7 @@ def test_auditlog_init_accepts_str_path(tmp_path: Path) -> None:
     assert log.path == target
 
 
-def test_auditlog_init_default_path_honors_linus_home(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_auditlog_init_default_path_honors_linus_home(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """With ``path=None``, the constructor falls back to default_audit_path()
     which honors LINUS_HOME — the hermetic escape hatch."""
     monkeypatch.setenv("LINUS_HOME", str(tmp_path))
@@ -404,11 +402,7 @@ def test_read_events_preserves_append_order(tmp_path: Path) -> None:
     """read_events returns dicts in the order they were appended."""
     log = AuditLog(tmp_path / "audit.jsonl")
     log.append_dispatch(DispatchEvent(**_valid_dispatch_kwargs(session_id="s1", turn_id=1)))
-    log.append_memory_write(
-        MemoryWriteEvent(
-            session_id="s1", turn_id=1, segment="scratchpad", content_hash="sha256:1"
-        )
-    )
+    log.append_memory_write(MemoryWriteEvent(session_id="s1", turn_id=1, segment="scratchpad", content_hash="sha256:1"))
     log.append_dispatch(DispatchEvent(**_valid_dispatch_kwargs(session_id="s1", turn_id=2)))
     events = log.read_events()
     assert len(events) == 3
@@ -520,9 +514,7 @@ def test_append_dispatch_rejects_nan_in_payload(tmp_path: Path) -> None:
     NaN cannot round-trip through strict JSON and would corrupt the log."""
     log = AuditLog(tmp_path / "audit.jsonl")
     # Stuff a NaN into per_layer_breakdown — the only float-friendly field.
-    event = DispatchEvent(
-        **_valid_dispatch_kwargs(per_layer_breakdown={"layer_a": float("nan")})
-    )
+    event = DispatchEvent(**_valid_dispatch_kwargs(per_layer_breakdown={"layer_a": float("nan")}))
     with pytest.raises(ValueError):
         log.append_dispatch(event)
 
@@ -721,9 +713,7 @@ def test_append_dispatch_preserves_unicode_in_tags(tmp_path: Path) -> None:
     important for any internationalized session metadata."""
     target = tmp_path / "audit.jsonl"
     log = AuditLog(target)
-    log.append_dispatch(
-        DispatchEvent(**_valid_dispatch_kwargs(tags=["project:linus", "topic:λ-calculus"]))
-    )
+    log.append_dispatch(DispatchEvent(**_valid_dispatch_kwargs(tags=["project:linus", "topic:λ-calculus"])))
     raw = target.read_text(encoding="utf-8")
     assert "λ-calculus" in raw
     on_disk = json.loads(raw.strip())

@@ -629,12 +629,8 @@ def _compute_degradations() -> tuple[str, list[dict[str, Any]]]:
     # declares an online_* policy. A fully-offline registry must produce
     # zero network-related degradations even if the host is genuinely
     # offline — the framework adds zero noise to offline-only setups.
-    online_required_tools = [
-        spec.name for spec in default_registry if spec.network_policy == "online_required"
-    ]
-    online_optional_tools = [
-        spec.name for spec in default_registry if spec.network_policy == "online_optional"
-    ]
+    online_required_tools = [spec.name for spec in default_registry if spec.network_policy == "online_required"]
+    online_optional_tools = [spec.name for spec in default_registry if spec.network_policy == "online_optional"]
     if online_required_tools or online_optional_tools:
         network_reachable = _check_network_reachable()
         if not network_reachable:

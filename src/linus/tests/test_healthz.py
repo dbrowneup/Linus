@@ -548,8 +548,7 @@ def test_healthz_offline_only_registry_stays_live_when_network_down(
     network_degs = [
         d
         for d in body["degradations"]
-        if d["component"]
-        in {"network_unreachable_for_online_required", "network_optional_degraded"}
+        if d["component"] in {"network_unreachable_for_online_required", "network_optional_degraded"}
     ]
     assert network_degs == []
     assert body["effective_state"] == "live"
@@ -565,18 +564,14 @@ def test_healthz_online_optional_with_no_network_is_degraded(
     monkeypatch.setattr(server_module, "_check_network_reachable", lambda: False)
 
     body = client.get("/healthz").json()
-    optional_degs = [
-        d for d in body["degradations"] if d["component"] == "network_optional_degraded"
-    ]
+    optional_degs = [d for d in body["degradations"] if d["component"] == "network_optional_degraded"]
     assert len(optional_degs) == 1
     deg = optional_degs[0]
     assert deg["severity"] == "warning"
     assert "test.online_optional" in deg["actual"]
     assert deg["remediation"]
     # No online_required tools registered → no error degradation.
-    assert not [
-        d for d in body["degradations"] if d["component"] == "network_unreachable_for_online_required"
-    ]
+    assert not [d for d in body["degradations"] if d["component"] == "network_unreachable_for_online_required"]
     assert body["effective_state"] == "degraded"
 
 
@@ -590,11 +585,7 @@ def test_healthz_online_required_with_no_network_is_down(
     monkeypatch.setattr(server_module, "_check_network_reachable", lambda: False)
 
     body = client.get("/healthz").json()
-    required_degs = [
-        d
-        for d in body["degradations"]
-        if d["component"] == "network_unreachable_for_online_required"
-    ]
+    required_degs = [d for d in body["degradations"] if d["component"] == "network_unreachable_for_online_required"]
     assert len(required_degs) == 1
     deg = required_degs[0]
     assert deg["severity"] == "error"
@@ -617,8 +608,7 @@ def test_healthz_online_tools_with_network_up_emit_no_network_degradations(
     network_degs = [
         d
         for d in body["degradations"]
-        if d["component"]
-        in {"network_unreachable_for_online_required", "network_optional_degraded"}
+        if d["component"] in {"network_unreachable_for_online_required", "network_optional_degraded"}
     ]
     assert network_degs == []
     # No other degradations should be triggered by the network paths.
@@ -644,8 +634,7 @@ def test_healthz_both_online_required_and_optional_with_no_network(
     severities = {
         d["severity"]
         for d in body["degradations"]
-        if d["component"]
-        in {"network_unreachable_for_online_required", "network_optional_degraded"}
+        if d["component"] in {"network_unreachable_for_online_required", "network_optional_degraded"}
     }
     assert severities == {"warning", "error"}
     assert body["effective_state"] == "down"
@@ -674,9 +663,7 @@ def test_healthz_network_check_is_module_level_monkeypatchable(
     # The probe was actually invoked.
     assert calls, "_check_network_reachable was not consulted by healthz"
     # And its return value drove the degradation.
-    assert any(
-        d["component"] == "network_optional_degraded" for d in body["degradations"]
-    )
+    assert any(d["component"] == "network_optional_degraded" for d in body["degradations"])
 
 
 def test_compute_degradations_network_paths_only_fire_when_online_tool_registered(
@@ -694,12 +681,10 @@ def test_compute_degradations_network_paths_only_fire_when_online_tool_registere
 
     monkeypatch.setattr(server_module, "_check_network_reachable", spy_reachable)
 
-    state, degs = server_module._compute_degradations()
+    state, _degs = server_module._compute_degradations()
     assert state == "live"
     # No online tool registered → probe must not have been called.
-    assert probe_called == [], (
-        "_check_network_reachable should not be invoked when no online_* tool is registered"
-    )
+    assert probe_called == [], "_check_network_reachable should not be invoked when no online_* tool is registered"
 
 
 def test_check_network_reachable_returns_bool() -> None:

@@ -68,9 +68,7 @@ NetworkPolicy = Literal["offline", "online_optional", "online_required"]
 
 #: The three valid values of :data:`NetworkPolicy`, exposed as a frozenset for
 #: cheap membership checks in validators. Kept in sync with the Literal above.
-_ALLOWED_NETWORK_POLICIES: frozenset[str] = frozenset(
-    {"offline", "online_optional", "online_required"}
-)
+_ALLOWED_NETWORK_POLICIES: frozenset[str] = frozenset({"offline", "online_optional", "online_required"})
 
 
 class ToolError(RuntimeError):
@@ -306,8 +304,7 @@ class ToolRegistry:
         """
         if network_policy not in _ALLOWED_NETWORK_POLICIES:
             raise ValueError(
-                f"network_policy must be one of {sorted(_ALLOWED_NETWORK_POLICIES)}, "
-                f"got {network_policy!r}"
+                f"network_policy must be one of {sorted(_ALLOWED_NETWORK_POLICIES)}, got {network_policy!r}"
             )
 
         if name is None:
@@ -318,9 +315,7 @@ class ToolRegistry:
             name = f"{module}.{short}".replace(".<locals>.", ".")
 
         if name in self._tools and not replace:
-            raise ValueError(
-                f"Tool {name!r} is already registered. Pass replace=True to override."
-            )
+            raise ValueError(f"Tool {name!r} is already registered. Pass replace=True to override.")
 
         spec = ToolSpec(
             name=name,
@@ -390,29 +385,19 @@ class ToolRegistry:
             try:
                 kwargs = json.loads(arguments)
             except json.JSONDecodeError as exc:
-                raise ToolError(
-                    f"Tool {name!r} arguments were not valid JSON: {exc}"
-                ) from exc
+                raise ToolError(f"Tool {name!r} arguments were not valid JSON: {exc}") from exc
             if not isinstance(kwargs, dict):
-                raise ToolError(
-                    f"Tool {name!r} arguments must decode to an object, got "
-                    f"{type(kwargs).__name__}"
-                )
+                raise ToolError(f"Tool {name!r} arguments must decode to an object, got {type(kwargs).__name__}")
         elif isinstance(arguments, dict):
             kwargs = dict(arguments)
         else:
-            raise ToolError(
-                f"Tool {name!r} arguments must be dict or JSON string, got "
-                f"{type(arguments).__name__}"
-            )
+            raise ToolError(f"Tool {name!r} arguments must be dict or JSON string, got {type(arguments).__name__}")
 
         try:
             return spec.func(**kwargs)
         except TypeError as exc:
             # Most often: model emitted an unexpected kwarg or omitted a required one.
-            raise ToolError(
-                f"Tool {name!r} rejected arguments {list(kwargs)}: {exc}"
-            ) from exc
+            raise ToolError(f"Tool {name!r} rejected arguments {list(kwargs)}: {exc}") from exc
         except Exception as exc:  # Tool-internal failure (e.g. KB unavailable)
             raise ToolError(f"Tool {name!r} raised {type(exc).__name__}: {exc}") from exc
 
