@@ -849,3 +849,87 @@ def test_adapter_to_paper_lookup_returns_page_count_from_paper(
     # Unknown paper → both methods return None.
     assert lookup.get_paper("missing") is None
     assert lookup.get_page_count("missing") is None
+
+
+# ── #107 H2: _AdapterPaperLookup must not double-call adapter.get_paper ────
+
+
+class _CountingKBAdapter:
+    """KB-adapter stand-in that counts every ``get_paper`` invocation.
+
+    The rigor gate calls ``get_paper`` once and ``get_page_count`` once
+    per citation; per the #107 H2 bug fix, the wrapper memoizes the
+    first call so the second method reads from cache rather than
+    re-querying SQLite. This fake makes the call count observable.
+    """
+
+    def __init__(self, papers: dict[str, int]) -> None:
+        self._papers = papers
+        self.call_count = 0
+        self.calls_by_id: dict[str, int] = {}
+
+    def get_paper(self, paper_id: str) -> _FakeKBPaper | None:
+        self.call_count += 1
+        self.calls_by_id[paper_id] = self.calls_by_id.get(paper_id, 0) + 1
+        if paper_id not in self._papers:
+            return None
+        return _FakeKBPaper(page_count=self._papers[paper_id])
+
+
+def test_adapter_paper_lookup_calls_get_paper_once_per_citation() -> None:
+    """The wrapper deduplicates ``adapter.get_paper`` across the rigor gate's
+    two-method call shape (``get_paper`` then ``get_page_count``) so each
+    citation produces exactly ONE SQLite round-trip (#107 H2 regression test).
+    """
+    from linus.knowledge.paperqa import _adapter_to_paper_lookup
+
+    adapter = _CountingKBAdapter({"doc-abc": 10})
+    lookup = _adapter_to_paper_lookup(adapter)
+
+    # Simulate the rigor gate's per-citation pattern: get_paper, then
+    # get_page_count, on the same paper id.
+    paper = lookup.get_paper("doc-abc")
+    page_count = lookup.get_page_count("doc-abc")
+
+    assert paper is not None
+    assert page_count == 10
+    # The critical assertion: the adapter saw exactly ONE call for this id.
+    assert adapter.call_count == 1
+    assert adapter.calls_by_id["doc-abc"] == 1
+
+
+def test_adapter_paper_lookup_caches_missing_paper_ids() -> None:
+    """Missing paper ids are cached as ``None`` so a follow-up ``get_page_count``
+    does not re-query the adapter for the known-absent row (#107 H2 corollary).
+    """
+    from linus.knowledge.paperqa import _adapter_to_paper_lookup
+
+    adapter = _CountingKBAdapter({})  # empty KB → every lookup misses
+    lookup = _adapter_to_paper_lookup(adapter)
+
+    assert lookup.get_paper("doc-missing") is None
+    assert lookup.get_page_count("doc-missing") is None
+    # Even though both calls returned None, only one DB hit should have
+    # occurred — caching the negative result is part of the fix.
+    assert adapter.call_count == 1
+
+
+def test_adapter_paper_lookup_caches_per_paper_id() -> None:
+    """The cache is keyed by paper_id, so distinct ids each cost one DB hit
+    but each repeated id costs zero extra (#107 H2 corollary).
+    """
+    from linus.knowledge.paperqa import _adapter_to_paper_lookup
+
+    adapter = _CountingKBAdapter({"a": 5, "b": 7})
+    lookup = _adapter_to_paper_lookup(adapter)
+
+    # Two citations, each calling the two-method pattern.
+    lookup.get_paper("a")
+    lookup.get_page_count("a")
+    lookup.get_paper("b")
+    lookup.get_page_count("b")
+    # Plus a re-lookup of "a" — should still be 2 total DB hits.
+    lookup.get_paper("a")
+
+    assert adapter.call_count == 2
+    assert adapter.calls_by_id == {"a": 1, "b": 1}

@@ -226,6 +226,30 @@ class KnowledgeBaseAdapter:
     def __exit__(self, exc_type, exc, tb) -> None:
         self.close()
 
+    def __del__(self) -> None:
+        """Best-effort cleanup if the caller forgot ``close()`` / ``with`` (#107 H4).
+
+        ``__del__`` runs when CPython's refcount drops to zero, which is
+        deterministic in CPython but not on PyPy and not under GC
+        pressure. It is therefore a defensive fallback, not the contract.
+        The class docstring still asks callers to use ``close()`` or the
+        context-manager form; this hook just narrows the leak window
+        when they don't.
+
+        Wrapped in ``try/except`` because ``__del__`` runs at interpreter
+        shutdown where module references may already be torn down, and
+        because the connection may have been closed or invalidated by
+        other means. Swallowing any exception keeps interpreter shutdown
+        quiet — a failed cleanup at exit is not actionable.
+        """
+        try:
+            self.close()
+        except Exception:
+            # Never let __del__ raise — CPython's resource-cleanup
+            # ignores it but emits a noisy warning, and at interpreter
+            # shutdown the exception may be ungettable anyway.
+            pass
+
     # --- queries --------------------------------------------------------------
 
     def search_papers(self, query: str, limit: int = 10) -> list[Paper]:
