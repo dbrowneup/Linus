@@ -20,7 +20,6 @@ import pytest
 
 from linus.sandbox import WRITE_ALLOWLIST, SandboxFS
 
-
 # ── Construction + root property ───────────────────────────────────────────
 
 
@@ -209,3 +208,136 @@ def test_write_allowlist_constant_is_exact() -> None:
     dropping ``benchmarks``) should fail this test loudly. SAFETY.md is the
     source of truth — coordinate any change there first."""
     assert WRITE_ALLOWLIST == ("src", "benchmarks", "experiments", "docs")
+
+
+# ── Symlink TOCTOU + escape hardening (#105 H-1 + M-1) ─────────────────────
+#
+# The four tests below pin the 2026-05-21 fix for the SandboxFS.write TOCTOU
+# + dangling-symlink escape. Policy summary: write refuses ANY symlink on
+# the target path — at the final component or any ancestor — regardless of
+# where the symlink ultimately resolves. "Narrower is safer" for v0.5.0;
+# a future tier may relax to "symlinks allowed if their target is also
+# under the allowlist," but not yet.
+
+
+def test_write_refuses_when_target_is_symlink_to_outside(tmp_path: Path) -> None:
+    """A symlink at the write target whose link-target is OUTSIDE repo_root
+    must be refused. The pre-fix bug: ``resolve(strict=False)`` returned the
+    outside path which then failed prefix-check (safe), BUT a dangling
+    variant (link target does not yet exist) returned the lexical inside
+    path which passed prefix-check and let ``write_text`` follow the link
+    at I/O time, creating the file outside the sandbox."""
+    repo_root = tmp_path / "repo"
+    (repo_root / "src").mkdir(parents=True)
+
+    outside_dir = tmp_path / "outside"
+    outside_dir.mkdir()
+    outside_target = outside_dir / "stolen.txt"
+    # Note: outside_target does NOT exist yet — this is the dangling case
+    # that triggered M-1 (resolve(strict=False) accepts the lexical path).
+
+    link = repo_root / "src" / "escape"
+    try:
+        os.symlink(outside_target, link)
+    except OSError:
+        pytest.skip("symlinks not supported on this platform")
+
+    sandbox = SandboxFS(repo_root)
+    with pytest.raises(PermissionError):
+        sandbox.write("src/escape", "leaked")
+
+    # Defense in depth: confirm no file was created outside.
+    assert not outside_target.exists(), "write must not have followed the symlink"
+
+
+def test_write_refuses_when_parent_component_is_symlink(tmp_path: Path) -> None:
+    """A symlink at an INTERMEDIATE parent of the write target must be
+    refused. This is the H-1 case: ``_resolve_under_root`` may return a
+    lexically-clean path under root, but the parent is a symlink to outside
+    and ``mkdir(parents=True)``/``write_text`` would extend the host tree."""
+    repo_root = tmp_path / "repo"
+    (repo_root / "src").mkdir(parents=True)
+
+    outside_dir = tmp_path / "outside_dir"
+    outside_dir.mkdir()
+    # outside_dir is empty — when write tries to mkdir + write under the
+    # symlink, it would create files inside outside_dir if not refused.
+
+    sneaky_link = repo_root / "src" / "sneaky"
+    try:
+        os.symlink(outside_dir, sneaky_link)
+    except OSError:
+        pytest.skip("symlinks not supported on this platform")
+
+    sandbox = SandboxFS(repo_root)
+    with pytest.raises(PermissionError):
+        sandbox.write("src/sneaky/file.txt", "leaked")
+
+    # Defense in depth: nothing must have been written under outside_dir.
+    assert list(outside_dir.iterdir()) == [], "write must not have followed the parent symlink"
+
+
+def test_write_refuses_when_target_is_symlink_to_inside_allowed_dir(tmp_path: Path) -> None:
+    """Even a "legitimate" symlink whose target is INSIDE an allowed
+    directory is refused on write. Policy for v0.5.0 is "no symlinks on
+    write," period — narrower is safer until we have a tier that explicitly
+    relaxes this. The test pins that policy so a future relaxation has to
+    be an explicit, documented decision."""
+    repo_root = tmp_path / "repo"
+    real_dir = repo_root / "src" / "real-dir"
+    real_dir.mkdir(parents=True)
+
+    inner_link = repo_root / "src" / "inner"
+    try:
+        os.symlink(real_dir, inner_link)
+    except OSError:
+        pytest.skip("symlinks not supported on this platform")
+
+    sandbox = SandboxFS(repo_root)
+    with pytest.raises(PermissionError):
+        sandbox.write("src/inner/file.txt", "data")
+
+    # Nothing was written through the link.
+    assert not (real_dir / "file.txt").exists()
+
+
+def test_write_creates_real_directory_chain(tmp_path: Path) -> None:
+    """Positive control: write to a deeply-nested path under an allowlist
+    directory creates ALL intermediate dirs as REAL directories (not
+    symlinks) and all under repo_root. Confirms the hardened ``_safe_mkdir``
+    happy path."""
+    repo_root = tmp_path / "repo"
+    repo_root.mkdir()
+
+    sandbox = SandboxFS(repo_root)
+    sandbox.write("src/new/nested/deep/file.txt", "ok")
+
+    expected_chain = [
+        repo_root / "src",
+        repo_root / "src" / "new",
+        repo_root / "src" / "new" / "nested",
+        repo_root / "src" / "new" / "nested" / "deep",
+    ]
+    for d in expected_chain:
+        assert d.is_dir(), f"{d!r} must exist as a directory"
+        assert not d.is_symlink(), f"{d!r} must be a real directory, not a symlink"
+        assert d.is_relative_to(repo_root.resolve()), f"{d!r} must be under repo_root"
+
+    target = repo_root / "src" / "new" / "nested" / "deep" / "file.txt"
+    assert target.read_text(encoding="utf-8") == "ok"
+    assert not target.is_symlink()
+
+
+# ── NUL byte rejection (#105 L-1, bundled with H-1 + M-1 fix) ──────────────
+
+
+def test_resolve_rejects_nul_byte_with_permissionerror(tmp_path: Path) -> None:
+    """A NUL byte in the input path must raise ``PermissionError`` (not the
+    bare ``ValueError`` that Python's OS layer raises on the embedded null).
+    Clients matching on the documented exception class need a consistent
+    signal — see the bug sweep L-1 finding."""
+    sandbox = SandboxFS(tmp_path)
+    with pytest.raises(PermissionError, match="NUL byte"):
+        sandbox.write("src/foo\x00bar.txt", "nope")
+    with pytest.raises(PermissionError, match="NUL byte"):
+        sandbox.read("foo\x00bar.txt")
