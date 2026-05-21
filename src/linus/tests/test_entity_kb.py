@@ -10,6 +10,7 @@ the exact composition.
 
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 from unittest.mock import patch
 
@@ -438,3 +439,58 @@ def test_chained_lookup_satisfies_entity_lookup_protocol() -> None:
     """:class:`ChainedEntityLookup` also satisfies the Protocol."""
     chain: EntityLookup = ChainedEntityLookup(BuiltinEntityLookup())
     assert chain.lookup_entity("BRCA1") is not None
+
+
+# ── H-1 regression test (PR #107 bug sweep) ────────────────────────────────
+
+
+def test_kb_entity_lookup_concurrent_first_calls_parse_once() -> None:
+    """H-1 regression: 16 concurrent first lookups must trigger ONE parse.
+
+    Under FastAPI concurrency, two threads can both observe
+    ``self._graph is None`` and both kick off ``nx.read_graphml``. With
+    the ``threading.Lock`` + double-checked guard in ``_ensure_loaded``,
+    only the first thread through the lock parses; the rest see the
+    populated index and return immediately. Uses a ``threading.Barrier``
+    so all 16 threads release together — without the lock this is enough
+    interleaving to produce ~16 parses (or at minimum, >1).
+    """
+    n_threads = 16
+    lookup = KBEntityLookup(graphml_path=_FIXTURE_GRAPHML)
+
+    real_read_graphml = nx.read_graphml
+    call_count = 0
+    count_lock = threading.Lock()
+
+    def counting_read_graphml(*args, **kwargs):  # type: ignore[no-untyped-def]
+        nonlocal call_count
+        with count_lock:
+            call_count += 1
+        return real_read_graphml(*args, **kwargs)
+
+    barrier = threading.Barrier(n_threads)
+    results: list[dict[str, object] | None] = [None] * n_threads
+    errors: list[BaseException] = []
+
+    def worker(idx: int) -> None:
+        try:
+            barrier.wait(timeout=5.0)
+            results[idx] = lookup.lookup_entity("BRCA1")
+        except BaseException as exc:  # pragma: no cover — surface in assertion
+            errors.append(exc)
+
+    with patch("linus.knowledge.entity_kb.nx.read_graphml", side_effect=counting_read_graphml):
+        threads = [threading.Thread(target=worker, args=(i,)) for i in range(n_threads)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=5.0)
+            assert not t.is_alive(), "worker thread did not exit in time"
+
+    assert not errors, f"worker threads raised: {errors!r}"
+    assert call_count == 1, f"expected exactly 1 nx.read_graphml call, got {call_count}"
+    # All 16 lookups must agree — and must match a serial baseline.
+    baseline = KBEntityLookup(graphml_path=_FIXTURE_GRAPHML).lookup_entity("BRCA1")
+    assert baseline is not None
+    for idx, result in enumerate(results):
+        assert result == baseline, f"thread {idx} got divergent result: {result!r}"

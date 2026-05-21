@@ -67,6 +67,7 @@ See also
 from __future__ import annotations
 
 import hashlib
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -179,70 +180,93 @@ class KBEntityLookup:
         self._graph: nx.MultiDiGraph | None = None
         self._index: dict[str, dict[str, Any]] | None = None
         self._source_tag: str | None = None
+        # H-1 (#107): serialize lazy-parse so concurrent first calls do not
+        # both invoke ``nx.read_graphml`` (expensive, briefly inconsistent
+        # in-memory state). Double-checked locking — the fast path stays
+        # lock-free once the index is populated.
+        self._load_lock: threading.Lock = threading.Lock()
 
     # ── lazy load helpers ──────────────────────────────────────────────────
 
     def _ensure_loaded(self) -> None:
-        """Parse the GraphML and build the name → metadata index once."""
+        """Parse the GraphML and build the name → metadata index once.
+
+        H-1 (#107): double-checked locking. The first check is the
+        unsynchronized fast path; if the index is already populated, we
+        return without touching the lock. If not, we acquire ``_load_lock``
+        and re-check under the lock so a thread that lost the race to a
+        peer's parse observes the populated index instead of redoing the
+        work. This keeps steady-state lookups lock-free while preventing
+        two concurrent first calls from both invoking ``nx.read_graphml``.
+        """
         if self._index is not None:
             return
 
-        if not self._graphml_path.exists():
-            raise FileNotFoundError(
-                f"KB knowledge-graph file not found at {self._graphml_path!s}. "
-                "This path is controlled by the LINUS_KB_OUTPUTS_DIR env var "
-                "(default: modules/KnowledgeBase/data/outputs). To regenerate "
-                "the file, run from the KnowledgeBase submodule:\n"
-                "    cd modules/KnowledgeBase\n"
-                "    python -m papers_analysis.knowledge_graph"
-            )
+        with self._load_lock:
+            if self._index is not None:  # double-checked
+                return
 
-        g = nx.read_graphml(self._graphml_path)
-        # Coerce to MultiDiGraph for consistent edge iteration (matches
-        # kg_render.load_kg's behavior — the KB writes a MultiDiGraph but
-        # NetworkX's GraphML reader may downcast in some versions).
-        if not isinstance(g, nx.MultiDiGraph):
-            g = nx.MultiDiGraph(g) if g.is_directed() else nx.MultiDiGraph(g.to_directed())
+            if not self._graphml_path.exists():
+                raise FileNotFoundError(
+                    f"KB knowledge-graph file not found at {self._graphml_path!s}. "
+                    "This path is controlled by the LINUS_KB_OUTPUTS_DIR env var "
+                    "(default: modules/KnowledgeBase/data/outputs). To regenerate "
+                    "the file, run from the KnowledgeBase submodule:\n"
+                    "    cd modules/KnowledgeBase\n"
+                    "    python -m papers_analysis.knowledge_graph"
+                )
 
-        # First pass: pick out entity nodes and their surface forms.
-        entity_nodes: list[tuple[str, dict[str, Any]]] = []
-        for node_id, data in g.nodes(data=True):
-            if _node_type(data) == "entity":
-                entity_nodes.append((str(node_id), data))
+            g = nx.read_graphml(self._graphml_path)
+            # Coerce to MultiDiGraph for consistent edge iteration (matches
+            # kg_render.load_kg's behavior — the KB writes a MultiDiGraph but
+            # NetworkX's GraphML reader may downcast in some versions).
+            if not isinstance(g, nx.MultiDiGraph):
+                g = nx.MultiDiGraph(g) if g.is_directed() else nx.MultiDiGraph(g.to_directed())
 
-        # Second pass: compute ref_count per entity (= count of distinct
-        # paper-typed predecessors, i.e. papers that mention the entity
-        # via a Paper → Entity edge). MultiDiGraph may have multiple
-        # parallel mentions edges between the same paper and entity;
-        # we count *distinct* papers.
-        source_tag = "kb:" + _short_sha(self._graphml_path)
-        index: dict[str, dict[str, Any]] = {}
-        for node_id, data in entity_nodes:
-            surface = _entity_surface(node_id, data)
-            key = surface.casefold() if self._case_insensitive else surface
+            # First pass: pick out entity nodes and their surface forms.
+            entity_nodes: list[tuple[str, dict[str, Any]]] = []
+            for node_id, data in g.nodes(data=True):
+                if _node_type(data) == "entity":
+                    entity_nodes.append((str(node_id), data))
 
-            paper_neighbors: set[str] = set()
-            for predecessor in g.predecessors(node_id):
-                pred_data = g.nodes[predecessor]
-                if _node_type(pred_data) == "paper":
-                    paper_neighbors.add(str(predecessor))
+            # Second pass: compute ref_count per entity (= count of distinct
+            # paper-typed predecessors, i.e. papers that mention the entity
+            # via a Paper → Entity edge). MultiDiGraph may have multiple
+            # parallel mentions edges between the same paper and entity;
+            # we count *distinct* papers.
+            source_tag = "kb:" + _short_sha(self._graphml_path)
+            index: dict[str, dict[str, Any]] = {}
+            for node_id, data in entity_nodes:
+                surface = _entity_surface(node_id, data)
+                key = surface.casefold() if self._case_insensitive else surface
 
-            metadata: dict[str, Any] = {
-                "kind": _entity_kind(data),
-                "source": source_tag,
-                "ref_count": len(paper_neighbors),
-            }
-            # If two entity nodes collapse to the same case-folded key
-            # (KB's id-construction already lowercases, so this is
-            # unlikely in practice but cheap to guard against), keep the
-            # one with the higher ref_count — it's the better anchor.
-            existing = index.get(key)
-            if existing is None or metadata["ref_count"] > existing["ref_count"]:
-                index[key] = metadata
+                paper_neighbors: set[str] = set()
+                for predecessor in g.predecessors(node_id):
+                    pred_data = g.nodes[predecessor]
+                    if _node_type(pred_data) == "paper":
+                        paper_neighbors.add(str(predecessor))
 
-        self._graph = g
-        self._index = index
-        self._source_tag = source_tag
+                metadata: dict[str, Any] = {
+                    "kind": _entity_kind(data),
+                    "source": source_tag,
+                    "ref_count": len(paper_neighbors),
+                }
+                # If two entity nodes collapse to the same case-folded key
+                # (KB's id-construction already lowercases, so this is
+                # unlikely in practice but cheap to guard against), keep the
+                # one with the higher ref_count — it's the better anchor.
+                existing = index.get(key)
+                if existing is None or metadata["ref_count"] > existing["ref_count"]:
+                    index[key] = metadata
+
+            # Publish the parsed state in a final order: ``_index`` last so
+            # the unsynchronized fast-path check above is the load-bearing
+            # publication signal. Any thread that sees ``_index is not None``
+            # is guaranteed to see the matching ``_graph`` / ``_source_tag``
+            # because they were assigned first under the same lock.
+            self._graph = g
+            self._source_tag = source_tag
+            self._index = index
 
     # ── EntityLookup protocol ──────────────────────────────────────────────
 
