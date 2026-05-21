@@ -46,13 +46,13 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import threading
 import time
 import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator
-
 
 DEFAULT_DB_PATH = Path.home() / ".linus" / "sessions.db"
 
@@ -103,9 +103,19 @@ class SessionStore:
 
     Connection lifecycle: opened lazily on first operation, kept alive
     on the instance, and closed by :meth:`close` (or the
-    context-manager form). The instance is not threadsafe; create one
-    per request handler thread if needed. For Phase 2a single-process
-    use that's not a constraint.
+    context-manager form).
+
+    **Thread safety.** All public methods serialize through an internal
+    ``threading.Lock`` so a single ``SessionStore`` instance can be
+    shared across request-handler threads — required because
+    :func:`get_default_store` returns a process-wide singleton and the
+    FastAPI test client / production servers can dispatch handlers from
+    multiple threads. Python's ``sqlite3.Connection`` itself is NOT
+    thread-safe even with ``check_same_thread=False``; the lock makes
+    the *Python* side safe, while the ``INSERT ... SELECT`` form of
+    :meth:`append_message` keeps the *SQL* side race-free against any
+    other process or other connection that bypasses this instance. See
+    bug-sweep 2026-05-20 (C1).
 
     Schema migration is idempotent — :meth:`_ensure_schema` runs on
     every connect and ``CREATE TABLE IF NOT EXISTS`` does the right
@@ -115,10 +125,20 @@ class SessionStore:
     def __init__(self, db_path: Path | str | None = None) -> None:
         self.db_path = _resolve_db_path(db_path)
         self._conn: sqlite3.Connection | None = None
+        # Serializes all access to ``self._conn`` so concurrent callers
+        # on a shared SessionStore (e.g. the process-wide singleton from
+        # ``get_default_store``) don't corrupt the underlying sqlite3
+        # connection's internal state. RLock is intentional so that
+        # internal helpers (e.g. ``ensure_session`` → ``get_session`` +
+        # ``create_session``) can re-enter without deadlocking.
+        self._lock = threading.RLock()
 
     # ── connection lifecycle ────────────────────────────────────────
 
     def _connect(self) -> sqlite3.Connection:
+        # Caller must hold ``self._lock``; this method is only invoked
+        # from within ``with self._lock:`` blocks. The lock ensures we
+        # never double-construct the connection from racing threads.
         if self._conn is not None:
             return self._conn
 
@@ -159,12 +179,14 @@ class SessionStore:
             )
 
     def close(self) -> None:
-        if self._conn is not None:
-            self._conn.close()
-            self._conn = None
+        with self._lock:
+            if self._conn is not None:
+                self._conn.close()
+                self._conn = None
 
     def __enter__(self) -> "SessionStore":
-        self._connect()
+        with self._lock:
+            self._connect()
         return self
 
     def __exit__(self, *args: object) -> None:
@@ -185,14 +207,15 @@ class SessionStore:
         UUID4 is minted. ``model`` and ``system_prompt`` are stored
         verbatim and surfaced via :meth:`get_session`.
         """
-        conn = self._connect()
         sid = session_id or str(uuid.uuid4())
         created_at = time.time_ns()
-        with conn:
-            conn.execute(
-                "INSERT INTO sessions(id, created_at, model, system_prompt) VALUES (?, ?, ?, ?)",
-                (sid, created_at, model, system_prompt),
-            )
+        with self._lock:
+            conn = self._connect()
+            with conn:
+                conn.execute(
+                    "INSERT INTO sessions(id, created_at, model, system_prompt) VALUES (?, ?, ?, ?)",
+                    (sid, created_at, model, system_prompt),
+                )
         return Session(id=sid, created_at=created_at, model=model, system_prompt=system_prompt)
 
     def ensure_session(self, session_id: str, model: str | None = None) -> Session:
@@ -203,10 +226,15 @@ class SessionStore:
         called :meth:`create_session` first. The endpoint can call
         ``ensure_session`` to upsert atomically.
         """
-        existing = self.get_session(session_id)
-        if existing is not None:
-            return existing
-        return self.create_session(model=model, session_id=session_id)
+        # Holds the lock across the read-then-write so a concurrent
+        # ``ensure_session`` against the same id doesn't double-insert
+        # (the sessions PK would refuse the second insert, but the
+        # RLock makes the intent explicit).
+        with self._lock:
+            existing = self.get_session(session_id)
+            if existing is not None:
+                return existing
+            return self.create_session(model=model, session_id=session_id)
 
     def append_message(
         self,
@@ -219,19 +247,33 @@ class SessionStore:
         Returns the stored record (with its assigned ``idx``). The
         session must already exist; callers can use
         :meth:`ensure_session` if they're not sure.
+
+        The next-idx computation and the INSERT are fused into a single
+        ``INSERT ... SELECT`` so two concurrent appenders on the same
+        session can't both observe the same ``next_idx`` and collide on
+        the ``(session_id, idx)`` PK. SQLite's row-level write lock
+        serializes the statement atomically. The outer Python lock
+        prevents two threads from interleaving operations on the same
+        :class:`sqlite3.Connection`, which is itself not thread-safe
+        even with ``check_same_thread=False`` (see bug-sweep C1,
+        2026-05-20).
         """
-        conn = self._connect()
         created_at = time.time_ns()
-        with conn:
-            cursor = conn.execute(
-                "SELECT COALESCE(MAX(idx), -1) + 1 AS next_idx FROM session_messages WHERE session_id = ?",
-                (session_id,),
-            )
-            next_idx = cursor.fetchone()["next_idx"]
-            conn.execute(
-                "INSERT INTO session_messages(session_id, idx, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
-                (session_id, next_idx, role, content, created_at),
-            )
+        with self._lock:
+            conn = self._connect()
+            with conn:
+                cursor = conn.execute(
+                    """
+                    INSERT INTO session_messages(session_id, idx, role, content, created_at)
+                    SELECT ?, COALESCE(MAX(idx), -1) + 1, ?, ?, ?
+                    FROM session_messages
+                    WHERE session_id = ?
+                    RETURNING idx
+                    """,
+                    (session_id, role, content, created_at, session_id),
+                )
+                row = cursor.fetchone()
+                next_idx = row["idx"]
         return StoredMessage(
             session_id=session_id,
             idx=next_idx,
@@ -249,34 +291,45 @@ class SessionStore:
 
         All messages land in one transaction; either the whole batch
         commits or none of it does. Indexes are assigned dense + monotonic.
+
+        Each row uses the same ``INSERT ... SELECT`` pattern as
+        :meth:`append_message` so the next-idx computation and the
+        insert happen atomically under SQLite's row-level write lock
+        (bug-sweep C1, 2026-05-20). The first INSERT in the
+        transaction acquires the write lock; subsequent INSERTs see
+        rows already inserted in this transaction, so ``MAX(idx) + 1``
+        produces dense, monotonic indexes. The outer Python lock
+        keeps concurrent callers from sharing the underlying sqlite3
+        connection's internal state, which is not itself thread-safe.
         """
         if not messages:
             return []
-        conn = self._connect()
         created_at = time.time_ns()
         out: list[StoredMessage] = []
-        with conn:
-            cursor = conn.execute(
-                "SELECT COALESCE(MAX(idx), -1) + 1 AS next_idx FROM session_messages WHERE session_id = ?",
-                (session_id,),
-            )
-            next_idx = cursor.fetchone()["next_idx"]
-            rows = []
-            for offset, (role, content) in enumerate(messages):
-                rows.append((session_id, next_idx + offset, role, content, created_at))
-                out.append(
-                    StoredMessage(
-                        session_id=session_id,
-                        idx=next_idx + offset,
-                        role=role,
-                        content=content,
-                        created_at=created_at,
+        with self._lock:
+            conn = self._connect()
+            with conn:
+                for role, content in messages:
+                    cursor = conn.execute(
+                        """
+                        INSERT INTO session_messages(session_id, idx, role, content, created_at)
+                        SELECT ?, COALESCE(MAX(idx), -1) + 1, ?, ?, ?
+                        FROM session_messages
+                        WHERE session_id = ?
+                        RETURNING idx
+                        """,
+                        (session_id, role, content, created_at, session_id),
                     )
-                )
-            conn.executemany(
-                "INSERT INTO session_messages(session_id, idx, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
-                rows,
-            )
+                    next_idx = cursor.fetchone()["idx"]
+                    out.append(
+                        StoredMessage(
+                            session_id=session_id,
+                            idx=next_idx,
+                            role=role,
+                            content=content,
+                            created_at=created_at,
+                        )
+                    )
         return out
 
     def delete_session(self, session_id: str) -> bool:
@@ -286,19 +339,21 @@ class SessionStore:
         otherwise. Useful for test cleanup and for a future
         ``DELETE /v1/sessions/{id}`` endpoint.
         """
-        conn = self._connect()
-        with conn:
-            cursor = conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
-        return cursor.rowcount > 0
+        with self._lock:
+            conn = self._connect()
+            with conn:
+                cursor = conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+            return cursor.rowcount > 0
 
     # ── reads ───────────────────────────────────────────────────────
 
     def get_session(self, session_id: str) -> Session | None:
-        conn = self._connect()
-        row = conn.execute(
-            "SELECT id, created_at, model, system_prompt FROM sessions WHERE id = ?",
-            (session_id,),
-        ).fetchone()
+        with self._lock:
+            conn = self._connect()
+            row = conn.execute(
+                "SELECT id, created_at, model, system_prompt FROM sessions WHERE id = ?",
+                (session_id,),
+            ).fetchone()
         if row is None:
             return None
         return Session(
@@ -310,12 +365,13 @@ class SessionStore:
 
     def get_messages(self, session_id: str) -> list[StoredMessage]:
         """Return all messages for a session, ordered by idx ascending."""
-        conn = self._connect()
-        rows = conn.execute(
-            "SELECT session_id, idx, role, content, created_at FROM session_messages "
-            "WHERE session_id = ? ORDER BY idx ASC",
-            (session_id,),
-        ).fetchall()
+        with self._lock:
+            conn = self._connect()
+            rows = conn.execute(
+                "SELECT session_id, idx, role, content, created_at FROM session_messages "
+                "WHERE session_id = ? ORDER BY idx ASC",
+                (session_id,),
+            ).fetchall()
         return [
             StoredMessage(
                 session_id=row["session_id"],
@@ -329,12 +385,12 @@ class SessionStore:
 
     def list_sessions(self, limit: int = 50) -> list[Session]:
         """Return up to ``limit`` sessions, most recent first."""
-        conn = self._connect()
-        rows = conn.execute(
-            "SELECT id, created_at, model, system_prompt FROM sessions "
-            "ORDER BY created_at DESC LIMIT ?",
-            (limit,),
-        ).fetchall()
+        with self._lock:
+            conn = self._connect()
+            rows = conn.execute(
+                "SELECT id, created_at, model, system_prompt FROM sessions ORDER BY created_at DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
         return [
             Session(
                 id=row["id"],
