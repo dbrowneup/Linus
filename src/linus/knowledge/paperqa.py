@@ -556,16 +556,48 @@ class _AdapterPaperLookup:
     occasionally fails to extract page count from supplementary
     materials), which the rigor gate tolerates as "can't validate the
     page" rather than as a failure.
+
+    Per-instance lookup cache (#107 H2)
+    -----------------------------------
+
+    The rigor gate's :func:`~linus.knowledge.rigor.check_citations` calls
+    :meth:`get_paper` first and :meth:`get_page_count` second on every
+    citation. The naive implementation issued two SQLite ``SELECT`` round
+    trips per citation; this wrapper deduplicates them by memoizing the
+    first lookup in :attr:`_paper_cache`. The cache is scoped to the
+    instance, which the rigor-gate auto-wiring (:func:`_run_rigor_gate`)
+    constructs fresh per ``paperqa.answer`` call. There is no eviction —
+    a single gate evaluation looks at O(max_sources) citations, which is
+    bounded and small. Cache entries store ``None`` for resolved-missing
+    paper ids so a second lookup of a missing id is also a single DB hit.
     """
 
     def __init__(self, adapter: Any) -> None:
         self._adapter = adapter
+        # paper_id → resolved Paper (or None if upstream returned None).
+        # Sentinel-free: presence in the dict means the lookup has run;
+        # use ``in`` for the cache-hit test, not truthiness on the value.
+        self._paper_cache: dict[str, Any | None] = {}
+
+    def _fetch(self, paper_id: str) -> Any | None:
+        """Return the cached or freshly-fetched paper for ``paper_id``.
+
+        First call for a given id hits the underlying adapter; subsequent
+        calls (within the lifetime of this :class:`_AdapterPaperLookup`
+        instance) read the memoized value, including the ``None`` for
+        ids the adapter resolved as missing.
+        """
+        if paper_id in self._paper_cache:
+            return self._paper_cache[paper_id]
+        paper = self._adapter.get_paper(paper_id)
+        self._paper_cache[paper_id] = paper
+        return paper
 
     def get_paper(self, paper_id: str) -> Any | None:
-        return self._adapter.get_paper(paper_id)
+        return self._fetch(paper_id)
 
     def get_page_count(self, paper_id: str) -> int | None:
-        paper = self._adapter.get_paper(paper_id)
+        paper = self._fetch(paper_id)
         if paper is None:
             return None
         # ``KnowledgeBaseAdapter.Paper.page_count`` is the canonical
