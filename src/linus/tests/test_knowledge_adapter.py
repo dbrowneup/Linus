@@ -656,3 +656,120 @@ def test_adapter_cannot_mutate_via_search_path(populated_db: Path) -> None:
     with pytest.raises(sqlite3.OperationalError):
         conn.execute("DELETE FROM papers WHERE sha256 = ?", ("a" * 64,))
     adapter.close()
+
+
+# ── #107 H4: resource-leak guards (__del__ + close + context-manager) ──────
+
+
+def test_kb_adapter_close_releases_connection(populated_db: Path) -> None:
+    """``close`` closes the cached SQLite connection so subsequent queries
+    against the now-closed connection raise — proving the file handle was
+    actually released (#107 H4 regression test).
+    """
+    adapter = KnowledgeBaseAdapter(db_path=populated_db)
+    conn = adapter._connect()
+    # Sanity: the freshly-opened connection works (row_factory=sqlite3.Row,
+    # so column-0 access is the canonical way to read a SELECT-literal value).
+    assert conn.execute("SELECT 1").fetchone()[0] == 1
+
+    adapter.close()
+
+    # The cached connection has been cleared, AND the underlying SQLite
+    # connection object is closed (further use raises ProgrammingError).
+    assert adapter._conn is None
+    with pytest.raises(sqlite3.ProgrammingError):
+        conn.execute("SELECT 1")
+
+
+def test_kb_adapter_context_manager_closes_on_exit(populated_db: Path) -> None:
+    """``with KnowledgeBaseAdapter() as kb:`` releases the connection on exit;
+    the connection captured during the block is closed afterward (#107 H4).
+    """
+    captured_conn: sqlite3.Connection | None = None
+    with KnowledgeBaseAdapter(db_path=populated_db) as adapter:
+        captured_conn = adapter._conn
+        assert captured_conn is not None
+        # Connection works inside the block.
+        assert captured_conn.execute("SELECT 1").fetchone()[0] == 1
+    # After exit: adapter clears its cache, AND the captured connection is closed.
+    assert adapter._conn is None
+    assert captured_conn is not None
+    with pytest.raises(sqlite3.ProgrammingError):
+        captured_conn.execute("SELECT 1")
+
+
+def test_kb_adapter_del_closes_connection(populated_db: Path) -> None:
+    """The ``__del__`` finalizer closes the connection when the adapter is
+    garbage-collected without ``close()`` having been called (#107 H4).
+
+    Captures the connection out-of-band, then forces ``__del__`` by dropping
+    the only reference. The captured connection must then be unusable.
+    """
+    adapter = KnowledgeBaseAdapter(db_path=populated_db)
+    captured_conn = adapter._connect()
+    assert captured_conn.execute("SELECT 1").fetchone()[0] == 1
+
+    # Drop the only reference to the adapter and force a collection so
+    # __del__ fires deterministically rather than relying on CPython's
+    # refcount-immediate behavior alone.
+    import gc
+
+    del adapter
+    gc.collect()
+
+    # The connection that the adapter held should now be closed.
+    with pytest.raises(sqlite3.ProgrammingError):
+        captured_conn.execute("SELECT 1")
+
+
+def test_kb_adapter_del_is_safe_when_never_connected(populated_db: Path) -> None:
+    """``__del__`` on an adapter whose connection was never opened must not
+    raise — the ``self._conn is not None`` guard inside ``close()`` covers
+    this, but exercising it via the finalizer path guards the integration
+    (#107 H4 corollary).
+    """
+    import gc
+
+    adapter = KnowledgeBaseAdapter(db_path=populated_db)
+    assert adapter._conn is None
+    # No exceptions should be raised when the adapter is collected without
+    # ever having opened a connection.
+    del adapter
+    gc.collect()
+
+
+def test_kb_adapter_del_is_safe_when_close_already_called(populated_db: Path) -> None:
+    """Calling ``close()`` then dropping the adapter must not raise from
+    ``__del__`` — close already nulled ``_conn`` so the finalizer is a no-op
+    (#107 H4 corollary).
+    """
+    import gc
+
+    adapter = KnowledgeBaseAdapter(db_path=populated_db)
+    adapter._connect()
+    adapter.close()
+    assert adapter._conn is None
+    del adapter
+    gc.collect()
+
+
+def test_kb_adapter_del_swallows_close_exceptions(populated_db: Path) -> None:
+    """``__del__`` must swallow any exception from ``close()`` to keep
+    interpreter shutdown quiet — even if a corrupt internal state would
+    otherwise raise (#107 H4 hardening).
+    """
+    import gc
+
+    adapter = KnowledgeBaseAdapter(db_path=populated_db)
+
+    # Replace the cached connection with a stub whose close() raises.
+    class _ExplodingConn:
+        def close(self) -> None:
+            raise RuntimeError("simulated close failure")
+
+    adapter._conn = _ExplodingConn()  # type: ignore[assignment]
+
+    # __del__ must not propagate the exception. del + gc.collect() would
+    # surface a noisy traceback if it did; the call itself is the assertion.
+    del adapter
+    gc.collect()
