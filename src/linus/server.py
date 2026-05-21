@@ -1153,47 +1153,83 @@ def _stream_with_session_append(
     session_id: str,
     new_messages: list[ChatMessage],
 ) -> Iterator[str]:
-    """Wrap :func:`_stream_chat_completion` with a post-stream session append.
+    """Wrap :func:`_stream_chat_completion` with durable session appends.
 
     Streams normally, accumulating the assistant content from each
-    ``delta.content`` event. After the inner stream emits ``[DONE]``,
-    appends the new user/system messages + the accumulated assistant
-    response to the session store so the next request with the same
-    ``session_id`` sees this turn in its history.
+    ``delta.content`` event. Persists two buckets of state to the
+    session store:
+
+    1. The NEW user/system messages — persisted **before** the Ollama
+       call so the user turn survives even if the client disconnects
+       before any tokens arrive. (H-1, bug-sweep 2026-05-20.)
+    2. The accumulated final assistant content.
+
+    Bucket 2 is persisted in a ``try/finally`` so that a mid-stream
+    client disconnect (which cancels the generator) still commits
+    whatever partial content was accumulated — the user's visible
+    reply is preserved on the next page load. The ``written``
+    sentinel keeps the finally block idempotent when the stream
+    completes normally and the post-loop append already ran.
 
     Session writes are best-effort — any exception during the append
     is swallowed silently so a storage failure doesn't truncate the
     user-visible stream.
     """
-    accumulated = ""
-    for event in _stream_chat_completion(transcript, resolved_model, options, tool_specs):
-        yield event
-        # Parse content deltas as they fly by; cheap because each event is
-        # already a small JSON blob the client is consuming.
-        if event.startswith("data: "):
-            payload = event[len("data: ") :].strip()
-            if payload and payload != "[DONE]":
-                try:
-                    chunk = json.loads(payload)
-                except json.JSONDecodeError:
-                    continue
-                choices = chunk.get("choices") or []
-                if choices:
-                    delta_content = choices[0].get("delta", {}).get("content")
-                    if delta_content:
-                        accumulated += delta_content
-
+    # Persist NEW user/system turns upfront so they survive a client
+    # disconnect that aborts the generator before the stream completes.
+    # If the upfront write fails we still attempt the post-stream write
+    # in the finally below.
     try:
-        new_turns: list[tuple[str, str]] = []
+        upfront_turns: list[tuple[str, str]] = []
         for m in new_messages:
             if m.role in ("user", "system") and m.content:
-                new_turns.append((m.role, m.content))
-        if accumulated:
-            new_turns.append(("assistant", accumulated))
-        if new_turns:
-            store.append_messages(session_id, new_turns)
-    except Exception:  # noqa: BLE001 — session-store failure must not truncate the stream
+                upfront_turns.append((m.role, m.content))
+        if upfront_turns:
+            store.append_messages(session_id, upfront_turns)
+    except Exception:
+        # Best-effort: the post-stream finally below will attempt the
+        # write again. Any storage failure here must NOT abort the
+        # streaming response.
         pass
+
+    accumulated = ""
+    written = False
+    try:
+        for event in _stream_chat_completion(transcript, resolved_model, options, tool_specs):
+            # Parse content deltas BEFORE yielding so that on client
+            # disconnect (which raises GeneratorExit at the yield), the
+            # finally block sees ``accumulated`` reflecting every event
+            # that was emitted to the client. If we parsed after the
+            # yield, the last-emitted token would be lost on disconnect.
+            if event.startswith("data: "):
+                payload = event[len("data: ") :].strip()
+                if payload and payload != "[DONE]":
+                    try:
+                        chunk = json.loads(payload)
+                    except json.JSONDecodeError:
+                        chunk = None
+                    if chunk is not None:
+                        choices = chunk.get("choices") or []
+                        if choices:
+                            delta_content = choices[0].get("delta", {}).get("content")
+                            if delta_content:
+                                accumulated += delta_content
+            yield event
+    finally:
+        # The finally runs even on GeneratorExit / CancelledError, so a
+        # client disconnect still commits whatever was accumulated. The
+        # ``written`` flag prevents a double-write if the stream
+        # completes normally and the try-block falls through (the
+        # finally still runs on normal exit; the flag stops a second
+        # store.append_messages call).
+        if not written:
+            written = True
+            try:
+                if accumulated:
+                    store.append_messages(session_id, [("assistant", accumulated)])
+            except Exception:
+                # Session-store failure must not truncate the stream.
+                pass
 
 
 # --- app --------------------------------------------------------------------
