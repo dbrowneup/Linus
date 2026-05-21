@@ -527,6 +527,195 @@ def test_append_dispatch_rejects_nan_in_payload(tmp_path: Path) -> None:
         log.append_dispatch(event)
 
 
+# ── network_egress (DEC-0061) ──────────────────────────────────────────────
+
+
+def test_dispatch_event_network_egress_defaults_to_empty_list() -> None:
+    """Per DEC-0061, ``network_egress`` defaults to an empty list — pre-DEC-0061
+    call sites construct an event without specifying it and see the same
+    semantics as before. Mutating one instance's list must not leak into
+    another (no shared mutable default)."""
+    e1 = DispatchEvent(**_valid_dispatch_kwargs())
+    e2 = DispatchEvent(**_valid_dispatch_kwargs())
+    assert e1.network_egress == []
+    assert e2.network_egress == []
+    e1.network_egress.append({"url_host": "example.com"})
+    assert e2.network_egress == []  # no shared state
+
+
+def test_append_dispatch_round_trips_network_egress(tmp_path: Path) -> None:
+    """A dispatch event with one network_egress entry round-trips: written
+    dict carries the list intact, on-disk JSON parses back to the same
+    structure, read_events() returns the same content."""
+    target = tmp_path / "audit.jsonl"
+    log = AuditLog(target)
+    egress_entry: dict[str, object] = {
+        "url_host": "eutils.ncbi.nlm.nih.gov",
+        "query_hash": "sha256:cafebabe",
+        "response_size": 4096,
+        "latency_ms": 142.3,
+        "timestamp_ns": 1716240000000000000,
+    }
+    event = DispatchEvent(
+        **_valid_dispatch_kwargs(network_egress=[egress_entry]),
+    )
+    written = log.append_dispatch(event)
+    assert written["network_egress"] == [egress_entry]
+
+    # Round-trip via the file.
+    on_disk = json.loads(target.read_text(encoding="utf-8").strip())
+    assert on_disk["network_egress"] == [egress_entry]
+
+    # Round-trip via read_events.
+    read_back = log.read_events()
+    assert len(read_back) == 1
+    assert read_back[0]["network_egress"] == [egress_entry]
+
+
+def test_append_dispatch_multiple_network_egress_entries(tmp_path: Path) -> None:
+    """Multiple egress entries in one dispatch — e.g. a tool that calls NCBI
+    Gene and then UniProt in sequence — preserve order on disk."""
+    target = tmp_path / "audit.jsonl"
+    log = AuditLog(target)
+    egress = [
+        {
+            "url_host": "eutils.ncbi.nlm.nih.gov",
+            "query_hash": "sha256:gene1",
+            "response_size": 2048,
+            "latency_ms": 95.0,
+            "timestamp_ns": 1716240000000000000,
+        },
+        {
+            "url_host": "rest.uniprot.org",
+            "query_hash": "sha256:prot1",
+            "response_size": 1024,
+            "latency_ms": 210.5,
+            "timestamp_ns": 1716240001000000000,
+        },
+    ]
+    written = log.append_dispatch(
+        DispatchEvent(**_valid_dispatch_kwargs(network_egress=egress)),
+    )
+    assert written["network_egress"] == egress
+    on_disk = json.loads(target.read_text(encoding="utf-8").strip())
+    assert on_disk["network_egress"] == egress
+    # Order is preserved.
+    assert [e["url_host"] for e in on_disk["network_egress"]] == [
+        "eutils.ncbi.nlm.nih.gov",
+        "rest.uniprot.org",
+    ]
+
+
+def test_append_dispatch_default_network_egress_serializes_as_empty_list(
+    tmp_path: Path,
+) -> None:
+    """A dispatch event without an explicit network_egress writes the default
+    empty list to disk. Consumers can rely on the field always being present
+    on records produced by the current code path."""
+    target = tmp_path / "audit.jsonl"
+    log = AuditLog(target)
+    log.append_dispatch(DispatchEvent(**_valid_dispatch_kwargs()))
+    on_disk = json.loads(target.read_text(encoding="utf-8").strip())
+    assert "network_egress" in on_disk
+    assert on_disk["network_egress"] == []
+
+
+def test_read_events_backwards_compat_record_without_network_egress(
+    tmp_path: Path,
+) -> None:
+    """Backwards compatibility: a pre-DEC-0061 JSONL line lacking
+    ``network_egress`` MUST still parse via :meth:`AuditLog.read_events`.
+    Simulates an audit file that was written before this field existed.
+
+    The reader is a plain ``json.loads`` per line — it does not enforce a
+    schema — so this is a contract test ensuring no later schema-validation
+    layer is sneaked in that would break the property."""
+    target = tmp_path / "audit.jsonl"
+    legacy_line = json.dumps(
+        {
+            "event_type": "dispatch",
+            "session_id": "sid-legacy",
+            "turn_id": 1,
+            "worker_id": "qwen3:8b",
+            "cot_budget": "linear",
+            "memory_mode": "session_stateful",
+            "context_used_tokens": 1234,
+            "context_capped": False,
+            "context_overflow_action": None,
+            "per_layer_breakdown": {},
+            "context_cap_override": None,
+            "input_hashes": [],
+            "output_hashes": [],
+            "tags": [],
+            "timestamp": "2026-05-19T12:00:00+00:00",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    target.write_text(legacy_line + "\n", encoding="utf-8")
+
+    log = AuditLog(target)
+    events = log.read_events()
+    assert len(events) == 1
+    assert events[0]["session_id"] == "sid-legacy"
+    # The legacy record simply lacks the key — readers see absence, not error.
+    assert "network_egress" not in events[0]
+
+
+def test_read_events_mixed_legacy_and_new_records(tmp_path: Path) -> None:
+    """A real-world audit file may contain both pre-DEC-0061 records and
+    post-DEC-0061 records appended after a restart. Both parse via
+    read_events() without error; consumers can distinguish via the presence
+    of the field."""
+    target = tmp_path / "audit.jsonl"
+    legacy = json.dumps(
+        {
+            "event_type": "dispatch",
+            "session_id": "legacy",
+            "turn_id": 1,
+            "worker_id": "qwen3:8b",
+            "cot_budget": "linear",
+            "memory_mode": "session_stateful",
+            "context_used_tokens": 1,
+            "context_capped": False,
+            "timestamp": "2026-05-19T12:00:00+00:00",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    target.write_text(legacy + "\n", encoding="utf-8")
+
+    log = AuditLog(target)
+    # Append a new-style record on top of the legacy file.
+    log.append_dispatch(
+        DispatchEvent(
+            **_valid_dispatch_kwargs(
+                session_id="new",
+                turn_id=2,
+                network_egress=[
+                    {
+                        "url_host": "example.com",
+                        "query_hash": "sha256:abc",
+                        "response_size": 256,
+                        "latency_ms": 12.0,
+                        "timestamp_ns": 1716240000000000000,
+                    }
+                ],
+            ),
+        ),
+    )
+
+    events = log.read_events()
+    assert len(events) == 2
+    assert events[0]["session_id"] == "legacy"
+    assert "network_egress" not in events[0]
+    assert events[1]["session_id"] == "new"
+    assert events[1]["network_egress"][0]["url_host"] == "example.com"
+
+
+# ── pre-existing unicode test below ────────────────────────────────────────
+
+
 def test_append_dispatch_preserves_unicode_in_tags(tmp_path: Path) -> None:
     """``ensure_ascii=False`` keeps non-ASCII characters as-is in the log —
     important for any internationalized session metadata."""
