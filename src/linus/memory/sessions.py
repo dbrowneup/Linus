@@ -408,13 +408,28 @@ class SessionStore:
 # layer uses _get_default_store() to share one store across requests.
 
 _default_store: SessionStore | None = None
+# Serializes the lazy-init in :func:`get_default_store` so two threads
+# racing on the first call don't each construct a store (which would
+# leak the loser's connection file descriptor). See bug-sweep
+# 2026-05-20 (C2).
+_default_store_lock = threading.Lock()
 
 
 def get_default_store() -> SessionStore:
-    """Return the process-wide :class:`SessionStore` singleton."""
+    """Return the process-wide :class:`SessionStore` singleton.
+
+    Uses double-checked locking: the fast-path read of
+    ``_default_store`` happens without the lock so steady-state calls
+    don't pay any synchronization cost; the lock is only taken on the
+    cold-start path, and we re-check the singleton inside the lock to
+    avoid the check-then-init race two threads racing on the first
+    call would otherwise hit (bug-sweep C2, 2026-05-20).
+    """
     global _default_store
     if _default_store is None:
-        _default_store = SessionStore()
+        with _default_store_lock:
+            if _default_store is None:  # double-checked under the lock
+                _default_store = SessionStore()
     return _default_store
 
 
@@ -425,9 +440,10 @@ def reset_default_store() -> None:
     to make the next :func:`get_default_store` honor the patched env.
     """
     global _default_store
-    if _default_store is not None:
-        _default_store.close()
-        _default_store = None
+    with _default_store_lock:
+        if _default_store is not None:
+            _default_store.close()
+            _default_store = None
 
 
 @contextmanager

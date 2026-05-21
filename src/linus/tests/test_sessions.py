@@ -7,8 +7,8 @@ Two suites in one file:
 2. **Endpoint tests** — exercise the FastAPI server's session-aware
    chat-completions endpoint and the new ``/v1/sessions`` endpoints.
    Ollama is patched throughout for hermeticity.
-3. **Concurrency tests** — regression coverage for bug-sweep finding
-   C1 (`docs/bug-sweeps/2026-05-20-memory-sweep.md`).
+3. **Concurrency tests** — regression coverage for bug-sweep findings
+   C1 and C2 (`docs/bug-sweeps/2026-05-20-memory-sweep.md`).
 """
 
 from __future__ import annotations
@@ -20,10 +20,11 @@ from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 
+from linus.memory import sessions as sessions_module
 from linus.memory.sessions import (
     Session,
     SessionStore,
-    StoredMessage,
+    get_default_store,
     in_memory_store,
     reset_default_store,
 )
@@ -338,7 +339,7 @@ def test_append_message_concurrent_writes_same_session_no_collision(tmp_path) ->
             barrier.wait()
             try:
                 store.append_message("sid-1", "user", f"msg{i}")
-            except BaseException as exc:  # noqa: BLE001 — capture for test assertion
+            except BaseException as exc:
                 with lock:
                     errors.append(exc)
 
@@ -377,7 +378,7 @@ def test_append_messages_concurrent_batches_same_session_no_collision(tmp_path) 
             barrier.wait()
             try:
                 store.append_messages("sid-1", batch)
-            except BaseException as exc:  # noqa: BLE001 — capture for test assertion
+            except BaseException as exc:
                 with lock:
                     errors.append(exc)
 
@@ -394,3 +395,47 @@ def test_append_messages_concurrent_batches_same_session_no_collision(tmp_path) 
         assert sorted(m.idx for m in messages) == list(range(total))
     finally:
         store.close()
+
+
+def test_get_default_store_concurrent_first_call_returns_same_instance(tmp_path, monkeypatch) -> None:
+    """C2 regression: 8 threads racing on the first ``get_default_store()``
+    call after ``reset_default_store()`` must all observe the SAME
+    instance. Without the double-checked lock, two threads can both
+    pass the ``is None`` check and each construct a fresh
+    ``SessionStore``, leaking the loser's connection file descriptor.
+
+    Verifies identity via ``id()`` and confirms the module-level
+    ``_default_store`` agrees, so a slow loser-thread can't smuggle in
+    a different instance under the singleton name.
+    """
+    # Point at a tmp DB so we don't clobber ``~/.linus/sessions.db``
+    # if it exists. ``reset_default_store`` honors the env var on the
+    # next construction.
+    monkeypatch.setenv("LINUS_SESSIONS_DB", str(tmp_path / "singleton.db"))
+    reset_default_store()
+
+    n_threads = 8
+    barrier = threading.Barrier(n_threads)
+    results: list[SessionStore] = []
+    lock = threading.Lock()
+
+    def worker() -> None:
+        barrier.wait()
+        store = get_default_store()
+        with lock:
+            results.append(store)
+
+    threads = [threading.Thread(target=worker) for _ in range(n_threads)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert len(results) == n_threads
+    first_id = id(results[0])
+    distinct = {id(r) for r in results}
+    assert len(distinct) == 1, f"Expected all calls to return the same instance; got {len(distinct)} distinct instances"
+    # Sanity: the module-level singleton agrees with what the threads observed.
+    assert id(sessions_module._default_store) == first_id
+
+    reset_default_store()
