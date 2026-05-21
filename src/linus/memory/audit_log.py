@@ -46,8 +46,18 @@ Per DEC-0031, every Worker dispatch records:
       "context_cap_override": null,
       "input_hashes": ["sha256:..."],
       "output_hashes": ["sha256:..."],
-      "tags": ["project:linus", "skill:default"]
+      "tags": ["project:linus", "skill:default"],
+      "network_egress": [
+        {"url_host": "eutils.ncbi.nlm.nih.gov", "query_hash": "sha256:...",
+         "response_size": 4096, "latency_ms": 142.3, "timestamp_ns": 1716240000000000000}
+      ]
     }
+
+Per DEC-0061, ``network_egress`` is the optional capture-list of external
+HTTP calls a tool made during this dispatch. Backwards-compatible: pre-DEC-0061
+records simply omit the field. Each entry is minimum-disclosure — host, query
+hash, response size, latency, and a wall-clock nanosecond timestamp — never the
+full URL or response body.
 
 ### ``event_type = "memory_write"``
 
@@ -123,6 +133,19 @@ class DispatchEvent:
 
     See module docstring for field semantics. All non-default fields are required;
     ``timestamp`` is auto-filled to "now" if absent.
+
+    ``network_egress`` (per DEC-0061) is the optional capture-list of external
+    HTTP calls a Worker tool made during this dispatch. Each entry has shape
+    ``{url_host, query_hash, response_size, latency_ms, timestamp_ns}`` and is
+    minimum-disclosure: host (not full URL), query hash (not query text),
+    response size (not body). The field is optional and backwards-compatible
+    — records without it parse exactly as before; readers built before
+    DEC-0061 continue to work because ``asdict`` emits ``"network_egress":
+    []`` only when the writer set one.
+
+    Default factory produces a fresh empty list per-instance so the captured
+    egress for one dispatch does not bleed into another (the canonical
+    "mutable default" footgun applied to audit-log records).
     """
 
     session_id: str
@@ -138,6 +161,7 @@ class DispatchEvent:
     input_hashes: list[str] = field(default_factory=list)
     output_hashes: list[str] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)
+    network_egress: list[dict[str, Any]] = field(default_factory=list)
     timestamp: str | None = None
     event_type: str = "dispatch"
 

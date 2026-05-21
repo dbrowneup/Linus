@@ -48,7 +48,27 @@ import inspect
 import json
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
-from typing import Any, Union, get_args, get_origin, get_type_hints
+from typing import Any, Literal, Union, get_args, get_origin, get_type_hints
+
+#: Closed vocabulary of network-egress postures a tool may declare at registration
+#: time. Per DEC-0061 (network-policy framework):
+#:
+#: - ``"offline"`` — the tool never touches the network. The default for every
+#:   tool unless explicitly elevated. KB reads, Ollama-routed inference, every
+#:   pre-2026-05-20 tool falls here.
+#: - ``"online_optional"`` — the tool prefers the network when available and
+#:   degrades cleanly to a local fallback (cache / alternative offline backend
+#:   / graceful ``None``) when not. Hermetic tests exercise the offline branch;
+#:   integration tests exercise both. First instance: ``entity_ncbi.py``
+#:   (follow-up PR).
+#: - ``"online_required"`` — the tool refuses to execute when offline. Reserved
+#:   for tools whose offline result would be materially misleading. None ship
+#:   in this PR; the slot exists so the framework is complete from day one.
+NetworkPolicy = Literal["offline", "online_optional", "online_required"]
+
+#: The three valid values of :data:`NetworkPolicy`, exposed as a frozenset for
+#: cheap membership checks in validators. Kept in sync with the Literal above.
+_ALLOWED_NETWORK_POLICIES: frozenset[str] = frozenset({"offline", "online_optional", "online_required"})
 
 
 class ToolError(RuntimeError):
@@ -70,12 +90,19 @@ class ToolSpec:
     callable; calling code should prefer :meth:`ToolRegistry.call_tool` rather
     than touching ``func`` directly so coercion and error handling stay
     consistent.
+
+    The ``network_policy`` field declares whether the tool may use the network
+    per DEC-0061. Defaults to ``"offline"`` so every pre-existing registration
+    keeps its semantics with zero change. The value is one of the three
+    :data:`NetworkPolicy` literals; the registry validates the value at
+    registration time so an invalid string cannot land in a ToolSpec.
     """
 
     name: str
     description: str
     parameters: dict[str, Any]
     func: Callable[..., Any]
+    network_policy: NetworkPolicy = "offline"
 
     def to_openai(self) -> dict[str, Any]:
         """Return the OpenAI-format ``{"type": "function", "function": {...}}`` entry.
@@ -243,6 +270,7 @@ class ToolRegistry:
         description: str | None = None,
         parameters: dict[str, Any] | None = None,
         replace: bool = False,
+        network_policy: NetworkPolicy = "offline",
     ) -> ToolSpec:
         """Register ``func`` under ``name`` (defaults to fully-qualified ``module.func``).
 
@@ -264,7 +292,21 @@ class ToolRegistry:
             If True, silently overwrite an existing tool with the same name.
             Default False raises a :class:`ValueError` on collision — this is
             usually what you want because silent re-registration is a footgun.
+        network_policy:
+            Per DEC-0061. One of ``"offline"`` (default; never touches the
+            network), ``"online_optional"`` (uses the network when available,
+            falls back to a local backend / cache / graceful None when not),
+            or ``"online_required"`` (refuses to execute when offline).
+            Validated at registration time; an invalid value raises
+            :class:`ValueError` so typos cannot ship silently. Surfaced via
+            :attr:`ToolSpec.network_policy` for the audit log and
+            :func:`~linus.server._compute_degradations` to consult.
         """
+        if network_policy not in _ALLOWED_NETWORK_POLICIES:
+            raise ValueError(
+                f"network_policy must be one of {sorted(_ALLOWED_NETWORK_POLICIES)}, got {network_policy!r}"
+            )
+
         if name is None:
             module = func.__module__.split(".")[0]
             # Use ``__qualname__`` so nested helpers register with a sensible
@@ -273,15 +315,14 @@ class ToolRegistry:
             name = f"{module}.{short}".replace(".<locals>.", ".")
 
         if name in self._tools and not replace:
-            raise ValueError(
-                f"Tool {name!r} is already registered. Pass replace=True to override."
-            )
+            raise ValueError(f"Tool {name!r} is already registered. Pass replace=True to override.")
 
         spec = ToolSpec(
             name=name,
             description=description or _summary_line(func),
             parameters=parameters or _build_parameters_schema(func),
             func=func,
+            network_policy=network_policy,
         )
         self._tools[name] = spec
         return spec
@@ -344,29 +385,19 @@ class ToolRegistry:
             try:
                 kwargs = json.loads(arguments)
             except json.JSONDecodeError as exc:
-                raise ToolError(
-                    f"Tool {name!r} arguments were not valid JSON: {exc}"
-                ) from exc
+                raise ToolError(f"Tool {name!r} arguments were not valid JSON: {exc}") from exc
             if not isinstance(kwargs, dict):
-                raise ToolError(
-                    f"Tool {name!r} arguments must decode to an object, got "
-                    f"{type(kwargs).__name__}"
-                )
+                raise ToolError(f"Tool {name!r} arguments must decode to an object, got {type(kwargs).__name__}")
         elif isinstance(arguments, dict):
             kwargs = dict(arguments)
         else:
-            raise ToolError(
-                f"Tool {name!r} arguments must be dict or JSON string, got "
-                f"{type(arguments).__name__}"
-            )
+            raise ToolError(f"Tool {name!r} arguments must be dict or JSON string, got {type(arguments).__name__}")
 
         try:
             return spec.func(**kwargs)
         except TypeError as exc:
             # Most often: model emitted an unexpected kwarg or omitted a required one.
-            raise ToolError(
-                f"Tool {name!r} rejected arguments {list(kwargs)}: {exc}"
-            ) from exc
+            raise ToolError(f"Tool {name!r} rejected arguments {list(kwargs)}: {exc}") from exc
         except Exception as exc:  # Tool-internal failure (e.g. KB unavailable)
             raise ToolError(f"Tool {name!r} raised {type(exc).__name__}: {exc}") from exc
 
@@ -387,6 +418,7 @@ def tool(
     description: str | None = None,
     parameters: dict[str, Any] | None = None,
     registry: ToolRegistry | None = None,
+    network_policy: NetworkPolicy = "offline",
 ) -> Callable[..., Any]:
     """Register a function as a tool. Usable bare or with arguments.
 
@@ -401,6 +433,11 @@ def tool(
         def search(query: str) -> list[dict]:
             ...
 
+        @tool(name="entity.ncbi", network_policy="online_optional")
+        def lookup_entity(symbol: str) -> dict | None:
+            \"\"\"Resolve a gene symbol against NCBI when reachable; stub otherwise.\"\"\"
+            ...
+
     The decorator returns the original function unchanged — registration is a
     side effect — so callers can still invoke the function directly.
 
@@ -410,6 +447,9 @@ def tool(
         Overrides forwarded to :meth:`ToolRegistry.register`.
     registry:
         Target registry. Defaults to the module-level :data:`default_registry`.
+    network_policy:
+        Per DEC-0061. Default ``"offline"``; see :meth:`ToolRegistry.register`.
+        Invalid values raise :class:`ValueError` at decoration time.
     """
     target = registry if registry is not None else default_registry
 
@@ -419,6 +459,7 @@ def tool(
             name=name,
             description=description,
             parameters=parameters,
+            network_policy=network_policy,
         )
         return f
 

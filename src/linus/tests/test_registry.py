@@ -19,6 +19,7 @@ from typing import Any, Optional, Union
 import pytest
 
 from linus.tools.registry import (
+    _ALLOWED_NETWORK_POLICIES,
     ToolError,
     ToolRegistry,
     ToolSpec,
@@ -794,6 +795,146 @@ def test_tool_decorator_forwards_description_and_parameters_overrides() -> None:
     assert spec is not None
     assert spec.description == "Override description."
     assert spec.parameters is custom_params
+
+
+# ── network_policy (DEC-0061) ──────────────────────────────────────────────
+
+
+def test_allowed_network_policies_set_matches_literal_vocabulary() -> None:
+    """The frozenset and the Literal must stay in lock-step. If the vocabulary
+    grows we want the test suite to fail loudly until both halves move
+    together."""
+    assert _ALLOWED_NETWORK_POLICIES == {"offline", "online_optional", "online_required"}
+
+
+def test_register_defaults_network_policy_to_offline() -> None:
+    """Tools registered without an explicit ``network_policy`` land as
+    ``"offline"`` per DEC-0061 — the migration is invisible for existing
+    tools."""
+    reg = ToolRegistry()
+
+    def fn() -> None:
+        return None
+
+    spec = reg.register(fn, name="t.offline_default")
+    assert spec.network_policy == "offline"
+
+
+@pytest.mark.parametrize("policy", ["offline", "online_optional", "online_required"])
+def test_register_accepts_each_allowed_network_policy(policy: str) -> None:
+    """All three DEC-0061 network-policy values construct cleanly via
+    ``ToolRegistry.register``."""
+    reg = ToolRegistry()
+
+    def fn() -> None:
+        return None
+
+    spec = reg.register(fn, name=f"t.{policy}", network_policy=policy)  # type: ignore[arg-type]
+    assert spec.network_policy == policy
+
+
+def test_register_rejects_invalid_network_policy() -> None:
+    """A network_policy outside the DEC-0061 vocabulary raises ValueError —
+    typos cannot ship silently."""
+    reg = ToolRegistry()
+
+    def fn() -> None:
+        return None
+
+    with pytest.raises(ValueError, match="network_policy must be one of"):
+        reg.register(fn, name="t.bad", network_policy="online")  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError, match="network_policy must be one of"):
+        reg.register(fn, name="t.bad2", network_policy="optional")  # type: ignore[arg-type]
+
+
+def test_register_invalid_network_policy_does_not_partially_register() -> None:
+    """Validation runs BEFORE the duplicate-name check and BEFORE the registry
+    dict insert — a rejected registration must not pollute the registry."""
+    reg = ToolRegistry()
+
+    def fn() -> None:
+        return None
+
+    with pytest.raises(ValueError):
+        reg.register(fn, name="t.partial", network_policy="bogus")  # type: ignore[arg-type]
+    assert "t.partial" not in reg
+    assert len(reg) == 0
+
+
+def test_toolspec_network_policy_default_is_offline() -> None:
+    """ToolSpec constructed directly (bypassing register) also defaults to
+    offline — important for any test or code that builds a spec by hand."""
+
+    def fn() -> None:
+        return None
+
+    spec = ToolSpec(name="t.x", description="d", parameters={}, func=fn)
+    assert spec.network_policy == "offline"
+
+
+def test_toolspec_network_policy_is_frozen() -> None:
+    """ToolSpec is a frozen dataclass; mutating network_policy in place must
+    raise. Keeps the audit-of-record property: a tool's declared policy is
+    fixed at registration."""
+
+    def fn() -> None:
+        return None
+
+    spec = ToolSpec(
+        name="t.x",
+        description="d",
+        parameters={},
+        func=fn,
+        network_policy="online_optional",
+    )
+    assert spec.network_policy == "online_optional"
+    with pytest.raises(Exception):  # FrozenInstanceError
+        spec.network_policy = "offline"  # type: ignore[misc]
+
+
+def test_tool_decorator_accepts_network_policy() -> None:
+    """The ``@tool`` decorator forwards network_policy to register, producing
+    a ToolSpec whose policy matches the kwarg."""
+    reg = ToolRegistry()
+
+    @tool(name="t.ncbi", registry=reg, network_policy="online_optional")
+    def lookup(symbol: str) -> str:
+        """Lookup."""
+        return symbol
+
+    spec = reg.get("t.ncbi")
+    assert spec is not None
+    assert spec.network_policy == "online_optional"
+
+
+def test_tool_decorator_defaults_network_policy_to_offline() -> None:
+    """The decorator's default network_policy is "offline" — every existing
+    @tool registration keeps its semantics unchanged."""
+    reg = ToolRegistry()
+
+    @tool(name="t.local", registry=reg)
+    def local(q: str) -> str:
+        """Local."""
+        return q
+
+    spec = reg.get("t.local")
+    assert spec is not None
+    assert spec.network_policy == "offline"
+
+
+def test_tool_decorator_rejects_invalid_network_policy() -> None:
+    """An invalid network_policy on the decorator raises ValueError at the
+    moment the decorator runs (i.e. at import time of the module that
+    defines the tool) — bad declarations fail loud before the registry is
+    consulted."""
+    reg = ToolRegistry()
+
+    with pytest.raises(ValueError, match="network_policy must be one of"):
+
+        @tool(name="t.bad", registry=reg, network_policy="weekly")  # type: ignore[arg-type]
+        def bad() -> None:
+            return None
 
 
 # ── ToolError surface ──────────────────────────────────────────────────────

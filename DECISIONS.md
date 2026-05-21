@@ -81,6 +81,7 @@ at-a-glance index. The canonical format spec, authoring procedure, and full ADR 
 | [DEC-0058](docs/adr/0058-x402-mcp-graduation-pathway.md)                      | @x402/mcp graduation pathway: Watch → Spike → Integrate, with concrete triggers (R4-03)                                       | accepted                                                                                    |
 | [DEC-0059](docs/adr/0059-grounding-gate-output-surface.md)                    | Grounding gate at the OUTPUT surface: hard admission for stakeable Worker outputs (Q1)                                        | accepted                                                                                    |
 | [DEC-0060](docs/adr/0060-loud-degradation-healthz-extension.md)               | Loud degradation: `/healthz` reports `effective_state` + `degradations[]` (Q3)                                                | accepted                                                                                    |
+| [DEC-0061](docs/adr/0061-network-policy-framework.md)                         | Network-policy framework: per-tool `network_policy` + audit-log `network_egress[]` + `/healthz` reachability                  | accepted                                                                                    |
 
 _New decisions: author the ADR in `docs/adr/` first (see [`docs/adr/README.md`](docs/adr/README.md) for the procedure),
 then add a row above._

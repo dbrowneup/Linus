@@ -502,3 +502,212 @@ def test_compute_degradations_kb_artifact_resolver_failure_is_swallowed(
     # still classifies normally (healthy fixture → live).
     assert not [d for d in degs if d["component"] == "kb_outputs"]
     assert state == "live"
+
+
+# ── network-policy degradations (DEC-0061) ───────────────────────────────
+
+
+def _register_temp_tool(
+    monkeypatch: pytest.MonkeyPatch,
+    name: str,
+    policy: str,
+) -> None:
+    """Register a no-op tool with the given network_policy into the default
+    registry for the duration of the test, then unregister it on teardown.
+
+    Uses ``monkeypatch.setitem`` against the registry's internal ``_tools``
+    dict so the registration is reverted automatically when the test
+    finishes — keeps tests hermetic and free of cross-test pollution.
+    """
+    from linus.tools import default_registry
+    from linus.tools.registry import ToolSpec
+
+    def _noop() -> None:
+        return None
+
+    spec = ToolSpec(
+        name=name,
+        description=f"Test tool with policy {policy!r}",
+        parameters={"type": "object", "properties": {}},
+        func=_noop,
+        network_policy=policy,  # type: ignore[arg-type]
+    )
+    monkeypatch.setitem(default_registry._tools, name, spec)
+
+
+def test_healthz_offline_only_registry_stays_live_when_network_down(
+    client: TestClient, healthy_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A fully-offline registry (no tools with online_* policy) produces NO
+    network-related degradations even when the host is offline. The
+    framework is silent when no online tool is registered — zero noise
+    for existing offline-only setups."""
+    monkeypatch.setattr(server_module, "_check_network_reachable", lambda: False)
+
+    body = client.get("/healthz").json()
+    network_degs = [
+        d
+        for d in body["degradations"]
+        if d["component"] in {"network_unreachable_for_online_required", "network_optional_degraded"}
+    ]
+    assert network_degs == []
+    assert body["effective_state"] == "live"
+
+
+def test_healthz_online_optional_with_no_network_is_degraded(
+    client: TestClient, healthy_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A tool with network_policy='online_optional' AND network unreachable
+    produces a warning-severity degradation. effective_state is 'degraded'
+    (not 'down') because the tool still works in fallback mode."""
+    _register_temp_tool(monkeypatch, "test.online_optional", "online_optional")
+    monkeypatch.setattr(server_module, "_check_network_reachable", lambda: False)
+
+    body = client.get("/healthz").json()
+    optional_degs = [d for d in body["degradations"] if d["component"] == "network_optional_degraded"]
+    assert len(optional_degs) == 1
+    deg = optional_degs[0]
+    assert deg["severity"] == "warning"
+    assert "test.online_optional" in deg["actual"]
+    assert deg["remediation"]
+    # No online_required tools registered → no error degradation.
+    assert not [d for d in body["degradations"] if d["component"] == "network_unreachable_for_online_required"]
+    assert body["effective_state"] == "degraded"
+
+
+def test_healthz_online_required_with_no_network_is_down(
+    client: TestClient, healthy_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A tool with network_policy='online_required' AND network unreachable
+    produces an error-severity degradation. effective_state becomes 'down'
+    because the tool cannot execute."""
+    _register_temp_tool(monkeypatch, "test.online_required", "online_required")
+    monkeypatch.setattr(server_module, "_check_network_reachable", lambda: False)
+
+    body = client.get("/healthz").json()
+    required_degs = [d for d in body["degradations"] if d["component"] == "network_unreachable_for_online_required"]
+    assert len(required_degs) == 1
+    deg = required_degs[0]
+    assert deg["severity"] == "error"
+    assert "test.online_required" in deg["actual"]
+    assert deg["remediation"]
+    assert body["effective_state"] == "down"
+
+
+def test_healthz_online_tools_with_network_up_emit_no_network_degradations(
+    client: TestClient, healthy_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """When the network probe succeeds, neither online_required nor
+    online_optional tools emit a degradation — everything they want is
+    available."""
+    _register_temp_tool(monkeypatch, "test.online_optional", "online_optional")
+    _register_temp_tool(monkeypatch, "test.online_required", "online_required")
+    monkeypatch.setattr(server_module, "_check_network_reachable", lambda: True)
+
+    body = client.get("/healthz").json()
+    network_degs = [
+        d
+        for d in body["degradations"]
+        if d["component"] in {"network_unreachable_for_online_required", "network_optional_degraded"}
+    ]
+    assert network_degs == []
+    # No other degradations should be triggered by the network paths.
+    assert body["effective_state"] == "live"
+
+
+def test_healthz_both_online_required_and_optional_with_no_network(
+    client: TestClient, healthy_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """When both an online_required and online_optional tool are registered
+    AND the network is down, BOTH degradations emit — the warning for the
+    optional tool sits alongside the error for the required tool. Severity
+    composition follows the existing rule: any error → down."""
+    _register_temp_tool(monkeypatch, "test.online_optional", "online_optional")
+    _register_temp_tool(monkeypatch, "test.online_required", "online_required")
+    monkeypatch.setattr(server_module, "_check_network_reachable", lambda: False)
+
+    body = client.get("/healthz").json()
+    components = {d["component"] for d in body["degradations"]}
+    assert "network_optional_degraded" in components
+    assert "network_unreachable_for_online_required" in components
+
+    severities = {
+        d["severity"]
+        for d in body["degradations"]
+        if d["component"] in {"network_unreachable_for_online_required", "network_optional_degraded"}
+    }
+    assert severities == {"warning", "error"}
+    assert body["effective_state"] == "down"
+
+
+def test_healthz_network_check_is_module_level_monkeypatchable(
+    client: TestClient, healthy_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Contract test: ``_check_network_reachable`` is a module-level callable
+    that hermetic tests can monkeypatch. The hermetic test discipline in
+    DEC-0061 contracts on this — without it, every healthz test would
+    need to either fire real network calls or hit unsafe internals.
+
+    The test ensures the substitution actually takes effect and is observed
+    by ``_compute_degradations``."""
+    _register_temp_tool(monkeypatch, "test.online_optional", "online_optional")
+
+    calls: list[int] = []
+
+    def fake_reachable() -> bool:
+        calls.append(1)
+        return False
+
+    monkeypatch.setattr(server_module, "_check_network_reachable", fake_reachable)
+    body = client.get("/healthz").json()
+    # The probe was actually invoked.
+    assert calls, "_check_network_reachable was not consulted by healthz"
+    # And its return value drove the degradation.
+    assert any(d["component"] == "network_optional_degraded" for d in body["degradations"])
+
+
+def test_compute_degradations_network_paths_only_fire_when_online_tool_registered(
+    healthy_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Direct test of `_compute_degradations`: with no online tool
+    registered, the function must not even invoke the network probe. This
+    keeps the probe cost out of the standard hot path for offline-only
+    setups."""
+    probe_called: list[int] = []
+
+    def spy_reachable() -> bool:
+        probe_called.append(1)
+        return False
+
+    monkeypatch.setattr(server_module, "_check_network_reachable", spy_reachable)
+
+    state, _degs = server_module._compute_degradations()
+    assert state == "live"
+    # No online tool registered → probe must not have been called.
+    assert probe_called == [], "_check_network_reachable should not be invoked when no online_* tool is registered"
+
+
+def test_check_network_reachable_returns_bool() -> None:
+    """Contract: the probe returns a bool. The implementation uses
+    ``socket.create_connection`` which is real-network; the unit-test guard
+    here only confirms the signature without asserting on the outcome
+    (which depends on the test host's connectivity).
+
+    The hermetic test suite never relies on the actual return value; every
+    higher-level test monkeypatches ``_check_network_reachable`` to the
+    desired value."""
+    result = server_module._check_network_reachable()
+    assert isinstance(result, bool)
+
+
+def test_check_network_reachable_swallows_oserror(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Defensive branch: any socket-level failure surfaces as False, not as
+    an exception bubbling up to /healthz. Hermetic: we stub
+    ``socket.create_connection`` to raise."""
+    import socket
+
+    def _raise(*_a, **_kw):
+        raise OSError("synthetic socket failure")
+
+    monkeypatch.setattr(socket, "create_connection", _raise)
+    assert server_module._check_network_reachable() is False

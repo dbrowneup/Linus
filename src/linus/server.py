@@ -367,6 +367,57 @@ def _resolve_papers_dir() -> Path:
     return Path.home() / ".linus" / "papers"
 
 
+#: Hostname / IP the reachability check resolves to confirm the host has DNS
+#: + outbound connectivity. ``1.1.1.1`` is Cloudflare's public resolver — it's
+#: chosen because resolving it requires DNS to be working AND a route to the
+#: public internet; resolving a vendor hostname instead would also probe that
+#: vendor's specific availability and add a confound. The check stays
+#: minimum-disclosure: a single DNS resolve, no HTTP, no payload.
+_NETWORK_REACHABILITY_PROBE_HOST = "1.1.1.1"
+
+#: Seconds before the reachability probe gives up. Kept short because
+#: ``/healthz`` callers expect a quick response; a stuck probe would block the
+#: liveness endpoint itself.
+_NETWORK_REACHABILITY_TIMEOUT_S = 1.0
+
+
+def _check_network_reachable() -> bool:
+    """Quick probe for external network reachability.
+
+    Per DEC-0061 Pillar 3, ``/healthz`` reports degradation when a registered
+    tool has ``network_policy ∈ {"online_required", "online_optional"}`` AND
+    the host cannot reach the internet. This function is the probe. It MUST be:
+
+    - **Fast.** Sub-second timeout so /healthz remains responsive.
+    - **Mockable.** Module-level callable that tests monkeypatch via
+      ``monkeypatch.setattr(server_module, "_check_network_reachable", ...)``.
+      The hermetic test suite never makes a real network call.
+    - **Minimum-disclosure.** A DNS resolve of a public address — no HTTP, no
+      payload, no telemetry to any vendor.
+
+    Returns True if the probe succeeds, False on any failure (DNS, timeout,
+    socket exhaustion, etc.). Failures are swallowed deliberately: this is a
+    yes/no signal for /healthz, not a diagnostic surface.
+
+    Implementation uses ``socket.create_connection`` rather than
+    ``gethostbyname`` because the latter blocks for the OS resolver timeout
+    (often 5+ seconds) without honoring a Python-level timeout. A connect with
+    explicit timeout is the only stdlib-clean way to bound the probe.
+    """
+    import socket
+
+    try:
+        with socket.create_connection(
+            (_NETWORK_REACHABILITY_PROBE_HOST, 53),
+            timeout=_NETWORK_REACHABILITY_TIMEOUT_S,
+        ):
+            return True
+    except OSError:
+        # Any socket-level failure (DNS, network unreachable, timeout, firewall
+        # block) means "not reachable" for /healthz purposes.
+        return False
+
+
 def _kb_artifact_paths() -> list[tuple[str, Path]]:
     """Return the canonical ``(label, path)`` list of KB artifacts.
 
@@ -397,8 +448,7 @@ def _compute_degradations() -> tuple[str, list[dict[str, Any]]]:
     surfaced reachable-vs-down, which let these failures hide until tool
     invocation. This function makes them loud.
 
-    Detection covers four classes (see CLAUDE.md and the Q3 spec for
-    cross-pollination context from Archimedes' ``/health``):
+    Detection covers six classes (four from DEC-0060 + two from DEC-0061):
 
     - ``worker_model`` — the first preferred model is not in the locally
       pulled list. severity=warning if a fallback preference matches;
@@ -413,6 +463,20 @@ def _compute_degradations() -> tuple[str, list[dict[str, Any]]]:
       missing case gracefully).
     - ``ollama_models_empty`` — Ollama is reachable but no models are
       pulled at all. severity=error.
+    - ``network_unreachable_for_online_required`` (DEC-0061) — at least
+      one registered tool declares ``network_policy="online_required"``
+      AND :func:`_check_network_reachable` returns False. The tool cannot
+      execute; severity=error.
+    - ``network_optional_degraded`` (DEC-0061) — at least one tool
+      declares ``network_policy="online_optional"`` AND the network is
+      unreachable. The tool still works in cached / fallback mode;
+      severity=warning.
+
+    Both DEC-0061 paths are gated on the presence of a tool declaring the
+    relevant policy. A fully-offline registry sees no network-related
+    degradations even when the host is genuinely offline — the framework
+    adds zero noise to existing offline-only setups and only speaks up
+    when an ``online_*`` tool is actually present.
 
     The returned ``effective_state`` is:
 
@@ -559,6 +623,45 @@ def _compute_degradations() -> tuple[str, list[dict[str, Any]]]:
                     ),
                 }
             )
+
+    # --- network reachability (DEC-0061) -----------------------------------
+    # Only inspect the registry / probe the network when at least one tool
+    # declares an online_* policy. A fully-offline registry must produce
+    # zero network-related degradations even if the host is genuinely
+    # offline — the framework adds zero noise to offline-only setups.
+    online_required_tools = [spec.name for spec in default_registry if spec.network_policy == "online_required"]
+    online_optional_tools = [spec.name for spec in default_registry if spec.network_policy == "online_optional"]
+    if online_required_tools or online_optional_tools:
+        network_reachable = _check_network_reachable()
+        if not network_reachable:
+            if online_required_tools:
+                degradations.append(
+                    {
+                        "component": "network_unreachable_for_online_required",
+                        "expected": "external network reachable for tool(s) with network_policy='online_required'",
+                        "actual": f"network probe failed; affected tools: {online_required_tools}",
+                        "severity": "error",
+                        "remediation": (
+                            "Restore network connectivity (the listed tools require it). "
+                            "If offline operation is intentional, unregister or reclassify the affected "
+                            "tools to 'online_optional' or 'offline' per DEC-0061."
+                        ),
+                    }
+                )
+            if online_optional_tools:
+                degradations.append(
+                    {
+                        "component": "network_optional_degraded",
+                        "expected": "external network reachable for tool(s) with network_policy='online_optional'",
+                        "actual": f"network probe failed; affected tools fall back to local mode: {online_optional_tools}",
+                        "severity": "warning",
+                        "remediation": (
+                            "Restore network connectivity to enable the online path. "
+                            "Tools still work in cached / fallback mode; no action required if offline operation "
+                            "is intentional."
+                        ),
+                    }
+                )
 
     # --- effective_state classification ------------------------------------
     # "down" covers both Ollama-unreachable AND any error-severity

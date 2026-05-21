@@ -19,6 +19,27 @@ output — the layer where domain knowledge, tools, skills, sandbox policy, and 
 labs will keep advancing the quality of the raw models. Linus makes whatever raw model Dan uses actually good at Dan's
 work.
 
+## Network posture
+
+Linus is local-primary, not local-only. Core inference (Ollama), the KB corpus, the chat-completions and
+Anthropic-compatible endpoints, and every operational path that produces a stakeable artifact run with zero network
+dependency. The assistant works fully offline, by design and by default.
+
+A small set of tools may opt-in to using the internet when it is available — `entity_ncbi.py` for gene-symbol
+resolution, future paper-metadata lookups for `arxiv_ingest`, and a handful of biology backends where a real online
+source is materially better than the offline fallback. These tools declare their network posture at registration via
+the `network_policy` field (DEC-0061): `offline` (the default; never touches the network), `online_optional` (uses the
+network when available, falls back to a local backend / cache / graceful `None` when not), or `online_required`
+(refuses to execute when offline). The audit log captures every external call as a `network_egress[]` entry per
+dispatch — host, query hash, response size, latency, timestamp — so post-facto verification of what left the box is
+mechanically possible. The Marelli accountability discipline extends to the network boundary in exactly the way it
+already covers Worker dispatch and memory writes.
+
+What stays unchanged: hermetic tests never fire real network calls; no paid API is required for any operational path;
+the network boundary remains the trust boundary; offline operation is a first-class mode, not a degraded one. What
+changes is that Linus has the option to use the internet when it's there and Dan wants it, with a discipline that
+keeps the option from compromising the default.
+
 ## Why the name
 
 ### Linus Pauling (1901–1994)
