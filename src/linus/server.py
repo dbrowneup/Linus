@@ -1144,6 +1144,62 @@ def _stream_chat_completion(
     yield "data: [DONE]\n\n"
 
 
+# Sentinel prefix used to serialize an assistant turn that emitted ``tool_calls``
+# (rather than user-visible content) into the session-store's single-string
+# ``content`` field. The schema doesn't have a dedicated ``tool_calls`` column,
+# so we encode the structured payload here as JSON behind a marker. The marker
+# is stable + greppable so future migrations can recover the structured form.
+# See bug-sweep 2026-05-20 H-2.
+_TOOL_CALLS_CONTENT_MARKER = "[linus:tool_calls]"
+
+
+def _persist_tool_loop_messages(messages: list[ChatMessage]) -> list[tuple[str, str]]:
+    """Convert a slice of ``ChatMessage`` (incl. tool-call assistant turns and
+    role=tool result messages) into the ``(role, content)`` tuples
+    :meth:`SessionStore.append_messages` accepts.
+
+    The session-store schema only stores ``role`` + ``content`` (single string)
+    per message. Three message shapes need handling:
+
+    - Plain user/system/assistant turns with non-empty content → straight pass-through.
+    - Assistant turns with ``tool_calls`` (content may be empty) → serialize the
+      structured ``tool_calls`` into the content field behind
+      :data:`_TOOL_CALLS_CONTENT_MARKER` so the audit trail survives. Any
+      free-text content is preserved alongside.
+    - ``role=tool`` messages → preserve content verbatim; the ``tool_call_id``
+      and ``name`` are dropped (schema doesn't carry them). Tools that need
+      structured re-hydration on resume must materialize through a future
+      schema extension.
+
+    Empty-content messages with no structured payload are skipped so we don't
+    pollute the session with no-op rows.
+    """
+    out: list[tuple[str, str]] = []
+    for m in messages:
+        if m.role == "assistant" and m.tool_calls:
+            payload = {
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": tc.type,
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }
+                    for tc in m.tool_calls
+                ],
+                "content": m.content or "",
+            }
+            out.append(("assistant", _TOOL_CALLS_CONTENT_MARKER + json.dumps(payload)))
+        elif m.role == "tool":
+            # Tool-result content is already a string (per _format_tool_result).
+            out.append(("tool", m.content or ""))
+        elif m.role in ("user", "system", "assistant") and m.content:
+            out.append((m.role, m.content))
+    return out
+
+
 def _stream_with_session_append(
     transcript: list[ChatMessage],
     resolved_model: str,
@@ -1153,47 +1209,100 @@ def _stream_with_session_append(
     session_id: str,
     new_messages: list[ChatMessage],
 ) -> Iterator[str]:
-    """Wrap :func:`_stream_chat_completion` with a post-stream session append.
+    """Wrap :func:`_stream_chat_completion` with durable session appends.
 
     Streams normally, accumulating the assistant content from each
-    ``delta.content`` event. After the inner stream emits ``[DONE]``,
-    appends the new user/system messages + the accumulated assistant
-    response to the session store so the next request with the same
-    ``session_id`` sees this turn in its history.
+    ``delta.content`` event. Persists three buckets of state to the
+    session store:
+
+    1. The NEW user/system messages — persisted **before** the Ollama
+       call so the user turn survives even if the client disconnects
+       before any tokens arrive. (H-1, bug-sweep 2026-05-20.)
+    2. Any intermediate tool-call assistant turns + role=tool result
+       messages the streaming tool-loop appends to ``transcript``
+       (H-2, bug-sweep 2026-05-20). Serialized via
+       :func:`_persist_tool_loop_messages` because the session schema
+       stores ``content`` as a single string.
+    3. The accumulated final assistant content.
+
+    Buckets 2 and 3 are persisted in a ``try/finally`` so that a
+    mid-stream client disconnect (which cancels the generator) still
+    commits whatever partial content was accumulated — the user's
+    visible reply is preserved on the next page load. The ``written``
+    sentinel keeps the finally block idempotent when the stream
+    completes normally and the post-loop append already ran.
 
     Session writes are best-effort — any exception during the append
     is swallowed silently so a storage failure doesn't truncate the
     user-visible stream.
     """
-    accumulated = ""
-    for event in _stream_chat_completion(transcript, resolved_model, options, tool_specs):
-        yield event
-        # Parse content deltas as they fly by; cheap because each event is
-        # already a small JSON blob the client is consuming.
-        if event.startswith("data: "):
-            payload = event[len("data: ") :].strip()
-            if payload and payload != "[DONE]":
-                try:
-                    chunk = json.loads(payload)
-                except json.JSONDecodeError:
-                    continue
-                choices = chunk.get("choices") or []
-                if choices:
-                    delta_content = choices[0].get("delta", {}).get("content")
-                    if delta_content:
-                        accumulated += delta_content
+    # Snapshot transcript length BEFORE any iteration so we can isolate
+    # the slice the tool-loop appended (intermediate assistant tool-call
+    # turns + role=tool results) when we persist at the end. Note: the
+    # caller already includes ``new_messages`` at the tail of
+    # ``transcript`` (transcript = history + new_messages), so any
+    # entries appended beyond ``initial_len`` are tool-loop artifacts.
+    initial_len = len(transcript)
 
+    # Persist NEW user/system turns upfront so they survive a client
+    # disconnect that aborts the generator before the stream completes.
+    # If the upfront write fails we still attempt the post-stream write
+    # in the finally below.
     try:
-        new_turns: list[tuple[str, str]] = []
+        upfront_turns: list[tuple[str, str]] = []
         for m in new_messages:
             if m.role in ("user", "system") and m.content:
-                new_turns.append((m.role, m.content))
-        if accumulated:
-            new_turns.append(("assistant", accumulated))
-        if new_turns:
-            store.append_messages(session_id, new_turns)
-    except Exception:  # noqa: BLE001 — session-store failure must not truncate the stream
+                upfront_turns.append((m.role, m.content))
+        if upfront_turns:
+            store.append_messages(session_id, upfront_turns)
+    except Exception:
+        # Best-effort: the post-stream finally below will attempt the
+        # write again. Any storage failure here must NOT abort the
+        # streaming response.
         pass
+
+    accumulated = ""
+    written = False
+    try:
+        for event in _stream_chat_completion(transcript, resolved_model, options, tool_specs):
+            # Parse content deltas BEFORE yielding so that on client
+            # disconnect (which raises GeneratorExit at the yield), the
+            # finally block sees ``accumulated`` reflecting every event
+            # that was emitted to the client. If we parsed after the
+            # yield, the last-emitted token would be lost on disconnect.
+            if event.startswith("data: "):
+                payload = event[len("data: ") :].strip()
+                if payload and payload != "[DONE]":
+                    try:
+                        chunk = json.loads(payload)
+                    except json.JSONDecodeError:
+                        chunk = None
+                    if chunk is not None:
+                        choices = chunk.get("choices") or []
+                        if choices:
+                            delta_content = choices[0].get("delta", {}).get("content")
+                            if delta_content:
+                                accumulated += delta_content
+            yield event
+    finally:
+        # The finally runs even on GeneratorExit / CancelledError, so a
+        # client disconnect still commits whatever was accumulated. The
+        # ``written`` flag prevents a double-write if the stream
+        # completes normally and the try-block falls through (the
+        # finally still runs on normal exit; the flag stops a second
+        # store.append_messages call).
+        if not written:
+            written = True
+            try:
+                tail_turns = _persist_tool_loop_messages(transcript[initial_len:])
+                final_turns: list[tuple[str, str]] = list(tail_turns)
+                if accumulated:
+                    final_turns.append(("assistant", accumulated))
+                if final_turns:
+                    store.append_messages(session_id, final_turns)
+            except Exception:
+                # Session-store failure must not truncate the stream.
+                pass
 
 
 # --- app --------------------------------------------------------------------
@@ -1326,17 +1435,33 @@ def chat_completions(req: ChatCompletionRequest):
             media_type="text/event-stream",
         )
 
+    # Capture the transcript length BEFORE the tool-loop mutates it so the
+    # post-loop slice ``transcript[initial_len:]`` contains exactly the
+    # tool-call assistant turns + role=tool result messages the loop appended.
+    # The original new_messages live in ``transcript[len(history):initial_len]``
+    # but we persist those from ``req.messages`` directly for clarity.
+    initial_len = len(transcript)
+
     final_message, finish_reason, prompt_tokens_total, completion_tokens_total = _run_chat_loop(
         transcript, resolved, options, tool_specs
     )
 
-    # Session-aware mode: append the new user turns + assistant response so the
-    # next request with the same session_id sees this turn in its history.
+    # Session-aware mode: append the new user turns + every assistant /
+    # tool message the tool-loop appended + final assistant response so
+    # the next request with the same session_id sees the full audit
+    # trail. Previously only req.messages + final_message.content were
+    # persisted, dropping intermediate tool-call cycles (H-2,
+    # bug-sweep 2026-05-20).
     if store is not None and req.session_id:
         new_turns: list[tuple[str, str]] = []
         for m in req.messages:
             if m.role in ("user", "system") and m.content:
                 new_turns.append((m.role, m.content))
+        # Intermediate tool-call assistant turns + role=tool result messages
+        # appended during the loop. _persist_tool_loop_messages serializes
+        # tool_calls payloads into the content field behind a marker since
+        # the session schema doesn't have a structured tool_calls column.
+        new_turns.extend(_persist_tool_loop_messages(transcript[initial_len:]))
         if final_message.content:
             new_turns.append(("assistant", final_message.content))
         if new_turns:
