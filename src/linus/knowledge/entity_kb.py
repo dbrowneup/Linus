@@ -67,6 +67,7 @@ See also
 from __future__ import annotations
 
 import hashlib
+import logging
 import threading
 from pathlib import Path
 from typing import Any
@@ -75,6 +76,8 @@ import networkx as nx
 
 from linus.app.config import KB_OUTPUTS_DIR
 from linus.knowledge.rigor import BuiltinEntityLookup, EntityLookup
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "ChainedEntityLookup",
@@ -313,9 +316,39 @@ class ChainedEntityLookup:
         self._backends: tuple[EntityLookup, ...] = backends
 
     def lookup_entity(self, name: str, kind: str | None = None) -> dict[str, Any] | None:
-        """Return the first non-``None`` lookup result across backends."""
+        """Return the first non-``None`` lookup result across backends.
+
+        H-3 (#107): per-backend exceptions are caught and treated as a
+        ``None`` result for that backend, then the chain continues to the
+        next backend. The chain's job is "try each entity backend in
+        order until one resolves the name"; a raise from one backend
+        (e.g. ``KBEntityLookup`` hitting a missing GraphML file at first
+        lookup) MUST NOT short-circuit that contract. Without this catch
+        a missing KG file leaks ``FileNotFoundError`` past the chain into
+        ``paperqa._run_rigor_gate``'s broad fail-open ``except``, which
+        silently sets ``rigor=None`` — the user loses the documented
+        ``stub:builtin`` fallback that the chain was specifically
+        designed to provide.
+
+        Failures are logged at debug level so operators can correlate a
+        silent-skip event with backend health, but they are NOT
+        propagated. The blanket ``except Exception`` is deliberate: any
+        per-backend failure (file IO, NetworkX parse error, network blip
+        in a future remote backend, ...) is treated the same way as a
+        clean ``None`` return, since the contract the consumer relies on
+        is "the chain returns the first resolved entity or None at end
+        of chain."
+        """
         for backend in self._backends:
-            result = backend.lookup_entity(name, kind=kind)
+            try:
+                result = backend.lookup_entity(name, kind=kind)
+            except Exception as exc:  # chain must not propagate; see docstring.
+                logger.debug(
+                    "ChainedEntityLookup: backend %s raised %s; skipping to next",
+                    type(backend).__name__,
+                    type(exc).__name__,
+                )
+                continue
             if result is not None:
                 return result
         return None
