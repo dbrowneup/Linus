@@ -21,9 +21,18 @@ Per the Phase 2h deliverable split in the implementation plan, this module ships
 
 ## Substrate hygiene
 
-- The store is single-writer-safe via SQLite's default transaction model. Multi-worker
-  write coordination (the DEC-0029 §3 cross-cutting concern) is the orchestration
-  layer's problem, not this module's.
+- The store is **single-process single-writer**: the connection is opened with
+  ``isolation_level=None`` (SQLite autocommit mode), so each statement commits
+  atomically on its own. There is **no in-process lock** around the write path,
+  so two threads in the same process calling :meth:`EpisodicStore.write_record`
+  concurrently are not serialized by this module — they race at the
+  Python-statement level and rely on SQLite's per-statement atomicity for
+  correctness of individual writes, but cross-statement transactions are not
+  available under autocommit. Multi-worker write coordination (the DEC-0029 §3
+  cross-cutting concern) is the orchestration layer's problem, not this module's.
+  A future revision may add a ``threading.Lock`` around the write paths if
+  in-process multi-thread writes become a supported use case; tracked as a
+  follow-up to the 2026-05-20 memory bug sweep (PR #108 H3).
 - ``WAL`` journal mode is enabled at migration time so concurrent readers don't block
   the single writer.
 - ``foreign_keys = ON`` is set per connection so the ``parent_turn_id`` self-reference
