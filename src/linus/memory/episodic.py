@@ -189,7 +189,21 @@ CREATE INDEX IF NOT EXISTS idx_episodic_segment   ON episodic_records (segment);
 
 
 def _utcnow() -> str:
-    """Return the current UTC timestamp as a sortable ISO-8601 string."""
+    """Return the current UTC timestamp as a sortable ISO-8601 string.
+
+    Resolution: **microsecond** (the precision of :func:`datetime.now`). The
+    emitted form looks like ``2026-05-21T14:23:45.123456+00:00`` and sorts
+    lexicographically. Back-to-back writes on a modern Apple Silicon machine
+    can share a microsecond — the sub-microsecond ordering is therefore not
+    guaranteed and callers needing strict-monotonic ordering should use the
+    insert ``rowid`` (which is auto-incremented) rather than the timestamp.
+
+    Note: this is intentionally **not** nanosecond-resolution. The session
+    store (:mod:`linus.memory.sessions`) uses ``time.time_ns()`` for that
+    purpose; the episodic store accepts microsecond resolution as the
+    cross-platform-legibility / human-readability tradeoff documented in the
+    module-level "Substrate hygiene" section above.
+    """
     return datetime.now(tz=UTC).isoformat()
 
 
