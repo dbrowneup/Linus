@@ -211,6 +211,25 @@ def _decode_content(stored: str, content_type: str) -> Any:
     raise ValueError(f"Unknown content_type: {content_type!r}")
 
 
+#: Maximum number of placeholders to bind in a single SQLite statement. SQLite's
+#: ``SQLITE_LIMIT_VARIABLE_NUMBER`` defaults to 999 on libsqlite < 3.32.0 and 32766
+#: on >= 3.32.0; we pick 499 so the IN-list chunking has plenty of margin even on
+#: the older libsqlite builds (and even when other params are bound alongside).
+_IN_CHUNK_SIZE = 499
+
+
+def _chunked(values: Sequence[Any], size: int = _IN_CHUNK_SIZE) -> Iterable[Sequence[Any]]:
+    """Yield successive ``size``-sized chunks of ``values``.
+
+    Used by :meth:`EpisodicStore.read_records` so an IN-list of length N gets
+    split across ceil(N / size) sub-queries whose results are unioned in Python,
+    keeping each statement under SQLite's parameter limit. The function is a
+    module-level helper rather than a closure so it can be unit-tested directly.
+    """
+    for start in range(0, len(values), size):
+        yield values[start : start + size]
+
+
 # ---------------------------------------------------------------------------
 # Store
 
@@ -382,31 +401,78 @@ class EpisodicStore:
             raise ValueError(f"order must be 'asc' or 'desc', got {order!r}")
         limit = query.get("limit")
 
-        where_clauses: list[str] = []
-        params: list[Any] = []
+        # Split filters into scalar-equals and IN-list groups. Scalars contribute
+        # a single ``=`` clause + one bound param; IN-lists must be chunked under
+        # SQLite's parameter limit so the per-chunk sub-query stays valid.
+        scalar_clauses: list[str] = []
+        scalar_params: list[Any] = []
+        in_filters: list[tuple[str, Sequence[Any]]] = []
         for key, value in query.items():
             if key not in allowed_columns:
                 continue
             if isinstance(value, list | tuple):
                 if not value:
+                    # Empty IN-list short-circuits to no results regardless of
+                    # the other filters.
                     return []
-                placeholders = ",".join("?" * len(value))
-                where_clauses.append(f"{key} IN ({placeholders})")
-                params.extend(value)
+                in_filters.append((key, list(value)))
             else:
-                where_clauses.append(f"{key} = ?")
-                params.append(value)
+                scalar_clauses.append(f"{key} = ?")
+                scalar_params.append(value)
 
-        sql = "SELECT * FROM episodic_records"
-        if where_clauses:
-            sql += " WHERE " + " AND ".join(where_clauses)
-        sql += f" ORDER BY rowid {order.upper()}"
-        if limit is not None:
-            sql += " LIMIT ?"
-            params.append(int(limit))
+        # Each IN-list is independently chunked; we run the Cartesian product of
+        # chunks, union the rows in Python (de-duplicated by rowid since the
+        # episodic table has a single primary key column), and then re-apply
+        # ``ORDER BY rowid`` and ``LIMIT`` so the externally-visible result is
+        # identical to what a single big query would have produced.
+        chunk_sets: list[list[Sequence[Any]]] = [list(_chunked(values)) for _, values in in_filters]
+
+        # Helper: run one sub-query with the given in-list chunks substituted.
+        def _run_subquery(conn: sqlite3.Connection, chunks: Sequence[Sequence[Any]]) -> list[sqlite3.Row]:
+            sub_clauses = list(scalar_clauses)
+            sub_params: list[Any] = list(scalar_params)
+            for (key, _values), chunk in zip(in_filters, chunks, strict=True):
+                placeholders = ",".join("?" * len(chunk))
+                sub_clauses.append(f"{key} IN ({placeholders})")
+                sub_params.extend(chunk)
+            sub_sql = "SELECT * FROM episodic_records"
+            if sub_clauses:
+                sub_sql += " WHERE " + " AND ".join(sub_clauses)
+            sub_sql += f" ORDER BY rowid {order.upper()}"
+            # Per-sub-query LIMIT is a safe over-fetch: if the caller asked for
+            # ``LIMIT N`` and we have K chunks, each sub-query may legitimately
+            # contribute up to N rows that survive the final merge. We bound the
+            # sub-query to ``limit`` so a giant table doesn't materialize fully
+            # per-chunk, then trim again after the merge.
+            if limit is not None:
+                sub_sql += " LIMIT ?"
+                sub_params.append(int(limit))
+            return list(conn.execute(sub_sql, sub_params).fetchall())
 
         with self._connection() as conn:
-            rows: Sequence[sqlite3.Row] = conn.execute(sql, params).fetchall()
+            if not chunk_sets:
+                # No IN-list filters; the scalar-only path is one statement.
+                rows = _run_subquery(conn, ())
+            else:
+                # Cartesian product across the per-filter chunk lists.
+                from itertools import product as _product
+
+                seen_rowids: set[int] = set()
+                merged: list[sqlite3.Row] = []
+                for combo in _product(*chunk_sets):
+                    for row in _run_subquery(conn, combo):
+                        rid = row["rowid"]
+                        if rid in seen_rowids:
+                            continue
+                        seen_rowids.add(rid)
+                        merged.append(row)
+                rows = merged
+
+        # Final ordering + limit applied after the merge so the result is
+        # indistinguishable from the single-statement form.
+        rows = sorted(rows, key=lambda r: r["rowid"], reverse=(order == "desc"))
+        if limit is not None:
+            rows = rows[: int(limit)]
 
         return [_row_to_record(row) for row in rows]
 
