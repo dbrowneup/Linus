@@ -10,6 +10,7 @@ the exact composition.
 
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 from unittest.mock import patch
 
@@ -438,3 +439,143 @@ def test_chained_lookup_satisfies_entity_lookup_protocol() -> None:
     """:class:`ChainedEntityLookup` also satisfies the Protocol."""
     chain: EntityLookup = ChainedEntityLookup(BuiltinEntityLookup())
     assert chain.lookup_entity("BRCA1") is not None
+
+
+# ── H-1 regression test (PR #107 bug sweep) ────────────────────────────────
+
+
+def test_kb_entity_lookup_concurrent_first_calls_parse_once() -> None:
+    """H-1 regression: 16 concurrent first lookups must trigger ONE parse.
+
+    Under FastAPI concurrency, two threads can both observe
+    ``self._graph is None`` and both kick off ``nx.read_graphml``. With
+    the ``threading.Lock`` + double-checked guard in ``_ensure_loaded``,
+    only the first thread through the lock parses; the rest see the
+    populated index and return immediately. Uses a ``threading.Barrier``
+    so all 16 threads release together — without the lock this is enough
+    interleaving to produce ~16 parses (or at minimum, >1).
+    """
+    n_threads = 16
+    lookup = KBEntityLookup(graphml_path=_FIXTURE_GRAPHML)
+
+    real_read_graphml = nx.read_graphml
+    call_count = 0
+    count_lock = threading.Lock()
+
+    def counting_read_graphml(*args, **kwargs):  # type: ignore[no-untyped-def]
+        nonlocal call_count
+        with count_lock:
+            call_count += 1
+        return real_read_graphml(*args, **kwargs)
+
+    barrier = threading.Barrier(n_threads)
+    results: list[dict[str, object] | None] = [None] * n_threads
+    errors: list[BaseException] = []
+
+    def worker(idx: int) -> None:
+        try:
+            barrier.wait(timeout=5.0)
+            results[idx] = lookup.lookup_entity("BRCA1")
+        except BaseException as exc:  # pragma: no cover — surface in assertion
+            errors.append(exc)
+
+    with patch("linus.knowledge.entity_kb.nx.read_graphml", side_effect=counting_read_graphml):
+        threads = [threading.Thread(target=worker, args=(i,)) for i in range(n_threads)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=5.0)
+            assert not t.is_alive(), "worker thread did not exit in time"
+
+    assert not errors, f"worker threads raised: {errors!r}"
+    assert call_count == 1, f"expected exactly 1 nx.read_graphml call, got {call_count}"
+    # All 16 lookups must agree — and must match a serial baseline.
+    baseline = KBEntityLookup(graphml_path=_FIXTURE_GRAPHML).lookup_entity("BRCA1")
+    assert baseline is not None
+    for idx, result in enumerate(results):
+        assert result == baseline, f"thread {idx} got divergent result: {result!r}"
+
+
+# ── H-3 regression tests (PR #107 bug sweep) ───────────────────────────────
+
+
+class _RaisingLookup:
+    """Backend whose ``lookup_entity`` always raises a given exception.
+
+    Used to exercise the H-3 fix in ``ChainedEntityLookup``: the chain
+    must catch per-backend exceptions and continue to the next backend
+    rather than propagating up to the caller.
+    """
+
+    def __init__(self, exc: BaseException) -> None:
+        self._exc = exc
+        self.call_count = 0
+
+    def lookup_entity(self, name: str, kind: str | None = None) -> dict[str, object] | None:
+        self.call_count += 1
+        raise self._exc
+
+
+def test_chained_entity_lookup_skips_raising_backend() -> None:
+    """H-3 regression: a raise from one backend must not propagate.
+
+    A backend that raises ``RuntimeError`` is treated as if it returned
+    ``None`` for the chain's purposes — the next backend runs. With the
+    builtin stub second in the chain, BRCA1 resolves via the fallback
+    and the user sees the stub source tag, not the RuntimeError.
+    """
+    raiser = _RaisingLookup(RuntimeError("simulated kb failure"))
+    builtin = BuiltinEntityLookup()
+    chain = ChainedEntityLookup(raiser, builtin)
+
+    result = chain.lookup_entity("BRCA1")
+    assert result is not None
+    assert result["source"] == "stub:builtin"
+    assert result["kind"] == "gene"
+    # The raising backend WAS consulted (its raise was caught), but the
+    # chain did not bail out — it advanced to the builtin.
+    assert raiser.call_count == 1
+
+
+def test_chained_entity_lookup_propagates_none_correctly_when_all_backends_miss() -> None:
+    """H-3 regression: two raisers + one None-returner yields None, not a raise.
+
+    The chain's documented contract is "first non-None wins; end-of-chain
+    returns None." With per-backend exception catching, that contract
+    holds even when intermediate backends raise — the chain still
+    returns None cleanly without leaking any of the suppressed
+    exceptions to the caller.
+    """
+    raiser_a = _RaisingLookup(FileNotFoundError("first backend missing"))
+    raiser_b = _RaisingLookup(OSError("second backend IO error"))
+    none_returner = _StubLookup({})
+    chain = ChainedEntityLookup(raiser_a, raiser_b, none_returner)
+
+    # Must return None — no leaked exception of any kind.
+    assert chain.lookup_entity("MISSING_ENTITY") is None
+    assert raiser_a.call_count == 1
+    assert raiser_b.call_count == 1
+    assert none_returner.call_count == 1
+
+
+def test_kb_entity_lookup_missing_file_does_not_leak_through_chain(tmp_path: Path) -> None:
+    """H-1 + H-3 interaction: missing GraphML must fall through to builtin.
+
+    Construction of ``KBEntityLookup`` with a non-existent path
+    succeeds (lazy load). The first ``lookup_entity`` call would raise
+    ``FileNotFoundError`` from inside ``_ensure_loaded``; without the
+    H-3 fix that exception leaks past ``ChainedEntityLookup`` and into
+    ``paperqa._run_rigor_gate``'s broad fail-open ``except``, silently
+    setting ``rigor=None``. With the fix, the chain swallows the
+    FileNotFoundError, advances to ``BuiltinEntityLookup``, and the
+    documented ``stub:builtin`` fallback resolves BRCA1.
+    """
+    missing_path = tmp_path / "definitely_does_not_exist.graphml"
+    kb = KBEntityLookup(graphml_path=missing_path)
+    builtin = BuiltinEntityLookup()
+    chain = ChainedEntityLookup(kb, builtin)
+
+    result = chain.lookup_entity("BRCA1")
+    assert result is not None
+    assert result["source"] == "stub:builtin", "missing KB GraphML should fall through to builtin, not raise"
+    assert result["kind"] == "gene"
