@@ -179,6 +179,68 @@ def test_default_model_used_when_none_specified() -> None:
     assert results[0].model_used == "qwen3:8b"
 
 
+def test_run_sync_catches_message_extraction_failure_as_agent_result_error() -> None:
+    """A response whose ``.content`` attribute raises on access must NOT escape
+    ``_run_sync`` — the spawner's "always returns a complete result list"
+    contract requires the failure to surface as :attr:`AgentResult.error`.
+
+    Regression cover for PR #108 H1: the pre-fix ``_run_sync`` wrapped only the
+    ``_resolve_model`` and ``ollama.chat`` call sites in try/except; an
+    exception raised by the message-extraction block (e.g., a typed object
+    whose ``.content`` property raises) bubbled out of the thread, through
+    ``asyncio.to_thread``, and into ``asyncio.gather`` — cancelling the batch
+    and discarding partial results.
+    """
+
+    class _BrokenMessage:
+        # Picking a non-AttributeError exception is load-bearing: ``hasattr``
+        # and ``getattr(..., default)`` both swallow ``AttributeError`` from a
+        # descriptor, which would silently produce empty content instead of an
+        # exception. A ``TypeError`` (or any non-AttributeError) propagates
+        # out of the extraction block and exercises the new outer try/except.
+        @property
+        def content(self) -> str:
+            raise TypeError("simulated broken .content descriptor")
+
+    tasks = [
+        AgentTask(name="ok-1", system="", user="hi"),
+        AgentTask(name="broken", system="", user="trigger broken response"),
+        AgentTask(name="ok-2", system="", user="hi again"),
+    ]
+
+    def side_effect(**kwargs):
+        user_msg = next(
+            (m["content"] for m in kwargs.get("messages", []) if m["role"] == "user"),
+            "",
+        )
+        if "broken" in user_msg:
+            return {"message": _BrokenMessage()}
+        return _ok_chat_response("ok")
+
+    with patch("linus.agents.spawner.ollama.chat", side_effect=side_effect), patch(
+        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    ):
+        results = asyncio.run(spawn_agents(tasks))
+
+    # Contract: one result per input task, in input order, even though one
+    # task's response shape was broken.
+    assert len(results) == 3
+    assert [r.task_name for r in results] == ["ok-1", "broken", "ok-2"]
+    by_name = {r.task_name: r for r in results}
+    # The two healthy tasks complete normally.
+    assert by_name["ok-1"].error is None
+    assert by_name["ok-1"].content == "ok"
+    assert by_name["ok-2"].error is None
+    assert by_name["ok-2"].content == "ok"
+    # The broken task surfaces the failure as ``error`` instead of raising.
+    assert by_name["broken"].error is not None
+    assert "TypeError" in by_name["broken"].error
+    assert "simulated broken .content descriptor" in by_name["broken"].error
+    assert by_name["broken"].content == ""
+    # Latency is still populated on the failed task (wall-time of the attempt).
+    assert by_name["broken"].latency_ms >= 0
+
+
 @pytest.mark.parametrize("message_field", ["dict", "object"])
 def test_handles_both_dict_and_object_message_shapes(message_field: str) -> None:
     """The ollama client has evolved across 0.x; support both shapes."""

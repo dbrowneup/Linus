@@ -112,33 +112,79 @@ async def spawn_agents(
 
 
 def _run_sync(task: AgentTask) -> AgentResult:
-    """Synchronous per-task body; called from a thread by :func:`spawn_agents`."""
+    """Synchronous per-task body; called from a thread by :func:`spawn_agents`.
+
+    The body is wrapped in a single outer ``try/except Exception`` so the
+    "always returns a complete result list" guarantee of
+    :func:`spawn_agents` holds even when a code path below the inner
+    ``ollama.chat`` block raises (e.g., a weird response shape with a
+    ``.content`` descriptor that raises on access, or a future munging step
+    added in a refactor). The inner try/except blocks remain so the
+    resulting :attr:`AgentResult.error` carries a specific message for the
+    common model-resolve and ollama-failure cases; the outer net catches
+    anything they miss.
+    """
     started = time.perf_counter()
     requested_model = task.model or "qwen3:8b"
+    resolved = requested_model
 
     try:
-        resolved = _resolve_model(requested_model)
-    except Exception as exc:  # noqa: BLE001 — capture model-resolution failures uniformly
+        try:
+            resolved = _resolve_model(requested_model)
+        except Exception as exc:  # noqa: BLE001 — capture model-resolution failures uniformly
+            elapsed_ms = int((time.perf_counter() - started) * 1000)
+            return AgentResult(
+                task_name=task.name,
+                content="",
+                model_used=requested_model,
+                latency_ms=elapsed_ms,
+                error=f"{type(exc).__name__}: {exc}",
+            )
+
+        messages = [
+            {"role": "system", "content": task.system},
+            {"role": "user", "content": task.user},
+        ]
+        chat_kwargs: dict = {"model": resolved, "messages": messages}
+        if task.max_tokens is not None:
+            chat_kwargs["options"] = {"num_predict": task.max_tokens}
+
+        try:
+            response = ollama.chat(**chat_kwargs)
+        except Exception as exc:  # noqa: BLE001 — surface any Ollama failure as AgentResult.error
+            elapsed_ms = int((time.perf_counter() - started) * 1000)
+            return AgentResult(
+                task_name=task.name,
+                content="",
+                model_used=resolved,
+                latency_ms=elapsed_ms,
+                error=f"{type(exc).__name__}: {exc}",
+            )
+
+        content = ""
+        message = response.get("message") if isinstance(response, dict) else None
+        if isinstance(message, dict):
+            content = message.get("content", "") or ""
+        elif message is not None and hasattr(message, "content"):
+            # Newer ollama client returns a typed object.
+            content = getattr(message, "content", "") or ""
+
         elapsed_ms = int((time.perf_counter() - started) * 1000)
         return AgentResult(
             task_name=task.name,
-            content="",
-            model_used=requested_model,
+            content=content,
+            model_used=resolved,
             latency_ms=elapsed_ms,
-            error=f"{type(exc).__name__}: {exc}",
+            error=None,
         )
-
-    messages = [
-        {"role": "system", "content": task.system},
-        {"role": "user", "content": task.user},
-    ]
-    chat_kwargs: dict = {"model": resolved, "messages": messages}
-    if task.max_tokens is not None:
-        chat_kwargs["options"] = {"num_predict": task.max_tokens}
-
-    try:
-        response = ollama.chat(**chat_kwargs)
-    except Exception as exc:  # noqa: BLE001 — surface any Ollama failure as AgentResult.error
+    except Exception as exc:  # noqa: BLE001 — safety net so the gather-batch guarantee holds
+        # Catches any exception escaping the message-extraction block (e.g., a
+        # response whose ``.content`` attribute raises on access) or any future
+        # post-chat munging step a refactor might add. Without this, such an
+        # exception bubbles through ``asyncio.to_thread`` into
+        # ``asyncio.gather`` (called without ``return_exceptions=True``),
+        # cancels the batch, and discards the partial results — directly
+        # violating the documented contract.
         elapsed_ms = int((time.perf_counter() - started) * 1000)
         return AgentResult(
             task_name=task.name,
@@ -147,20 +193,3 @@ def _run_sync(task: AgentTask) -> AgentResult:
             latency_ms=elapsed_ms,
             error=f"{type(exc).__name__}: {exc}",
         )
-
-    content = ""
-    message = response.get("message") if isinstance(response, dict) else None
-    if isinstance(message, dict):
-        content = message.get("content", "") or ""
-    elif message is not None and hasattr(message, "content"):
-        # Newer ollama client returns a typed object.
-        content = getattr(message, "content", "") or ""
-
-    elapsed_ms = int((time.perf_counter() - started) * 1000)
-    return AgentResult(
-        task_name=task.name,
-        content=content,
-        model_used=resolved,
-        latency_ms=elapsed_ms,
-        error=None,
-    )
