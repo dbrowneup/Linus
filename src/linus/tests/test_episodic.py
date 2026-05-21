@@ -544,6 +544,59 @@ def test_read_records_empty_in_list_short_circuits_to_empty(store: EpisodicStore
     assert store.read_records({"turn_id": ()}) == []
 
 
+def test_read_records_in_list_chunks_past_sqlite_limit(store: EpisodicStore) -> None:
+    """An IN-list of 2000 values must NOT raise ``sqlite3.OperationalError:
+    too many SQL variables``. The implementation chunks the IN-list under
+    SQLite's ``SQLITE_LIMIT_VARIABLE_NUMBER`` (default 999 on older libsqlite)
+    and unions the results in Python.
+
+    Regression cover for PR #108 H2: the pre-fix ``read_records`` built a
+    single ``IN (?, ?, ..., ?)`` placeholder list of length N; passing N > 999
+    raised ``OperationalError`` on default libsqlite builds.
+    """
+    # Write 50 real records under known turn_ids 0..49 inside one session.
+    for i in range(50):
+        store.write_record(EpisodicRecord(session_id="s1", turn_id=i, role="user", content=f"m{i}"))
+
+    # Build an IN-list of 2000 candidate turn_ids: 50 that exist (0..49) plus
+    # 1950 dummies (1000..2949) that don't. The query should return exactly
+    # 50 rows. 2000 > 999, so the pre-fix code would have raised
+    # ``sqlite3.OperationalError: too many SQL variables`` on a libsqlite
+    # build with the default limit.
+    huge_filter = list(range(50)) + list(range(1000, 2950))
+    assert len(huge_filter) == 2000
+
+    # Must not raise.
+    out = store.read_records({"session_id": "s1", "turn_id": huge_filter})
+    assert len(out) == 50
+    assert sorted(o.turn_id for o in out) == list(range(50))
+
+    # Sanity check at the small-batch scale: the chunked path must produce
+    # identical results to the naive single-query path. We compare against a
+    # small IN-list (well under any limit) so the equivalence is unambiguous.
+    small_filter = [0, 10, 20, 30, 40]
+    small_out = store.read_records({"session_id": "s1", "turn_id": small_filter})
+    assert sorted(o.turn_id for o in small_out) == small_filter
+
+
+def test_read_records_in_list_chunks_preserve_order_and_limit(store: EpisodicStore) -> None:
+    """Chunked IN-list queries must still honor ``order=desc`` and ``limit``
+    so the externally-visible result is identical to a single-statement form.
+    """
+    for i in range(100):
+        store.write_record(EpisodicRecord(session_id="s1", turn_id=i, role="user", content=f"m{i}"))
+
+    # IN-list that forces chunking (> 499, the configured chunk size).
+    huge_filter = list(range(100)) + list(range(1000, 1500))
+    assert len(huge_filter) == 600
+
+    out_desc = store.read_records(
+        {"session_id": "s1", "turn_id": huge_filter, "order": "desc", "limit": 5}
+    )
+    # Limit applied after merge; desc order over the merged set → highest 5 turn_ids.
+    assert [r.turn_id for r in out_desc] == [99, 98, 97, 96, 95]
+
+
 def test_read_records_limit_caps_result_count(store: EpisodicStore) -> None:
     for i in range(10):
         store.write_record(EpisodicRecord(session_id="s1", turn_id=i, role="user", content=f"m{i}"))
