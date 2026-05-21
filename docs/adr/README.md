@@ -87,6 +87,7 @@ link to the new ADR.
 | [DEC-0058](0058-x402-mcp-graduation-pathway.md)                      | @x402/mcp graduation pathway: Watch → Spike → Integrate, with concrete triggers (R4-03)                                       | accepted                                                                                    |
 | [DEC-0059](0059-grounding-gate-output-surface.md)                    | Grounding gate at the OUTPUT surface: hard admission for stakeable Worker outputs (Q1)                                        | accepted                                                                                    |
 | [DEC-0060](0060-loud-degradation-healthz-extension.md)               | Loud degradation: `/healthz` reports `effective_state` + `degradations[]` (Q3)                                                | accepted                                                                                    |
+| [DEC-0061](0061-network-policy-framework.md)                         | Network-policy framework: per-tool `network_policy` + audit-log `network_egress[]` + `/healthz` reachability                  | accepted                                                                                    |
 
 _DEC-0044 through DEC-0054 also exist; see [`../../DECISIONS.md`](../../DECISIONS.md) for the full canonical index. New
 ADRs append to this index with monotonically increasing `DEC-NNNN` ids._
