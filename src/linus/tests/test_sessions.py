@@ -7,25 +7,28 @@ Two suites in one file:
 2. **Endpoint tests** — exercise the FastAPI server's session-aware
    chat-completions endpoint and the new ``/v1/sessions`` endpoints.
    Ollama is patched throughout for hermeticity.
+3. **Concurrency tests** — regression coverage for bug-sweep findings
+   C1 and C2 (`docs/bug-sweeps/2026-05-20-memory-sweep.md`).
 """
 
 from __future__ import annotations
 
+import threading
 from typing import Any
 from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 
+from linus.memory import sessions as sessions_module
 from linus.memory.sessions import (
     Session,
     SessionStore,
-    StoredMessage,
+    get_default_store,
     in_memory_store,
     reset_default_store,
 )
 from linus.server import app
-
 
 # ── Store-level tests ──────────────────────────────────────────────────────
 
@@ -198,8 +201,9 @@ def test_chat_completions_with_session_id_persists_history(client: TestClient) -
     create = client.post("/v1/sessions", json={}).json()
     sid = create["session_id"]
 
-    with patch("linus.server.ollama.chat", return_value=_ok_ollama_response("Hello!")), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=_ok_ollama_response("Hello!")),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -226,8 +230,9 @@ def test_session_history_prepended_on_subsequent_request(client: TestClient) -> 
     create = client.post("/v1/sessions", json={}).json()
     sid = create["session_id"]
 
-    with patch("linus.server.ollama.chat", return_value=_ok_ollama_response("Hi back")) as mock_chat, patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=_ok_ollama_response("Hi back")) as mock_chat,
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         # Turn 1
         client.post(
@@ -260,8 +265,9 @@ def test_session_history_prepended_on_subsequent_request(client: TestClient) -> 
 
 def test_chat_completions_without_session_id_remains_stateless(client: TestClient) -> None:
     """Backward compat: no session_id means no history loaded or persisted."""
-    with patch("linus.server.ollama.chat", return_value=_ok_ollama_response("ok")) as mock_chat, patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=_ok_ollama_response("ok")) as mock_chat,
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -283,8 +289,9 @@ def test_session_auto_created_on_first_chat_use(client: TestClient) -> None:
     ensure_session creates it on demand."""
     sid = "auto-created-id"
 
-    with patch("linus.server.ollama.chat", return_value=_ok_ollama_response("ok")), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=_ok_ollama_response("ok")),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -299,3 +306,136 @@ def test_session_auto_created_on_first_chat_use(client: TestClient) -> None:
     hist = client.get(f"/v1/sessions/{sid}/messages")
     assert hist.status_code == 200
     assert len(hist.json()["messages"]) == 2
+
+
+# ── Concurrency regression tests (bug-sweep 2026-05-20, C1) ─────────────────
+
+
+def test_append_message_concurrent_writes_same_session_no_collision(tmp_path) -> None:
+    """C1 regression: 16 threads appending to the same session must not
+    collide on ``(session_id, idx)``. All 16 must commit and the resulting
+    idx values must be the dense range 0..15.
+
+    Uses a file-backed SQLite DB (shared by all threads on the same
+    ``SessionStore`` instance) — ``:memory:`` connections aren't shared
+    across statements in a way that exercises the lock path on a single
+    connection. ``check_same_thread=False`` on the connection (line 126
+    of sessions.py) is what makes the multi-threaded access possible at
+    all; without the C1 fix this test would surface
+    ``sqlite3.IntegrityError: UNIQUE constraint failed`` or wedge into a
+    deadlock.
+    """
+    db_path = tmp_path / "concurrent_single.db"
+    store = SessionStore(db_path=db_path)
+    try:
+        store.create_session(session_id="sid-1")
+
+        n_threads = 16
+        barrier = threading.Barrier(n_threads)
+        errors: list[BaseException] = []
+        lock = threading.Lock()
+
+        def worker(i: int) -> None:
+            barrier.wait()
+            try:
+                store.append_message("sid-1", "user", f"msg{i}")
+            except BaseException as exc:
+                with lock:
+                    errors.append(exc)
+
+        threads = [threading.Thread(target=worker, args=(i,)) for i in range(n_threads)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        assert errors == [], f"Concurrent appends raised: {errors!r}"
+        messages = store.get_messages("sid-1")
+        assert len(messages) == n_threads
+        assert sorted(m.idx for m in messages) == list(range(n_threads))
+    finally:
+        store.close()
+
+
+def test_append_messages_concurrent_batches_same_session_no_collision(tmp_path) -> None:
+    """C1 regression for the batch path: 4 threads each appending 5
+    messages to the same session must produce 20 rows with idx 0..19,
+    no duplicates and no gaps.
+    """
+    db_path = tmp_path / "concurrent_batch.db"
+    store = SessionStore(db_path=db_path)
+    try:
+        store.create_session(session_id="sid-1")
+
+        n_threads = 4
+        per_batch = 5
+        barrier = threading.Barrier(n_threads)
+        errors: list[BaseException] = []
+        lock = threading.Lock()
+
+        def worker(i: int) -> None:
+            batch = [("user", f"thread{i}-msg{j}") for j in range(per_batch)]
+            barrier.wait()
+            try:
+                store.append_messages("sid-1", batch)
+            except BaseException as exc:
+                with lock:
+                    errors.append(exc)
+
+        threads = [threading.Thread(target=worker, args=(i,)) for i in range(n_threads)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        assert errors == [], f"Concurrent batch appends raised: {errors!r}"
+        messages = store.get_messages("sid-1")
+        total = n_threads * per_batch
+        assert len(messages) == total
+        assert sorted(m.idx for m in messages) == list(range(total))
+    finally:
+        store.close()
+
+
+def test_get_default_store_concurrent_first_call_returns_same_instance(tmp_path, monkeypatch) -> None:
+    """C2 regression: 8 threads racing on the first ``get_default_store()``
+    call after ``reset_default_store()`` must all observe the SAME
+    instance. Without the double-checked lock, two threads can both
+    pass the ``is None`` check and each construct a fresh
+    ``SessionStore``, leaking the loser's connection file descriptor.
+
+    Verifies identity via ``id()`` and confirms the module-level
+    ``_default_store`` agrees, so a slow loser-thread can't smuggle in
+    a different instance under the singleton name.
+    """
+    # Point at a tmp DB so we don't clobber ``~/.linus/sessions.db``
+    # if it exists. ``reset_default_store`` honors the env var on the
+    # next construction.
+    monkeypatch.setenv("LINUS_SESSIONS_DB", str(tmp_path / "singleton.db"))
+    reset_default_store()
+
+    n_threads = 8
+    barrier = threading.Barrier(n_threads)
+    results: list[SessionStore] = []
+    lock = threading.Lock()
+
+    def worker() -> None:
+        barrier.wait()
+        store = get_default_store()
+        with lock:
+            results.append(store)
+
+    threads = [threading.Thread(target=worker) for _ in range(n_threads)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert len(results) == n_threads
+    first_id = id(results[0])
+    distinct = {id(r) for r in results}
+    assert len(distinct) == 1, f"Expected all calls to return the same instance; got {len(distinct)} distinct instances"
+    # Sanity: the module-level singleton agrees with what the threads observed.
+    assert id(sessions_module._default_store) == first_id
+
+    reset_default_store()
