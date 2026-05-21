@@ -33,7 +33,9 @@ atom. Linus is a force that harnesses human knowledge for good in the world.
 
 A personal AI orchestration backend that:
 
-- Runs on Dan's MacBook Pro (and future Mac hardware), no paid APIs required for operation
+- Runs on Dan's MacBook Pro (and future Mac hardware), no paid APIs required for operation; local-primary with an
+  opt-in network framework (DEC-0061) — some tools may use the internet when available, none depend on it,
+  hermetic tests stay network-free, and every external call is captured in the audit log
 - Exposes an OpenAI-compatible endpoint so any harness (VS Code, openclaw, LM Studio, a future native app) can use it
 - Provides domain-specific tools backed by Dan's knowledge base (papers, notes, corpora)
 - Supports multi-agent parallel task execution
@@ -649,6 +651,14 @@ For a task you (Claude Code, playing Maestro) could delegate to a local Worker:
 5. If the spec needed clarification, update the spec. Specs are living docs.
 
 ## Tool Use Policy
+
+**Network egress requires design-time review (DEC-0061).** Any tool registered with
+`network_policy != "offline"` (i.e. `online_optional` or `online_required`) constitutes a potential
+exfiltration surface, however narrow. Before such a tool merges to `main`, Maestro (Dan + hosted Claude)
+reviews: what hostnames it contacts, which fields of the call carry user / KB / corpus data, the host's
+privacy posture, and what happens to the data after the response returns. The review lives in the tool's
+PR description and the answering ADR if one is filed. This is the same discipline that gates `repos/`
+additions and any `pip install` outside a `uv venv` — network egress is the same kind of trust decision.
 
 ### Allowlist (auto-execute OK)
 
