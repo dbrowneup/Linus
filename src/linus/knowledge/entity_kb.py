@@ -83,6 +83,7 @@ __all__ = [
     "ChainedEntityLookup",
     "KBEntityLookup",
     "default_kb_lookup",
+    "default_kb_lookup_with_ncbi",
 ]
 
 
@@ -365,3 +366,37 @@ def default_kb_lookup() -> EntityLookup:
     factory over instantiating either backend directly.
     """
     return ChainedEntityLookup(KBEntityLookup(), BuiltinEntityLookup())
+
+
+def default_kb_lookup_with_ncbi() -> EntityLookup:
+    """Return the chained entity lookup including the NCBI/UniProt/ChEBI backend.
+
+    Composes :class:`KBEntityLookup` (primary, KB-derived) with
+    ``NCBIEntityLookup`` (canonical reference DBs, ``online_optional``
+    per DEC-0061) and :class:`BuiltinEntityLookup` (fallback stub).
+    Resolution precedence is:
+
+    1. **KB** — entities derived from Dan's actual reading corpus.
+       Highest precedence: if it appears in the KG, the answer is
+       grounded in real reading.
+    2. **NCBI / UniProt / ChEBI** — canonical reference DBs. Used when
+       the KB doesn't know an entity; degrades cleanly to None when
+       the network is unreachable and the cache misses.
+    3. **Builtin stub** — hand-seeded well-known anchors (BRCA1, TP53,
+       ...). Catches the case where the corpus snapshot and network
+       are both unhelpful.
+
+    The NCBI backend's construction is wrapped so that any
+    initialization failure (e.g., cache-dir unwriteable) does not break
+    the chain — the chain still works with KB + builtin. This is the
+    "forward-compatible" property the spec calls for.
+    """
+    backends: list[EntityLookup] = [KBEntityLookup()]
+    try:
+        from linus.knowledge.entity_ncbi import NCBIEntityLookup
+
+        backends.append(NCBIEntityLookup())
+    except Exception as exc:
+        logger.debug("NCBIEntityLookup unavailable; falling back to KB+builtin: %s", exc)
+    backends.append(BuiltinEntityLookup())
+    return ChainedEntityLookup(*backends)
