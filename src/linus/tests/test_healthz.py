@@ -535,6 +535,24 @@ def _register_temp_tool(
     monkeypatch.setitem(default_registry._tools, name, spec)
 
 
+def _strip_online_tools(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Remove every ``online_*`` tool from the default registry for the
+    duration of the test, restoring on teardown.
+
+    The default registry ships at least one ``online_optional`` tool
+    (``entity_ncbi.lookup``, the first instance of DEC-0061 per the
+    follow-up PR). Tests that exercise the "no online tools registered"
+    healthz branch need a clean baseline; monkeypatching the registry's
+    internal ``_tools`` dict to a copy without those entries is the
+    cleanest way to get one without disturbing the module-level
+    registry state across tests.
+    """
+    from linus.tools import default_registry
+
+    clean = {name: spec for name, spec in default_registry._tools.items() if spec.network_policy == "offline"}
+    monkeypatch.setattr(default_registry, "_tools", clean)
+
+
 def test_healthz_offline_only_registry_stays_live_when_network_down(
     client: TestClient, healthy_env: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -542,6 +560,7 @@ def test_healthz_offline_only_registry_stays_live_when_network_down(
     network-related degradations even when the host is offline. The
     framework is silent when no online tool is registered — zero noise
     for existing offline-only setups."""
+    _strip_online_tools(monkeypatch)
     monkeypatch.setattr(server_module, "_check_network_reachable", lambda: False)
 
     body = client.get("/healthz").json()
@@ -673,6 +692,7 @@ def test_compute_degradations_network_paths_only_fire_when_online_tool_registere
     registered, the function must not even invoke the network probe. This
     keeps the probe cost out of the standard hot path for offline-only
     setups."""
+    _strip_online_tools(monkeypatch)
     probe_called: list[int] = []
 
     def spy_reachable() -> bool:

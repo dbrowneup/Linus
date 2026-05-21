@@ -101,6 +101,45 @@ def rigor_check(
     return result_to_dict(result)
 
 
+# Phase 2c — first online_optional tool (DEC-0061). Registers
+# ``entity_ncbi.lookup`` as the canonical-reference-DB entity backend
+# (NCBI Gene + UniProt + ChEBI). Per DEC-0061, the declaration is
+# explicit at registration time so reviewers and operators see at design
+# time that this tool can leak the entity name over the wire. The tool
+# uses a local SQLite cache (``~/.linus/cache/ncbi_entities.db``) for
+# subsequent calls and falls back to ``None`` when the network is
+# unreachable and the cache misses; callers chain it with a stub so the
+# rigor gate still produces an answer offline.
+@tool(
+    name="entity_ncbi.lookup",
+    description=(
+        "Resolve a biological entity name (gene / protein / chemical) "
+        "against the canonical reference DBs (NCBI Gene, UniProt, ChEBI). "
+        "Online-optional per DEC-0061: prefers the network when reachable, "
+        "caches results locally, returns None when offline and cache misses. "
+        "Only the entity name is sent upstream; every call is audit-logged."
+    ),
+    network_policy="online_optional",
+)
+def entity_ncbi_lookup(name: str, kind: str | None = None) -> dict[str, Any] | None:
+    """Look up ``name`` (with optional ``kind`` hint) against NCBI / UniProt / ChEBI.
+
+    See :class:`linus.knowledge.entity_ncbi.NCBIEntityLookup` for the
+    full contract. The returned dict has shape
+    ``{kind, source, canonical_name, external_id, cached_at}`` or
+    ``None`` when neither cache nor network produce a hit.
+
+    ``kind`` accepts ``"gene"`` / ``"protein"`` / ``"chemical"`` to
+    route directly at a single backend; ``None`` (default) tries each
+    in order (NCBI → UniProt → ChEBI) and returns the first non-None
+    result.
+    """
+    from linus.knowledge.entity_ncbi import NCBIEntityLookup
+
+    lookup = NCBIEntityLookup()
+    return lookup.lookup_entity(name, kind=kind)
+
+
 __all__ = [
     "ToolRegistry",
     "ToolSpec",
