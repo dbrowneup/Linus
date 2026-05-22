@@ -109,6 +109,8 @@ proceeds.
   DEC-0029's requirements with almost no friction. Adopt verbatim with Linus-specific columns added, or rename to
   `(episodes, episode_links)` to signal ownership boundary from the first migration? Decision before the first DEC-0029
   migration file. _(g4-memory.)_
+  _Framing refresh (2026-05-22): the Linus episodic schema went a different direction (DEC-0029) — `src/linus/memory/episodic.py` shipped a single
+  `(session_id, turn_id, parent_turn_id, segment, content_hash, content, trust_level, tags)` schema, not a `(blocks, links)` shape; the openaugi-style lift is no longer pending in the framing as originally stated._
 - **R2-10. sqlite-vec vs Qdrant for memory v0.** Omega-memory and openaugi prove that 384-dim cosine search inside the
   same SQLite file satisfies Phase 2 recall requirements with no separate service. The Algorithm says delete the Qdrant
   service from v0 scope and add it back if sqlite-vec proves insufficient. _(g4-memory.)_
@@ -121,6 +123,7 @@ proceeds.
 - **R2-13. Two-tier LLM config as a named convention.** TradingAgents' `deep_think_llm` / `quick_think_llm` split is a
   transferable pattern. Formalize in ARCHITECTURE.md as a named config pattern before Phase 3, or leave implicit in
   per-skill configuration? _(g10-finance.)_
+  _Framing refresh (2026-05-22): refresh-flagged by the 2026-05-18 TradingAgents repo-pull audit (39-commit refresh); codification of `deep_think_llm` / `quick_think_llm` as a named Linus convention in ARCHITECTURE.md or an ADR still pending._
 - **R2-14. Biology RLVR verifier candidates (Phase 6 scope).** ether0's chemistry recipe generalizes if the oracle side
   does. Candidates: BLAST, ESMFold pLDDT, ClinVar, eQTL direction-of-effect — all sub-second per call,
   near-deterministic, no remote paid API. Dan's genomics experience is the filter for which biology tasks have
@@ -156,6 +159,7 @@ proceeds.
   deliverable + KB update proposals) is operationally clear for serial work, less so for parallel Workers writing to
   overlapping pages. DEC-0022 resolved KB-write coordination at the policy level; the question now is the implementation
   pattern (lease, optimistic-merge, branch-per-Worker). _(llm-wiki.)_
+  _Framing refresh (2026-05-22): DEC-0022 set policy; single-writer hygiene is documented at `src/linus/memory/episodic.py:27-35` and the multi-Worker implementation pattern (lease / optimistic-merge / branch-per-Worker) is still open, tracked alongside the PR #108 H3 follow-up._
 - **R2-23. Immutable atomic notes vs mutable wiki pages.** The community is split. Immutable atomic Zettelkasten notes
   are append-only, link-rich, content-hashable; mutable wiki pages compound knowledge but invite drift. Phase 2/3 KB
   substrate-level architecture choice. _(llm-wiki.)_
@@ -302,6 +306,7 @@ proceeds.
   enumerate ~30 event types with per-type weights (0.05 file*summary → 3.0 constraint/reminder) and per-type Jaccard
   dedup thresholds. Decision before the first DEC-0029 migration: seed with OMEGA-style typed taxonomy from day one
   (adds a `type_weight` column + lookup table) or stay schema-flat and add types empirically. *(g4-memory.)\_
+  _Framing refresh (2026-05-22): DEC-0029 shipped schema-flat without a per-type weights table; the question is now whether to retrofit a typed taxonomy later, not an up-front design call before the first migration._
 - **R3-12.** _RESOLVED 2026-05-16 (N6 janitorial). Ollama blobs are content-addressed by SHA-256; all 10 local blobs
   pass on-disk integrity check (mistral:7b-instruct + qwen2.5-coder:7b). See
   [security-log.md](../security-log.md). Registry-side provenance verification (HTTP fetch of manifest + comparison)
@@ -345,6 +350,7 @@ proceeds.
   flow) landed in PR #16. The stylometric/identity-leakage tiering — per-request audit log fields (`destination`,
   `content-class`, `bytes-sent`) and a redact-before-paste CLI — is scoped Phase 2a but has no ADR, no spec entry, no
   PR. Without a delivery target it risks indefinite deferral. _(safety-alignment-privacy.)_
+  _Framing refresh (2026-05-22): DEC-0061 covered the network-egress audit-log fields; the stylometric/identity-leakage SAFETY.md section is separate in scope and remains unblocked, still without an ADR or spec entry._
 - **R3-21. `value_frame` as a mandatory task-spec field — design now or defer.** The Values paper argues every Linus
   task implicitly summons a value frame from the hosted Maestro; the synthesis recommends a mandatory `value_frame`
   field in the orchestration task-spec template. CLAUDE.md mentions it but no ADR or Phase 2a delivery target exists.
@@ -362,6 +368,7 @@ proceeds.
   and llmbase's operations registry as high-priority lift candidates for Phase 2 KB. Do those lifts go on top of
   paper-qa's ingest pipeline, in parallel to it, or are they superseded by paper-qa's own provenance mechanisms? Needs
   decision before Phase 2 KB code is written. _(g2-wiki-engines; cross-cuts g8-sci-agents.)_
+  _Framing refresh (2026-05-22): paper-qa is the v0.5.0 KB retrieval engine (LX-1 / `src/linus/knowledge/paperqa.py`, PR #89); G2 lifts are now post-reveal additions on top of, or parallel to, the running paper-qa pipeline, not pre-conditions for it._
 - **R3-24. dlt corpus-analytics store selection (DuckDB vs PostgreSQL vs SQLite).** DEC-0029 settled the
   episodic/session store on SQLite, but the Phase 2b dlt ingestion destination for bulk corpus data (paper metadata,
   full-text chunks) is unresolved. Determines whether the dlt integration is a one-line `dlt[duckdb]` install or a
@@ -380,6 +387,7 @@ proceeds.
   audit log be redesigned as a per-output record of model + prompt + retrieved context + claimed-vs-retrieved citations?
   Concrete action: open `docs/specs/audit-log-spec.md` as a Phase 2a deliverable alongside memory-architecture spec.
   _(llms-in-science.)_
+  _Framing refresh (2026-05-22): the audit log is substantially specified via DEC-0030 + DEC-0031 + DEC-0061 + `src/linus/memory/audit_log.py` (per-output records of model + memory_mode + cot_budget + network_egress); a standalone `docs/specs/audit-log-spec.md` is still outstanding but lower-priority than originally framed._
 
 ### Tier 3 — reservoir
 
@@ -416,6 +424,68 @@ DEC-0058 (see [`answered-questions.md`](answered-questions.md#round-4-sweep-reso
   [DEC-0058](../adr/0058-x402-mcp-graduation-pathway.md): three-step pathway (Watch → Spike → Integrate) with concrete
   triggers for each transition. Spike is pre-specified as a one-week deliverable; Integrate ADR scope is pre-specified;
   negative-graduation paths (Dismiss, Re-evaluate) documented so Watch cannot drift into indefinite deferral.
+
+---
+
+## Round 5 sweep promotions (added 2026-05-22)
+
+A 2026-05-22 audit pass over the 2026-05-19 → 2026-05-21 reveal-prep arc surfaced eight items that do not fit any
+existing R2 / R3 / R4 entry. Most are v0.5.0-reveal-adjacent: env-architecture work, KB hardcoded-paths refactor, demo
+script ownership, and the editable-installs + worktrees collision lesson from the 2026-05-21 fix-and-polish session.
+The remainder are post-reveal scope items (entity-grounding promotion gate, signed-audit-slice scope, bug-sweep
+backlog disposition, integration-suite gating discipline) that benefit from being tracked openly rather than
+re-discovered later. Numbering uses the `R5-NN` prefix per the audit at
+[`experiments/2026-05-22-question-audit.md`](../../experiments/2026-05-22-question-audit.md).
+
+### Tier 1 — block v0.5.0 reveal (next 3 days)
+
+These four items each have a v0.5.0 reveal dependency within the 2026-05-22 → 2026-05-25 window. Walk first.
+
+- **R5-01. Env-architecture layered (Option C) — when does v0.6.0 ship.**
+  [`docs/specs/2026-05-21-env-architecture-layered.md`](../specs/2026-05-21-env-architecture-layered.md) is committed
+  but the actual env-layering work — separating the `papers` env from the `linus` env, or unifying both via a shared
+  meta-env — has no implementation owner or target. Blocks the Streamlit-pages-fully-alive story end-to-end and gates
+  whether v0.6.0 ships as the layered env or as a continuation of the current `linus` env footprint. _(Phase 2a / v0.6.0
+  env architecture.)_
+- **R5-02. KB hardcoded-paths fix — v0.6.0 ownership.**
+  [`docs/specs/2026-05-21-kb-hardcoded-paths-fix.md`](../specs/2026-05-21-kb-hardcoded-paths-fix.md) documents the
+  path-constant inventory but the refactor (proposed `papers_analysis/paths.py`) has no PR. For v0.5.0 reveal Dan is the
+  only person who can run the KB pipeline end-to-end; this is the load-bearing barrier to broader use by anyone outside
+  Dan's machine. _(KnowledgeBase submodule; v0.6.0 deliverable.)_
+- **R5-03. Demo-script ownership for 2026-05-25.** [`docs/demo-script-2026-05-25.md`](../demo-script-2026-05-25.md) is
+  draft. The 2026-05-21 session summary lists "Demo dry-run" as outstanding-for-next-session item #3. No owner, no
+  dry-run wall-time estimate, no go/no-go gate definition. Three days to reveal as of 2026-05-22 — this is the most
+  time-sensitive item in the R5 batch. _(v0.5.0 reveal logistics.)_
+- **R5-04. Editable-installs + worktrees collision discipline.** The 2026-05-21 fix-and-polish session summary
+  §Lessons learned flagged a recurring failure mode: editable installs (`pip install -e .`) and worktree-isolated agents
+  collide on `PYTHONPATH` resolution and `pyproject.toml` site-packages registration. Every fix agent in the 2026-05-21
+  arc hit it. Not yet propagated to CLAUDE.md's "Worktree fan-out discipline" section. Cheap addition; high recurrence
+  risk if left unwritten before further fan-outs. _(CLAUDE.md convention update; load-bearing for future agent work.)_
+
+### Tier 2 — post-reveal but tracked
+
+These four items are not v0.5.0-reveal-blocking but should be tracked rather than left to re-surface ad hoc later.
+
+- **R5-05. Entity-grounding severity promotion gate.** DEC-0059's amendment commits to "may be promoted to error when
+  canonical reference DBs (NCBI + UniProt + GO) ship." `entity_ncbi.py` shipped 2026-05-21 (PR #113), making the
+  promotion gate actionable. Criteria are not yet codified: what percentage of the test corpus must resolve to canonical
+  IDs to trigger the promotion, what fallback behavior is acceptable when the resolver is offline, and what regression
+  budget applies when the promotion lands. _(entity-grounding / KB ingest; depends on DEC-0059.)_
+- **R5-06. Q2 signed-audit-slice (`anchor.py`) post-reveal scope.** Seeded under "Seeded ADRs" in DECISIONS.md
+  (line 102, 2026-05-19) but not in any question file. Should be a tracked open question if Marelli attribution on
+  Dan's manuscripts is genuinely v0.6.0+ scope. The decision is whether `anchor.py` ships in v0.6.0 alongside the
+  Anthropic-Messages endpoint, in a later Phase 2b deliverable, or remains seeded indefinitely until a concrete
+  attribution use case lands. _(audit log / Marelli surface; v0.6.0+ scope.)_
+- **R5-07. Bug-sweep medium-severity backlog disposition.** ~20 medium-severity findings across the four bug-sweep
+  reports under [`docs/bug-sweeps/`](../bug-sweeps/) were deferred to v0.5.1. No triage spec yet; risks indefinite
+  deferral the way R3-20 has drifted. Concrete action: open a triage spec that buckets the 20 findings into
+  fix-in-v0.5.1 / defer-to-v0.6.0 / close-as-wontfix with explicit per-item rationale, before v0.5.1 work begins.
+  _(bug-sweep follow-up; v0.5.1 scope.)_
+- **R5-08. pytest integration suite gating discipline.** PR #84 codified the hermetic-pytest-before-merge rule but the
+  integration-suite (`tests/`) gating — required when a PR touches `src/linus/server.py`, `src/linus/agents/`,
+  `src/linus/knowledge/`, `src/linus/memory/`, or `src/linus/sandbox/` per CLAUDE.md — is not visibly enforced by any
+  tool; it relies on Maestro discipline. Worth a `.github/CODEOWNERS`-adjacent or CI-side automation pass post-reveal so
+  the integration gate is mechanical rather than human-memory-dependent. _(CI / merge-gate automation; post-reveal.)_
 
 ---
 
