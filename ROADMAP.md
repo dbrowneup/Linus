@@ -51,7 +51,15 @@ satisfied.
   `experiments/first-loop-review.md`. Sandbox helpers subsequently hand-written by Maestro (PR #50).
 - **1f — minGRU MLX-port spike:** not yet run (Dan-driven, ~1 day feasibility pass; v2 plan C3).
 - **ADR landings since 2026-05-10:** DEC-0055 (filename discipline) via PR #31; DEC-0056 / DEC-0057 / DEC-0058
-  (Anthropic-compat, AGPL-fork posture, x402 graduation) via PR #36.
+  (Anthropic-compat, AGPL-fork posture, x402 graduation) via PR #36; DEC-0059 (output rigor / grounding gate)
+  via PR #94 with the entity-backend amendment via PR #104; DEC-0060 (loud degradation, `/healthz`
+  `effective_state` + `degradations[]`) via PR #93; DEC-0061 (network-policy framework) via PR #109.
+
+**Gate retrospective:** Phase 1's Phase-1b gate-decision framing has been retired in practice. Linus shipped Phase 2
+with Ollama+qwen3:8b as the default Worker engine (`LINUS_DEFAULT_MODEL` in `src/linus/server.py`) without waiting on
+the pmetal verdict. pmetal v0.5.0 binaries rebuilt 2026-05-19 (Metal Toolchain quirk resolved); the comparative
+benchmark + verdict ADR remain open as Phase 6 substrate questions, not Phase 2 blockers. lm-eval harness deferred to
+a Phase 6 prerequisite.
 
 **Goal:** know what each repo is, know how our worker models perform on real tasks, and have the first Maestro/Worker
 loop on record.
@@ -156,11 +164,10 @@ and private benchmarks, (c) the Maestro/Worker pattern works end-to-end on a rea
 **Goal:** a minimal but real Linus orchestration backend + a chat UI, grounded in KnowledgeBase, demo-able to a peer in
 under 5 minutes.
 
-**Status snapshot (2026-05-19, v0.5.0 reveal-prep arc):**
+**Status snapshot (2026-05-21, v0.5.0 reveal-prep complete):**
 
-Phase 2 MVP shipped 2026-05-19 (PRs #66–#82, v0.4.0 release tag). The v0.5.0 reveal-prep arc through 2026-05-25 adds
-paper-qa Phase 2c integration, a grounding gate, loud-degradation health checks, reveal-ready READMEs, and pmetal
-v0.5.0 binaries. Hermetic test suite at **413 tests** (~2.5s), zero regressions.
+Phase 2 MVP shipped 2026-05-19 as v0.4.0 (PRs #66–#82); the v0.5.0 reveal-prep arc closed 2026-05-21 with PRs
+#83–#118. Hermetic test suite at **695 tests** (~7s), zero regressions.
 
 - **2a Orchestration backend:** shipped — FastAPI server at `src/linus/server.py` with OpenAI-compatible
   `/v1/chat/completions` (PRs #32 + #40), streaming SSE (PR #72), Anthropic `/v1/messages` per DEC-0056 (PR #73),
@@ -176,18 +183,33 @@ v0.5.0 binaries. Hermetic test suite at **413 tests** (~2.5s), zero regressions.
   `paperqa.answer`, `paperqa.reset`) (PR #89). KB submodule pin bumped 2026-05-19 to incorporate the AGPL-honest
   README rewrite (PR #90 + KB PR #1).
 - **2e Output rigor (NEW for v0.5.0 reveal):** shipped — grounding gate at `src/linus/knowledge/rigor.py` with
-  citation grounding, entity grounding (`BuiltinEntityLookup` stub for v0.5.0), and confidence-calibration
-  cross-check via the audit log (PR #94, DEC-0059). Time-series-aware and Archimedes-style quant-overfitting
-  extensions documented as post-reveal additive plug-ins.
+  citation grounding, entity grounding, and confidence-calibration cross-check via the audit log (PR #94,
+  DEC-0059). Entity backend graduated from stub to KB-derived `KBEntityLookup` + `ChainedEntityLookup` (PR #103,
+  DEC-0059 amendment); rigor gate auto-runs inside `paperqa.answer` (PR #102); `entity_ncbi.lookup` joins the
+  chain as an `online_optional` first option (PR #113, DEC-0061). Time-series-aware and Archimedes-style
+  quant-overfitting extensions documented as post-reveal additive plug-ins.
 - **2h Memory pillar v0:** shipped — Layer C SQLite substrate, content hashes, audit log (PR #35). Coverage push
   2026-05-19 brought `memory/episodic.py` (PR #86), `memory/audit_log.py` (PR #88), and `memory/sessions.py` to
   ≥96% hermetic coverage. The 2h.5/6/7 dispatch-layer prefix loader + router primitive plumbing + Worker registry
   remain deferred behind the D3 hook-taxonomy ADR (Phase 3 work).
 - **Tool registry + KB tools:** shipped (PR #40). Tool registry coverage hit 100% in PR #87.
-- **Sandbox:** shipped — `SandboxFS` at `src/linus/sandbox/fs.py` (PR #50) — coverage hit 100% in PR #85.
+- **Sandbox:** shipped — `SandboxFS` at `src/linus/sandbox/fs.py` (PR #50) — coverage hit 100% in PR #85; C-level
+  TOCTOU + symlink-escape race fixed (PR #110).
+- **Network policy (DEC-0061, NEW for v0.5.0):** shipped — per-tool `network_policy` field on `ToolSpec`,
+  `network_egress[]` on audit log, `/healthz` reachability for `online_*` tools (PR #109). First instance
+  `entity_ncbi.lookup` for NCBI Gene + UniProt + ChEBI lookup as the production reference backend behind
+  DEC-0059's entity grounding (PR #113). Local-primary stance preserved; nothing depends on network.
+- **2k Server tool-invoke route + coverage hardening:** `POST /v1/tools/{name}/invoke` direct-invoke route (PR #98)
+  plus hermetic coverage push to 99–100% on sandbox/fs, memory/episodic, memory/audit_log, memory/sessions,
+  tools/registry, tools/kb_tools, knowledge/adapter, server.py (PRs #85–#88, #96–#99). Race-condition + TOCTOU
+  fixes shipped via the bug-sweep dispatch (PRs #105–#116, 4 sweeps + 7 fix PRs).
 - **Deferred to post-reveal:** 2f KB dual substrate (RDF + property graph), 2i ARC-AGI memory diagnostic, 2j Worker
   non-conformance constraints. Q2 signed-audit-slice (`anchor.py`) seeded for post-reveal authorship per the
   Archimedes cross-pollination eval.
+- **v0.6.0 seeded:** KB hardcoded-paths fix (`docs/specs/2026-05-21-kb-hardcoded-paths-fix.md`, PR #117),
+  env-architecture-layered Option C (`docs/specs/2026-05-21-env-architecture-layered.md`, PR #118),
+  `entity_ncbi` promotion to error-severity (depends on real reference backend coverage), v0.5.0 bug-sweep
+  mediums (~20 across the four sweeps in `docs/bug-sweeps/`).
 
 **2a — Orchestration backend (first implementation) at `src/linus/`:**
 
@@ -294,6 +316,11 @@ without Linus's RAG on the Dan task suite.
 **Goal:** Linus becomes meaningfully smarter on Dan's work, and the Maestro/Worker pattern extends to parallel
 multi-agent fan-out.
 
+**Phase 2 absorbed the minimum agent-spawner v0** (`src/linus/agents/spawner.py`, PR #67), exercised by the MVP suite
+and hardened with a broad-except safety net in PR #115. Phase 3 builds on top: Role as first-class type (DEC-0050),
+AgentReport typed messages (DEC-0051), Layer D investigation memory (DEC-0052), and parallel-write coordination of
+episodic-store writes. The 3b deliverable below is now the v1 of an in-tree spawner, not a greenfield build.
+
 **Branching model graduation:** Phase 3 is the gate for adopting full Driessen gitflow (see BRANCHING.md). At the start
 of Phase 3:
 
@@ -355,6 +382,9 @@ multi-subtask jobs in parallel with observable speedup.
 **Goal:** Linus's knowledge scope extends beyond the personal library to curated external corpora, all stored locally
 and accessible completely offline. Phase 4 makes explicit what has always been implicit: Linus must operate without
 network access, with every data source under Dan's physical control.
+
+**Reframed by DEC-0061:** Linus's core path is already network-independent (Ollama + KB + sandbox). Phase 4 is now
+about expanding the physically-controlled corpus (Wikipedia, Khan Academy, OSM), not enforcing offline operation.
 
 **Core:**
 
@@ -426,6 +456,10 @@ local source — with no network required.
 
 - Carbon atom logo in SVG, used in Streamlit header and README
 - One option first; iterate if desired
+
+**5e — Streamlit UI is the de facto v0.5.0 user surface** (landing + 7 pages, PRs #74–#80, #92). Phase 5 decisions on
+openclaw vs. native vs. continued-Streamlit-expansion are now empirically informed by reveal feedback rather than
+chosen in advance.
 
 **Gate to Phase 6:** Dan can chat with Linus from three surfaces (VS Code, openclaw desktop, terminal) without friction.
 
@@ -580,6 +614,9 @@ tasks, Phase 8b transition planning begins. Timeline: entirely driven by model q
   Phase 6e TTT spike result.
 - **Layer A active management** via Coconut-style or minGRU-style substrate (DEC-0042, DEC-0038): Phase 6+ pending spike
   outcomes; Phase 8 if spikes don't graduate.
+- **Signed-audit-slice** (seeded ADR, post-reveal Q2): ed25519-keypair-based exportable signed slice of audit +
+  episodic records for Marelli attribution discipline when Linus output enters Dan's manuscript submissions;
+  forward-compatible with future Merkle-root external anchoring.
 
 ---
 
