@@ -390,8 +390,8 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
   Anthropic-compatible endpoints; Kimi-K2 deploys with both; Goose ships full ACP. **CLOSED 2026-05-16 via PR #36**
   (DEC-0056): Phase 2a orchestration HTTP layer exposes both an OpenAI-compatible surface (`/v1/chat/completions` +
   Responses) and an Anthropic-compatible surface (`/v1/messages` + `/v1/anthropic/...`), sharing routing/dispatch/audit
-  underneath. Amends DEC-0005. The Phase 2a FastAPI bootstrap (PR #32) lands the OpenAI side; the Anthropic side is the
-  next Phase 2a deliverable.
+  underneath. Amends DEC-0005. The Phase 2a FastAPI bootstrap (PR #32) lands the OpenAI side; the Anthropic-compat
+  surface shipped 2026-05-19 — `/v1/messages` is live in `src/linus/server.py` alongside `/v1/chat/completions`.
 - **A `@x402/mcp` graduation ADR (Phase 7+ / Phase 8).** **CLOSED 2026-05-16 via PR #36** (DEC-0058): Watch → Spike →
   Integrate pathway with concrete triggers documented; x402-mcp remains Watch today, graduates to Spike when a Linus
   commercial-surface decision forces the question.
@@ -407,8 +407,9 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
 
 - **Phase 2a FastAPI orchestration backend.** **CLOSED 2026-05-16 via PR #32** — `src/linus/server.py` ships an
   OpenAI-compatible `/v1/chat/completions` endpoint backed by Ollama, with a `linus-serve` console script entry point in
-  `pyproject.toml` and a smoke test in `src/linus/tests/`. The Anthropic-compat surface (DEC-0056) is the immediate
-  follow-on.
+  `pyproject.toml` and a smoke test in `src/linus/tests/`. The Anthropic-compat surface (DEC-0056) **CLOSED 2026-05-19**
+  — `/v1/messages` is live in `src/linus/server.py` alongside `/v1/chat/completions`, sharing the same internal
+  dispatch and audit underneath.
 - **Phase 1d Dan task suite v0.** **CLOSED 2026-05-16 via PR #33** — three-task baseline in `benchmarks/dan_tasks/` with
   first run against `qwen2.5-coder:7b` (qwen3:8b not yet pulled). Concrete results: `paper-summarization` full-credit on
   MemGPT (10.5s); `fasta-gc-content` partial (19.2s, includes `N` in denominator — rubric says exclude);
@@ -416,8 +417,9 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
   1c Worker-selection methodology now has its first empirical anchor.
 - **Phase 2c KnowledgeBase read-only adapter.** **CLOSED 2026-05-16 via PR #34** — `src/linus/knowledge/adapter.py`
   opens `modules/KnowledgeBase/data/metadata.db` via `file:?mode=ro`, with keyword search and SHA-256-keyed lookup; 17
-  unit tests + 3 integration tests against the real submodule DB (skip cleanly when absent). First DEC-0044 paper-qa
-  integration is the next step.
+  unit tests + 3 integration tests against the real submodule DB (skip cleanly when absent). DEC-0044 paper-qa
+  integration **CLOSED 2026-05-21** — paper-qa is now integrated as `src/linus/knowledge/paperqa.py` exposing four Linus
+  tools (`paperqa.search`, `paperqa.gather_evidence`, `paperqa.answer`, `paperqa.reset`).
 - **Phase 2h memory v0.** **CLOSED 2026-05-16 via PR #35** — SQLite episodic store + JSONL audit log + content-hashing
   in `src/linus/memory/`; SHA-256 algorithm (Keccak deferred per `_resolve_algorithm`); `DispatchEvent` validates
   `memory_mode` and `cot_budget` at construction per DEC-0031, also recording cap-override audit-noise per DEC-0032. 35
@@ -426,6 +428,15 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
   the SWARM paper (arxiv 2604.19752), and the newly added `earendil-works/pi` repo (agent harness, added 2026-05-16).
   When those land they fold into safety-alignment-privacy (caveman safety patterns) and skills-and-practices (symphony +
   swarm + pi harness primitives) syntheses; this landscape will refresh again.
+
+**Quality + safety surface (2026-05-19+).** Three ADRs landed alongside the MVP wave that shape what Linus is rather
+than what it can do. DEC-0059 (grounding gate) introduces `src/linus/knowledge/rigor.py` and auto-gates paperqa answers
+through it — answers without sufficient grounded citations are refused at the tool boundary rather than emitted with a
+hedge. DEC-0060 (loud degradation) turns `/healthz` from a green/red signal into a structured `effective_state` plus
+`degradations[]` array, so a degraded-but-running Linus declares its degradations rather than masking them. DEC-0061
+(network policy) makes every tool's network egress explicit via a `network_policy` field (`offline` / `online_optional`
+/ `online_required`), with `entity_ncbi.lookup` as the first `online_optional` instance — hermetic tests stay
+network-free and every external call is captured in the audit log.
 
 ---
 

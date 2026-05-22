@@ -407,10 +407,10 @@ gate for any classify-N-into-K task. Each becomes a real prior for spawner-stage
 
 **First Phase 2a orchestration runtime (2026-05-16, PR #32).** `src/linus/server.py` now ships an OpenAI-compatible
 FastAPI bootstrap with an Ollama backend — the Worker-dispatch surface this synthesis has been writing against now
-exists in code. The Anthropic-compat surface per DEC-0056 is the immediate next deliverable; combined the two endpoint
-families share the same internal `LinusRequest`/`LinusResponse` pair and the same Worker dispatch beneath, so the Phase
-3 spawner work (DEC-0050 Role, DEC-0051 AgentReport, DEC-0052 investigation memory) builds on a runtime that is no
-longer hypothetical.
+exists in code. The Anthropic-compat surface per DEC-0056 shipped 2026-05-19; `/v1/messages` is live in
+`src/linus/server.py` alongside `/v1/chat/completions`. Both endpoint families share the same internal
+`LinusRequest`/`LinusResponse` pair and the same Worker dispatch beneath, so the Phase 3 spawner work (DEC-0050 Role,
+DEC-0051 AgentReport, DEC-0052 investigation memory) builds on a runtime that is no longer hypothetical.
 
 ---
 

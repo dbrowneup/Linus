@@ -89,7 +89,8 @@ and therefore the largest supply chain risk:
   changes across its ML stack.
 
 - **streamlit**: Moderate tree, widely used, but it includes a bundled web server and pulls in tornado, protobuf, and
-  other components. Phase 2 target, so same concern as langchain — installed before it's active.
+  other components. Now the production landing UI at `src/linus/app/main.py` — supply-chain surface is active, not
+  hypothetical; pin and audit accordingly.
 
 - **mlx-lm**: Smaller tree than the above, but directly interfaces with the inference stack. A compromised mlx-lm that
   exfiltrated model weights or modified outputs would be nearly invisible.
@@ -131,8 +132,9 @@ with a documented CVE response protocol. The implementation checklist:
 **Immediate: audit the existing install.** Run `pip-audit` against the current linus environment. Fix any HIGH or
 CRITICAL findings before continuing Phase 1 work. Estimated effort: 30 minutes including triage.
 
-**Remove Phase 3+ dependencies from `environment.yml`.** Delete `langchain`, `langgraph`, `streamlit`, and `lm-eval`
-from the file. These will be re-added when their phases begin. Reduces supply chain surface immediately.
+**Remove Phase 3+ dependencies from `environment.yml`.** Delete `langchain`, `langgraph`, and `lm-eval` from the file.
+These will be re-added when their phases begin. Reduces supply chain surface immediately. (Streamlit stays — it's now
+the production landing UI at `src/linus/app/main.py`.)
 
 **Generate and commit a pip lock file with hashes.** Install `pip-tools`, run `pip-compile --generate-hashes` against a
 `requirements.in` derived from the pip section of `environment.yml`. Commit the resulting `requirements-locked.txt`.
@@ -334,8 +336,9 @@ to match Linus's roadmap.
 3. **Run `pip-audit` on the current linus env.** `pip install pip-audit && pip-audit`. Fix any HIGH or CRITICAL
    findings. Estimated effort: 30 minutes including triage.
 
-4. **Remove Phase 3+ dependencies from `environment.yml`.** Delete `langchain`, `langgraph`, `streamlit`, and `lm-eval`.
-   Reduces supply chain surface immediately. Estimated effort: 10 minutes.
+4. **Remove Phase 3+ dependencies from `environment.yml`.** Delete `langchain`, `langgraph`, and `lm-eval`. Reduces
+   supply chain surface immediately. Estimated effort: 10 minutes. (Streamlit stays — it's the production landing UI at
+   `src/linus/app/main.py`.)
 
 5. **Generate and commit a pip lock file with hashes** per DEC-0024. Install `pip-tools`, run
    `pip-compile --generate-hashes`, commit `requirements-locked.txt`. Estimated effort: 1 hour.
@@ -475,8 +478,11 @@ which is a different kind of risk. Keep it, but pin to a specific version with h
 `mlx-lm` is the primary inference runtime. Its supply chain risk is real but its functionality is not easily
 reimplemented. Keep it; pin it; watch it closely.
 
-`streamlit` is a convenience chat UI for Phase 2. Worth asking whether a simpler static HTML frontend or a direct
-integration with an existing UI (LM Studio, openclaw in Phase 5) serves the need without the dependency.
+`streamlit` is now the Linus landing UI, shipped as `src/linus/app/main.py`. Its supply-chain surface is active, not
+hypothetical — keep it, pin it with hashes, and audit it on the same monthly cadence as the other ML/web deps. The open
+question on this surface is no longer "do we need it?" but the auth model: an unauthenticated Streamlit app bound to
+`127.0.0.1` is fine for local-only Dan, but any future LAN or remote-access posture requires explicit auth (DEC-0061's
+network-policy framework names exposure as a design-time review item).
 
 **Low-risk:**
 
