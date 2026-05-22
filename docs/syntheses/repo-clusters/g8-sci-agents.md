@@ -132,8 +132,9 @@ Phase 2c KnowledgeBase retrieval-and-synthesis engine in an "adopt + extend" pat
 corpus-of-record; paper-qa's `Docs` runtime sits above the RDF + property-graph substrate. The 5-paper smoke-test gate
 is the phasing primitive: `pip install paper-qa[local]`, point `llm`/`summary_llm` at `ollama/qwen2.5:14b` via LiteLLM,
 set `embedding="st-multi-qa-MiniLM-L6-cos-v1"` (Apple-Silicon-friendly, no API key), index a 10-paper sample from
-`context/papers/`, run `pqa ask` against a known biochem question, log tok/s and answer quality. If acceptable, expose
-as a Linus tool in Phase 2c. There is a hardware floor to name explicitly: paper-qa's README warns that 7B local models
+`context/papers/`, run `pqa ask` against a known biochem question, log tok/s and answer quality. Now shipped as
+`src/linus/knowledge/paperqa.py` exposing four Linus tools (`paperqa.search`, `paperqa.gather_evidence`,
+`paperqa.answer`, `paperqa.reset`). There is a hardware floor to name explicitly: paper-qa's README warns that 7B local models
 perform poorly because the agent must follow many nested instructions. On the M1 Max, Qwen2.5-14B-Instruct is the
 minimum credible model for `GatherEvidence` re-ranking; the published "superhuman" benchmark numbers require
 `gpt-4o-2024-11-20` and a configured Crossref/Semantic Scholar pipeline and are not the target. The right metric is
@@ -276,11 +277,12 @@ endpoint on LitQA2 + SeqQA (closed-form, fast, deterministic) and add the result
 the first real biology-benchmark number in the Dan-task-suite and costs a few hours.
 
 **Phase 2 — Linus MVP.** The KB substrate decision is resolved: DEC-0044 adopts paper-qa as the Phase 2c
-retrieval-and-synthesis engine (adopt + extend, KnowledgeBase as corpus-of-record). The 5-paper smoke-test gate is the
-next concrete action; its result determines the configuration tuning path but not the adoption question itself.
-`fhaviary` ships transitively with paper-qa; `ldp` is explicitly NOT pulled in until a Phase 6 fine-tuning spike
-validates the benefit. Adopt aviary's `Tool.from_function` pattern for the Linus tool registry in Phase 2a — it is
-available as a transitive install the moment paper-qa lands and requires no additional dependency decision.
+retrieval-and-synthesis engine (adopt + extend, KnowledgeBase as corpus-of-record). Landed: see
+`src/linus/knowledge/paperqa.py`, which exposes four Linus tools (`paperqa.search`, `paperqa.gather_evidence`,
+`paperqa.answer`, `paperqa.reset`). `fhaviary` ships transitively with paper-qa; `ldp` is explicitly NOT pulled in until
+a Phase 6 fine-tuning spike validates the benefit. Adopt aviary's `Tool.from_function` pattern for the Linus tool
+registry in Phase 2a — it is available as a transitive install the moment paper-qa lands and requires no additional
+dependency decision.
 
 **Phase 3 — Knowledge and Parallel Agents.** Port the `choix`-based Bradley-Terry pairwise ranker into a Linus utility
 for candidate selection. Adopt the `Prompts.validate_all_prompts` convention when the prompt registry forms. Implement
@@ -313,7 +315,7 @@ env needs.
 _Resolved (DEC-0044, `docs/specs/kb/paper-qa-substrate-integration.md`): paper-qa adopted as the Phase 2c
 retrieval-and-synthesis engine in an "adopt + extend" pattern (option 1). KnowledgeBase remains the corpus-of-record;
 paper-qa sits above the RDF + property-graph substrate. The 5-paper smoke-test gate is the phasing primitive for the
-integration._
+integration. Shipped 2026-05-21 as `linus.knowledge.paperqa`._
 
 **Biology RLVR verifier candidates.** ether0's chemistry recipe generalizes if the oracle side generalizes. The
 candidate verifiers above (BLAST, ESMFold pLDDT, ClinVar, eQTL direction-of-effect) are based on what's publicly

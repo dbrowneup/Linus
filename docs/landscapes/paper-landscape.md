@@ -3,7 +3,7 @@
 > **Status: DEPRECATED 2026-05-04.** This document was retired during the post-fan-out integration pass that
 > produced the 13 thematic syntheses in [`docs/syntheses/`](../syntheses/) and the 10 cluster syntheses in
 > [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/). Its narrative content has been absorbed into
-> those syntheses; its navigation function moved to [`docs/papers/INDEX.md`](../papers/INDEX.md).
+> those syntheses; its navigation function moved to [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md).
 
 ## Where the content went
 
