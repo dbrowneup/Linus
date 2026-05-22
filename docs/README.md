@@ -1,12 +1,14 @@
 # docs/
 
 Long-form writing for Linus: decision records, study notes on the cloned-repo and paper corpus, syntheses that roll
-those notes up by theme, landscapes that integrate everything, open-question logs, planning specs, and the
-Maestro/Worker protocol. Source code lives under `src/`; this tree is where reasoning is captured.
+those notes up by theme, landscapes that integrate everything, open-question logs, planning specs, bug-sweep reports,
+dated audits, session summaries, and operating protocols. Source code lives under `src/`; this tree is where reasoning
+is captured.
 
 The intended reading order for a newcomer is roughly: top-level [CLAUDE.md](../CLAUDE.md) and [VISION.md](../VISION.md)
 first, then [landscapes/total-landscape.md](landscapes/total-landscape.md) for the integrated picture, then dive into
-whichever subtree matches the current task.
+whichever subtree matches the current task. Each externally-facing subdirectory carries a `README.md` describing its
+purpose and contents; this top-level `README.md` is the entry point.
 
 ## Top-level files
 
@@ -21,8 +23,10 @@ whichever subtree matches the current task.
 
 One markdown file per decision, numbered `NNNN-<slug>.md` and matching the `DEC-NNNN` ids indexed in the repo-root
 [DECISIONS.md](../DECISIONS.md). Each ADR captures context, the decision, and consequences for a single architectural
-choice (project name, orchestration backend as the product, KnowledgeBase as a submodule, OpenAI-compatible protocol,
-pmetal evaluation, branching model, MCP as the extensibility substrate, and so on). Currently 44 entries.
+choice (project name, orchestration backend as the product, KnowledgeBase as a submodule, OpenAI- and
+Anthropic-compatible protocol, pmetal evaluation, branching model, MCP as the extensibility substrate, grounding gate,
+network-policy framework, and so on). Currently 62 entries (DEC-0061 latest); see [`adr/README.md`](adr/README.md) for
+the full table.
 
 ### `landscapes/` — Integrated maps
 
@@ -74,10 +78,11 @@ when execution surfaces gaps.
 
 ### `syntheses/` — Cross-cutting roll-ups by theme
 
-Theme-level digests built by reading across many repo-notes and paper-notes at once. The flat files here are
-topic-oriented (agentic systems, biological foundation models, function annotation, generative biology, infra
-foundations, LLM wikis, LLMs in science, memory, native low-bit Apple Silicon, safety/alignment/privacy, security,
-skills/practices, humans-and-teams). The nested [`repo-clusters/`](syntheses/repo-clusters/) directory holds the G1–G10
-group syntheses produced during the 2026-05-04 fan-out — each `gN-<slug>.md` covers one cluster of related repos
-(Apple-Silicon, wiki engines, wiki patterns, memory, graph tools, MCP tools, harnesses, scientific agents, biology,
-finance).
+Theme-level digests built by reading across many repo-notes and paper-notes at once. 15 flat thematic files cover
+agentic systems, biological foundation models, entrepreneurship, function annotation, generative biology, humans-and-
+teams, infra foundations, LLM hardware design, LLM wikis, LLMs in science, memory, native low-bit Apple Silicon,
+safety/alignment/privacy, security, and skills/practices. The nested [`repo-clusters/`](syntheses/repo-clusters/)
+directory holds the G1–G12 group syntheses produced during the 2026-05-04 fan-out — each `gN-<slug>.md` covers one
+cluster of related repos (Apple-Silicon, wiki engines, wiki patterns, memory, graph tools, MCP tools, harnesses,
+scientific agents, biology, finance, agent frameworks, LLM hardware design). See
+[`syntheses/README.md`](syntheses/README.md) for the convention.
