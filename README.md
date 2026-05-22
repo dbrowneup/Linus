@@ -5,7 +5,7 @@ scientific and software work, fully under your control. Named after Linus Paulin
 
 **Status:** v0.5.0 public reveal — 2026-05-25 (Agora hackathon). **Linked projects:** debuting alongside
 [KnowledgeBase](https://github.com/dbrowneup/KnowledgeBase) (paper corpus + RAG + KG pipeline; the data substrate) and
-Archimedes (q-fin strategy engine; the entrepreneurial sibling — link TBD).
+[Archimedes](https://github.com/hackagora/archimedes-arcadia) (q-fin strategy engine; the entrepreneurial sibling).
 
 > _Logo placeholder: a carbon atom — sp³ orbitals, the substrate of biochemistry. Asset to land before reveal._
 
@@ -55,7 +55,7 @@ diagram and component-by-component breakdown.
   episodic (SQLite + content hashes + git), investigation memory, and semantic knowledge (KnowledgeBase).
 - **Sandbox** — path-validating `SandboxFS` enforcing the SAFETY.md Tier 0/1 contract on every filesystem and shell
   call.
-- **Hermetic test suite** — 341 tests, ~6s, runs without any external service.
+- **Hermetic test suite** — 695 tests, ~7s, runs without any external service.
 
 ## Hardware and setup
 

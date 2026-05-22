@@ -9,10 +9,10 @@ atom. Linus is a force that harnesses human knowledge for good in the world.
 
 ## Owner Background
 
-- Daniel R. Browne, 37 (GitHub: dbrowneup, email: dbrowne.up@gmail.com). Hawthorn Woods, IL.
-- **Current role**: Senior Scientist at LanzaTech (Skokie, IL) since Apr 2026 — maintains enterprise LLM infra +
-  leads metagenomics bioinformatics SW. Promoted from Computational Biologist (Jun 2023). Prior: PacBio
-  (2019–2023, Product Owner Bioinformatics + Field Applications Scientist).
+- Daniel R. Browne (GitHub: dbrowneup, email: dbrowne.up@gmail.com).
+- **Current role**: Senior Scientist in industrial biotech — maintains enterprise LLM infrastructure +
+  leads metagenomics bioinformatics software. Prior: long-read sequencing industry (Product Owner
+  Bioinformatics + Field Applications Scientist).
 - **Education**: PhD Biochemistry, Texas A&M (2018, + Entrepreneurship cert). Thesis on _Botryococcus braunii_
   metabolism. BS Environmental Science + Chemistry minor, U. Portland (2011).
 - **Domain specialty**: genomics + computational biology — long-read sequencing (PacBio HiFi), genome/transcriptome
