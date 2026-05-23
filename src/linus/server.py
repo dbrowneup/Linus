@@ -1333,7 +1333,7 @@ def root() -> dict[str, Any]:
         "version": app.version,
         "docs": "/docs",
         "endpoints": {
-            "health": "GET /healthz",
+            "health": "GET /healthz (alias: GET /health)",
             "openai_chat_completions": "POST /v1/chat/completions",
             "anthropic_messages": "POST /v1/messages",
             "tool_invoke": "POST /v1/tools/{tool_name}/invoke",
@@ -1344,8 +1344,14 @@ def root() -> dict[str, Any]:
 
 
 @app.get("/healthz")
+@app.get("/health")
 def healthz() -> dict[str, Any]:
     """Lightweight liveness probe with degradation reporting.
+
+    Served at both ``/healthz`` (K8s-style) and ``/health`` (alternate
+    convention used by some probing clients, including Archimedes). The
+    two routes return byte-identical responses; both are listed in the
+    OpenAPI schema so either name discovers the endpoint.
 
     Returns the locally-available model list and registered tool names
     (pre-existing keys; backwards-compat preserved) AND two new fields:

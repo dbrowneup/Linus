@@ -112,6 +112,39 @@ def test_healthz_backwards_compat_keys_preserved(client: TestClient, healthy_env
     assert "degradations" in body
 
 
+# ── /health alias (K8s-style /healthz + alt-convention /health) ──────────
+
+
+def test_health_alias_returns_same_payload_as_healthz(client: TestClient, healthy_env: Path) -> None:
+    """``/health`` is a route alias for ``/healthz`` and returns byte-identical content.
+
+    K8s convention varies — some probing clients hit ``/health``, some
+    ``/healthz``. The server registers both decorators on the same handler
+    so either path discovers the endpoint.
+    """
+    healthz_resp = client.get("/healthz")
+    health_resp = client.get("/health")
+
+    assert healthz_resp.status_code == 200
+    assert health_resp.status_code == 200
+    assert healthz_resp.status_code == health_resp.status_code
+    # Payloads are produced by the same function under the same env, so
+    # they must agree key-for-key.
+    assert healthz_resp.json() == health_resp.json()
+
+
+def test_health_alias_is_listed_in_openapi(client: TestClient) -> None:
+    """Both ``/healthz`` and ``/health`` appear in the OpenAPI schema.
+
+    The aliasing must be discoverable via ``/docs`` / ``/openapi.json``;
+    hiding the alternate route would defeat the point of belt-and-suspenders.
+    """
+    schema = client.get("/openapi.json").json()
+    paths = schema.get("paths", {})
+    assert "/healthz" in paths
+    assert "/health" in paths
+
+
 # ── worker_model degradation ─────────────────────────────────────────────
 
 
