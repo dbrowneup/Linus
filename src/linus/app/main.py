@@ -74,6 +74,12 @@ with health_col:
 with url_col:
     st.code(detail, language="text")
 
+st.caption(
+    f"_Probing `{SERVER_URL}`. Override with `LINUS_SERVER_URL` env var "
+    "(e.g. `LINUS_SERVER_URL=http://localhost:8001`) before launching Streamlit "
+    "— useful when port 8000 is occupied by another service (e.g. Archimedes)._"
+)
+
 if not ok:
     st.info(
         "To start the server, in a separate terminal run:\n"
