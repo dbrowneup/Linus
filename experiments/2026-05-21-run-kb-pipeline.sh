@@ -27,6 +27,7 @@
 # Estimated wall times on M1 Max (rough, from KB README + Dan's prior runs):
 #   - extract:         ~4.5 min full corpus (71 files/sec via PyMuPDF)
 #   - metadata:        ~2 min
+#   - stats:           ~2-5 min (corpus stats + Zipf plots + Mistral-7B token counts)
 #   - vectorize:       ~10-30 min depending on SPECTER2 GPU/CPU split
 #   - cluster:         ~5-15 min (HDBSCAN + BERTopic)
 #   - graph:           ~3-10 min
@@ -89,9 +90,14 @@ fi
 cd "$KB_DIR"
 
 # Phase definitions: name → module
+# Order matches KB README §"Running the Pipeline": extract → metadata → stats → vectorize →
+# cluster → graph → knowledge_graph → summarize. Stats sits between metadata and vectorize
+# because the corpus-stats plots (Zipf, page/word distributions, per-doc token counts) help
+# inform vectorization choices and the Linus Corpus Stats page reads its outputs.
 phases=(
     "extract:papers_analysis.extract"
     "metadata:papers_analysis.metadata"
+    "stats:papers_analysis.stats"
     "vectorize:papers_analysis.vectorize"
     "cluster:papers_analysis.cluster"
     "graph:papers_analysis.graph"
