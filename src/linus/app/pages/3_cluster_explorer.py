@@ -43,6 +43,9 @@ def _load_cluster_data_cached(outputs_dir_str: str, mtime: float):
     return load_cluster_data(Path(outputs_dir_str))
 
 
+CLUSTERS_DIR = KB_OUTPUTS_DIR / "clusters"
+
+
 def _hierarchy_mtime() -> float:
     """Use any one of the cluster files' mtime as the cache key.
 
@@ -51,13 +54,13 @@ def _hierarchy_mtime() -> float:
     the whole batch in one run.
     """
     for name in ("labels_fine.json", "labels_mid.json", "labels_broad.json"):
-        path = KB_OUTPUTS_DIR / name
+        path = CLUSTERS_DIR / name
         if path.exists():
             return path.stat().st_mtime
     return 0.0
 
 
-data = _load_cluster_data_cached(str(KB_OUTPUTS_DIR), _hierarchy_mtime())
+data = _load_cluster_data_cached(str(CLUSTERS_DIR), _hierarchy_mtime())
 
 if data is None:
     st.warning(
@@ -67,7 +70,7 @@ if data is None:
         "cd modules/KnowledgeBase\n"
         "python -m papers_analysis.cluster\n"
         "```\n"
-        f"Expected files under `{KB_OUTPUTS_DIR}/`:\n"
+        f"Expected files under `{CLUSTERS_DIR}/`:\n"
         "- `labels_broad.json`, `labels_mid.json`, `labels_fine.json`\n"
         "- `topics_broad.json`, `topics_mid.json`, `topics_fine.json`\n"
         "- `hierarchy.json`, `umap_3d.npy`, `umap_sha256s.json`"

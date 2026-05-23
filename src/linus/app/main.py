@@ -124,11 +124,15 @@ if ok and health_body is not None:
 st.header("KnowledgeBase artifacts")
 
 artifact_rows: list[tuple[str, str, bool]] = [
-    ("Cluster hierarchy", str(KB_OUTPUTS_DIR / "hierarchy.json"), (KB_OUTPUTS_DIR / "hierarchy.json").exists()),
+    (
+        "Cluster hierarchy",
+        str(KB_OUTPUTS_DIR / "clusters" / "hierarchy.json"),
+        (KB_OUTPUTS_DIR / "clusters" / "hierarchy.json").exists(),
+    ),
     (
         "Broad cluster labels",
-        str(KB_OUTPUTS_DIR / "labels_broad.json"),
-        (KB_OUTPUTS_DIR / "labels_broad.json").exists(),
+        str(KB_OUTPUTS_DIR / "clusters" / "labels_broad.json"),
+        (KB_OUTPUTS_DIR / "clusters" / "labels_broad.json").exists(),
     ),
     (
         "Paper graph (2D)",
