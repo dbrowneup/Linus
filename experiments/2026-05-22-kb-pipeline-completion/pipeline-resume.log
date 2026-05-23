@@ -1,0 +1,109 @@
+==> Skipping extract (resuming from knowledge_graph)
+==> Skipping metadata (resuming from knowledge_graph)
+==> Skipping vectorize (resuming from knowledge_graph)
+==> Skipping cluster (resuming from knowledge_graph)
+==> Skipping graph (resuming from knowledge_graph)
+
+==> Phase: knowledge_graph (2026-05-22 15:06:12)
+Device set to use mps
+/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/spacy/language.py:2195: FutureWarning: Possible set union at position 6328
+  deserializers["tokenizer"] = lambda p: self.tokenizer.from_disk(  # type: ignore[union-attr]
+
+── Knowledge Graph ────────────────────────────────────────────────────
+  9,250 articles with abstracts
+  Loading REBEL (Babelscape/rebel-large) on device=mps …
+  Checkpoint: 775 papers already processed
+  Running REBEL on 8,475 abstracts …
+  … 8/8,475 abstracts  (14 new triples this run)
+  … 168/8,475 abstracts  (320 new triples this run)
+  … 328/8,475 abstracts  (617 new triples this run)
+  … 488/8,475 abstracts  (942 new triples this run)
+  … 648/8,475 abstracts  (1,235 new triples this run)
+  … 808/8,475 abstracts  (1,515 new triples this run)
+  … 968/8,475 abstracts  (1,819 new triples this run)
+  … 1,128/8,475 abstracts  (2,126 new triples this run)
+  … 1,288/8,475 abstracts  (2,421 new triples this run)
+  … 1,448/8,475 abstracts  (2,712 new triples this run)
+  … 1,608/8,475 abstracts  (3,007 new triples this run)
+  … 1,768/8,475 abstracts  (3,307 new triples this run)
+  … 1,928/8,475 abstracts  (3,606 new triples this run)
+  … 2,088/8,475 abstracts  (3,892 new triples this run)
+  … 2,248/8,475 abstracts  (4,187 new triples this run)
+  … 2,408/8,475 abstracts  (4,481 new triples this run)
+  … 2,568/8,475 abstracts  (4,792 new triples this run)
+  … 2,728/8,475 abstracts  (5,093 new triples this run)
+  … 2,888/8,475 abstracts  (5,391 new triples this run)
+  … 3,048/8,475 abstracts  (5,712 new triples this run)
+  … 3,208/8,475 abstracts  (6,007 new triples this run)
+  … 3,368/8,475 abstracts  (6,313 new triples this run)
+  … 3,528/8,475 abstracts  (6,610 new triples this run)
+  … 3,688/8,475 abstracts  (6,923 new triples this run)
+  … 3,848/8,475 abstracts  (7,239 new triples this run)
+  … 4,008/8,475 abstracts  (7,494 new triples this run)
+  … 4,168/8,475 abstracts  (7,805 new triples this run)
+  … 4,328/8,475 abstracts  (8,097 new triples this run)
+  … 4,488/8,475 abstracts  (8,403 new triples this run)
+  … 4,648/8,475 abstracts  (8,701 new triples this run)
+  … 4,808/8,475 abstracts  (8,984 new triples this run)
+  … 4,968/8,475 abstracts  (9,290 new triples this run)
+  … 5,128/8,475 abstracts  (9,583 new triples this run)
+  … 5,288/8,475 abstracts  (9,864 new triples this run)
+  … 5,448/8,475 abstracts  (10,176 new triples this run)
+  … 5,608/8,475 abstracts  (10,478 new triples this run)
+  … 5,768/8,475 abstracts  (10,786 new triples this run)
+  … 5,928/8,475 abstracts  (11,097 new triples this run)
+  … 6,088/8,475 abstracts  (11,401 new triples this run)
+  … 6,248/8,475 abstracts  (11,692 new triples this run)
+  … 6,408/8,475 abstracts  (11,983 new triples this run)
+  … 6,568/8,475 abstracts  (12,279 new triples this run)
+  … 6,728/8,475 abstracts  (12,568 new triples this run)
+  … 6,888/8,475 abstracts  (12,864 new triples this run)
+  … 7,048/8,475 abstracts  (13,176 new triples this run)
+  … 7,208/8,475 abstracts  (13,471 new triples this run)
+  … 7,368/8,475 abstracts  (13,764 new triples this run)
+  … 7,528/8,475 abstracts  (14,070 new triples this run)
+  … 7,688/8,475 abstracts  (14,368 new triples this run)
+  … 7,848/8,475 abstracts  (14,658 new triples this run)
+  … 8,008/8,475 abstracts  (14,951 new triples this run)
+  … 8,168/8,475 abstracts  (15,243 new triples this run)
+  … 8,328/8,475 abstracts  (15,526 new triples this run)
+  REBEL done: 15,804 new triples  (17,263 total)
+  Running NER on 9,250 abstracts (model=en_core_sci_lg) …
+  … 500/9,250 docs  (28,004 entities so far)
+  … 1,000/9,250 docs  (56,291 entities so far)
+  … 1,500/9,250 docs  (84,424 entities so far)
+  … 2,000/9,250 docs  (112,657 entities so far)
+  … 2,500/9,250 docs  (140,647 entities so far)
+  … 3,000/9,250 docs  (169,411 entities so far)
+  … 3,500/9,250 docs  (197,335 entities so far)
+  … 4,000/9,250 docs  (225,609 entities so far)
+  … 4,500/9,250 docs  (254,293 entities so far)
+  … 5,000/9,250 docs  (282,740 entities so far)
+  … 5,500/9,250 docs  (310,339 entities so far)
+  … 6,000/9,250 docs  (338,779 entities so far)
+  … 6,500/9,250 docs  (366,955 entities so far)
+  … 7,000/9,250 docs  (395,337 entities so far)
+  … 7,500/9,250 docs  (423,934 entities so far)
+  … 8,000/9,250 docs  (452,507 entities so far)
+  … 8,500/9,250 docs  (480,667 entities so far)
+  … 9,000/9,250 docs  (508,819 entities so far)
+  NER done: 523,048 new entity mentions  (523,048 total)
+
+  Building NetworkX graph …
+  Nodes: 130,556  {'Paper': 9250, 'Entity': 121306}
+  Edges: 540,311  {'mentions': 523048, 'rebel': 17263}
+
+  GraphML  → /Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/data/outputs/knowledge_graph/kg_graph.graphml  (137,027 KB)
+  Building RDF graph (Turtle) …
+  Turtle   → /Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/data/outputs/knowledge_graph/kg_graph.ttl  (30,015 KB)
+  Meta     → /Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/data/outputs/knowledge_graph/kg_meta.json
+==> Phase knowledge_graph complete in 3378s
+
+==> All phases complete in 3378s total
+==> Outputs at: /Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/data/
+
+Next steps:
+  1. Verify outputs:
+     ls /Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/data/outputs/
+  2. Point Linus at them (default LINUS_KB_OUTPUTS_DIR should already work).
+  3. Restart Linus server + reload Streamlit pages to see populated KB views.
