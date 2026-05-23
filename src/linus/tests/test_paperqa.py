@@ -505,21 +505,118 @@ def test_papers_dir_default_is_under_home() -> None:
         assert _papers_dir() == expected
 
 
-def test_papers_dir_honors_linus_paperqa_dir_env(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_papers_dir_honors_linus_paperqa_dir_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """``LINUS_PAPERQA_DIR`` takes precedence over the default."""
-    monkeypatch.setenv("LINUS_PAPERQA_DIR", "/tmp/papers-explicit")
+    target = tmp_path / "papers-explicit"
+    monkeypatch.setenv("LINUS_PAPERQA_DIR", str(target))
     from linus.knowledge.paperqa import _papers_dir
 
-    assert _papers_dir() == Path("/tmp/papers-explicit")
+    assert _papers_dir() == target
 
 
-def test_papers_dir_falls_back_to_linus_papers_dir(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_papers_dir_falls_back_to_linus_papers_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """``LINUS_PAPERS_DIR`` (the arxiv-ingest shared var) is used if PAPERQA_DIR unset."""
+    target = tmp_path / "papers-shared"
     monkeypatch.delenv("LINUS_PAPERQA_DIR", raising=False)
-    monkeypatch.setenv("LINUS_PAPERS_DIR", "/tmp/papers-shared")
+    monkeypatch.setenv("LINUS_PAPERS_DIR", str(target))
     from linus.knowledge.paperqa import _papers_dir
 
-    assert _papers_dir() == Path("/tmp/papers-shared")
+    assert _papers_dir() == target
+
+
+# ── 2026-05-22 reveal-prep bug 4 — papers-dir auto-create ──────────────────
+
+
+def test_papers_dir_auto_creates_when_missing(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """``_papers_dir()`` materializes the configured path with a README inside.
+
+    Regression test for the 2026-05-22 reveal-prep bug 4: a fresh
+    machine without ``~/.linus/papers`` used to surface as
+    :class:`PaperQAConfigError`. The fix shifts the missing-dir path
+    into the resolver, which auto-creates the directory and drops a
+    README so the user knows what belongs there.
+    """
+    target = tmp_path / "papers-fresh"
+    monkeypatch.setenv("LINUS_PAPERQA_DIR", str(target))
+    from linus.knowledge.paperqa import _papers_dir
+
+    # Pre-condition: the target does not exist.
+    assert not target.exists()
+
+    resolved = _papers_dir()
+    assert resolved == target
+    # Post-condition: the directory is now materialized + README written.
+    assert target.is_dir()
+    readme = target / "README.md"
+    assert readme.is_file()
+    body = readme.read_text(encoding="utf-8")
+    assert "Linus Paper Q&A" in body
+    assert "Drop PDFs here" in body
+
+
+def test_papers_dir_auto_create_is_idempotent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Calling :func:`_papers_dir` twice on a pre-existing directory does not
+    rewrite the README — the user is free to edit it in place without losing
+    their changes on the next page load.
+    """
+    target = tmp_path / "papers-stable"
+    target.mkdir()
+    readme = target / "README.md"
+    readme.write_text("custom content — please do not overwrite\n", encoding="utf-8")
+
+    monkeypatch.setenv("LINUS_PAPERQA_DIR", str(target))
+    from linus.knowledge.paperqa import _papers_dir
+
+    _papers_dir()
+    _papers_dir()
+
+    # The README content should be unchanged after two resolver calls
+    # on an already-existing directory.
+    assert readme.read_text(encoding="utf-8") == "custom content — please do not overwrite\n"
+
+
+def test_ensure_loaded_no_longer_raises_when_default_dir_missing(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """When the resolver auto-creates the dir, ``_ensure_loaded`` succeeds.
+
+    This is the end-to-end shape of the bug-4 fix: a fresh
+    :class:`LinusPaperQA` whose ``papers_dir`` comes from the resolver
+    against a non-existent path no longer fails at the
+    ``_ensure_loaded`` boundary.
+    """
+    _install_fake_paperqa(monkeypatch)
+    target = tmp_path / "papers-autocreated"
+    monkeypatch.setenv("LINUS_PAPERQA_DIR", str(target))
+    reset_singleton()
+
+    # Building via the singleton + resolver should yield a working facade
+    # whose ``_ensure_loaded`` does not raise.
+    facade = get_singleton()
+    facade._ensure_loaded()
+    assert facade.papers_dir == target
+    assert target.is_dir()
+
+
+def test_ensure_loaded_still_rejects_non_directory_path(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A regular file at the configured path still surfaces ``PaperQAConfigError``.
+
+    The auto-create resolver only handles the missing-dir case. If the
+    user pointed ``LINUS_PAPERQA_DIR`` at a regular file (or a symlink to
+    one), the wrapper still rejects it explicitly so the failure is
+    legible instead of crashing inside paper-qa.
+    """
+    _install_fake_paperqa(monkeypatch)
+    bogus = tmp_path / "not-a-directory"
+    bogus.write_text("this is a file, not a dir", encoding="utf-8")
+
+    facade = LinusPaperQA(papers_dir=bogus)
+    import asyncio
+
+    with pytest.raises(PaperQAConfigError, match="not a directory"):
+        asyncio.run(facade.search(query="x", k=3))
 
 
 # ── default-embedding constants ───────────────────────────────────────────

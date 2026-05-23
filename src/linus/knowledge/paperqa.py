@@ -106,24 +106,32 @@ DEFAULT_EMBEDDING_MODEL: str = "ollama/mxbai-embed-large"
 
 
 def _papers_dir() -> Path:
-    """Return the configured paper directory.
+    """Return the configured paper directory, auto-creating it if missing.
 
-    Resolution order:
+    Resolution order (delegated to :func:`linus.app.config.paperqa_dir_path`):
 
     1. ``LINUS_PAPERQA_DIR`` environment variable, if set.
     2. ``LINUS_PAPERS_DIR`` environment variable, if set (shared with
        :mod:`linus.tools.arxiv_ingest`).
     3. Default ``~/.linus/papers/``.
 
-    The directory is NOT created — paper-qa expects the caller to have
-    populated it with PDFs. Missing directory raises
-    :class:`PaperQAConfigError` at tool-invocation time, not at module
-    import.
+    The directory is **auto-created** with a README on first access via
+    :func:`linus.app.config.resolve_paperqa_dir` — this is the durable
+    fix for the 2026-05-22 reveal-prep bug 4 (fresh machines used to
+    surface ``PaperQAConfigError`` because ``~/.linus/papers`` did not
+    exist). A non-directory at the resolved path still surfaces as
+    :class:`PaperQAConfigError` from :meth:`LinusPaperQA._ensure_loaded`.
+
+    The resolver is best-effort: on filesystem failures (permission
+    denied, read-only filesystem) the path is returned unchanged and
+    :meth:`LinusPaperQA._ensure_loaded` will raise
+    :class:`PaperQAConfigError` per the existing contract.
     """
-    raw = os.environ.get("LINUS_PAPERQA_DIR") or os.environ.get("LINUS_PAPERS_DIR")
-    if raw:
-        return Path(raw).expanduser()
-    return Path.home() / ".linus" / "papers"
+    # Local import to keep this module importable in test environments
+    # that don't ship the full app surface.
+    from linus.app.config import resolve_paperqa_dir
+
+    return resolve_paperqa_dir()
 
 
 def _ollama_host() -> str:
@@ -316,10 +324,23 @@ class LinusPaperQA:
         except ImportError as exc:
             raise PaperQAUnavailableError("paper-qa is not installed. Run: pip install 'paper-qa>=5.0'") from exc
 
+        # Missing-dir is no longer a hard error: callers acquire the
+        # papers directory through :func:`_papers_dir` which delegates to
+        # :func:`linus.app.config.resolve_paperqa_dir` and auto-creates
+        # ``~/.linus/papers`` on first access (2026-05-22 reveal-prep
+        # bug 4). Tests construct :class:`LinusPaperQA` with an explicit
+        # ``papers_dir`` though, so still guard against the case where
+        # the caller hands us a path that does not exist or is not a
+        # directory.
         if not self.papers_dir.exists():
             raise PaperQAConfigError(
                 f"paper-qa papers directory does not exist: {self.papers_dir}. "
                 "Create it and add PDFs, or set LINUS_PAPERQA_DIR to an existing directory."
+            )
+        if not self.papers_dir.is_dir():
+            raise PaperQAConfigError(
+                f"paper-qa papers path exists but is not a directory: {self.papers_dir}. "
+                "Set LINUS_PAPERQA_DIR to a directory (a file or symlink-to-file is rejected)."
             )
 
         llm_config = build_ollama_llm_config()
