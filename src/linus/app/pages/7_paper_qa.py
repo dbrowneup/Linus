@@ -54,14 +54,13 @@ Every failure mode is surfaced inline:
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
 import httpx
 import streamlit as st
 
-from linus.app.config import SERVER_URL
+from linus.app.config import SERVER_URL, resolve_paperqa_dir
 
 st.set_page_config(page_title="Paper Q&A — Linus", page_icon="🜨", layout="wide")
 st.title("📚 Paper Q&A")
@@ -76,26 +75,28 @@ st.caption(
 
 
 def _resolve_papers_dir() -> Path:
-    """Mirror :func:`linus.knowledge.paperqa._papers_dir` for display only.
+    """Resolve (and auto-create) the Paper Q&A papers directory.
 
-    Reads ``LINUS_PAPERQA_DIR`` then ``LINUS_PAPERS_DIR``, falling back to
-    ``~/.linus/papers``. This function does NOT import paper-qa or the
-    Linus paper-qa module — it's pure display logic. The actual indexing
-    happens server-side when the tool is invoked.
+    Delegates to :func:`linus.app.config.resolve_paperqa_dir`, which
+    auto-creates ``~/.linus/papers`` with a README on first access
+    (2026-05-22 reveal-prep bug 4). The "dir does not exist" branch in
+    the status renderer below is therefore retained only as a defensive
+    fallback for the case where the auto-create silently failed
+    (permission denied, read-only filesystem) — under normal operation
+    the post-resolve path is always an existing directory.
     """
-    raw = os.environ.get("LINUS_PAPERQA_DIR") or os.environ.get("LINUS_PAPERS_DIR")
-    if raw:
-        return Path(raw).expanduser()
-    return Path.home() / ".linus" / "papers"
+    return resolve_paperqa_dir()
 
 
 def _count_indexable_pdfs(papers_dir: Path) -> int | None:
     """Return the count of ``*.pdf`` files in the paper directory, or ``None``.
 
-    ``None`` signals "directory does not exist" (so the UI can render the
-    "create me" hint instead of a misleading zero). The count is shallow
-    (top-level only) since paper-qa's default ingestion behavior is also
-    flat.
+    ``None`` signals "directory does not exist or is not readable" — a
+    rare path after the auto-create fix, but still surfaced as a
+    distinct UI state so a permission-denied filesystem surfaces a
+    "create the directory" hint instead of a misleading zero. The count
+    is shallow (top-level only) since paper-qa's default ingestion
+    behavior is also flat.
     """
     if not papers_dir.exists() or not papers_dir.is_dir():
         return None
@@ -269,13 +270,27 @@ pdf_count = _count_indexable_pdfs(papers_dir)
 status_cols = st.columns([3, 1])
 with status_cols[0]:
     if pdf_count is None:
+        # Should not happen under normal operation — the auto-create
+        # resolver in :mod:`linus.app.config` materializes the directory
+        # on first access. We still surface this as a hard warning so a
+        # permission-denied filesystem or a malformed LINUS_PAPERQA_DIR
+        # (pointing at a regular file) doesn't fail silently.
         st.warning(
-            f"Paper directory `{papers_dir}` does not exist. "
-            "Create it and drop PDFs in, or set `LINUS_PAPERQA_DIR` "
-            "to an existing directory."
+            f"Paper directory `{papers_dir}` is unavailable. "
+            "Linus tried to auto-create it but the filesystem refused. "
+            "Check permissions or set `LINUS_PAPERQA_DIR` to a writable "
+            "directory."
         )
     elif pdf_count == 0:
-        st.warning(f"Paper directory `{papers_dir}` is empty — no PDFs to query. Drop some PDFs in and rerun.")
+        # The empty-dir case is the new-machine baseline now — the
+        # auto-create resolver dropped a README in there but no PDFs
+        # yet. Render it as gentle info, not a warning: the user just
+        # needs the on-ramp, not an alert.
+        st.info(
+            f"No PDFs indexed yet — drop some in `{papers_dir}` and click **Ask** "
+            "to get started. The directory was auto-created on first launch; "
+            "see the `README.md` inside for the workflow."
+        )
     else:
         st.info(f"Paper directory: `{papers_dir}` — **{pdf_count}** PDF{'s' if pdf_count != 1 else ''} on disk.")
 with status_cols[1]:
