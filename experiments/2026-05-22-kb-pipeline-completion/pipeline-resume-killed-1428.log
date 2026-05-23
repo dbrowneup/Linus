@@ -1,0 +1,64 @@
+==> Skipping extract (resuming from knowledge_graph)
+==> Skipping metadata (resuming from knowledge_graph)
+==> Skipping vectorize (resuming from knowledge_graph)
+==> Skipping cluster (resuming from knowledge_graph)
+==> Skipping graph (resuming from knowledge_graph)
+
+==> Phase: knowledge_graph (2026-05-22 12:28:44)
+Device set to use mps
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/papers_analysis/knowledge_graph.py", line 581, in <module>
+    main()
+  File "/Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/papers_analysis/knowledge_graph.py", line 569, in main
+    run_knowledge_graph(
+  File "/Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/papers_analysis/knowledge_graph.py", line 455, in run_knowledge_graph
+    rebel_triples = extract_rebel_triples(
+                    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dbrowne/Desktop/Programming/GitHub/Linus/modules/KnowledgeBase/papers_analysis/knowledge_graph.py", line 172, in extract_rebel_triples
+    outputs = rebel(texts, max_length=512, batch_size=batch_size, return_tensors=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/pipelines/text2text_generation.py", line 173, in __call__
+    result = super().__call__(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/pipelines/base.py", line 1360, in __call__
+    outputs = list(final_iterator)
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/pipelines/pt_utils.py", line 124, in __next__
+    item = next(self.iterator)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/pipelines/pt_utils.py", line 125, in __next__
+    processed = self.infer(item, **self.params)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/pipelines/base.py", line 1286, in forward
+    model_outputs = self._forward(model_inputs, **forward_params)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/pipelines/text2text_generation.py", line 202, in _forward
+    output_ids = self.model.generate(**model_inputs, **generate_kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/generation/utils.py", line 2484, in generate
+    result = self._beam_search(
+             ^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/generation/utils.py", line 4016, in _beam_search
+    this_peer_finished = not self._beam_search_has_unfinished_sequences(
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/mambaforge/base/envs/papers/lib/python3.11/site-packages/transformers/generation/utils.py", line 3620, in _beam_search_has_unfinished_sequences
+    valid_continuations = ~torch.all(next_token_hits_stopping_criteria)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+── Knowledge Graph ────────────────────────────────────────────────────
+  9,250 articles with abstracts
+  Loading REBEL (Babelscape/rebel-large) on device=mps …
+  Checkpoint: 5 papers already processed
+  Running REBEL on 9,245 abstracts …
+  … 8/9,245 abstracts  (11 new triples this run)
+  … 168/9,245 abstracts  (297 new triples this run)
+  … 328/9,245 abstracts  (594 new triples this run)
+  … 488/9,245 abstracts  (886 new triples this run)
+  … 648/9,245 abstracts  (1,192 new triples this run)
+experiments/2026-05-21-run-kb-pipeline.sh: line 112: 47222 Terminated: 15          python -m "$phase_module"
