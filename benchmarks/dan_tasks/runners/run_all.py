@@ -65,7 +65,7 @@ def ollama_list_models() -> list[str]:
     """Return the names of pulled models. FAIL LOUD if the server is unreachable."""
     url = f"{OLLAMA_HOST}/api/tags"
     try:
-        with urllib.request.urlopen(url, timeout=10) as resp:  # noqa: S310 — local-only
+        with urllib.request.urlopen(url, timeout=10) as resp:
             payload = json.loads(resp.read())
     except urllib.error.URLError as exc:
         raise RunnerError(
@@ -92,7 +92,7 @@ def ollama_generate(model: str, prompt: str) -> dict:
     ).encode("utf-8")
     req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=OLLAMA_TIMEOUT_S) as resp:  # noqa: S310 — local-only
+        with urllib.request.urlopen(req, timeout=OLLAMA_TIMEOUT_S) as resp:
             return json.loads(resp.read())
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
@@ -135,7 +135,7 @@ def extract_pdf_text(pdf_path: pathlib.Path, char_limit: int) -> str:
         for page in reader.pages:
             try:
                 t = page.extract_text() or ""
-            except Exception as exc:  # noqa: BLE001 — best-effort extraction
+            except Exception as exc:
                 t = f"\n[pypdf extraction error on page: {exc}]\n"
             pages_text.append(t)
             total += len(t)
@@ -164,9 +164,7 @@ def extract_pdf_text(pdf_path: pathlib.Path, char_limit: int) -> str:
         check=False,
     )
     if proc.returncode != 0:
-        raise RunnerError(
-            f"pdftotext failed (rc={proc.returncode}) on {pdf_path}: {proc.stderr.strip()[:500]}"
-        )
+        raise RunnerError(f"pdftotext failed (rc={proc.returncode}) on {pdf_path}: {proc.stderr.strip()[:500]}")
     return proc.stdout[:char_limit]
 
 
@@ -180,10 +178,7 @@ def run_paper_summarization(task_dir: pathlib.Path, model: str) -> dict:
     pdf_path = REPO_ROOT / spec["pdf_path"]
     extracted = extract_pdf_text(pdf_path, char_limit=12000)
 
-    prompt = (
-        f"{spec['prompt']}\n\n"
-        f"--- BEGIN PAPER TEXT ---\n{extracted}\n--- END PAPER TEXT ---"
-    )
+    prompt = f"{spec['prompt']}\n\n--- BEGIN PAPER TEXT ---\n{extracted}\n--- END PAPER TEXT ---"
     raw = ollama_generate(model, prompt)
     response_text = raw.get("response", "")
 
@@ -329,7 +324,7 @@ def main() -> int:
     print(f"[runner] Tasks discovered: {task_slugs}")
 
     # 3. Run each task.
-    started_at = _dt.datetime.now(_dt.timezone.utc)
+    started_at = _dt.datetime.now(_dt.UTC)
     entries: list[dict] = []
     for slug in task_slugs:
         task_dir = TASKS_DIR / slug
@@ -344,7 +339,7 @@ def main() -> int:
             output = None
             status = "error"
             err = str(exc)
-        except Exception as exc:  # noqa: BLE001 — capture per-task failures, keep going
+        except Exception as exc:
             print(f"[runner] {slug} EXCEPTION: {exc!r}", file=sys.stderr)
             output = None
             status = "exception"
@@ -361,7 +356,7 @@ def main() -> int:
             }
         )
 
-    finished_at = _dt.datetime.now(_dt.timezone.utc)
+    finished_at = _dt.datetime.now(_dt.UTC)
 
     # 4. Write results.
     date_stamp = args.date_stamp or started_at.strftime("%Y-%m-%d")

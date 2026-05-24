@@ -108,17 +108,9 @@ class TestAuditLogAppendJsonl:
         """
         path = tmp_path / "audit.jsonl"
         a1 = AuditLog(path=path)
-        a1.append_memory_write(
-            MemoryWriteEvent(
-                session_id="s", turn_id=1, segment="answer", content_hash="sha256:a"
-            )
-        )
+        a1.append_memory_write(MemoryWriteEvent(session_id="s", turn_id=1, segment="answer", content_hash="sha256:a"))
         a2 = AuditLog(path=path)
-        a2.append_memory_write(
-            MemoryWriteEvent(
-                session_id="s", turn_id=2, segment="answer", content_hash="sha256:b"
-            )
-        )
+        a2.append_memory_write(MemoryWriteEvent(session_id="s", turn_id=2, segment="answer", content_hash="sha256:b"))
         events = a2.read_events()
         assert [e["turn_id"] for e in events] == [1, 2]
 
@@ -181,9 +173,7 @@ class TestAuditLogAppendJsonl:
         """``iter_events`` returns a generator, not a list."""
         import types
 
-        audit.append_memory_write(
-            MemoryWriteEvent(session_id="s", turn_id=1, segment=None, content_hash="x")
-        )
+        audit.append_memory_write(MemoryWriteEvent(session_id="s", turn_id=1, segment=None, content_hash="x"))
         gen = audit.iter_events()
         assert isinstance(gen, types.GeneratorType)
         assert next(gen)["content_hash"] == "x"

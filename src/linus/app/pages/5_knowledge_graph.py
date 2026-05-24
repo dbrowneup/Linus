@@ -242,8 +242,7 @@ if view_key == "papers_entities":
 
 elif view_key == "rebel_typed":
     st.caption(
-        "Entity↔entity subgraph from REBEL triples · "
-        "filtered to nodes with degree ≥ 2 · coloured by Louvain community."
+        "Entity↔entity subgraph from REBEL triples · filtered to nodes with degree ≥ 2 · coloured by Louvain community."
     )
     _render_static_html(_HTML_REBEL_TYPED, "REBEL typed relations")
 
@@ -291,10 +290,7 @@ else:  # drill_down
         keep = sorted(sub.nodes(), key=lambda n: sub.degree(n), reverse=True)[:500]
         sub = sub.subgraph(keep).copy()
 
-    st.markdown(
-        f"**Neighborhood: {sub.number_of_nodes():,} nodes, {sub.number_of_edges():,} edges** "
-        f"(hops={hops})"
-    )
+    st.markdown(f"**Neighborhood: {sub.number_of_nodes():,} nodes, {sub.number_of_edges():,} edges** (hops={hops})")
 
     with st.spinner("Rendering pyvis…"):
         html = _render_neighborhood_pyvis(sub, seed.lower().strip())

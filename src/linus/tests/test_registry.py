@@ -30,7 +30,6 @@ from linus.tools.registry import (
     tool,
 )
 
-
 # ── _annotation_to_schema: every documented branch ─────────────────────────
 
 
@@ -804,7 +803,7 @@ def test_allowed_network_policies_set_matches_literal_vocabulary() -> None:
     """The frozenset and the Literal must stay in lock-step. If the vocabulary
     grows we want the test suite to fail loudly until both halves move
     together."""
-    assert _ALLOWED_NETWORK_POLICIES == {"offline", "online_optional", "online_required"}
+    assert {"offline", "online_optional", "online_required"} == _ALLOWED_NETWORK_POLICIES
 
 
 def test_register_defaults_network_policy_to_offline() -> None:

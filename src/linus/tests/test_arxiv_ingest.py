@@ -184,9 +184,12 @@ def test_pypdf_unavailable_yields_warning_not_failure(tmp_path: Path, monkeypatc
     monkeypatch.setenv("LINUS_PAPERS_DIR", str(tmp_path))
 
     # Patch the helper directly so we test the integration behavior.
-    with patch("linus.tools.arxiv_ingest.urllib.request.urlopen") as mock_urlopen, patch(
-        "linus.tools.arxiv_ingest._try_extract_text",
-        return_value=(None, "pypdf_unavailable"),
+    with (
+        patch("linus.tools.arxiv_ingest.urllib.request.urlopen") as mock_urlopen,
+        patch(
+            "linus.tools.arxiv_ingest._try_extract_text",
+            return_value=(None, "pypdf_unavailable"),
+        ),
     ):
         _patch_http_ok(mock_urlopen)
         result = ingest_arxiv("2407.12345")

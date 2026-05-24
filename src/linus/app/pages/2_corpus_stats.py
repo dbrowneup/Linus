@@ -133,8 +133,7 @@ PANELS: list[tuple[str, str, str]] = [
     (
         "tokens_per_document.png",
         "Tokens per document (Mistral-7B)",
-        "Per-paper Mistral-7B SentencePiece token counts with 4k / 8k / 32k / 128k context "
-        "reference lines.",
+        "Per-paper Mistral-7B SentencePiece token counts with 4k / 8k / 32k / 128k context reference lines.",
     ),
     (
         "words_per_page.png",

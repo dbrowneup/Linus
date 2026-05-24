@@ -88,9 +88,7 @@ class TestEpisodicWriteReadRoundtrip:
 
     def test_bytes_content_roundtrip(self, store: EpisodicStore) -> None:
         payload = b"\x00\x01\xff"
-        record = EpisodicRecord(
-            session_id="s", turn_id=1, role="tool", content=payload, segment="tool_output"
-        )
+        record = EpisodicRecord(session_id="s", turn_id=1, role="tool", content=payload, segment="tool_output")
         store.write_record(record)
         rows = store.read_records({"session_id": "s"})
         assert rows[0].content == payload
@@ -98,9 +96,7 @@ class TestEpisodicWriteReadRoundtrip:
 
     def test_json_content_roundtrip(self, store: EpisodicStore) -> None:
         payload = {"x": 1, "y": [2, 3, {"nested": True}]}
-        record = EpisodicRecord(
-            session_id="s", turn_id=1, role="assistant", content=payload, segment="answer"
-        )
+        record = EpisodicRecord(session_id="s", turn_id=1, role="assistant", content=payload, segment="answer")
         store.write_record(record)
         rows = store.read_records({"session_id": "s"})
         assert rows[0].content == payload
@@ -130,9 +126,7 @@ class TestEpisodicWriteReadRoundtrip:
         """Same ``(session_id, turn_id, segment)`` cannot be inserted twice."""
         import sqlite3
 
-        record = EpisodicRecord(
-            session_id="dup", turn_id=1, role="user", segment="answer", content="x"
-        )
+        record = EpisodicRecord(session_id="dup", turn_id=1, role="user", segment="answer", content="x")
         store.write_record(record)
         with pytest.raises(sqlite3.IntegrityError):
             store.write_record(
@@ -147,9 +141,7 @@ class TestEpisodicWriteReadRoundtrip:
 
     def test_parent_turn_id_recorded(self, store: EpisodicStore) -> None:
         """Parent-pointer chain survives a roundtrip."""
-        store.write_record(
-            EpisodicRecord(session_id="s", turn_id=1, role="user", content="first")
-        )
+        store.write_record(EpisodicRecord(session_id="s", turn_id=1, role="user", content="first"))
         store.write_record(
             EpisodicRecord(
                 session_id="s",
@@ -185,11 +177,7 @@ class TestEpisodicWriteReadRoundtrip:
 
     def test_query_limit_and_order(self, store: EpisodicStore) -> None:
         for turn in range(1, 6):
-            store.write_record(
-                EpisodicRecord(
-                    session_id="s", turn_id=turn, role="user", content=f"t{turn}"
-                )
-            )
+            store.write_record(EpisodicRecord(session_id="s", turn_id=turn, role="user", content=f"t{turn}"))
         first_two = store.read_records({"limit": 2})
         assert [r.turn_id for r in first_two] == [1, 2]
         last_two = store.read_records({"limit": 2, "order": "desc"})
@@ -197,26 +185,14 @@ class TestEpisodicWriteReadRoundtrip:
 
     def test_query_in_list(self, store: EpisodicStore) -> None:
         for turn in range(1, 4):
-            store.write_record(
-                EpisodicRecord(
-                    session_id=f"s{turn}", turn_id=1, role="user", content="x"
-                )
-            )
+            store.write_record(EpisodicRecord(session_id=f"s{turn}", turn_id=1, role="user", content="x"))
         rows = store.read_records({"session_id": ["s1", "s3"]})
         assert {r.session_id for r in rows} == {"s1", "s3"}
 
     def test_content_hash_deterministic_across_writes(self, store: EpisodicStore) -> None:
         """Two records with identical content hash to the same value."""
-        store.write_record(
-            EpisodicRecord(
-                session_id="s", turn_id=1, role="user", content="same payload"
-            )
-        )
+        store.write_record(EpisodicRecord(session_id="s", turn_id=1, role="user", content="same payload"))
         # Same content in a different session must produce the same hash.
-        store.write_record(
-            EpisodicRecord(
-                session_id="s2", turn_id=1, role="user", content="same payload"
-            )
-        )
+        store.write_record(EpisodicRecord(session_id="s2", turn_id=1, role="user", content="same payload"))
         hashes = {r.content_hash for r in store.read_records()}
         assert len(hashes) == 1

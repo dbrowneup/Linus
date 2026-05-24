@@ -61,7 +61,7 @@ def _check_server(url: str, timeout: float = 2.0) -> tuple[bool, str, dict | Non
         return False, f"Connection refused at {probe} — is the server running?", None
     except httpx.TimeoutException:
         return False, f"Timeout after {timeout}s at {probe}", None
-    except Exception as exc:  # noqa: BLE001 — surface any failure mode to the UI
+    except Exception as exc:
         return False, f"{type(exc).__name__}: {exc}", None
 
 

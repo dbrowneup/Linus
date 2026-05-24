@@ -282,9 +282,7 @@ class KnowledgeRetriever:
                 # Shouldn't happen — every sha came from an adapter result —
                 # but guard against schema drift.
                 continue
-            method_scores = {
-                method: scores[sha] for method, scores in per_method.items() if sha in scores
-            }
+            method_scores = {method: scores[sha] for method, scores in per_method.items() if sha in scores}
             provenance = [m for m, s in method_scores.items() if s > 0.0]
             hits.append(
                 RetrievalHit(

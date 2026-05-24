@@ -74,8 +74,9 @@ def _parse_sse_stream(body: str) -> list[Any]:
 def test_streaming_returns_event_stream_content_type(client: TestClient) -> None:
     """``stream=true`` should return ``Content-Type: text/event-stream``."""
     chunks = _stream_chunks(["Hello", " world"])
-    with patch("linus.server.ollama.chat", return_value=iter(chunks)), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=iter(chunks)),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -92,8 +93,9 @@ def test_streaming_returns_event_stream_content_type(client: TestClient) -> None
 def test_streaming_first_chunk_has_role(client: TestClient) -> None:
     """OpenAI convention: first chunk's delta carries role=assistant."""
     chunks = _stream_chunks(["hi"])
-    with patch("linus.server.ollama.chat", return_value=iter(chunks)), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=iter(chunks)),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -115,8 +117,9 @@ def test_streaming_content_chunks_concatenate_to_full_response(client: TestClien
     """Joining all content deltas should reconstruct the model's full response."""
     parts = ["Hello", " ", "world", "!"]
     chunks = _stream_chunks(parts)
-    with patch("linus.server.ollama.chat", return_value=iter(chunks)), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=iter(chunks)),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -139,8 +142,9 @@ def test_streaming_content_chunks_concatenate_to_full_response(client: TestClien
 def test_streaming_terminator_chunk_has_finish_reason(client: TestClient) -> None:
     """The chunk immediately before ``[DONE]`` carries finish_reason."""
     chunks = _stream_chunks(["hi"], done_reason="stop")
-    with patch("linus.server.ollama.chat", return_value=iter(chunks)), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=iter(chunks)),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -161,8 +165,9 @@ def test_streaming_terminator_chunk_has_finish_reason(client: TestClient) -> Non
 def test_streaming_done_sentinel_emitted(client: TestClient) -> None:
     """The stream must end with the ``data: [DONE]`` sentinel."""
     chunks = _stream_chunks(["hi"])
-    with patch("linus.server.ollama.chat", return_value=iter(chunks)), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=iter(chunks)),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -180,8 +185,9 @@ def test_streaming_done_sentinel_emitted(client: TestClient) -> None:
 def test_streaming_chunks_have_stable_completion_id(client: TestClient) -> None:
     """All chunks in a single stream share the same ``id``."""
     chunks = _stream_chunks(["a", "b", "c"])
-    with patch("linus.server.ollama.chat", return_value=iter(chunks)), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=iter(chunks)),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -211,8 +217,9 @@ def test_non_streaming_path_returns_json_unchanged(client: TestClient) -> None:
         "prompt_eval_count": 5,
         "eval_count": 3,
     }
-    with patch("linus.server.ollama.chat", return_value=non_streaming_response), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=non_streaming_response),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -239,8 +246,9 @@ def test_stream_field_absent_is_non_streaming(client: TestClient) -> None:
         "prompt_eval_count": 1,
         "eval_count": 1,
     }
-    with patch("linus.server.ollama.chat", return_value=non_streaming_response), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=non_streaming_response),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -288,12 +296,14 @@ def test_streaming_tool_call_resolved_internally_then_continues(client: TestClie
         return iter(post_tool_chunks)
 
     fake_tool_result = [{"sha256": "abc", "title": "Test Paper", "year": 2024}]
-    with patch("linus.server.ollama.chat", side_effect=chat_side_effect), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
-    ), patch.object(
-        __import__("linus.tools", fromlist=["default_registry"]).default_registry,
-        "call_tool",
-        return_value=fake_tool_result,
+    with (
+        patch("linus.server.ollama.chat", side_effect=chat_side_effect),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
+        patch.object(
+            __import__("linus.tools", fromlist=["default_registry"]).default_registry,
+            "call_tool",
+            return_value=fake_tool_result,
+        ),
     ):
         resp = client.post(
             "/v1/chat/completions",
@@ -325,8 +335,9 @@ def test_streaming_ollama_failure_surfaces_as_inline_error(client: TestClient) -
     def boom(**kwargs):
         raise RuntimeError("simulated ollama crash")
 
-    with patch("linus.server.ollama.chat", side_effect=boom), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", side_effect=boom),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/chat/completions",

@@ -115,8 +115,8 @@ def mock_ollama(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
                 "role": "assistant",
                 "content": (
                     "Two papers discuss memory architecture: "
-                    "\"Paper about memory architecture (#1)\" (2024) and "
-                    "\"Paper about memory architecture (#2)\" (2023)."
+                    '"Paper about memory architecture (#1)" (2024) and '
+                    '"Paper about memory architecture (#2)" (2023).'
                 ),
             },
             done=True,
@@ -224,9 +224,7 @@ def test_server_routes_unknown_tool_call_as_error_to_model(
                 message={
                     "role": "assistant",
                     "content": "",
-                    "tool_calls": [
-                        {"function": {"name": "ghost.tool", "arguments": {}}}
-                    ],
+                    "tool_calls": [{"function": {"name": "ghost.tool", "arguments": {}}}],
                 },
                 done=True,
                 done_reason="stop",

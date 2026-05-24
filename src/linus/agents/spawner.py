@@ -131,7 +131,7 @@ def _run_sync(task: AgentTask) -> AgentResult:
     try:
         try:
             resolved = _resolve_model(requested_model)
-        except Exception as exc:  # noqa: BLE001 — capture model-resolution failures uniformly
+        except Exception as exc:
             elapsed_ms = int((time.perf_counter() - started) * 1000)
             return AgentResult(
                 task_name=task.name,
@@ -151,7 +151,7 @@ def _run_sync(task: AgentTask) -> AgentResult:
 
         try:
             response = ollama.chat(**chat_kwargs)
-        except Exception as exc:  # noqa: BLE001 — surface any Ollama failure as AgentResult.error
+        except Exception as exc:
             elapsed_ms = int((time.perf_counter() - started) * 1000)
             return AgentResult(
                 task_name=task.name,
@@ -177,7 +177,7 @@ def _run_sync(task: AgentTask) -> AgentResult:
             latency_ms=elapsed_ms,
             error=None,
         )
-    except Exception as exc:  # noqa: BLE001 — safety net so the gather-batch guarantee holds
+    except Exception as exc:
         # Catches any exception escaping the message-extraction block (e.g., a
         # response whose ``.content`` attribute raises on access) or any future
         # post-chat munging step a refactor might add. Without this, such an

@@ -145,8 +145,7 @@ def resolve_paperqa_dir(*, create: bool = True) -> Path:
         if not readme_path.exists():
             readme_path.write_text(PAPERQA_README_BODY, encoding="utf-8")
         logger.info(
-            "Auto-created Linus Paper Q&A papers directory at %s "
-            "(populate with PDFs to enable the paper-qa tool).",
+            "Auto-created Linus Paper Q&A papers directory at %s (populate with PDFs to enable the paper-qa tool).",
             papers_dir,
         )
     except OSError as exc:

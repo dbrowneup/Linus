@@ -327,9 +327,7 @@ def test_connect_raises_with_remediation_when_db_missing(tmp_path: Path) -> None
     assert "papers_analysis.metadata" in msg
 
 
-def test_connect_wraps_sqlite_operational_error(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_connect_wraps_sqlite_operational_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """If ``sqlite3.connect`` raises ``OperationalError`` (e.g. permissions,
     locked file), the adapter must wrap it as :class:`KnowledgeBaseUnavailableError`
     and chain the original via ``__cause__`` (lines 206-209)."""
@@ -409,18 +407,16 @@ def test_context_manager_surfaces_connection_error(tmp_path: Path) -> None:
     """``__enter__`` must trigger ``_connect`` so a missing DB raises inside
     the ``with`` statement (not later when a query is made)."""
     missing = tmp_path / "absent.db"
-    with pytest.raises(KnowledgeBaseUnavailableError):
-        with KnowledgeBaseAdapter(db_path=missing):
-            pass
+    with pytest.raises(KnowledgeBaseUnavailableError), KnowledgeBaseAdapter(db_path=missing):
+        pass
 
 
 def test_context_manager_closes_on_exception(populated_db: Path) -> None:
     """Exit closes the connection even when the body raises."""
     adapter = KnowledgeBaseAdapter(db_path=populated_db)
-    with pytest.raises(RuntimeError, match="forced"):
-        with adapter:
-            assert adapter._conn is not None
-            raise RuntimeError("forced")
+    with pytest.raises(RuntimeError, match="forced"), adapter:
+        assert adapter._conn is not None
+        raise RuntimeError("forced")
     assert adapter._conn is None
 
 
@@ -594,7 +590,7 @@ def test_get_paper_empty_sha_returns_none(populated_db: Path) -> None:
 def test_get_paper_case_insensitive_lookup(populated_db: Path) -> None:
     """SHA input is lowercased before lookup, so uppercase still matches."""
     adapter = KnowledgeBaseAdapter(db_path=populated_db)
-    paper = adapter.get_paper(("A" * 64))  # uppercase
+    paper = adapter.get_paper("A" * 64)  # uppercase
     adapter.close()
     assert paper is not None
     assert paper.sha256 == "a" * 64

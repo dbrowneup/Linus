@@ -115,9 +115,7 @@ def test_round_trip_answer_produces_text_and_citations(
     facade = get_singleton()
     import asyncio
 
-    payload = asyncio.run(
-        facade.answer(query="what does the literature say?", max_sources=5)
-    )
+    payload = asyncio.run(facade.answer(query="what does the literature say?", max_sources=5))
     assert isinstance(payload, dict)
     assert {"question", "answer", "formatted_answer", "citations"} <= set(payload)
     assert isinstance(payload["citations"], list)

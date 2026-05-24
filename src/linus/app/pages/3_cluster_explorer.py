@@ -21,8 +21,6 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from linus.app.cluster_data import (
-    SCALES,
-    ClusterData,
     Scale,
     TopicScale,
     load_cluster_data,
@@ -247,11 +245,7 @@ def _selected_papers() -> tuple[list[str], Scale, str | None]:
 
 def _build_sankey(scope_broad: str | None, scope_mid: str | None) -> go.Figure:
     """Build a broad → mid → fine Sankey scoped to the current selection."""
-    broad_ids = (
-        [scope_broad]
-        if scope_broad is not None
-        else sorted(data.broad.cluster_to_papers.keys())
-    )
+    broad_ids = [scope_broad] if scope_broad is not None else sorted(data.broad.cluster_to_papers.keys())
 
     sources: list[int] = []
     targets: list[int] = []
@@ -313,9 +307,7 @@ def _build_sankey(scope_broad: str | None, scope_mid: str | None) -> go.Figure:
     return fig
 
 
-def _build_umap_scatter(
-    selected_papers_set: set[str], color_by_scale: Scale
-) -> go.Figure | None:
+def _build_umap_scatter(selected_papers_set: set[str], color_by_scale: Scale) -> go.Figure | None:
     """3D UMAP scatter — color by cluster at given scale; dim non-selected."""
     if data.umap_3d is None or not data.umap_sha256s:
         return None
@@ -340,7 +332,7 @@ def _build_umap_scatter(
             colors.append("#999999")
         else:
             # Simple deterministic color from cluster_id
-            hue = (abs(hash(cluster_id)) % 360)
+            hue = abs(hash(cluster_id)) % 360
             colors.append(f"hsl({hue}, 70%, 55%)")
         opacities.append(1.0 if sha in selected_papers_set else 0.08)
 

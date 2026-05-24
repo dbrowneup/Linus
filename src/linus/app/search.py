@@ -76,8 +76,8 @@ def _to_row(hit: RetrievalHit) -> SearchResult:
 
 
 __all__ = [
-    "SearchResult",
     "KnowledgeBaseUnavailableError",
     "RetrievalResult",
+    "SearchResult",
     "run_search",
 ]

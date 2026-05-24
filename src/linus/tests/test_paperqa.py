@@ -24,11 +24,10 @@ from __future__ import annotations
 import sys
 import types
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from linus.knowledge import paperqa as paperqa_module
 from linus.knowledge.paperqa import (
     DEFAULT_EMBEDDING_MODEL,
     DEFAULT_MODEL,
@@ -598,9 +597,7 @@ def test_ensure_loaded_no_longer_raises_when_default_dir_missing(
     assert target.is_dir()
 
 
-def test_ensure_loaded_still_rejects_non_directory_path(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_ensure_loaded_still_rejects_non_directory_path(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """A regular file at the configured path still surfaces ``PaperQAConfigError``.
 
     The auto-create resolver only handles the missing-dir case. If the

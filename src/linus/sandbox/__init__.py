@@ -2,4 +2,4 @@
 
 from linus.sandbox.fs import WRITE_ALLOWLIST, SandboxFS
 
-__all__ = ["SandboxFS", "WRITE_ALLOWLIST"]
+__all__ = ["WRITE_ALLOWLIST", "SandboxFS"]

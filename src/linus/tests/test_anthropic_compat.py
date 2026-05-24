@@ -37,9 +37,10 @@ def _ok_ollama_response(text: str = "Hello back!", prompt_tokens: int = 10, comp
 @pytest.fixture()
 def patched_chat():
     """Patch ``ollama.chat`` and ``_resolve_model`` for hermetic tests."""
-    with patch("linus.server.ollama.chat", return_value=_ok_ollama_response()) as mock_chat, patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
-    ) as mock_resolve:
+    with (
+        patch("linus.server.ollama.chat", return_value=_ok_ollama_response()) as mock_chat,
+        patch("linus.server._resolve_model", return_value="qwen3:8b") as mock_resolve,
+    ):
         yield mock_chat, mock_resolve
 
 
@@ -180,8 +181,9 @@ def test_messages_max_tokens_stop_reason(client: TestClient) -> None:
     response = _ok_ollama_response()
     response["done_reason"] = "length"
 
-    with patch("linus.server.ollama.chat", return_value=response), patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=response),
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         resp = client.post(
             "/v1/messages",
@@ -283,8 +285,9 @@ def test_messages_response_matches_anthropic_sdk_fields(client: TestClient, patc
 
 def test_messages_sampling_fields_forwarded_to_ollama(client: TestClient) -> None:
     """temperature, top_p, max_tokens land in Ollama's options dict."""
-    with patch("linus.server.ollama.chat", return_value=_ok_ollama_response()) as mock_chat, patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=_ok_ollama_response()) as mock_chat,
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         client.post(
             "/v1/messages",
@@ -303,8 +306,9 @@ def test_messages_sampling_fields_forwarded_to_ollama(client: TestClient) -> Non
 
 def test_messages_doesnt_advertise_tools(client: TestClient) -> None:
     """v1 of /v1/messages intentionally doesn't expose the OpenAI tool registry."""
-    with patch("linus.server.ollama.chat", return_value=_ok_ollama_response()) as mock_chat, patch(
-        "linus.server._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.server.ollama.chat", return_value=_ok_ollama_response()) as mock_chat,
+        patch("linus.server._resolve_model", return_value="qwen3:8b"),
     ):
         client.post(
             "/v1/messages",

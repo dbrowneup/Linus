@@ -225,7 +225,7 @@ def _try_extract_text(pdf_path: Path) -> tuple[str | None, str | None]:
         reader = PdfReader(str(pdf_path))
         pages = [page.extract_text() or "" for page in reader.pages]
         return "\n".join(pages), None
-    except Exception as exc:  # noqa: BLE001 — wrap any extraction failure uniformly
+    except Exception as exc:
         return None, f"extraction_failed: {type(exc).__name__}: {exc}"
 
 
@@ -260,7 +260,7 @@ def _try_specter2_embed(title: str | None, abstract: str | None) -> tuple[bytes 
         buf = io.BytesIO()
         np.save(buf, embedding[0])
         return buf.getvalue(), None
-    except Exception as exc:  # noqa: BLE001 — surface model-load + embed failures
+    except Exception as exc:
         return None, f"specter2_failed: {type(exc).__name__}: {exc}"
 
 
@@ -300,7 +300,7 @@ def ingest_arxiv(arxiv_id: str) -> dict[str, Any]:
         return {"error": "arxiv_api_failed", "detail": str(exc), "arxiv_id": normalized}
     except ET.ParseError as exc:
         return {"error": "arxiv_api_parse_failed", "detail": str(exc), "arxiv_id": normalized}
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         return {"error": "arxiv_api_failed", "detail": f"{type(exc).__name__}: {exc}", "arxiv_id": normalized}
 
     # Step 2: PDF download

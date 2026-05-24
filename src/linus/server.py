@@ -1055,7 +1055,7 @@ def _stream_chat_completion(
                 options=options or None,
                 tools=tool_specs or None,
             )
-        except Exception as exc:  # noqa: BLE001 — surface any failure mid-stream
+        except Exception as exc:
             yield _sse_format({"error": {"message": f"Ollama call failed: {exc!r}", "type": "ollama_error"}})
             yield "data: [DONE]\n\n"
             return

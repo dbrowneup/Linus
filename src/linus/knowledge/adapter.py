@@ -316,10 +316,7 @@ class KnowledgeBaseAdapter:
             # without it; ``year DESC`` alone is fine — NULL years just sort to the
             # head, which is a cosmetic difference, not a correctness one.
             sql_fallback = (
-                f"SELECT {cols} FROM papers "
-                f"WHERE is_supplement = 0 AND ({where}) "
-                "ORDER BY year DESC, title "
-                "LIMIT ?"
+                f"SELECT {cols} FROM papers WHERE is_supplement = 0 AND ({where}) ORDER BY year DESC, title LIMIT ?"
             )
             rows = conn.execute(sql_fallback, params).fetchall()
 
