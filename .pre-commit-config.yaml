@@ -1,0 +1,22 @@
+# Pre-commit hooks — run before every commit to catch issues early.
+# Install:  pip install pre-commit && pre-commit install
+# Run all:  pre-commit run --all-files
+# Docs:     https://pre-commit.com
+#
+# Mirrors Archimedes's .pre-commit-config.yaml shape so the same code
+# passes the same gate in both repos (Linus is consumed as a submodule
+# under Archimedes; shared CI shape avoids drift noise).
+
+repos:
+  # Python linting + formatting — MIRRORS the CI ruff-gate blocking subset
+  # (.github/workflows/ruff-gate.yml). Deliberately scoped to the same rules
+  # so pre-commit can't pass while CI fails (or vice versa).
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.13
+    hooks:
+      - id: ruff
+        name: ruff check (critical rules only — matches CI ruff-gate)
+        args: ['--select', 'E9,F63,F7,F40,F82']
+      - id: ruff-format
+        name: ruff format (check only; no auto-fix on commit)
+        args: ['--check']
