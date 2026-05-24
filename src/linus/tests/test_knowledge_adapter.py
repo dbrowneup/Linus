@@ -18,6 +18,7 @@ The suite is fully hermetic — every test creates an ephemeral SQLite DB inside
 from __future__ import annotations
 
 import sqlite3
+from dataclasses import FrozenInstanceError
 from pathlib import Path
 
 import pytest
@@ -223,7 +224,7 @@ def test_paper_defaults_only_sha_required() -> None:
 def test_paper_is_frozen() -> None:
     """``Paper`` is frozen — attribute mutation must raise."""
     paper = Paper(sha256="x")
-    with pytest.raises(Exception):  # FrozenInstanceError subclasses AttributeError
+    with pytest.raises(FrozenInstanceError):
         paper.title = "mutated"  # type: ignore[misc]
 
 

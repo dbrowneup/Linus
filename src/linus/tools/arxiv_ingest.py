@@ -113,10 +113,7 @@ def normalize_arxiv_id(raw: str) -> str | None:
 
 def _papers_dir() -> Path:
     raw = os.environ.get("LINUS_PAPERS_DIR")
-    if raw:
-        root = Path(raw).expanduser()
-    else:
-        root = Path.home() / ".linus" / "papers"
+    root = Path(raw).expanduser() if raw else Path.home() / ".linus" / "papers"
     root.mkdir(parents=True, exist_ok=True)
     return root
 

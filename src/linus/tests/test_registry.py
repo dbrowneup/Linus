@@ -14,6 +14,7 @@ no filesystem touch beyond what pytest provides.
 
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError
 from typing import Any, Optional, Union
 
 import pytest
@@ -53,7 +54,10 @@ def test_annotation_typing_optional_unwraps_to_inner() -> None:
     """``Optional[int]`` (i.e. ``Union[int, None]``) unwraps to the schema for
     ``int`` — ``None`` is modeled by the ``required`` semantics, not as a
     schema branch (lines 126-128)."""
-    assert _annotation_to_schema(Optional[int]) == {"type": "integer"}
+    # The suppression below is intentional: this test deliberately exercises
+    # the legacy ``typing.Optional`` form to verify the schema function still
+    # handles it alongside the PEP 604 form covered by the next test.
+    assert _annotation_to_schema(Optional[int]) == {"type": "integer"}  # noqa: UP045
 
 
 def test_annotation_pep604_optional_unwraps_to_inner() -> None:
@@ -66,7 +70,9 @@ def test_annotation_multi_type_union_falls_back_to_string() -> None:
     """A union with more than one non-None member can't be safely modeled as
     a single JSON-Schema branch, so we fall back to string rather than lie
     (line 130 — both ``typing.Union`` and PEP 604 ``|`` cover this)."""
-    assert _annotation_to_schema(Union[int, str]) == {"type": "string"}
+    # The suppression below is intentional: deliberately exercises the legacy
+    # ``typing.Union`` form alongside the PEP 604 form on the next line.
+    assert _annotation_to_schema(Union[int, str]) == {"type": "string"}  # noqa: UP007
     assert _annotation_to_schema(int | str) == {"type": "string"}
 
 
@@ -185,7 +191,10 @@ def test_build_parameters_schema_none_default_is_not_serialized() -> None:
     but NOT serialize ``"default": None`` into the schema (line 194 branch:
     ``param.default is not None``)."""
 
-    def fn(x: int = None) -> None:  # type: ignore[assignment]
+    # The suppression below is intentional: the implicit-Optional form
+    # (``x: int = None`` without ``int | None``) is what the test exercises
+    # — verifying ``_build_parameters_schema`` handles this anti-pattern.
+    def fn(x: int = None) -> None:  # type: ignore[assignment]  # noqa: RUF013
         return None
 
     schema = _build_parameters_schema(fn)
@@ -286,7 +295,7 @@ def test_toolspec_is_frozen_dataclass() -> None:
         return None
 
     spec = ToolSpec(name="t.x", description="d", parameters={}, func=fn)
-    with pytest.raises(Exception):  # FrozenInstanceError, but be tolerant
+    with pytest.raises(FrozenInstanceError):
         spec.name = "t.y"  # type: ignore[misc]
 
 
@@ -888,7 +897,7 @@ def test_toolspec_network_policy_is_frozen() -> None:
         network_policy="online_optional",
     )
     assert spec.network_policy == "online_optional"
-    with pytest.raises(Exception):  # FrozenInstanceError
+    with pytest.raises(FrozenInstanceError):
         spec.network_policy = "offline"  # type: ignore[misc]
 
 

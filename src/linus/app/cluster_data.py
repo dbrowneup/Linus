@@ -127,17 +127,14 @@ def _coerce_labels(raw: object) -> dict[str, str]:
             if isinstance(shas, list) and isinstance(labs, list) and len(shas) == len(labs):
                 return {
                     str(s): str(int(label) if isinstance(label, (int, float)) else label)
-                    for s, label in zip(shas, labs)
+                    for s, label in zip(shas, labs, strict=False)
                 }
             return {}
         out: dict[str, str] = {}
         for sha, cid in raw.items():
             if cid is None:
                 continue
-            if isinstance(cid, (int, float)):
-                cid_str = str(int(cid))
-            else:
-                cid_str = str(cid)
+            cid_str = str(int(cid)) if isinstance(cid, (int, float)) else str(cid)
             out[str(sha)] = cid_str
         return out
     return {}
@@ -255,10 +252,7 @@ def _load_umap(outputs_dir: Path) -> tuple[np.ndarray | None, list[str]]:
         return None, []
 
     raw = _read_json(sha_path)
-    if isinstance(raw, list):
-        shas = [str(s) for s in raw]
-    else:
-        shas = []
+    shas = [str(s) for s in raw] if isinstance(raw, list) else []
 
     # If sha list length doesn't match, the alignment is broken — return without shas
     # rather than fail; the page can render the scatter without click-back-to-paper.

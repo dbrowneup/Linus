@@ -149,14 +149,12 @@ with left:
         if st.button(f"Broad: {_topic_label('broad', broad_id)}", key="bc_broad"):
             _select_broad(broad_id)
             st.rerun()
-        if mid_id is not None:
-            if st.button(f"▸ Mid: {_topic_label('mid', mid_id)}", key="bc_mid"):
-                _select_mid(mid_id)
-                st.rerun()
-        if fine_id is not None:
-            if st.button(f"▸ Fine: {_topic_label('fine', fine_id)}", key="bc_fine"):
-                _select_fine(fine_id)
-                st.rerun()
+        if mid_id is not None and st.button(f"▸ Mid: {_topic_label('mid', mid_id)}", key="bc_mid"):
+            _select_mid(mid_id)
+            st.rerun()
+        if fine_id is not None and st.button(f"▸ Fine: {_topic_label('fine', fine_id)}", key="bc_fine"):
+            _select_fine(fine_id)
+            st.rerun()
 
     st.divider()
     if broad_id is not None and st.button("⬆ Back", key="back", use_container_width=True):

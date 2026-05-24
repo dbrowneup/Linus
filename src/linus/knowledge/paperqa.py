@@ -56,6 +56,7 @@ hackathon-prep framing this module ships against.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 from pathlib import Path
@@ -352,15 +353,12 @@ class LinusPaperQA:
             summary_llm_config=llm_config,
             embedding=_embedding_model_name(),
         )
-        # Point paper-qa's agent index at our papers directory.
-        try:
+        # Point paper-qa's agent index at our papers directory. Older
+        # paper-qa versions may surface a different settings tree; if the
+        # attribute layout differs, defer to whatever the default
+        # Settings provides — the spec drift is flagged in the PR description.
+        with contextlib.suppress(AttributeError):
             self._settings.agent.index.paper_directory = str(self.papers_dir)
-        except AttributeError:
-            # Older paper-qa versions may surface a different settings tree.
-            # If the attribute layout differs, defer to whatever the
-            # default Settings provides — the spec drift is flagged in
-            # the PR description.
-            pass
 
         self._docs = Docs()
         self._loaded = True
