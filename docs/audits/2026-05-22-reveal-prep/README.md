@@ -19,10 +19,22 @@ items, and capture forward-looking Linus-flavored design input for Dan's Archime
 ## Companion design memo
 
 - [`strategy-engine-linus-flavor.md`](strategy-engine-linus-flavor.md) — Linus-flavored design
-  ideas for the Archimedes strategy engine that Dan owns. Five concrete patterns lifted from
-  Linus's recent work (grounding gate analog, provenance-traced steps, multi-Worker generation +
-  critique, network-policy framework, loud-degradation health surface) — each with smallest-first-
-  step. Not an audit; a forward-looking memo for Dan's own design work on Archimedes.
+  retrospective + forward for the Archimedes strategy engine that Dan owns. Originally written
+  2026-05-22 as five forward-looking patterns lifted from Linus's recent work; **refreshed
+  2026-05-23** against the live Archimedes repo into a retrospective on what shipped (and how
+  the shipped shape diverged from the proposal) plus three new forward proposals informed by
+  current state, `spine-plus-v2-plan.md`, and the 2026-05-23 launch-execution-plan. Not an
+  audit; a thinking-aid memo for Dan's Archimedes ownership work.
+
+## Refresh note (2026-05-23)
+
+Both [`archimedes-orient.md`](archimedes-orient.md) and
+[`strategy-engine-linus-flavor.md`](strategy-engine-linus-flavor.md) were originally written
+2026-05-22 by sub-agents sandbox-blocked from reading `repos/archimedes/`; they grounded on
+in-tree priors from 2026-05-12 → 2026-05-14. The 2026-05-23 refresh re-sources both against the
+live Archimedes repo (~340 commits later) and against Dan's own source-verified bidirectional
+comparison at `docs/research/linus-archimedes-comparison.md` in the Archimedes repo (the
+authoritative bidirectional source — this Linus-side pair complements rather than mirrors it).
 
 ## Note on shape
 
