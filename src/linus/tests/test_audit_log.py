@@ -26,14 +26,13 @@ from linus.memory.audit_log import (
     default_audit_path,
 )
 
-
 # ── module-level constants + default_audit_path() ──────────────────────────
 
 
 def test_default_audit_path_constant_points_under_dot_linus() -> None:
     """The DEFAULT_AUDIT_PATH constant must resolve to ``~/.linus/audit.jsonl``
     so the on-disk artifact landing-zone is stable across releases."""
-    assert DEFAULT_AUDIT_PATH == Path.home() / ".linus" / "audit.jsonl"
+    assert Path.home() / ".linus" / "audit.jsonl" == DEFAULT_AUDIT_PATH
     assert DEFAULT_AUDIT_PATH.name == "audit.jsonl"
 
 

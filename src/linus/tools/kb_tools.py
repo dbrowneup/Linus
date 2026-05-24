@@ -25,7 +25,6 @@ from typing import Any
 from linus.knowledge import KnowledgeBaseAdapter, Paper
 from linus.tools.registry import tool
 
-
 # Singleton adapter — created on demand. Tests can monkeypatch this attribute to
 # inject a fixture-backed adapter; the indirection through ``_get_adapter`` keeps
 # the patch site stable.

@@ -77,17 +77,11 @@ except KnowledgeBaseUnavailableError as exc:
 try:
     rows, skipped = run_search(query.strip(), method=method, top_k=top_k, adapter=adapter)
 except NotImplementedError as exc:
-    st.warning(
-        f"**{method.title()} retrieval not yet wired in this Linus build.**\n\n"
-        f"{exc}"
-    )
+    st.warning(f"**{method.title()} retrieval not yet wired in this Linus build.**\n\n{exc}")
     st.stop()
 
 if skipped:
-    st.info(
-        "Methods skipped (interface present, implementation pending): "
-        + ", ".join(skipped)
-    )
+    st.info("Methods skipped (interface present, implementation pending): " + ", ".join(skipped))
 
 st.markdown(f"**{len(rows)} result(s)** for `{query}` via `{method}`.")
 

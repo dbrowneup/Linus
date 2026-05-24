@@ -40,8 +40,8 @@ class TopicScale:
     """All per-paper + per-cluster info for one of the three scales."""
 
     scale: Scale
-    paper_to_cluster: dict[str, str]   # sha256 → cluster_id
-    cluster_to_label: dict[str, str]   # cluster_id → human-readable topic label
+    paper_to_cluster: dict[str, str]  # sha256 → cluster_id
+    cluster_to_label: dict[str, str]  # cluster_id → human-readable topic label
     cluster_to_papers: dict[str, list[str]] = field(default_factory=dict)
 
     def papers_in_cluster(self, cluster_id: str) -> list[str]:
@@ -61,7 +61,7 @@ class ClusterData:
     fine_to_mid: dict[str, str]
     mid_to_broad: dict[str, str]
     umap_3d: np.ndarray | None  # shape (N, 3) or None if file absent
-    umap_sha256s: list[str]     # parallel to rows of umap_3d
+    umap_sha256s: list[str]  # parallel to rows of umap_3d
 
     def scale(self, name: Scale) -> TopicScale:
         return {"broad": self.broad, "mid": self.mid, "fine": self.fine}[name]
@@ -125,16 +125,16 @@ def _coerce_labels(raw: object) -> dict[str, str]:
             shas = raw["sha256s"]
             labs = raw["labels"]
             if isinstance(shas, list) and isinstance(labs, list) and len(shas) == len(labs):
-                return {str(s): str(int(label) if isinstance(label, (int, float)) else label) for s, label in zip(shas, labs)}
+                return {
+                    str(s): str(int(label) if isinstance(label, (int, float)) else label)
+                    for s, label in zip(shas, labs, strict=False)
+                }
             return {}
         out: dict[str, str] = {}
         for sha, cid in raw.items():
             if cid is None:
                 continue
-            if isinstance(cid, (int, float)):
-                cid_str = str(int(cid))
-            else:
-                cid_str = str(cid)
+            cid_str = str(int(cid)) if isinstance(cid, (int, float)) else str(cid)
             out[str(sha)] = cid_str
         return out
     return {}
@@ -174,9 +174,7 @@ def _load_scale(outputs_dir: Path, scale: Scale) -> TopicScale:
     )
 
 
-def _derive_parent_map_via_majority(
-    child_scale: TopicScale, parent_scale: TopicScale
-) -> dict[str, str]:
+def _derive_parent_map_via_majority(child_scale: TopicScale, parent_scale: TopicScale) -> dict[str, str]:
     """For each cluster at child scale, find its parent at parent scale by majority vote.
 
     For each child cluster, look at its papers and find what parent
@@ -254,10 +252,7 @@ def _load_umap(outputs_dir: Path) -> tuple[np.ndarray | None, list[str]]:
         return None, []
 
     raw = _read_json(sha_path)
-    if isinstance(raw, list):
-        shas = [str(s) for s in raw]
-    else:
-        shas = []
+    shas = [str(s) for s in raw] if isinstance(raw, list) else []
 
     # If sha list length doesn't match, the alignment is broken — return without shas
     # rather than fail; the page can render the scatter without click-back-to-paper.

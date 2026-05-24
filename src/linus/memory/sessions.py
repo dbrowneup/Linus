@@ -49,10 +49,10 @@ import sqlite3
 import threading
 import time
 import uuid
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator
 
 DEFAULT_DB_PATH = Path.home() / ".linus" / "sessions.db"
 
@@ -184,7 +184,7 @@ class SessionStore:
                 self._conn.close()
                 self._conn = None
 
-    def __enter__(self) -> "SessionStore":
+    def __enter__(self) -> SessionStore:
         with self._lock:
             self._connect()
         return self

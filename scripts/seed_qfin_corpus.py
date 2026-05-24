@@ -114,9 +114,7 @@ def main(argv: list[str] | None = None) -> int:
             ok_count += 1
 
     print()
-    print(
-        f"Done. ingested={ok_count}  cached={skipped_count}  failed={fail_count}  total={len(ids)}"
-    )
+    print(f"Done. ingested={ok_count}  cached={skipped_count}  failed={fail_count}  total={len(ids)}")
     print()
     print("Next step: run the KB pipeline against this corpus.")
     print("See modules/QFinCorpus/README.md for the two-option playbook.")

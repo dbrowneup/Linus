@@ -590,9 +590,7 @@ def test_read_records_in_list_chunks_preserve_order_and_limit(store: EpisodicSto
     huge_filter = list(range(100)) + list(range(1000, 1500))
     assert len(huge_filter) == 600
 
-    out_desc = store.read_records(
-        {"session_id": "s1", "turn_id": huge_filter, "order": "desc", "limit": 5}
-    )
+    out_desc = store.read_records({"session_id": "s1", "turn_id": huge_filter, "order": "desc", "limit": 5})
     # Limit applied after merge; desc order over the merged set → highest 5 turn_ids.
     assert [r.turn_id for r in out_desc] == [99, 98, 97, 96, 95]
 

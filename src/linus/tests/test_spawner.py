@@ -34,8 +34,9 @@ def test_all_tasks_succeed() -> None:
         AgentTask(name="describe-cat", system="", user="describe a cat"),
     ]
 
-    with patch("linus.agents.spawner.ollama.chat") as mock_chat, patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.agents.spawner.ollama.chat") as mock_chat,
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b"),
     ):
         mock_chat.side_effect = [
             _ok_chat_response("hello"),
@@ -74,8 +75,9 @@ def test_per_task_failure_isolated_to_that_task() -> None:
             raise RuntimeError("simulated ollama crash")
         return _ok_chat_response("ok")
 
-    with patch("linus.agents.spawner.ollama.chat", side_effect=side_effect), patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.agents.spawner.ollama.chat", side_effect=side_effect),
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b"),
     ):
         results = asyncio.run(spawn_agents(tasks))
 
@@ -118,8 +120,9 @@ def test_concurrency_actually_parallelizes() -> None:
         time.sleep(0.1)
         return _ok_chat_response("ok")
 
-    with patch("linus.agents.spawner.ollama.chat", side_effect=slow_chat), patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.agents.spawner.ollama.chat", side_effect=slow_chat),
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b"),
     ):
         start = time.perf_counter()
         results = asyncio.run(spawn_agents(tasks, concurrency=3))
@@ -141,8 +144,9 @@ def test_concurrency_limit_serializes_excess() -> None:
         time.sleep(0.1)
         return _ok_chat_response("ok")
 
-    with patch("linus.agents.spawner.ollama.chat", side_effect=slow_chat), patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.agents.spawner.ollama.chat", side_effect=slow_chat),
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b"),
     ):
         start = time.perf_counter()
         results = asyncio.run(spawn_agents(tasks, concurrency=1))
@@ -157,8 +161,9 @@ def test_max_tokens_threaded_into_ollama_options() -> None:
     """max_tokens=50 should map to Ollama's options['num_predict'] = 50."""
     tasks = [AgentTask(name="capped", system="", user="hi", max_tokens=50)]
 
-    with patch("linus.agents.spawner.ollama.chat", return_value=_ok_chat_response("hi")) as mock_chat, patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.agents.spawner.ollama.chat", return_value=_ok_chat_response("hi")) as mock_chat,
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b"),
     ):
         asyncio.run(spawn_agents(tasks))
 
@@ -170,9 +175,10 @@ def test_default_model_used_when_none_specified() -> None:
     """task.model=None routes through default model resolution."""
     tasks = [AgentTask(name="default-model", system="", user="hi")]
 
-    with patch("linus.agents.spawner.ollama.chat", return_value=_ok_chat_response("ok")), patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
-    ) as mock_resolve:
+    with (
+        patch("linus.agents.spawner.ollama.chat", return_value=_ok_chat_response("ok")),
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b") as mock_resolve,
+    ):
         results = asyncio.run(spawn_agents(tasks))
 
     mock_resolve.assert_called_once_with("qwen3:8b")
@@ -217,8 +223,9 @@ def test_run_sync_catches_message_extraction_failure_as_agent_result_error() -> 
             return {"message": _BrokenMessage()}
         return _ok_chat_response("ok")
 
-    with patch("linus.agents.spawner.ollama.chat", side_effect=side_effect), patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.agents.spawner.ollama.chat", side_effect=side_effect),
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b"),
     ):
         results = asyncio.run(spawn_agents(tasks))
 
@@ -256,8 +263,9 @@ def test_handles_both_dict_and_object_message_shapes(message_field: str) -> None
         response = {"message": _MessageObj()}
         expected = "hello-object"
 
-    with patch("linus.agents.spawner.ollama.chat", return_value=response), patch(
-        "linus.agents.spawner._resolve_model", return_value="qwen3:8b"
+    with (
+        patch("linus.agents.spawner.ollama.chat", return_value=response),
+        patch("linus.agents.spawner._resolve_model", return_value="qwen3:8b"),
     ):
         results = asyncio.run(spawn_agents(tasks))
 

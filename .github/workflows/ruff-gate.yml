@@ -1,0 +1,31 @@
+# Ruff gate — blocks PRs on formatting + the critical lint rule families that
+# catch real bugs (syntax errors, undefined names/modules). Mirrors the
+# ruff-gate job in Archimedes (.github/workflows/quality-gate.yml :: ruff-gate)
+# so the same code passes the same gate in both repos — Linus is consumed as
+# a submodule under Archimedes and shared CI shape avoids drift noise.
+#
+# Reads [tool.ruff] from pyproject.toml.
+
+name: Ruff Gate
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ruff-gate:
+    name: Ruff — format + critical lint rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet ruff
+      - name: ruff format --check
+        run: ruff format --check .
+      - name: ruff check (critical rules only)
+        run: ruff check --select E9,F63,F7,F40,F82 .

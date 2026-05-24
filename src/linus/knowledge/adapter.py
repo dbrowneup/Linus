@@ -28,6 +28,7 @@ substrate (SPARQL + property graph) lands in Phase 2f. See
 
 from __future__ import annotations
 
+import contextlib
 import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -236,19 +237,15 @@ class KnowledgeBaseAdapter:
         context-manager form; this hook just narrows the leak window
         when they don't.
 
-        Wrapped in ``try/except`` because ``__del__`` runs at interpreter
-        shutdown where module references may already be torn down, and
-        because the connection may have been closed or invalidated by
-        other means. Swallowing any exception keeps interpreter shutdown
-        quiet — a failed cleanup at exit is not actionable.
+        Wrapped in ``contextlib.suppress`` because ``__del__`` runs at
+        interpreter shutdown where module references may already be torn
+        down, and because the connection may have been closed or
+        invalidated by other means. Never let ``__del__`` raise —
+        CPython's resource-cleanup ignores it but emits a noisy warning,
+        and at shutdown the exception may be ungettable anyway.
         """
-        try:
+        with contextlib.suppress(Exception):
             self.close()
-        except Exception:
-            # Never let __del__ raise — CPython's resource-cleanup
-            # ignores it but emits a noisy warning, and at interpreter
-            # shutdown the exception may be ungettable anyway.
-            pass
 
     # --- queries --------------------------------------------------------------
 
@@ -316,10 +313,7 @@ class KnowledgeBaseAdapter:
             # without it; ``year DESC`` alone is fine — NULL years just sort to the
             # head, which is a cosmetic difference, not a correctness one.
             sql_fallback = (
-                f"SELECT {cols} FROM papers "
-                f"WHERE is_supplement = 0 AND ({where}) "
-                "ORDER BY year DESC, title "
-                "LIMIT ?"
+                f"SELECT {cols} FROM papers WHERE is_supplement = 0 AND ({where}) ORDER BY year DESC, title LIMIT ?"
             )
             rows = conn.execute(sql_fallback, params).fetchall()
 

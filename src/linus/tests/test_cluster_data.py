@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 
 import numpy as np
-import pytest
 
 from linus.app.cluster_data import load_cluster_data
 

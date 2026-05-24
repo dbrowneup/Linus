@@ -21,7 +21,6 @@ import pytest
 
 from linus.tools.registry import ToolError, ToolRegistry, tool
 
-
 # ---------------------------------------------------------------------------
 # test_registry_register_and_lookup
 # ---------------------------------------------------------------------------
