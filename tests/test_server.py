@@ -56,9 +56,12 @@ def test_root_endpoint_returns_identity_and_endpoint_map(client: TestClient) -> 
     body = resp.json()
     assert body["name"] == "Linus"
     assert "endpoints" in body
-    # Sanity-check a few key endpoints are advertised:
+    # Sanity-check a few key endpoints are advertised. The "health" entry
+    # also advertises the `/health` alias inline (see server.py root()), so
+    # assert containment rather than exact equality — keeps the test from
+    # going brittle to future tweaks of the alias-suffix text.
     endpoints = body["endpoints"]
-    assert endpoints["health"] == "GET /healthz"
+    assert "GET /healthz" in endpoints["health"]
     assert "openai_chat_completions" in endpoints
     assert "anthropic_messages" in endpoints
 
