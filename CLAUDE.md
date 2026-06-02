@@ -72,8 +72,10 @@ Ship rough, learn, iterate.
 - **Maestro** = Dan + hosted Claude (this chat, Claude Code, Claude.ai). Architecture, planning, spec writing, hard
   debugging, taste-level decisions.
 - **Worker** = local models. Current practical Worker on 32 GB M1 Max is `qwen3:8b` (FP16) — empirically validated
-  2026-05-18 against `qwen3.6:27b` which swap-thrashed at the 600s timeout on all Dan tasks. Bulk implementation,
-  test generation, refactors, pipeline execution.
+  2026-05-18 against `qwen3.6:27b` which swap-thrashed at the 600s timeout on all Dan tasks. **`qwen3.6:27b` (and other
+  27B-class models) are dropped from all further testing as of 2026-06-02** — they exhaust unified memory and lock the
+  machine; larger, more capable models await a memory-streaming serving path (e.g. pmetal) that doesn't blow the 32 GB
+  ceiling. Bulk implementation, test generation, refactors, pipeline execution.
 - Maestro attention is the scarce resource. Push any well-specified task to Workers.
 
 ### Evidence beats intuition
@@ -429,6 +431,13 @@ checkout rather than the worktree — the resolver anchors to the registered pri
 an agent reports "file already has this content" or edits appear in the wrong checkout, the root cause is almost always
 absolute-path resolution. Recovery: capture `git diff` in main, `git checkout --` to restore main, `git apply` inside
 the worktree.
+
+**Editable installs (`pip install -e .`) collide with worktrees on import resolution.** When `pip install -e .` is run
+from the main checkout, the resulting `.pth` / `__editable__` finder points Python at the **main** checkout's `src/`, so
+`python -c "import linus.foo"` and `pytest` inside a worktree silently resolve to MAIN's code, not the worktree's. Every
+fix agent in the 2026-05-21 arc hit this. Recovery: run the worktree's Python with `PYTHONPATH=<worktree>/src pytest ...`
+(or `cd <worktree> && PYTHONPATH=$PWD/src ...`) so the worktree's source wins. Suspect it whenever a worktree agent's
+test run passes or fails in a way that doesn't match the edits it just made (R5-04).
 
 **Handoff artifacts written into a worktree are invisible to humans in the main checkout.** Write handoff files (specs,
 briefs, drafts in `experiments/`) using the main-checkout absolute path
