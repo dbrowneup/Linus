@@ -429,8 +429,8 @@ def _kb_artifact_paths() -> list[tuple[str, Path]]:
     from linus.app.config import KB_EMBEDDINGS_DIR, KB_METADATA_DB, KB_OUTPUTS_DIR
 
     return [
-        ("hierarchy.json", KB_OUTPUTS_DIR / "hierarchy.json"),
-        ("labels_broad.json", KB_OUTPUTS_DIR / "labels_broad.json"),
+        ("hierarchy.json", KB_OUTPUTS_DIR / "clusters" / "hierarchy.json"),
+        ("labels_broad.json", KB_OUTPUTS_DIR / "clusters" / "labels_broad.json"),
         ("graph_sigma.html", KB_OUTPUTS_DIR / "graph" / "graph_sigma.html"),
         ("kg_graph.graphml", KB_OUTPUTS_DIR / "knowledge_graph" / "kg_graph.graphml"),
         ("metadata.db", KB_METADATA_DB),
