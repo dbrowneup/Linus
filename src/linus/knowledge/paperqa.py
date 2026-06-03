@@ -306,6 +306,7 @@ class LinusPaperQA:
         self._docs: Any = None
         self._settings: Any = None
         self._loaded: bool = False
+        self._ingested: bool = False
 
     # --- lazy paper-qa import ---------------------------------------------
 
@@ -363,6 +364,34 @@ class LinusPaperQA:
         self._docs = Docs()
         self._loaded = True
 
+    async def _ensure_ingested(self) -> None:
+        """Ingest every PDF under :attr:`papers_dir` into :attr:`_docs` once.
+
+        paper-qa's :meth:`Docs.aquery` / :meth:`Docs.aget_evidence` operate
+        only over documents explicitly added via :meth:`Docs.aadd`.
+        Constructing an empty :class:`Docs` and querying it returns zero
+        contexts — the pre-2026-06 bug where the corpus was never loaded, so
+        the marquee always answered "I cannot answer". This adds each
+        ``*.pdf`` in the papers directory on first use; paper-qa deduplicates
+        by content hash so re-adds are cheap. Idempotent via
+        :attr:`_ingested`.
+
+        Per-file failures are logged and skipped rather than aborting the
+        whole ingest — one unreadable PDF must not sink the corpus.
+        """
+        if self._ingested:
+            return
+        pdfs = sorted(self.papers_dir.glob("*.pdf"))
+        ingested = 0
+        for pdf in pdfs:
+            try:
+                await self._docs.aadd(str(pdf), settings=self._settings)
+                ingested += 1
+            except Exception as exc:  # noqa: BLE001 — one bad PDF must not sink ingest
+                logger.warning("paperqa: skipped %s during ingest: %s: %s", pdf.name, type(exc).__name__, exc)
+        logger.info("paperqa: ingested %d/%d PDFs from %s", ingested, len(pdfs), self.papers_dir)
+        self._ingested = True
+
     # --- public surface ----------------------------------------------------
 
     async def search(self, query: str, k: int = 10) -> list[dict[str, Any]]:
@@ -382,6 +411,7 @@ class LinusPaperQA:
         if k < 1:
             raise ValueError(f"k must be >= 1, got {k}")
         self._ensure_loaded()
+        await self._ensure_ingested()
 
         from paperqa import PQASession  # type: ignore[import-not-found]
 
@@ -403,6 +433,7 @@ class LinusPaperQA:
         contexts).
         """
         self._ensure_loaded()
+        await self._ensure_ingested()
 
         from paperqa import PQASession  # type: ignore[import-not-found]
 
@@ -435,6 +466,7 @@ class LinusPaperQA:
         if max_sources < 1:
             raise ValueError(f"max_sources must be >= 1, got {max_sources}")
         self._ensure_loaded()
+        await self._ensure_ingested()
 
         from paperqa import PQASession  # type: ignore[import-not-found]
 
@@ -470,6 +502,7 @@ class LinusPaperQA:
             return {"status": "reset", "detail": "no-op (facade not yet loaded)"}
 
         self._docs.clear_docs()
+        self._ingested = False
         return {"status": "reset", "detail": "docs collection cleared"}
 
 

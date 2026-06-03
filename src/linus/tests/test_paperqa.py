@@ -1027,3 +1027,42 @@ def test_adapter_paper_lookup_caches_per_paper_id() -> None:
 
     assert adapter.call_count == 2
     assert adapter.calls_by_id == {"a": 1, "b": 1}
+
+
+def test_ensure_ingested_adds_each_pdf_once_and_is_idempotent(tmp_path) -> None:
+    """``_ensure_ingested`` aadds every PDF in the papers dir exactly once, skips
+    non-PDFs, and is idempotent (the ``_ingested`` flag short-circuits).
+
+    Regression guard for the empty-``Docs`` bug: before this, ``answer`` built a
+    fresh empty ``Docs`` and queried it without ever loading the corpus, so the
+    marquee always answered "I cannot answer".
+    """
+    import asyncio
+
+    from linus.knowledge.paperqa import LinusPaperQA
+
+    papers = tmp_path / "papers"
+    papers.mkdir()
+    (papers / "a.pdf").write_bytes(b"%PDF-1.4 a")
+    (papers / "b.pdf").write_bytes(b"%PDF-1.4 b")
+    (papers / "notes.txt").write_text("ignored")  # non-PDF must be skipped
+
+    facade = LinusPaperQA(papers_dir=papers)
+    added: list[str] = []
+
+    class _FakeDocs:
+        async def aadd(self, path, settings=None):  # noqa: ANN001
+            added.append(str(path))
+            return "dockey"
+
+    facade._docs = _FakeDocs()
+    facade._settings = object()
+    facade._loaded = True  # skip the real paper-qa import
+
+    asyncio.run(facade._ensure_ingested())
+    assert sorted(p.rsplit("/", 1)[-1] for p in added) == ["a.pdf", "b.pdf"]
+    assert facade._ingested is True
+
+    # Idempotent: a second call adds nothing more.
+    asyncio.run(facade._ensure_ingested())
+    assert len(added) == 2

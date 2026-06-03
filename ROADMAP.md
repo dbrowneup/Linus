@@ -22,7 +22,7 @@ Legend: ✅ done · 🔄 in progress · 🔲 not started · ⏸️ deferred (tar
 | -------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------- |
 | 0 — Foundation                   | ✅    | Closed.                                                                                                    |
 | 1 — Recon & Baselines            | 🔄    | 1a/1d/1e ✅; **1b pmetal trials, 1c Worker-selection Pareto, 1f minGRU 🔲** — committed to an Arc-2 pass.   |
-| 2 — Linus MVP                    | 🔄    | Feature-complete + 701 hermetic tests, but **UNTAGGED** — `__about__.py` is `0.0.1.dev0`, newest tag `v0.4.0`. v0.5.0 gated on UI bug-fixes + the (never-recorded) RAG-vs-no-RAG measurement. |
+| 2 — Linus MVP                    | ✅    | **v0.5.0 tagged 2026-06-02** — the orchestration substrate (704 tests). Corpus-scale citation-grounded RAG marquee deferred to **v0.6.0** (paper-qa proved too slow; Linus-native full-text-chunk substrate planned). |
 | 3 — Knowledge & Parallel Agents  | 🔲    | Agent-spawner v0 already absorbed into Phase 2 (`src/linus/agents/spawner.py`); the rest is not started.    |
 | 4 — Data Sovereignty             | 🔲    | Not started.                                                                                                |
 | 5 — Interface Refinement         | 🔲    | Not started; the 7-page Streamlit UI is the de facto v0.5.0 surface ahead of schedule.                      |
@@ -30,9 +30,11 @@ Legend: ✅ done · 🔄 in progress · 🔲 not started · ⏸️ deferred (tar
 | 7 — Skills & Autonomy            | 🔲    | Not started.                                                                                                |
 | 8 — Beyond MacBook               | 🔲    | Not started.                                                                                                |
 
-**The single most load-bearing open item:** the Phase-2→3 gate — "paper-grounded answers measurably better than the
-same local model without Linus's RAG" — has **never been measured**. It is the North-Star value claim and gates the
-v0.5.0 tag. See Phase 2 below.
+**The next marquee:** the Phase-2→3 gate — "paper-grounded answers measurably better than the same local model without
+Linus's RAG" — is **not yet measured**, because the corpus-scale RAG itself is being rebuilt natively for **v0.6.0**
+(paper-qa proved structurally too slow as a corpus engine). It is the North-Star value claim and gates v0.6.0, not the
+v0.5.0 substrate tag. See Phase 2 below and the
+[RAG evaluation](docs/specs/2026-06-02-paperqa-evaluation-and-linus-native-rag.md).
 
 ---
 
@@ -191,14 +193,19 @@ and private benchmarks, (c) the Maestro/Worker pattern works end-to-end on a rea
 **Goal:** a minimal but real Linus orchestration backend + a chat UI, grounded in KnowledgeBase, demo-able to a peer in
 under 5 minutes.
 
-**Status snapshot (2026-06-02): ✅ feature-complete · 🔲 UNTAGGED — v0.5.0 not yet cut.**
+**Status snapshot (2026-06-02): ✅ v0.5.0 tagged — the orchestration substrate.**
 
 Phase 2 MVP shipped 2026-05-19 as **v0.4.0** (PRs #66–#82); the v0.5.0 reveal-prep arc ran through PR #136
-(2026-05-23), and Linus was revealed publicly at the Agora hackathon on 2026-05-25. Hermetic suite at **701 tests**
-(~7s), zero regressions. **But v0.5.0 was never formally cut:** `src/linus/__about__.py` is still `0.0.1.dev0` and the
-newest git tag is `v0.4.0`. Closing v0.5.0 (Arc 1) is gated on (a) fixing the remaining Streamlit UI bugs Dan hits in
-use and (b) recording the RAG-vs-no-RAG delta on the Dan task suite — the Phase-2→3 gate criterion, **which has never
-been measured** (the newest benchmark, 2026-05-18, predates paper-qa landing on 2026-05-19).
+(2026-05-23), Linus was first revealed publicly at the Agora hackathon on 2026-05-25, and **v0.5.0 was tagged
+2026-06-02** after a substrate-hardening pass (healthz path fix #138, Cluster Explorer labels #139, paper-qa ingest
+fix, core-doc truth-up #137; hermetic suite at **704 tests**). **What v0.5.0 is:** the local orchestration substrate —
+OpenAI + Anthropic endpoints, streaming, tool loop, sessions, sandbox, memory pillar, KB-browse UI, loud `/healthz`
+degradation, network policy. **What it is not (deferred to v0.6.0):** the corpus-scale, citation-grounded RAG marquee.
+Live testing showed paper-qa is structurally too slow as a corpus engine (~11 LLM calls/query + re-embedding full text
+every process), so it is demoted to an optional "few named papers" tool and the v0.6.0 marquee is a Linus-native
+full-text-chunk RAG substrate — see
+[the evaluation](docs/specs/2026-06-02-paperqa-evaluation-and-linus-native-rag.md). The RAG-vs-no-RAG measurement moves
+to v0.6.0 (it gates that marquee, not the substrate tag).
 
 - **2a Orchestration backend:** shipped — FastAPI server at `src/linus/server.py` with OpenAI-compatible
   `/v1/chat/completions` (PRs #32 + #40), streaming SSE (PR #72), Anthropic `/v1/messages` per DEC-0056 (PR #73),
@@ -336,8 +343,9 @@ non-conformant; Phase 2 will not ship with a non-conformant Worker as default.
 - Skills (Phase 7)
 
 **Gate to Phase 3:** MVP demo-able end-to-end. Paper-grounded answers measurably better than the same local model
-without Linus's RAG on the Dan task suite. **🔲 Not yet met — the RAG-vs-no-RAG delta has never been measured (Arc 1 /
-A2). This is the gate that closes Phase 2 and tags v0.5.0.**
+without Linus's RAG on the Dan task suite. **🔲 Not yet met — deferred to v0.6.0: the corpus-scale RAG is being rebuilt
+natively (paper-qa proved too slow), and the RAG-vs-no-RAG delta is measured once that lands. The v0.5.0 substrate tag
+does not depend on it.**
 
 ---
 
