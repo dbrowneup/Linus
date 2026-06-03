@@ -58,6 +58,35 @@ def test_cluster_to_papers_inversion(tmp_path: Path) -> None:
     assert sorted(data.mid.cluster_to_papers["10"]) == ["p1", "p2", "p3"]
 
 
+def test_dict_shaped_topics_resolve_to_name_not_repr(tmp_path: Path) -> None:
+    """BERTopic dict-shaped topic values (``{'id','size','name','top_words'}``,
+    the shape the real KB pipeline emits) resolve to their ``name`` field, not
+    the raw ``{'id': ...}`` dict repr. Regression guard for the Cluster Explorer
+    rendering raw dicts as topic labels."""
+    _write(tmp_path / "labels_fine.json", {"p1": 100, "p2": 100, "p3": 101})
+    _write(tmp_path / "labels_mid.json", {"p1": 10, "p2": 10, "p3": 10})
+    _write(tmp_path / "labels_broad.json", {"p1": 1, "p2": 1, "p3": 1})
+    _write(
+        tmp_path / "topics_fine.json",
+        {
+            "100": {"id": 100, "size": 2, "name": "100_alpha_beta", "top_words": ["alpha", "beta"]},
+            "101": {"id": 101, "size": 1, "name": "", "top_words": ["gamma", "delta"]},  # empty name → top_words
+        },
+    )
+    _write(tmp_path / "topics_mid.json", {"10": {"id": 10, "size": 3, "name": "10_midname", "top_words": ["m"]}})
+    _write(tmp_path / "topics_broad.json", {"1": {"id": 1, "size": 3, "name": "1_broadname", "top_words": ["b"]}})
+
+    data = load_cluster_data(tmp_path)
+    assert data is not None
+    assert data.fine.cluster_to_label["100"] == "100_alpha_beta"
+    assert data.fine.cluster_to_label["101"] == "gamma, delta"  # fell back to top_words
+    assert data.mid.cluster_to_label["10"] == "10_midname"
+    assert data.broad.cluster_to_label["1"] == "1_broadname"
+    # No raw-dict reprs leaked through at any scale.
+    for scale in (data.broad, data.mid, data.fine):
+        assert all("{" not in label for label in scale.cluster_to_label.values())
+
+
 def test_hierarchy_majority_vote_fallback(tmp_path: Path) -> None:
     """No hierarchy.json → fine_to_mid + mid_to_broad derived via majority vote."""
     _seed_minimal(tmp_path)
