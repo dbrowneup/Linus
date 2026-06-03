@@ -93,3 +93,58 @@ Keep the in-tree `linus.knowledge.paperqa` wrapper + this session's ingest fix a
 "deep-dive over a few named papers" tool** (it works for small, explicit sets), but **demote it
 from the corpus marquee.** Supersede DEC-0044 with a new ADR adopting the Linus-native substrate
 once the direction is chosen.
+
+## Speed vs. rigor is not a strict frontier (deeper analysis, per Dan's prompt)
+
+Dan's instinct — that fast and precise needn't be mutually exclusive — is correct. paper-qa's
+latency doesn't come from "rigor"; it comes from **one expensive way of buying precision**: an
+LLM call per retrieved chunk (`evidence_k` summaries). That conflates rigor with a single
+implementation. Precision in RAG actually comes from several independent levers, and most are far
+cheaper than per-chunk LLM summarization:
+
+- **Retrieval quality — the dominant lever, and cheap.** The answer is only as good as the top-k
+  passages. Wins: coherent chunking (semantic/structural, not arbitrary 5000-char cuts); a strong
+  embedder; **hybrid dense + lexical retrieval fused via RRF** (KB already has TF-IDF + SPECTER2 —
+  the qmd RRF pattern is liftable); optional one-shot query expansion / HyDE. Get the top-k
+  _right_ and the expensive per-chunk filtering becomes largely redundant.
+- **Cross-encoder reranking — most of paper-qa's per-chunk benefit at ~1000× less cost.** A small
+  cross-encoder reorders the top-k by query–passage relevance in **milliseconds**, no per-chunk
+  LLM call. This captures the relevance-scoring half of paper-qa's evidence step almost for free.
+- **Citation verification as a cheap post-hoc gate, not an upfront map.** Dan's rigor = _the claim
+  traces to a verifiable passage_. Achieved by feeding the synthesis LLM the actual passages with
+  stable ids, requiring inline citations, then **verifying each cited claim against its passage** —
+  which Linus already has in `rigor.py` (DEC-0059). That's one structured check (or a cheap
+  entailment model), not N LLM summaries.
+
+What the per-chunk LLM summary genuinely adds is (a) relevance scoring — a cross-encoder does this
+cheaper — and (b) compressing each chunk to its question-relevant core, which matters only when
+chunks are long/noisy and context is tight. Both shrink with better chunking and larger context
+windows. So: paper-qa sits at an _expensive corner_, not on an unavoidable speed/rigor frontier.
+
+**Design consequence for the v0.6.0 Linus-native RAG.** Don't frame it as a binary "fast mode vs
+rigorous mode." Make the **default both fast and well-grounded**:
+
+```
+persistent full-text chunk store
+  → hybrid retrieve top-N (dense + BM25, fused via RRF)
+  → cross-encoder rerank to top-k
+  → one grounded-citation synthesis call
+  → rigor.py verifies every cited claim against its cited passage
+```
+
+and reserve an **optional max-rigor top-up** (paper-qa-style per-chunk LLM extraction, or a second
+verification pass) for genuinely high-stakes claims (manuscript submission). The knob isn't "speed
+vs rigor"; it's "how much _marginal_ precision to pay on top of an already fast-and-grounded
+baseline." Most queries never need the top-up.
+
+This reframes the open decisions above:
+
+- The two model choices that matter are the **full-text chunk embedder** and a **small local
+  cross-encoder reranker** — both swappable behind a clean interface (the modular boundary Dan
+  asked for, so we can rebuild a component if it's a bottleneck).
+- **Persistence scope** (whole-corpus pre-embed vs grow-on-demand-and-cache) becomes a pure
+  cost/coverage call, now decoupled from the speed/rigor question.
+- The deferred **RAG-vs-no-RAG measurement** should evaluate this default pipeline and **ablate the
+  levers** (retrieval-only → +rerank → +LLM-topup) — turning Dan's "are they exclusive?" question
+  into an empirical speed/precision curve rather than an assumption.
+
