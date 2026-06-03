@@ -141,17 +141,42 @@ def _coerce_labels(raw: object) -> dict[str, str]:
 
 
 def _coerce_topics(raw: object) -> dict[str, str]:
-    """Normalize topics file into ``{cluster_id_str: topic_label}``."""
+    """Normalize topics file into ``{cluster_id_str: topic_label}``.
+
+    KB ships each topic value in one of two shapes:
+
+    1. a plain label string, or
+    2. a BERTopic-style dict ``{"id", "size", "name", "top_words"}`` — in
+       which case the human-readable label is the ``name`` field (falling
+       back to the joined ``top_words``), NOT the ``str(dict)`` repr. Older
+       code stringified the whole dict, which leaked raw
+       ``{'id': 1, 'size': 178, ...}`` text into the Cluster Explorer's
+       topic list and Sankey node labels.
+    """
     if isinstance(raw, dict):
         out: dict[str, str] = {}
         for cid, label in raw.items():
             if cid is None or label is None:
                 continue
             cid_str = str(int(cid)) if isinstance(cid, (int, float)) else str(cid)
-            label_str = label if isinstance(label, str) else str(label)
-            out[cid_str] = label_str
+            out[cid_str] = _topic_label_from_value(label, cid_str)
         return out
     return {}
+
+
+def _topic_label_from_value(label: object, cid_str: str) -> str:
+    """Extract a human-readable label from a single topics-file value."""
+    if isinstance(label, str):
+        return label
+    if isinstance(label, dict):
+        name = label.get("name")
+        if isinstance(name, str) and name:
+            return name
+        words = label.get("top_words")
+        if isinstance(words, list) and words:
+            return ", ".join(str(w) for w in words[:6])
+        return f"#{cid_str}"
+    return str(label)
 
 
 def _invert_to_clusters(paper_to_cluster: dict[str, str]) -> dict[str, list[str]]:
