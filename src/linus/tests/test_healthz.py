@@ -519,6 +519,25 @@ def test_kb_artifact_paths_returns_canonical_six() -> None:
         assert isinstance(path, Path)
 
 
+def test_kb_artifact_cluster_files_resolve_under_clusters_subdir() -> None:
+    """hierarchy.json and labels_broad.json must resolve under the ``clusters/``
+    subdirectory — that is where the KB pipeline writes them and where the
+    Streamlit landing page (``app/main.py``) audits them.
+
+    Regression guard for the bug where ``/healthz`` looked directly under
+    ``outputs/`` (the pre-#125 layout) and falsely reported these two
+    artifacts missing, dragging ``effective_state`` to ``degraded`` on an
+    otherwise healthy install. The full-suite fixtures monkeypatch
+    ``_kb_artifact_paths``, so only this test exercises the real resolver's
+    path structure."""
+    artifacts = dict(server_module._kb_artifact_paths())
+    assert artifacts["hierarchy.json"].parent.name == "clusters"
+    assert artifacts["labels_broad.json"].parent.name == "clusters"
+    # The graph / kg artifacts live under their own subdirs, not clusters/.
+    assert artifacts["graph_sigma.html"].parent.name == "graph"
+    assert artifacts["kg_graph.graphml"].parent.name == "knowledge_graph"
+
+
 def test_compute_degradations_kb_artifact_resolver_failure_is_swallowed(
     healthy_env: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
