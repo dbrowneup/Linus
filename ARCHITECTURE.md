@@ -88,6 +88,10 @@ harness layer can stay thin and swappable.
 
 ### Front-ends
 
+- **Streamlit personal UI (`src/linus/app/`)**. Linus's own shipped front-end and the de facto v0.5.0 user surface: a
+  landing page plus seven pages (chat, corpus stats, cluster explorer, paper graph, knowledge graph, search, paper-qa).
+  Talks to the Linus backend over HTTP and reads KnowledgeBase outputs directly. This is what a first-time visitor
+  actually runs.
 - **Claude Code (terminal)**. Primary hosted-Maestro interface. Used for planning, architecture, multi-file
   coordination, and tasks that benefit from frontier-model reasoning. Does NOT route through Linus — Claude Code talks
   directly to hosted Claude.
@@ -104,19 +108,26 @@ harness layer can stay thin and swappable.
 
 ### The Linus orchestration layer (src/linus/)
 
-This is the product. A Python package; Phase 2a is largely landed as of 2026-05-18. Current modules:
+This is the product. A Python package; Phase 2 is feature-complete as of 2026-06-02 (701 hermetic tests), pending the
+v0.5.0 tag (see ROADMAP Phase 2). Current modules:
 
-- `linus.server` — FastAPI app exposing OpenAI-compatible `POST /v1/chat/completions` with tool-call routing and
-  model-preference fallback (PRs #32 + #40).
-- `linus.tools` — in-memory tool registry + `@tool` decorator + KB tool wrappers (`search_papers`, `get_paper`).
-- `linus.knowledge` — read-only `KnowledgeBaseAdapter` over the submodule's metadata SQLite (PR #34).
-- `linus.memory` — SQLite episodic store (DEC-0029), append-only JSONL audit log (DEC-0030/0031), content-hashing
-  helpers (PR #35).
-- `linus.sandbox` — path-validating `SandboxFS` enforcing the SAFETY.md Tier 0/1 contract (PR #50).
+- `linus.server` — FastAPI app exposing an OpenAI-compatible `POST /v1/chat/completions` and an Anthropic-compatible
+  `POST /v1/messages` (DEC-0056), both with SSE streaming and a multi-iteration tool-call loop; `/healthz` reporting
+  `effective_state` + `degradations[]` (DEC-0060); `POST /v1/tools/{name}/invoke` direct-invoke; session endpoints.
+- `linus.app` — the Streamlit front-end: landing page + seven pages + `config`/`search`/`cluster_data`/`kg_render`
+  helpers.
+- `linus.tools` — in-memory tool registry + `@tool` decorator + KB tool wrappers + `papers.ingest_arxiv`.
+- `linus.knowledge` — read-only `KnowledgeBaseAdapter` (PR #34); `paperqa` citation-grounded Q&A over local Ollama;
+  `rigor` grounding gate (DEC-0059); `entity_kb` + `entity_ncbi` entity backends (the latter the first
+  `online_optional` tool, DEC-0061); `retriever` RAG gateway.
+- `linus.memory` — SQLite episodic store (DEC-0029), append-only JSONL audit log with `network_egress[]`
+  (DEC-0030/0031/0061), SQLite-WAL session store, content-hashing helpers.
+- `linus.sandbox` — path-validating `SandboxFS` enforcing the SAFETY.md Tier 0/1 contract; TOCTOU + symlink-escape
+  hardened (PR #110).
+- `linus.agents` — a minimal parallel agent spawner (`asyncio` + semaphore), absorbed early from Phase 3.
 
-Outstanding Phase 2a items tracked in
-[`docs/specs/2026-05-17-linus-implementation-plan-v2.md`](docs/specs/2026-05-17-linus-implementation-plan-v2.md):
-streaming SSE (N2), Anthropic `/v1/messages` per DEC-0056 (N3), env-loaded model config (N4), session store (N5).
+The original Phase 2a backlog (streaming SSE N2, Anthropic `/v1/messages` N3, env-loaded config N4, session store N5)
+**all shipped**; the remaining work is closing v0.5.0 — the tag plus the never-recorded RAG-vs-no-RAG measurement.
 
 **Router.** Receives OpenAI-compatible requests. Selects the appropriate worker model based on request metadata and task
 class. Routes to the chosen inference engine.

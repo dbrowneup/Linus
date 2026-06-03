@@ -14,6 +14,28 @@ simplified.
 
 ---
 
+## Status at a glance (2026-06-02)
+
+Legend: ✅ done · 🔄 in progress · 🔲 not started · ⏸️ deferred (target phase) · ❌ deprecated.
+
+| Phase                            | State | One-line status                                                                                            |
+| -------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------- |
+| 0 — Foundation                   | ✅    | Closed.                                                                                                    |
+| 1 — Recon & Baselines            | 🔄    | 1a/1d/1e ✅; **1b pmetal trials, 1c Worker-selection Pareto, 1f minGRU 🔲** — committed to an Arc-2 pass.   |
+| 2 — Linus MVP                    | 🔄    | Feature-complete + 701 hermetic tests, but **UNTAGGED** — `__about__.py` is `0.0.1.dev0`, newest tag `v0.4.0`. v0.5.0 gated on UI bug-fixes + the (never-recorded) RAG-vs-no-RAG measurement. |
+| 3 — Knowledge & Parallel Agents  | 🔲    | Agent-spawner v0 already absorbed into Phase 2 (`src/linus/agents/spawner.py`); the rest is not started.    |
+| 4 — Data Sovereignty             | 🔲    | Not started.                                                                                                |
+| 5 — Interface Refinement         | 🔲    | Not started; the 7-page Streamlit UI is the de facto v0.5.0 surface ahead of schedule.                      |
+| 6 — Fine-Tuning                  | 🔲    | Not started; absorbs the deferred 1b/1c substrate verdicts + lm-eval harness.                               |
+| 7 — Skills & Autonomy            | 🔲    | Not started.                                                                                                |
+| 8 — Beyond MacBook               | 🔲    | Not started.                                                                                                |
+
+**The single most load-bearing open item:** the Phase-2→3 gate — "paper-grounded answers measurably better than the
+same local model without Linus's RAG" — has **never been measured**. It is the North-Star value claim and gates the
+v0.5.0 tag. See Phase 2 below.
+
+---
+
 ## Phase 0 — Foundation
 
 **Target duration:** closed
@@ -30,36 +52,41 @@ satisfied.
 
 **Target duration:** 2 weeks (in progress)
 
-**Status snapshot (2026-05-18):**
+**Status snapshot (2026-06-02):** ✅ done · 🔄 in progress · 🔲 not started · ⏸️ deferred · ❌ deprecated.
 
-- **1a — Repo synthesis notes:** complete. ~130 repo notes + ~127 paper notes + 27 syntheses (15 thematic + 12 cluster,
-  g1–g12). All 27 syntheses carry `## References` sections (PR #55 convention). Wave-2 stragglers (moby, distroless,
-  the Spinner protein-design paper-note) and everything-claude-code landed via PRs #53 and #61.
-- **1b — pmetal deep evaluation:** in progress (Dan-driven; v1 Item 7 / v2 C1). v0.5.0 release confirmed via the
-  2026-05-18 repo-pull audit (99 commits / 418 files since clone); refresh repo-note landed via PR #57. LoRA trial,
-  serve trial, comparative benchmark vs. Ollama, and verdict ADR still to run — see
-  [`docs/specs/2026-05-18-dan-manual-tasks.md`](docs/specs/2026-05-18-dan-manual-tasks.md) task A1.
-- **1c — Memory-pillar viability spike:** not yet run (Dan-driven). Spec at
-  [`docs/specs/phase1c-spike.md`](docs/specs/phase1c-spike.md); reconciliation of model list between syntheses (R3-04)
-  is the 15-minute prep step. The 2026-05-18 qwen3.6:27b run is an early data point: 27B-class FP16 Workers are
-  empirically non-viable on M1 Max 32 GB at current Ollama config (swap-thrashed all three Dan tasks at 600s timeout),
-  so qwen3:8b remains the practical Worker ceiling. Informs DEC-0033 / DEC-0034 fingerprint calibration.
-- **1d — Dan task suite v0:** complete. Three tasks shipped via PR #33 (fasta-gc-content, paper-summarization,
-  title-clustering); baselines collected for `qwen2.5-coder:7b` (2026-05-16) and `qwen3:8b` (2026-05-18) at
-  `benchmarks/results/dan_tasks_baseline_*.json`. R3-08 benchmark-convention ADR (v2 plan N7) outstanding.
-- **1e — First Maestro/Worker loop:** complete. Recorded via PR #38; verdict REJECT; calibration data preserved at
+- **1a — Repo synthesis notes: ✅ done.** 133 repo-note files + 129 paper-note files on disk + 27 syntheses (15
+  thematic + 12 cluster, g1–g12), each carrying a `## References` section (PR #55 convention). _Count drift to fix in
+  Track C2: both landscapes still cite the older "117 repo / 118 paper" figures._
+- **1b — pmetal deep evaluation: 🔄 build done, trials not run.** pmetal v0.5.0 binaries rebuilt 2026-05-19 (Metal
+  Toolchain quirk resolved); refresh repo-note landed via PR #57. **No measurements on disk.** Still to run — **now
+  committed to Arc 2 (2026-06-02)**, not "Dan-driven someday": LoRA trial, serve trial, comparative benchmark vs.
+  Ollama, verdict ADR. See [`docs/specs/2026-05-18-dan-manual-tasks.md`](docs/specs/2026-05-18-dan-manual-tasks.md).
+- **1c — Worker-selection Pareto (memory-pillar spike): 🔲 not started.** No results on disk; spec at
+  [`docs/specs/phase1c-spike.md`](docs/specs/phase1c-spike.md) (four configs: Bonsai 8B 1-bit, PrismML ternary,
+  BitNet 2B4T, FP16 baseline). **Committed to Arc 2 (2026-06-02).** **Hard hardware constraint:** `qwen3.6:27b` is
+  **dropped from all further testing** — it swap-thrashed the 32 GB machine on its single Phase-1d run (locked the
+  laptop); its baseline file is retained only as the documented reason. The C4 FP16 baseline is pinned to a
+  comfortable size (Qwen2.5-7B FP16 or 14B-Q8, **not** 14B-FP16). `qwen3:8b` remains the practical Worker ceiling until
+  a memory-streaming path (e.g. pmetal) proves larger models viable. Informs DEC-0033 / DEC-0034.
+- **1d — Dan task suite v0: ✅ done (thin).** Three tasks via PR #33 (fasta-gc-content, paper-summarization,
+  title-clustering); baselines for `qwen2.5-coder:7b` (2026-05-16) and `qwen3:8b` (2026-05-18) at
+  `benchmarks/results/dan_tasks_baseline_*.json`. Only `paper-summarization` is RAG-shaped, so the suite is being
+  expanded with ~4–5 KB-grounded questions for the RAG-vs-no-RAG measurement (Arc 1 / A2). R3-08 benchmark-convention
+  ADR still outstanding.
+- **1e — First Maestro/Worker loop: ✅ done.** Recorded via PR #38; verdict REJECT; calibration at
   `experiments/first-loop-review.md`. Sandbox helpers subsequently hand-written by Maestro (PR #50).
-- **1f — minGRU MLX-port spike:** not yet run (Dan-driven, ~1 day feasibility pass; v2 plan C3).
-- **ADR landings since 2026-05-10:** DEC-0055 (filename discipline) via PR #31; DEC-0056 / DEC-0057 / DEC-0058
-  (Anthropic-compat, AGPL-fork posture, x402 graduation) via PR #36; DEC-0059 (output rigor / grounding gate)
-  via PR #94 with the entity-backend amendment via PR #104; DEC-0060 (loud degradation, `/healthz`
-  `effective_state` + `degradations[]`) via PR #93; DEC-0061 (network-policy framework) via PR #109.
+- **1f — minGRU MLX-port spike: 🔲 not started.** No `experiments/mingru-mlx-shakespeare/` dir or results. ~1-day
+  feasibility pass. **Committed to Arc 2 (2026-06-02).**
+- **ADR landings since 2026-05-10:** DEC-0055 (filename discipline, PR #31); DEC-0056 / DEC-0057 / DEC-0058
+  (Anthropic-compat, AGPL-fork posture, x402 graduation, PR #36); DEC-0059 (grounding gate, PR #94, entity-backend
+  amendment PR #104); DEC-0060 (loud degradation, PR #93); DEC-0061 (network-policy framework, PR #109).
 
-**Gate retrospective:** Phase 1's Phase-1b gate-decision framing has been retired in practice. Linus shipped Phase 2
-with Ollama+qwen3:8b as the default Worker engine (`LINUS_DEFAULT_MODEL` in `src/linus/server.py`) without waiting on
-the pmetal verdict. pmetal v0.5.0 binaries rebuilt 2026-05-19 (Metal Toolchain quirk resolved); the comparative
-benchmark + verdict ADR remain open as Phase 6 substrate questions, not Phase 2 blockers. lm-eval harness deferred to
-a Phase 6 prerequisite.
+**Gate retrospective:** Phase 1's Phase-1b gate-decision framing was retired in practice — Linus shipped Phase 2 on
+Ollama+qwen3:8b (`LINUS_DEFAULT_MODEL` in `src/linus/server.py`) without waiting on the pmetal verdict, and the
+comparative benchmark + verdict ADR were re-classed as Phase 6 substrate questions rather than Phase 2 blockers. **As of
+2026-06-02 the three open spikes (1b trials, 1c Pareto, 1f minGRU) are no longer "someday" items — they are committed to
+a dedicated Arc-2 execution pass** (not v0.5.0-tag-blocking, but committed work to finish). The lm-eval harness stays
+deferred to a Phase 6 prerequisite.
 
 **Goal:** know what each repo is, know how our worker models perform on real tasks, and have the first Maestro/Worker
 loop on record.
@@ -164,10 +191,14 @@ and private benchmarks, (c) the Maestro/Worker pattern works end-to-end on a rea
 **Goal:** a minimal but real Linus orchestration backend + a chat UI, grounded in KnowledgeBase, demo-able to a peer in
 under 5 minutes.
 
-**Status snapshot (2026-05-21, v0.5.0 reveal-prep complete):**
+**Status snapshot (2026-06-02): ✅ feature-complete · 🔲 UNTAGGED — v0.5.0 not yet cut.**
 
-Phase 2 MVP shipped 2026-05-19 as v0.4.0 (PRs #66–#82); the v0.5.0 reveal-prep arc closed 2026-05-21 with PRs
-#83–#118. Hermetic test suite at **695 tests** (~7s), zero regressions.
+Phase 2 MVP shipped 2026-05-19 as **v0.4.0** (PRs #66–#82); the v0.5.0 reveal-prep arc ran through PR #136
+(2026-05-23), and Linus was revealed publicly at the Agora hackathon on 2026-05-25. Hermetic suite at **701 tests**
+(~7s), zero regressions. **But v0.5.0 was never formally cut:** `src/linus/__about__.py` is still `0.0.1.dev0` and the
+newest git tag is `v0.4.0`. Closing v0.5.0 (Arc 1) is gated on (a) fixing the remaining Streamlit UI bugs Dan hits in
+use and (b) recording the RAG-vs-no-RAG delta on the Dan task suite — the Phase-2→3 gate criterion, **which has never
+been measured** (the newest benchmark, 2026-05-18, predates paper-qa landing on 2026-05-19).
 
 - **2a Orchestration backend:** shipped — FastAPI server at `src/linus/server.py` with OpenAI-compatible
   `/v1/chat/completions` (PRs #32 + #40), streaming SSE (PR #72), Anthropic `/v1/messages` per DEC-0056 (PR #73),
@@ -305,7 +336,8 @@ non-conformant; Phase 2 will not ship with a non-conformant Worker as default.
 - Skills (Phase 7)
 
 **Gate to Phase 3:** MVP demo-able end-to-end. Paper-grounded answers measurably better than the same local model
-without Linus's RAG on the Dan task suite.
+without Linus's RAG on the Dan task suite. **🔲 Not yet met — the RAG-vs-no-RAG delta has never been measured (Arc 1 /
+A2). This is the gate that closes Phase 2 and tags v0.5.0.**
 
 ---
 
