@@ -3,7 +3,7 @@
 _A personal AI orchestration backend for Apple Silicon. Private, local, modular — Claude-equivalent capabilities for
 scientific and software work, fully under your control. Named after Linus Pauling and Linus Torvalds._
 
-**Status:** v0.5.0 public reveal — 2026-05-25 (Agora hackathon). Debuting alongside
+**Status:** v0.5.0 — the local orchestration substrate, tagged 2026-06-02 (first revealed at the Agora hackathon, 2026-05-25). Debuting alongside
 [KnowledgeBase](https://github.com/dbrowneup/KnowledgeBase) (the data substrate) and
 [Archimedes](https://github.com/hackagora/archimedes-arcadia) (q-fin strategy engine — Linus specialized to one
 domain, made externally verifiable, and shipped on-chain).
@@ -34,14 +34,16 @@ performance env vars, and known library quirks live in [CLAUDE.md](CLAUDE.md).
 
 ## What's shipped (v0.5.0)
 
-OpenAI + Anthropic chat-completions endpoints (streaming + tool calls, multi-iteration tool loop) · server-side session
-persistence (SQLite WAL) · fastmcp-based MCP tool registry (DEC-0045) with grounding-gate-ready outputs (Phase 2c) ·
-**paper-qa** citation-grounded Q&A routed through Linus tools on local Ollama (no hosted API) · **KnowledgeBase**
-read-only adapter feeding Streamlit pages for paper graph, cluster explorer, KG render, and paper-qa · five-layer
-**memory pillar** (DEC-0028; intra-step latent → within-session scratchpad → cross-session episodic → investigation
-memory → KnowledgeBase semantic) · path-validating **sandbox** enforcing the SAFETY.md Tier 0/1 contract · hermetic
-test suite, 701 tests in ~7s. Component-by-component breakdown in [ARCHITECTURE.md](ARCHITECTURE.md); per-phase status
-in [ROADMAP.md](ROADMAP.md).
+The local orchestration **substrate**: OpenAI + Anthropic chat-completions endpoints (streaming + tool calls,
+multi-iteration tool loop) · server-side session persistence (SQLite WAL) · fastmcp-based MCP tool registry (DEC-0045)
+· **KnowledgeBase** read-only adapter feeding Streamlit pages (paper graph, cluster explorer, KG render, search) · a
+**grounding/rigor gate** (DEC-0059), loud `/healthz` degradation (DEC-0060), and per-tool **network policy** (DEC-0061)
+· five-layer **memory pillar** (DEC-0028; intra-step latent → within-session scratchpad → cross-session episodic →
+investigation memory → KnowledgeBase semantic) · path-validating **sandbox** enforcing the SAFETY.md Tier 0/1 contract
+· hermetic test suite, 704 tests in ~6s. **paper-qa** ships as an optional "few named papers" deep-dive tool — the
+corpus-scale, citation-grounded RAG marquee is the **v0.6.0** deliverable, a Linus-native full-text-chunk substrate
+(see the [evaluation](docs/specs/2026-06-02-paperqa-evaluation-and-linus-native-rag.md)). Component-by-component
+breakdown in [ARCHITECTURE.md](ARCHITECTURE.md); per-phase status in [ROADMAP.md](ROADMAP.md).
 
 ## Documentation map
 
