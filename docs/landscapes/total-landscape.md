@@ -4,9 +4,9 @@
 
 The master integration map across the four kinds of input Linus has accumulated:
 
-- **118 paper notes** in [`docs/paper-notes/`](../paper-notes/) — flat lookup in
+- **128 paper notes** in [`docs/paper-notes/`](../paper-notes/) — flat lookup in
   [`docs/paper-notes/INDEX.md`](../paper-notes/INDEX.md).
-- **117 repo notes** in [`docs/repo-notes/`](../repo-notes/) — flat lookup in
+- **132 repo notes** in [`docs/repo-notes/`](../repo-notes/) — flat lookup in
   [`docs/repo-notes/INDEX.md`](../repo-notes/INDEX.md).
 - **15 thematic syntheses** in [`docs/syntheses/`](../syntheses/) — security, llm-wiki, skills-and-practices, memory,
   humans-teams-performance, generative-biology, infra-foundations, native-low-bit-apple-silicon, llms-in-science,
@@ -15,6 +15,9 @@ The master integration map across the four kinds of input Linus has accumulated:
 - **12 repo-cluster syntheses** in [`docs/syntheses/repo-clusters/`](../syntheses/repo-clusters/) — `g1`–`g12`; `g11`
   (agent frameworks, skills, and evaluation) added 2026-05-05; `g12` (llm-hardware-design, anchored on the QiMeng
   family) added 2026-05-09.
+
+_Note-count audit 2026-06-02 (Track C2): actual counts are 128 paper-notes and 132 repo-notes — up from the prior
+118/117 figures. Counts corrected above._
 
 This document does not enumerate the underlying notes (the indexes do that) and does not retell the syntheses (those
 documents do that themselves). It crosses _the syntheses_ — pointing out where independent threads converge, where they
@@ -47,7 +50,13 @@ langgraph, x402, goose, debate-or-vote, MiroFish-Offline) added; counts brought 
 task suite v0 with first qwen2.5-coder:7b baseline (PR #33), Phase 2c KnowledgeBase read-only adapter v0 (PR #34), and
 Phase 2h memory v0 (SQLite episodic store + audit log + content-hashing) (PR #35) all land; three new R4 ADRs (DEC-0056
 amending DEC-0005 to add Anthropic-compat HTTP, DEC-0057 AGPL-fork posture, DEC-0058 x402-mcp graduation pathway) via PR
-#36, plus DEC-0055 filename discipline via PR #31. ADR index now extends through DEC-0058._
+#36, plus DEC-0055 filename discipline via PR #31. ADR index now extends through DEC-0058. Refreshed 2026-06-02 (Track
+C2 freshness audit): note counts corrected to 128/132/27 (actual ls counts; up from the stale 118/117 figures); v0.5.0
+tagged (orchestration substrate — OpenAI+Anthropic endpoints, streaming, tools, sessions, sandbox, memory pillar,
+KB-browse Streamlit UI, rigor gate DEC-0059, loud /healthz DEC-0060, network policy DEC-0061; 704 hermetic + 77
+integration tests); paper-qa demoted from corpus-scale marquee to optional "few named papers" tool — see
+`docs/specs/2026-06-02-paperqa-evaluation-and-linus-native-rag.md`; Linus-native corpus RAG promoted to v0.6.0 marquee;
+Phase 2→3 gate (RAG-vs-no-RAG measurement) moved to v0.6.0; ADR ceiling is DEC-0061 (PRs #137–#140)._
 
 ---
 
@@ -147,7 +156,7 @@ fine-tuned 8B exceeds RAM" framing of Phase 6d. The g1 synthesis confirms the OS
 opportunistic ternary 30B+ from PrismML). flash-moe stays methodology-only reference. Phase 8 BitNet × Flash-MoE × JPmHC
 stays long-horizon. **New question (S20):** rewrite Phase 6d framing to reflect the narrower target.
 
-### Crossing 3 — KnowledgeBase as graph + vector layered substrate, now with paper-qa as substrate candidate
+### Crossing 3 — KnowledgeBase as graph + vector layered substrate; Linus-native RAG as v0.6.0 marquee
 
 The Hogan KG survey + Stankevičius embeddings + Curse-of-Dimensionality form the theoretical spine; the llm-wiki
 synthesis adds operational depth (claim typing, content hashing, write-back, hot cache); the g8 cluster surfaces
@@ -158,6 +167,15 @@ synthesis adds the `model_prediction` edge class requirement before Group A Wave
 as Phase 2 KB substrate default integration target — reframes Phase 2 as "adopt + extend" rather than "build from
 scratch." **New Tier 1 question (S6):** `model_prediction` edge class with provenance before Group A writes back. **New
 Tier 1 obligation (S2):** LAB-Bench canary blocklist before any KB ingestion runs.
+
+_Superseded framing (2026-06-02): paper-qa's "corpus-scale Integrate" posture is superseded. Live testing 2026-06-02
+showed paper-qa timed out at 10 minutes on 12 papers — structurally too slow (re-embeds full corpus every process, ~11
+LLM calls/query) for corpus-scale use. paper-qa is **demoted to an optional "few named papers" tool**; the corpus-scale
+citation-grounded RAG is being rebuilt Linus-native as the **v0.6.0 marquee**. The ideas (full-text chunking,
+passage-level provenance, local-model-hardened JSON parsing) are sound and will be adopted. See
+`docs/specs/2026-06-02-paperqa-evaluation-and-linus-native-rag.md`. The DEC-0044 "corpus engine" framing is superseded
+by a forthcoming ADR once the Linus-native RAG direction is chosen. The Phase 2→3 gate (RAG-vs-no-RAG measurement) moves
+to v0.6.0._
 
 ### Crossing 4 — Structure as the operational bottleneck
 
@@ -297,7 +315,9 @@ obsidian-llm-wiki-local's 3-tier JSON fallback for Ollama Workers).
 - **Linus → KB read path** — Phase 2c read-only adapter landed 2026-05-16 via PR #34 (`src/linus/knowledge/adapter.py`
   opens `modules/KnowledgeBase/data/metadata.db` via `file:?mode=ro`; AND-of-LIKE keyword search; SHA-256-keyed
   `get_paper`; 20 tests including 3 against the real submodule DB).
-- **paper-qa** as candidate substrate for the paper-corpus side of KB (S1).
+- **paper-qa** as optional "few named papers" tool — demoted from corpus marquee 2026-06-02; corpus-scale RAG is being
+  rebuilt Linus-native as the v0.6.0 deliverable. See `docs/specs/2026-06-02-paperqa-evaluation-and-linus-native-rag.md`
+  and the superseded-framing note under Crossing 3.
 - **`model_prediction` edge class** with producing-model + version + confidence + content-hash provenance before Group A
   Wave 1 skills start writing back (S6).
 - **LAB-Bench canary blocklist** at ingestion time before any RAG or fine-tune work (S2).
@@ -408,8 +428,8 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
 - **Phase 2a FastAPI orchestration backend.** **CLOSED 2026-05-16 via PR #32** — `src/linus/server.py` ships an
   OpenAI-compatible `/v1/chat/completions` endpoint backed by Ollama, with a `linus-serve` console script entry point in
   `pyproject.toml` and a smoke test in `src/linus/tests/`. The Anthropic-compat surface (DEC-0056) **CLOSED 2026-05-19**
-  — `/v1/messages` is live in `src/linus/server.py` alongside `/v1/chat/completions`, sharing the same internal
-  dispatch and audit underneath.
+  — `/v1/messages` is live in `src/linus/server.py` alongside `/v1/chat/completions`, sharing the same internal dispatch
+  and audit underneath.
 - **Phase 1d Dan task suite v0.** **CLOSED 2026-05-16 via PR #33** — three-task baseline in `benchmarks/dan_tasks/` with
   first run against `qwen2.5-coder:7b` (qwen3:8b not yet pulled). Concrete results: `paper-summarization` full-credit on
   MemGPT (10.5s); `fasta-gc-content` partial (19.2s, includes `N` in denominator — rubric says exclude);
@@ -418,8 +438,11 @@ deliverable). The remaining three plus several new ones surfaced by the post-fan
 - **Phase 2c KnowledgeBase read-only adapter.** **CLOSED 2026-05-16 via PR #34** — `src/linus/knowledge/adapter.py`
   opens `modules/KnowledgeBase/data/metadata.db` via `file:?mode=ro`, with keyword search and SHA-256-keyed lookup; 17
   unit tests + 3 integration tests against the real submodule DB (skip cleanly when absent). DEC-0044 paper-qa
-  integration **CLOSED 2026-05-21** — paper-qa is now integrated as `src/linus/knowledge/paperqa.py` exposing four Linus
-  tools (`paperqa.search`, `paperqa.gather_evidence`, `paperqa.answer`, `paperqa.reset`).
+  integration **CLOSED 2026-05-21** — paper-qa is integrated as `src/linus/knowledge/paperqa.py` exposing four Linus
+  tools (`paperqa.search`, `paperqa.gather_evidence`, `paperqa.answer`, `paperqa.reset`). **DEMOTED 2026-06-02** from
+  corpus-scale marquee to optional "few named papers" tool after live testing timed out at 10 min / 12 papers. The
+  corpus-scale citation-grounded RAG is being rebuilt Linus-native as the v0.6.0 marquee; DEC-0044 superseded by a
+  forthcoming ADR. See `docs/specs/2026-06-02-paperqa-evaluation-and-linus-native-rag.md`.
 - **Phase 2h memory v0.** **CLOSED 2026-05-16 via PR #35** — SQLite episodic store + JSONL audit log + content-hashing
   in `src/linus/memory/`; SHA-256 algorithm (Keccak deferred per `_resolve_algorithm`); `DispatchEvent` validates
   `memory_mode` and `cot_budget` at construction per DEC-0031, also recording cap-override audit-noise per DEC-0032. 35
@@ -436,7 +459,13 @@ hedge. DEC-0060 (loud degradation) turns `/healthz` from a green/red signal into
 `degradations[]` array, so a degraded-but-running Linus declares its degradations rather than masking them. DEC-0061
 (network policy) makes every tool's network egress explicit via a `network_policy` field (`offline` / `online_optional`
 / `online_required`), with `entity_ncbi.lookup` as the first `online_optional` instance — hermetic tests stay
-network-free and every external call is captured in the audit log.
+network-free and every external call is captured in the audit log. ADR ceiling is DEC-0061 as of PRs #137–#140.
+
+**v0.5.0 tagged 2026-06-02.** The orchestration substrate is now tagged: OpenAI-compatible + Anthropic /v1/messages
+endpoints, streaming SSE, tool registry + KB tools, sessions, sandbox, memory pillar, KB-browse Streamlit UI, rigor gate
+(DEC-0059), loud /healthz (DEC-0060), and network policy (DEC-0061). 704 hermetic + 77 integration tests pass. The next
+milestone is **v0.6.0**, whose marquee deliverable is the Linus-native corpus-scale citation-grounded RAG (replacing
+paper-qa as the corpus engine). The Phase 2→3 gate (RAG-vs-no-RAG measurement) moves to v0.6.0.
 
 ---
 
@@ -444,14 +473,14 @@ network-free and every external call is captured in the audit log.
 
 ```
 docs/
-├── paper-notes/INDEX.md      (navigation: 118 paper notes → thematic syntheses)
-├── repo-notes/INDEX.md       (navigation: 117 repo notes → cluster + thematic syntheses)
-├── paper-notes/*.md          (118 per-paper write-ups)
-├── repo-notes/*.md           (117 per-repo write-ups)
+├── paper-notes/INDEX.md      (navigation: 128 paper notes → thematic syntheses)
+├── repo-notes/INDEX.md       (navigation: 132 repo notes → cluster + thematic syntheses)
+├── paper-notes/*.md          (128 per-paper write-ups)
+├── repo-notes/*.md           (132 per-repo write-ups)
 │
 ├── syntheses/
 │   ├── *-synthesis.md        (15 thematic syntheses; entrepreneurship added 2026-05-05; llm-hardware-design 2026-05-09)
-│   └── repo-clusters/*.md    (12 cluster syntheses, g1–g12; all anchored to a thematic synthesis)
+│   └── repo-clusters/*.md    (12 cluster syntheses, g1–g12; all anchored to a thematic synthesis; counts verified 2026-06-02)
 │
 ├── landscapes/
 │   ├── synthesis-landscape.md  (cross-synthesis structure: where 27 agree/disagree/overlap)
@@ -476,9 +505,9 @@ Specs and ADRs live alongside:
   covering Tier 1–7 fold-ins plus this Tier 10 audit.
 - [`docs/session-summaries/2026-05-04-fan-out-session-summary.md`](../session-summaries/2026-05-04-fan-out-session-summary.md)
   — read-out from the Section 7 fan-out.
-- `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0058 as of 2026-05-16; DEC-0055 codifies filename
-  discipline via PR #31; DEC-0056/0057/0058 land Wave 2 R4 ADRs via PR #36 — Anthropic-compat HTTP amending DEC-0005,
-  AGPL-fork posture, x402-mcp graduation pathway).
+- `docs/adr/NNNN-*.md` — per-file ADRs (DEC-0001 through DEC-0061 as of PRs #137–#140; DEC-0059 grounding gate, DEC-0060
+  loud /healthz, DEC-0061 network policy are the v0.5.0 ADRs; DEC-0044 paper-qa corpus-engine posture is superseded
+  2026-06-02 and pending a new ADR for the Linus-native RAG direction).
 
 The intended workflow is: walk `top-questions.md` Tier 1 in conversation, with `total-landscape.md` open as the map,
 `synthesis-landscape.md` open for cross-synthesis context, and the relevant per-synthesis or per-note file open for
