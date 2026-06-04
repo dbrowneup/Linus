@@ -28,9 +28,10 @@ load-bearing: BitNet/Bonsai built the 1-bit substrate; flash-streaming made >32 
 Silicon; **Kimi-K2 is the candidate model that could combine both for Linus**. The Phase 6d stretch target —
 opportunistic ternary >8B integration if the community released one — has been delivered ahead of schedule by Bonsai.
 The Phase 6/8 ceiling — a frontier-class agentic base model that Linus can plausibly fine-tune and serve under its own
-inference layer — has a concrete candidate for the first time. Two ADR seeds named in this synthesis (DEC-0055 for the
-Phase 6 Qwen3 → Kimi-K2 base swap, DEC-0056 for the Phase 8 Linus-flavored 1-bit Kimi-K2 variant) are open commitments,
-not speculation.
+inference layer — has a concrete candidate for the first time. Two ADR seeds named in this synthesis (`DEC-NNNN`
+base-model-swap for the Phase 6 Qwen3 → Kimi-K2 base swap, `DEC-NNNN` low-bit-kimi-variant for the Phase 8
+Linus-flavored 1-bit Kimi-K2 variant — soft seeds, not reservations; the previously-cited DEC-0055/0056 are now taken by
+other landed ADRs) are open commitments, not speculation.
 
 ---
 
@@ -589,7 +590,7 @@ it or the community reverse-engineers it. The pragmatic Phase 6 sequence is FP16
 BitDistill on the small fine-tuned Worker as the first low-bit pass (when the spike confirms tractability), then watch
 PrismML for either an opened recipe or a Bonsai-LoRA workflow.
 
-The new Phase 6 question Kimi-K2 raises is the **base-model swap (DEC-0055 seed, see Sub-thread D and the combinable-
+The new Phase 6 question Kimi-K2 raises is the **base-model swap (`DEC-NNNN` base-model-swap seed, see Sub-thread D and the combinable-
 bets section above)**. CLAUDE.md currently commits to Qwen3 as Linus's default Worker base. Kimi-K2-Instruct is at
 minimum a credible alternative on agentic benchmarks (open-source SOTA on every axis the paper measures) and at maximum
 an architecturally distinct path that — combined with the 1-bit Linus-flavored variant of DEC-0056 — could replace the

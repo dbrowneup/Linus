@@ -81,7 +81,9 @@ These eight items each block a Phase 1 spike or a Phase 2a architectural decisio
   "similar." Phase 1d blocks on Dan authoring the tasks and choosing the grader strategy. _(g11-agent-frameworks;
   cross-cutting Phase 1d need.)_ _INFORMED 2026-05-18 (post-consolidation audit) by the qwen3:8b + qwen3.6:27b
   baselines; design call carried by C2 in `docs/specs/2026-05-18-dan-manual-tasks.md`. See
-  [answered-questions.md](answered-questions.md#session-2026-05-18-resolutions)._
+  [answered-questions.md](answered-questions.md#session-2026-05-18-resolutions)._ _Disposition 2026-06-03 (C2 triage):
+  stays open by choice — the grader strategy (exact-match/keyword for factual genomics QA vs. LLM-as-judge vs. rubric) is
+  chosen at v0.6.0 RAG-build time with the real ablation questions in hand, per R5-09._
 - **R2-04. Context-routing policy in the Phase 2a orchestration layer.** Agent-Skills-for-Context-Engineering argues
   that context quality, not model size, is the primary determinant of Worker effectiveness. When does session history
   get summarized vs. passed verbatim? When does a KB query result get truncated vs. passed in full? Phase 2a spec needs
@@ -269,10 +271,12 @@ These eight items each block a Phase 1 spike, a Phase 2a deliverable, or an ADR 
   syntheses give slightly different model lists for the Phase 1c benchmark sweep (g1 includes `llama3-8b-1.58` via
   Ollama as a 1-bit baseline; native-low-bit's four-way comparison does not). Running the spike from two reading angles
   produces different test matrices. Reconcile in `docs/specs/phase1c-spike.md` first. _(native-low-bit-apple-silicon;
-  cluster anchor: g1-apple-silicon.)_ _INFORMED 2026-05-18 (post-consolidation audit): qwen3.6:27b run failed all three
-  Dan-task baselines at the 600s timeout — 27B-class FP16 is not viable as M1 Max 32 GB FP16 ceiling; the existing spike
-  spec's Qwen2.5-7B/14B cap is the right anchor. See
-  [answered-questions.md](answered-questions.md#session-2026-05-18-resolutions)._
+  cluster anchor: g1-apple-silicon.)_ _RESOLVED 2026-06-03 (C2 triage): the model-list decision is settled —
+  qwen3.6:27b and all 27B-class FP16 are banned from spike testing (they swap-thrash the 32 GB machine), and
+  `phase1c-spike.md`'s C4 FP16 baseline is pinned to a comfortable size (Qwen2.5-7B FP16 / 14B-Q8, not 14B-FP16); g1's
+  `llama3-8b-1.58` 1-bit baseline folds in as an optional Ollama row. The mechanical merge of the two synthesis lists
+  into `phase1c-spike.md` applies when spike 1c runs (Arc 2). See
+  [answered-questions.md](answered-questions.md#c2-triage-resolutions-2026-06-03)._
 - **R3-05. AlphaGenome local-deployability spike (overdue Phase 1).** The biological-foundation-models synthesis
   recommends a one-day spike (clone, inspect model size, attempt one local inference on a 1 Mb interval) before
   committing the variant-scoring skill. Not yet done. The answer determines whether AlphaGenome is a local Worker or
@@ -459,16 +463,19 @@ closed by the reveal prep arc — the demo ran, and the CLAUDE.md "Worktree fan-
 editable-installs collision lesson. R5-01 and R5-02 are now post-reveal v0.6.0 deliverables. See the R5 tracking entries
 below and the relevant resolved items in [answered-questions.md](answered-questions.md)._
 
-- **R5-01. Env-architecture layered (Option C) — when does v0.6.0 ship.**
-  [`docs/specs/2026-05-21-env-architecture-layered.md`](../specs/2026-05-21-env-architecture-layered.md) is committed
-  but the actual env-layering work — separating the `papers` env from the `linus` env, or unifying both via a shared
-  meta-env — has no implementation owner or target. Blocks the Streamlit-pages-fully-alive story end-to-end and gates
-  whether v0.6.0 ships as the layered env or as a continuation of the current `linus` env footprint. _(Phase 2a / v0.6.0
-  env architecture.)_
-- **R5-02. KB hardcoded-paths fix — v0.6.0 ownership.**
+- **R5-01. Env-architecture layered (Option C) — implementation timing.**
+  [`docs/specs/2026-05-21-env-architecture-layered.md`](../specs/2026-05-21-env-architecture-layered.md) records the
+  decision (**Option C, layered**: KB ships its own `pyproject.toml`; `pip install -e .[kb]` overlays KB's deps into the
+  `linus` env; the license boundary stays at the submodule edge). _Decided 2026-06-03 (C2 triage): implement **before**
+  the v0.6.0 RAG build, bundled with R5-02 into a single KB-side packaging PR, so the native RAG can import KB modules
+  directly (`pip install -e .[kb]`) instead of only reading disk artifacts._ Remaining: author the KB `pyproject.toml`,
+  add the Linus `[kb]` optional extra, bump the submodule pin. _(KnowledgeBase submodule + Linus packaging; v0.6.0, ahead
+  of the RAG marquee.)_
+- **R5-02. KB hardcoded-paths fix — bundled with R5-01, before the RAG build.**
   [`docs/specs/2026-05-21-kb-hardcoded-paths-fix.md`](../specs/2026-05-21-kb-hardcoded-paths-fix.md) documents the
-  path-constant inventory but the refactor (proposed `papers_analysis/paths.py`) has no PR. This is the load-bearing
-  barrier to broader use by anyone outside Dan's machine. _(KnowledgeBase submodule; v0.6.0 deliverable.)_
+  path-constant inventory but the refactor (proposed `papers_analysis/paths.py`) has no PR. _Decided 2026-06-03 (C2
+  triage): lands in the same KB-side packaging PR as R5-01, ahead of the v0.6.0 RAG build._ The load-bearing barrier to
+  KB use beyond Dan's machine. _(KnowledgeBase submodule; v0.6.0 deliverable.)_
 - **R5-03. Demo-script ownership for 2026-05-25.** _RESOLVED 2026-06-02 — demo ran for the Agora reveal; demo script at
   [`docs/demo-script-2026-05-25.md`](../demo-script-2026-05-25.md) is the artifact. See
   [answered-questions.md](answered-questions.md)._
@@ -485,11 +492,12 @@ These four items are post-reveal and tracked for v0.6.0 or later scope.
   promotion gate actionable. Criteria are not yet codified: what percentage of the test corpus must resolve to canonical
   IDs to trigger the promotion, what fallback behavior is acceptable when the resolver is offline, and what regression
   budget applies when the promotion lands. _(entity-grounding / KB ingest; depends on DEC-0059.)_
-- **R5-06. Q2 signed-audit-slice (`anchor.py`) post-reveal scope.** Seeded under "Seeded ADRs" in DECISIONS.md (line
-  102, 2026-05-19) but not in any question file. Should be a tracked open question if Marelli attribution on Dan's
-  manuscripts is genuinely v0.6.0+ scope. The decision is whether `anchor.py` ships in v0.6.0 alongside the
-  Anthropic-Messages endpoint, in a later Phase 2b deliverable, or remains seeded indefinitely until a concrete
-  attribution use case lands. _(audit log / Marelli surface; v0.6.0+ scope.)_
+- **R5-06. Q2 signed-audit-slice (`anchor.py`) post-reveal scope.** _Factual half resolved 2026-06-03 (C2 triage): it
+  IS tracked — as Seeded ADR #5 ("DEC-NNNN-signed-audit-slice") in DECISIONS.md (line 102); the filename `anchor.py` is
+  only a proposed target path in `docs/audits/2026-05-22-reveal-prep/strategy-engine-linus-flavor.md`, not a DECISIONS.md
+  commitment._ Scope question (does it ship in v0.6.0, a later Phase 2b, or stay seeded?) **deferred post-v0.6.0** —
+  revisit when a concrete Marelli/manuscript-attribution use case lands. _(audit log / Marelli surface; deferred
+  post-v0.6.0.)_
 - **R5-07. Bug-sweep medium-severity backlog disposition.** ~20 medium-severity findings across the four bug-sweep
   reports under [`docs/bug-sweeps/`](../bug-sweeps/) were deferred to v0.5.1. No triage spec yet; risks indefinite
   deferral the way R3-20 has drifted. Concrete action: open a triage spec that buckets the 20 findings into

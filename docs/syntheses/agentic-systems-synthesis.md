@@ -280,7 +280,7 @@ number lands within striking distance of Claude Opus 4's 72.5% in the same singl
 SOTA on every agentic axis, achieved through a synthetic agentic-data pipeline (3,000+ real MCP tools
 
 - rubric-paired tasks + RL with verifiable rewards) rather than through hosted-model post-training. For Linus the
-  implication is concrete: the Phase 6 base-swap argument (Qwen3 → Kimi K2 LoRA seed, DEC-0055 seed) is no longer just a
+  implication is concrete: the Phase 6 base-swap argument (Qwen3 → Kimi K2 LoRA seed, `DEC-NNNN` base-model-swap seed) is no longer just a
   weight-streaming feasibility question — it is also a "do we want our local Worker to inherit Kimi K2's tool-use prior
   before LoRA?" question, and the answer is increasingly yes pending the streaming-feasibility measurements queued in
   Phase 6d. The architectural primitives this synthesis canonicalizes (typed AgentReport, role-as-first-class, per-stage

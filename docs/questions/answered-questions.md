@@ -15,6 +15,7 @@ Sister documents:
 
 ## Table of contents
 
+- [2026-06-03 C2 triage resolutions](#c2-triage-resolutions-2026-06-03)
 - [2026-06-02 session resolutions](#session-2026-06-02-resolutions)
 - [2026-05-18 session resolutions](#session-2026-05-18-resolutions)
 - [N6 janitorial (resolved 2026-05-16)](#n6-janitorial-resolved-2026-05-16)
@@ -34,6 +35,69 @@ Sister documents:
 - [Source-archive items propagated and resolved (from open-questions.md)](#source-archive-items-propagated-and-resolved-from-open-questionsmd)
 - [Uncovered resolutions](#uncovered-resolutions)
 - [Resolution sessions log](#resolution-sessions-log)
+
+---
+
+<a id="c2-triage-resolutions-2026-06-03"></a>
+
+## 2026-06-03 C2 triage resolutions
+
+The seven ambiguous items the Track-C2 worker (PR #142) left for Dan's judgment, worked through with Dan on 2026-06-03.
+Four were resolved against the docs directly; two were Dan-decision items; one is a deliberate defer.
+
+#### Item 4 — DEC-NNNN ADR-seed collision (factual fix)
+
+**Resolved.** Two synthesis files pinned _taken_ DEC numbers to base-model-swap seeds:
+`native-low-bit-apple-silicon-synthesis.md` (claiming "DEC-0055 for the Qwen3 → Kimi-K2 base swap, DEC-0056 for the 1-bit
+Kimi variant … open commitments") and `agentic-systems-synthesis.md` ("DEC-0055 seed"). But DEC-0055 is the
+filename-discipline ADR and DEC-0056 is the OpenAI/Anthropic-compat ADR — both accepted, about something else entirely.
+Per the CLAUDE.md "ADR numbering atomic reservation" convention (prose seeds are soft placeholders, NOT reservations),
+these were converted to literal `DEC-NNNN` placeholders with descriptive slugs. `llm-hardware-design-synthesis.md`'s ~11
+seeds already used the correct literal `DEC-NNNN` form — no change needed there. This is exactly the drift the CLAUDE.md
+factual-grep clause is designed to catch.
+
+#### Item 5 — g8 "12 total" scientific-agents count
+
+**Verified correct, no change.** `g8-sci-agents.md` lists exactly 12 repos (paper-qa, aviary, ldp, robin, ether0,
+BixBench, LAB-Bench, finch, scientific-agent-skills, ibmdotcom-tutorials, claude-prism, Sketch2Simulation); all 12 have
+repo-notes on disk; the verdict tally (Integrate 3 + Study 8 + Ignore 1) sums to 12. Internally consistent.
+
+#### Item 6 / R5-06 — signed-audit-slice (`anchor.py`) tracking
+
+**Factual half resolved; scope deferred.** It IS tracked — as Seeded ADR #5 ("DEC-NNNN-signed-audit-slice") in the
+DECISIONS.md "Seeded ADRs (not yet authored)" section, not under the name `anchor.py` (that filename is only a proposed
+target path in `docs/audits/2026-05-22-reveal-prep/strategy-engine-linus-flavor.md`). The scope decision — ship in
+v0.6.0 / later Phase 2b / stay seeded — is **deferred post-v0.6.0** until a concrete manuscript-attribution use case
+lands.
+
+#### R3-04 — Phase 1c spike model-list reconciliation
+
+**Resolved.** The model-list decision is settled: qwen3.6:27b and all 27B-class FP16 are banned from spike testing (they
+swap-thrash the 32 GB machine); `phase1c-spike.md`'s C4 FP16 baseline is pinned to a comfortable size (Qwen2.5-7B FP16 /
+14B-Q8, not 14B-FP16); and g1's `llama3-8b-1.58` 1-bit baseline folds in as an optional Ollama row. The mechanical merge
+of the g1 and native-low-bit model lists into `phase1c-spike.md` applies when spike 1c runs (Arc 2). Supersedes the
+"Informed, not resolved" 2026-05-18 entry.
+
+#### R5-01 + R5-02 — env-architecture (Option C) + KB hardcoded-paths (Dan decision)
+
+**Decided: implement before the RAG build.** Option C (layered env) was already the recorded decision in
+`docs/specs/2026-05-21-env-architecture-layered.md`; Dan's 2026-06-03 call sequences the implementation **ahead of** the
+v0.6.0 native-RAG build, bundled with the R5-02 hardcoded-paths refactor into a single KB-side packaging PR (author KB
+`pyproject.toml` + `papers_analysis/paths.py`, add the Linus `[kb]` optional extra, bump the submodule pin). Rationale:
+the native RAG can then import KB modules directly via `pip install -e .[kb]` rather than only reading disk artifacts.
+Both stay tracked in top-questions until the PR lands.
+
+#### R2-03 — Dan task suite grader (Dan decision)
+
+**Stays open by choice.** Dan's 2026-06-03 call: defer the grader-strategy decision (exact-match/keyword for factual
+genomics QA vs. LLM-as-judge vs. rubric) to v0.6.0 RAG-build time, when the real ablation questions are in hand. Tracked
+with R5-09.
+
+#### Item 7 — full per-synthesis open-questions sweep
+
+**Deferred.** Sweeping all 27 synthesis bodies' "Open questions for Dan" sections for alignment against the question docs
+is low-value for the token cost: the landscapes and the three question docs are already current (PR #142). Revisit at the
+next quarterly curation review (2026-08-01) if drift is suspected.
 
 ---
 
@@ -111,7 +175,8 @@ current 600s timeout, independent of which synthesis lists it. The existing `doc
 the FP16 baseline (C4) at Qwen2.5-7B or 14B — the 27B failure confirms 14B is the right ceiling rather than a later 27B
 aspiration. The actual reconciliation work — comparing the g1-apple-silicon and native-low-bit synthesis model lists and
 committing the merged list to `phase1c-spike.md` — has not landed. R3-04 stays open; the 27B datapoint should be folded
-into the reconciliation rationale when it lands.
+into the reconciliation rationale when it lands. _(→ RESOLVED 2026-06-03; see
+[2026-06-03 C2 triage resolutions](#c2-triage-resolutions-2026-06-03).)_
 
 #### R3-22. Bonsai Ternary 8B domain-task quality gap measurement
 
