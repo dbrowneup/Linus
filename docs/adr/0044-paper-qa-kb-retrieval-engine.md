@@ -1,6 +1,7 @@
 ## DEC-0044 — paper-qa as Phase 2c KnowledgeBase retrieval-and-synthesis engine
 
-**Date:** 2026-05-06 **Status:** accepted
+**Date:** 2026-05-06 **Status:** accepted (corpus-engine posture superseded by DEC-0062; "few named papers"
+optional-tool use retained)
 
 **Context.** paper-qa (FutureHouse, Apache 2.0, `arXiv:2409.13740`) is the first paper-corpus-shaped tool to earn an
 Integrate verdict in the g8-sci-agents fan-out. It ships four well-scoped tools — `PaperSearch` (tantivy full-text +
